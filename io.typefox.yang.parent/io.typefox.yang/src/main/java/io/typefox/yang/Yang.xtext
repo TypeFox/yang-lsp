@@ -1,0 +1,548 @@
+grammar io.typefox.yang.Yang hidden(WS, ML_COMMENT, SL_COMMENT)
+
+import "http://www.eclipse.org/emf/2002/Ecore" as ecore
+generate yang "http://www.typefox.io/yang/Yang"
+
+YangFile:
+	statements+=Statement*;
+	
+Statement:
+	  Action
+	| Anydata
+	| Anyxml
+	| Argument
+	| Augment
+	| Base
+	| BelongsTo
+	| Bit
+	| Case
+	| Choice
+	| Config
+	| Contact
+	| Container
+	| Default
+	| Description
+	| Enum
+	| ErrorAppTag
+	| ErrorMessage
+	| Extension
+	| Deviation
+	| Deviate
+	| Feature
+	| FractionDigits
+	| Grouping
+	| Identity
+	| IfFeature
+	| Import
+	| Include
+	| Input
+	| Key
+	| Leaf
+	| LeafList
+	| Length
+	| List
+	| Mandatory
+	| MaxElements
+	| MinElements
+	| Module
+	| Must
+	| Namespace
+	| Notification
+	| OrderedBy
+	| Organization
+	| Output
+	| Path
+	| Pattern
+	| Position
+	| Prefix
+	| Presence
+	| Range
+	| Reference
+	| Refine
+	| RequireInstance
+	| Revision
+	| RevisionDate
+	| Rpc
+	| Status
+	| Submodule
+	| Type
+	| Typedef
+	| Unique
+	| Units
+	| Uses
+	| Value
+	| When
+	| YangVersion
+	| YinElement
+;
+
+fragment StatementEnd returns Statement:
+	('{'
+		subStatements+=Statement*
+	'}' | ';')
+;
+
+Node :
+	Module
+;
+
+// 7.1	
+Module:
+	'module' name=Identifier StatementEnd;
+
+// 7.1.2 
+YangVersion : 
+	'yang-version' yangVersion=StringValue StatementEnd;
+
+// 7.1.3
+Namespace : 
+	'namespace' uri=StringValue StatementEnd ;
+
+// 7.1.4
+Prefix : 
+	'prefix' prefix=Identifier StatementEnd ;
+
+// 7.1.5
+Import:
+	'import' module=[Module|Identifier] StatementEnd;
+	
+// 7.1.5.1
+RevisionDate:
+	'revision-date' date=StringValue StatementEnd
+;
+
+// 7.1.6
+Include: 
+	'include' subModule=[Submodule|Identifier] StatementEnd ;
+
+// 7.1.7
+Organization: 
+	'organization' organization=StringValue StatementEnd;
+
+// 7.1.8
+Contact: 
+	'contact' contact=StringValue StatementEnd;
+
+// 7.1.9
+Revision :
+	'revision' revision=StringValue StatementEnd;
+
+// 7.2
+Submodule:
+	'submodule' name=Identifier StatementEnd;
+
+// 7.2.2
+BelongsTo : 
+	'belongs-to' belongsTo=[Module|Identifier] StatementEnd;
+
+// 7.3
+Typedef: 
+	'typedef' name=Identifier StatementEnd;
+	
+// 7.3.3
+Units:
+	'units' definition=StringValue StatementEnd;
+	
+// 7.3.4
+Default:
+	'default' defaultStringValue=StringValue StatementEnd;
+
+// 7.4
+Type:
+	'type' baseType=[Typedef|Identifier] StatementEnd;
+
+// 7.5
+Container:
+	'container' name=Identifier StatementEnd
+;
+
+// 7.5.3
+Must:
+	'must' constraint=Expression StatementEnd
+;
+
+// 7.5.4.1 
+ErrorMessage:
+	'error-message' message=StringValue StatementEnd
+;
+
+// 7.5.4.2
+ErrorAppTag:
+	'error-app-tag' tag=StringValue StatementEnd
+;
+
+// 7.5.5
+Presence :	
+	'presence' description=StringValue StatementEnd
+;
+
+// 7.6
+Leaf :
+	'leaf' name=Identifier StatementEnd 
+;
+
+// 7.6.5
+Mandatory :
+	'mandatory' isMandatory=Identifier StatementEnd
+;
+
+// 7.7
+LeafList:
+	'leaf-list' name=Identifier StatementEnd
+;
+
+// 7.7.5
+MinElements:
+	'min-elements' minElements=StringValue StatementEnd
+;
+
+// 7.7.6
+MaxElements:
+	'may-elements' maxElements=StringValue StatementEnd
+;
+
+// 7.7.7
+OrderedBy:
+	'ordered-by' orderedBy=Identifier StatementEnd
+;
+
+// 7.8
+List:
+	'list' name=Identifier StatementEnd
+;
+
+// 7.8.2
+Key:
+	{Key} 'key' InternalReferences StatementEnd
+;
+
+fragment InternalReferences :
+	ref+=InternalReference |
+	'"' ref+=InternalReference+ '"'
+	"'" ref+=InternalReference+ "'"
+;
+
+InternalReference :
+	leaf=[Leaf|Identifier]
+;
+
+// 7.8.3
+Unique:
+	{Unique} 'unique' InternalReferences StatementEnd
+;
+
+// 7.9
+Choice:
+	'choice' name=Identifier StatementEnd
+;
+
+// 7.9.2
+Case:
+	'case' name=Identifier StatementEnd
+;
+
+// 7.10
+Anydata:
+	'anydata' name=Identifier StatementEnd
+;
+
+// 7.11
+Anyxml:
+	'anyxml' name=Identifier StatementEnd
+;
+
+// 7.12
+Grouping:
+	'grouping' name=Identifier StatementEnd
+;
+
+// 7.13
+Uses:
+	'uses' grouping=[Grouping|QualifiedName] StatementEnd
+;
+
+// 7.13.2
+Refine:
+	'refine' node=[Node|Identifier] StatementEnd
+;
+
+// 7.14
+Rpc:
+	'rpc' name=Identifier StatementEnd
+;
+
+// 7.14.2
+Input:
+	{Input} 'input' StatementEnd
+;
+
+// 7.14.3
+Output:
+	{Output} 'output' StatementEnd
+;
+
+// 7.15
+Action:
+	'action' name=Identifier StatementEnd
+;
+
+// 7.16
+Notification:
+	'notification' name=Identifier StatementEnd
+;
+
+// 7.17
+Augment:
+	'augment' path=SchemaNodeIdentifier StatementEnd
+;
+
+// 7.18
+Identity:
+	'identity' name=Identifier StatementEnd
+;
+
+// 7.18.2
+Base:
+	'base' reference=[Identity| Identifier] StatementEnd
+;
+
+// 7.19
+Extension:
+	'extension' name=Identifier StatementEnd
+;
+
+// 7.19.2
+Argument:
+	'argument' name=StringValue StatementEnd
+;
+
+// 7.19.3
+YinElement:
+	'yin-element' isYinElement=Identifier StatementEnd
+;
+
+// 7.20.1
+Feature:
+	'feature' name=Identifier StatementEnd
+;
+
+// 7.20.2
+IfFeature:
+	'if-feature' condition=Expression StatementEnd
+;
+
+// 7.20.3
+Deviation:
+	'deviation' reference=SchemaNodeIdentifier StatementEnd
+;
+
+// 7.20.3.2
+Deviate:
+	'deviate' argument=StringValue
+;
+
+// Common Statement
+
+// 7.21.1
+Config:
+	'config' isConfig=StringValue StatementEnd
+;
+
+// 7.21.2
+Status:
+	'status' argument=StringValue StatementEnd
+;
+
+// 7.21.3
+Description :
+	'description' description=StringValue StatementEnd;
+
+// 7.21.4
+Reference :
+	'reference' reference=StringValue StatementEnd;
+	
+// 7.21.5
+When :
+	'when' condition=Expression StatementEnd
+;
+
+// 9.2.4 
+Range:
+	'range' range=StringValue StatementEnd
+;
+
+// 9.3.4
+FractionDigits:
+	'fraction-digits' range=StringValue StatementEnd
+;
+
+// 9.4.4
+Length:
+	'length' length=StringValue StatementEnd
+;
+
+// 9.4.5
+Pattern:
+	'pattern' regexp=StringValue StatementEnd
+;
+
+// 9.6.4
+Enum:
+	'enum' name=StringValue StatementEnd
+;
+
+// 9.6.4.2
+Value:
+	'value' value=StringValue StatementEnd
+;
+
+// 9.7.4
+Bit:
+	'bit' name=StringValue StatementEnd
+;
+
+// 9.7.4.2
+Position:
+	'position' position=StringValue StatementEnd
+;
+
+// 9.9.2
+Path:
+	'path' reference=Expression StatementEnd
+;
+
+// 9.9.3
+RequireInstance:
+	'require-instance' isRequireInstance=StringValue StatementEnd
+;
+
+SchemaNodeIdentifier:
+	element+=PathElement |
+	"'" element+=PathElement ('/' element+=PathElement)* "'" |
+	'"' element+=PathElement ('/' element+=PathElement)* '"'
+;
+
+PathElement:
+	node=[Node|Identifier]
+;
+
+Identifier:
+	QualifiedName | YANG_ID | KEYWORD
+;
+
+QualifiedName:
+	YANG_ID ':' YANG_ID
+;
+
+StringValue :
+	STRING | Identifier
+;
+
+KEYWORD :
+	STATEMENT_KEYWORD
+	// other keywords
+	| 'add'
+	| 'current'
+	| 'delete'
+	| 'deprecated'
+	| 'false'
+	| 'max'
+	| 'min'
+	| 'not-supported'
+	| 'obsolete'
+	| 'replace'
+	| 'system'
+	| 'true'
+	| 'unbounded'
+	| 'user'
+;
+
+STATEMENT_KEYWORD :
+	'action'
+| 'anydata'
+| 'anyxml'
+| 'argument'
+| 'augment'
+| 'base'
+| 'belongs-to'
+| 'bit'
+| 'case'
+| 'choice'
+| 'config'
+| 'contact'
+| 'container'
+| 'default'
+| 'description'
+| 'enum'
+| 'error-app-tag'
+| 'error-message'
+| 'extension'
+| 'deviation'
+| 'deviate'
+| 'feature'
+| 'fraction-digits'
+| 'grouping'
+| 'identity'
+| 'if-feature'
+| 'import'
+| 'include'
+| 'input'
+| 'key'
+| 'leaf'
+| 'leaf-list'
+| 'length'
+| 'list'
+| 'mandatory'
+| 'max-elements'
+| 'min-elements'
+| 'module'
+| 'must'
+| 'namespace'
+| 'notification'
+| 'ordered-by'
+| 'organization'
+| 'output'
+| 'path'
+| 'pattern'
+| 'position'
+| 'prefix'
+| 'presence'
+| 'range'
+| 'reference'
+| 'refine'
+| 'require-instance'
+| 'revision'
+| 'revision-date'
+| 'rpc'
+| 'status'
+| 'submodule'
+| 'type'
+| 'typedef'
+| 'unique'
+| 'units'
+| 'uses'
+| 'value'
+| 'when'
+| 'yang-version'
+| 'yin-element'
+;
+
+Expression :
+	'"' value=ID '"' |
+	"'"	value=ID "'" |
+	value=ID
+;
+
+// lexer rules
+
+terminal ID  		: 'an id that occurs in the context of an expression';
+terminal YANG_ID  		: 'same as id, nbut only in outer context';
+terminal STRING : 'an unquoted string';
+terminal QUOTED_STRING	: 'a string';
+
+terminal ML_COMMENT	: '/*' -> '*/';
+terminal SL_COMMENT 	: '//' !('\n'|'\r')* ('\r'? '\n')?;
+
+terminal WS			: (' '|'\t'|'\r'|'\n')+;
+
+terminal ANY_OTHER: .;
