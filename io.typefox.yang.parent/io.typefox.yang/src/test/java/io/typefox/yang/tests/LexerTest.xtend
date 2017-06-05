@@ -22,11 +22,13 @@ class LexerTest {
 	@Test def void testExpressionString() {
 		val l = lexer.get
 		l.charStream = new ANTLRStringStream('''
-			when "./foo[x = \"holla\"] and myFunction(23.4, .5 + (.45 div 23))";
+			when "./foo[x = \"holla\"] "
+				+ /* test */ 
+				"and myFunction(23.4, .5 + (.45 div 23))";
 		''')
 		l.assertNextToken(When,'when')
 		l.assertNextToken(RULE_WS,' ')
-		l.assertNextToken(QuotationMark,'"')
+		l.assertNextToken(RULE_HIDDEN,'"')
 		l.assertNextToken(FullStop,'.')
 		l.assertNextToken(Solidus,'/')
 		l.assertNextToken(RULE_ID,'foo')
@@ -38,6 +40,10 @@ class LexerTest {
 		l.assertNextToken(RULE_STRING,'\\\"holla\\\"')
 		l.assertNextToken(RightSquareBracket,']')
 		l.assertNextToken(RULE_WS,' ')
+		l.assertNextToken(RULE_HIDDEN,'''
+			"
+				+ /* test */ 
+				"''')
 		l.assertNextToken(RULE_OPERATOR,'and')
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(RULE_ID,'myFunction')
@@ -57,7 +63,7 @@ class LexerTest {
 		l.assertNextToken(RULE_NUMBER,'23')
 		l.assertNextToken(RightParenthesis,')')
 		l.assertNextToken(RightParenthesis,')')
-		l.assertNextToken(QuotationMark,'"')
+		l.assertNextToken(RULE_HIDDEN,'"')
 		l.assertNextToken(Semicolon,';')
 	}
 	
@@ -89,9 +95,9 @@ class LexerTest {
 		l.assertNextToken(RULE_WS, '\n  ')
 		l.assertNextToken(Path, 'path')
 		l.assertNextToken(RULE_WS, ' ')
-		l.assertNextToken(QuotationMark, '"')
+		l.assertNextToken(RULE_HIDDEN, '"')
 		l.assertNextToken(RULE_ID, 'module')
-		l.assertNextToken(QuotationMark, '"')
+		l.assertNextToken(RULE_HIDDEN, '"')
 		l.assertNextToken(RULE_WS, '\n')
 		l.assertNextToken(RightCurlyBracket, '}')
 	}

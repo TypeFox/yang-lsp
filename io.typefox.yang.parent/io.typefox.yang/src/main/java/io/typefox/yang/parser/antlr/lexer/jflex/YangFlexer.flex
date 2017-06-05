@@ -87,6 +87,8 @@ NUMBER= [0-9]+ ("." [0-9]+)? | "." [0-9]+
 
 OPERATOR= "and" | "or" | "mod" | "div" | "*" | "|" | "+" | "-" | "=" | "!=" | "<" | "<=" | ">" | ">="
 
+STRING_CONCAT= \" ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | {SL_COMMENT})* \"
+
 %s AWAITING_EXPRESSION, IN_EXPRESSION_STRING
 %s COLON_EXPECTED, ID_EXPECTED
 %s BLACK_BOX_STRING
@@ -112,16 +114,16 @@ OPERATOR= "and" | "or" | "mod" | "div" | "*" | "|" | "+" | "-" | "=" | "!=" | "<
 <AWAITING_EXPRESSION> {
 	{ML_COMMENT} { return RULE_ML_COMMENT; }
 	{SL_COMMENT} { return RULE_SL_COMMENT; }
-	\" {yybegin(IN_EXPRESSION_STRING); return QuotationMark;}
+	\" {yybegin(IN_EXPRESSION_STRING); return RULE_HIDDEN;}
 	{ID} { yybegin(YYINITIAL); return RULE_ID; }
 }
 
 <IN_EXPRESSION_STRING> {
 	{SINGLE_QUOTED_STRING} { return RULE_STRING; }
 	{ESCAPED_DQ_STRING}    { return RULE_STRING; }
-	{OPERATOR} { return RULE_OPERATOR; }
-	{ID}       { return RULE_ID; }
-	{NUMBER}   { return RULE_NUMBER; }
+	{OPERATOR}  { return RULE_OPERATOR; }
+	{ID}        { return RULE_ID; }
+	{NUMBER}    { return RULE_NUMBER; }
 	":"         { return Colon; }
 	"("         { return LeftParenthesis; }
 	")"         { return RightParenthesis; }
@@ -131,8 +133,9 @@ OPERATOR= "and" | "or" | "mod" | "div" | "*" | "|" | "+" | "-" | "=" | "!=" | "<
 	".."        { return FullStopFullStop; }
 	"/"         { return Solidus; }
 	","         { return Comma; }
-	
-	\"         {yybegin(YYINITIAL); return QuotationMark;}
+
+	{STRING_CONCAT} { return RULE_HIDDEN; }
+	\"              { yybegin(YYINITIAL); return RULE_HIDDEN; }
 }
 
 <YYINITIAL> {
