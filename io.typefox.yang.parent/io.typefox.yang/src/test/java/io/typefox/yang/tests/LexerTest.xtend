@@ -18,6 +18,19 @@ import static org.junit.Assert.*
 class LexerTest {
 
 	@Inject Provider<JFlexBasedInternalYangLexer> lexer
+	
+	@Test def void testCustomStatement() {
+		val l = lexer.get
+		l.charStream = new ANTLRStringStream('''
+			foo:bar 'holz';
+		''')
+		l.assertNextToken(RULE_ID,'foo')
+		l.assertNextToken(Colon,':')
+		l.assertNextToken(RULE_ID,'bar')
+		l.assertNextToken(RULE_WS,' ')
+		l.assertNextToken(RULE_STRING,"'holz'")
+		l.assertNextToken(Semicolon,';')
+	}
 
 	@Test def void testLexer() {
 		val l = lexer.get
@@ -42,14 +55,14 @@ class LexerTest {
 	}
 	
 	
-	@Test def void test_DoubleQuotedID() {
+	@Test def void test_DoubleQuotedString() {
 		val l = lexer.get
 		l.charStream = new ANTLRStringStream('''
 			module "foo"
 		''')
 		l.assertNextToken(Module, 'module')
 		l.assertNextToken(RULE_WS, ' ')
-		l.assertNextToken(RULE_YANG_ID, '"foo"')
+		l.assertNextToken(RULE_STRING, '"foo"')
 	}
 	
 	@Test def void test_SingleQuotedString() {
@@ -59,7 +72,7 @@ class LexerTest {
 		''')
 		l.assertNextToken(Module, 'module')
 		l.assertNextToken(RULE_WS, ' ')
-		l.assertNextToken(RULE_YANG_ID, "'foo-bar42'")
+		l.assertNextToken(RULE_STRING, "'foo-bar42'")
 	}
 	
 	

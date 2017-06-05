@@ -77,17 +77,32 @@ ML_COMMENT="/*" ~"*/"
 SL_COMMENT="/""/"[^\r\n]*(\r?\n)?
 
 ID= [a-zA-Z] [a-zA-Z0-9_\.\-]*
-SINGLE_QUOTED_ID= "'" {ID} "'"?
-DOUBLE_QUOTED_ID= \" {ID} \"?
 
 STRING=[^\ \n\r\t\{\}\;\'\"]+
 SINGLE_QUOTED_STRING= "'" [^']* "'"?
 DOUBLE_QUOTED_STRING= \" ([^\\\"]|\\.)* \"?
 
 %s AWAITING_EXPRESSION, IN_EXPRESSION_STRING
+%s COLON_EXPECTED, ID_EXPECTED
+%s BLACK_BOX_STRING
 
 %%
 
+<COLON_EXPECTED> {
+	\: {yybegin(ID_EXPECTED); return Colon;}
+}
+<ID_EXPECTED> {
+	{ID} {yybegin(BLACK_BOX_STRING); return RULE_ID;}
+}
+
+<BLACK_BOX_STRING> {
+	{STRING} { return RULE_STRING; }	
+	{SINGLE_QUOTED_STRING} { return RULE_STRING; }
+	{DOUBLE_QUOTED_STRING} { return RULE_STRING; }
+	
+	{ML_COMMENT} { return RULE_ML_COMMENT; }
+	{SL_COMMENT} { return RULE_SL_COMMENT; }
+}
 
 <AWAITING_EXPRESSION> {
 	{ML_COMMENT} { return RULE_ML_COMMENT; }
@@ -97,92 +112,85 @@ DOUBLE_QUOTED_STRING= \" ([^\\\"]|\\.)* \"?
 }
 
 <IN_EXPRESSION_STRING> {
+	{SINGLE_QUOTED_STRING} { return RULE_STRING; }
 	\" {yybegin(YYINITIAL); return QuotationMark;}
 	{ID} { return RULE_ID; }
 }
 
 <YYINITIAL> {
-"action"                  {return Action; }
-"anydata"                 {return Anydata; }
-"anyxml"                  {return Anyxml; }
-"argument"                {return Argument; }
-"augment"                 {return Augment; }
-"base"                    {return Base; }
-"belongs-to"              {return BelongsTo; }
-"bit"                     {return Bit; }
-"case"                    {return Case; }
-"choice"                  {return Choice; }
-"config"                  {return Config; }
-"contact"                 {return Contact; }
-"container"               {return Container; }
- "default"                {return Default; }
- "description"            {return Description; }
- "enum"                   {return Enum; }
- "error-app-tag"          {return ErrorAppTag; }
- "error-message"          {return ErrorMessage; }
- "extension"              {return Extension; }
+"action"                  {yybegin(BLACK_BOX_STRING); return Action; }
+"anydata"                 {yybegin(BLACK_BOX_STRING); return Anydata; }
+"anyxml"                  {yybegin(BLACK_BOX_STRING); return Anyxml; }
+"argument"                {yybegin(BLACK_BOX_STRING); return Argument; }
+"augment"                 {yybegin(BLACK_BOX_STRING); return Augment; }
+"base"                    {yybegin(BLACK_BOX_STRING); return Base; }
+"belongs-to"              {yybegin(BLACK_BOX_STRING); return BelongsTo; }
+"bit"                     {yybegin(BLACK_BOX_STRING); return Bit; }
+"case"                    {yybegin(BLACK_BOX_STRING); return Case; }
+"choice"                  {yybegin(BLACK_BOX_STRING); return Choice; }
+"config"                  {yybegin(BLACK_BOX_STRING); return Config; }
+"contact"                 {yybegin(BLACK_BOX_STRING); return Contact; }
+"container"               {yybegin(BLACK_BOX_STRING); return Container; }
+ "default"                {yybegin(BLACK_BOX_STRING); return Default; }
+ "description"            {yybegin(BLACK_BOX_STRING); return Description; }
+ "enum"                   {yybegin(BLACK_BOX_STRING); return Enum; }
+ "error-app-tag"          {yybegin(BLACK_BOX_STRING); return ErrorAppTag; }
+ "error-message"          {yybegin(BLACK_BOX_STRING); return ErrorMessage; }
+ "extension"              {yybegin(BLACK_BOX_STRING); return Extension; }
  "deviation"              {yybegin(AWAITING_EXPRESSION); return Deviation; }
- "deviate"                {return Deviate; }
- "feature"                {return Feature; }
- "fraction-digits"        {return FractionDigits; }
- "grouping"               {return Grouping; }
- "identity"               {return Identity; }
+ "deviate"                {yybegin(BLACK_BOX_STRING); return Deviate; }
+ "feature"                {yybegin(BLACK_BOX_STRING); return Feature; }
+ "fraction-digits"        {yybegin(BLACK_BOX_STRING); return FractionDigits; }
+ "grouping"               {yybegin(BLACK_BOX_STRING); return Grouping; }
+ "identity"               {yybegin(BLACK_BOX_STRING); return Identity; }
  "if-feature"             {yybegin(AWAITING_EXPRESSION); return IfFeature; }
- "import"                 {return Import; }
- "include"                {return Include; }
- "input"                  {return Input; }
+ "import"                 {yybegin(BLACK_BOX_STRING); return Import; }
+ "include"                {yybegin(BLACK_BOX_STRING); return Include; }
+ "input"                  {yybegin(BLACK_BOX_STRING); return Input; }
  "key"                    {yybegin(AWAITING_EXPRESSION); return Key; }
- "leaf"                   {return Leaf; }
- "leaf-list"              {return LeafList; }
- "length"                 {return Length; }
- "list"                   {return List; }
- "mandatory"              {return Mandatory; }
- "max-elements"           {return MaxElements; }
- "min-elements"           {return MinElements; }
- "module"                 {return Module; }
+ "leaf"                   {yybegin(BLACK_BOX_STRING); return Leaf; }
+ "leaf-list"              {yybegin(BLACK_BOX_STRING); return LeafList; }
+ "length"                 {yybegin(BLACK_BOX_STRING); return Length; }
+ "list"                   {yybegin(BLACK_BOX_STRING); return List; }
+ "mandatory"              {yybegin(BLACK_BOX_STRING); return Mandatory; }
+ "max-elements"           {yybegin(BLACK_BOX_STRING); return MaxElements; }
+ "min-elements"           {yybegin(BLACK_BOX_STRING); return MinElements; }
+ "module"                 {yybegin(BLACK_BOX_STRING); return Module; }
  "must"                   {yybegin(AWAITING_EXPRESSION); return Must; }
- "namespace"              {return Namespace; }
- "notification"           {return Notification; }
- "ordered-by"             {return OrderedBy; }
- "organization"           {return Organization; }
- "output"                 {return Output; }
+ "namespace"              {yybegin(BLACK_BOX_STRING); return Namespace; }
+ "notification"           {yybegin(BLACK_BOX_STRING); return Notification; }
+ "ordered-by"             {yybegin(BLACK_BOX_STRING); return OrderedBy; }
+ "organization"           {yybegin(BLACK_BOX_STRING); return Organization; }
+ "output"                 {yybegin(BLACK_BOX_STRING); return Output; }
  "path"                   {yybegin(AWAITING_EXPRESSION); return Path; }
- "pattern"                {return Pattern; }
- "position"               {return Position; }
- "prefix"                 {return Prefix; }
- "presence"               {return Presence; }
- "range"                  {return Range; }
- "reference"              {return Reference; }
- "refine"                 {return Refine; }
- "require-instance"       {return RequireInstance; }
- "revision"               {return Revision; }
- "revision-date"          {return RevisionDate; }
- "rpc"                    {return Rpc; }
- "status"                 {return Status; }
- "submodule"              {return Submodule; }
- "type"                   {return Type; }
- "typedef"                {return Typedef; }
+ "pattern"                {yybegin(BLACK_BOX_STRING); return Pattern; }
+ "position"               {yybegin(BLACK_BOX_STRING); return Position; }
+ "prefix"                 {yybegin(BLACK_BOX_STRING); return Prefix; }
+ "presence"               {yybegin(BLACK_BOX_STRING); return Presence; }
+ "range"                  {yybegin(BLACK_BOX_STRING); return Range; }
+ "reference"              {yybegin(BLACK_BOX_STRING); return Reference; }
+ "refine"                 {yybegin(BLACK_BOX_STRING); return Refine; }
+ "require-instance"       {yybegin(BLACK_BOX_STRING); return RequireInstance; }
+ "revision"               {yybegin(BLACK_BOX_STRING); return Revision; }
+ "revision-date"          {yybegin(BLACK_BOX_STRING); return RevisionDate; }
+ "rpc"                    {yybegin(BLACK_BOX_STRING); return Rpc; }
+ "status"                 {yybegin(BLACK_BOX_STRING); return Status; }
+ "submodule"              {yybegin(BLACK_BOX_STRING); return Submodule; }
+ "type"                   {yybegin(BLACK_BOX_STRING); return Type; }
+ "typedef"                {yybegin(BLACK_BOX_STRING); return Typedef; }
  "unique"                 {yybegin(AWAITING_EXPRESSION); return Unique; }
- "units"                  {return Units; }
- "uses"                   {return Uses; }
- "value"                  {return Value; }
- "when"                   {return When; }
- "yang-version"           {return YangVersion; }
- "yin-element"            {return YinElement; }
-	
-	{ID} { yybegin(YYINITIAL); return RULE_YANG_ID; }
-	{STRING} { return RULE_STRING; }	
-		
-	{SINGLE_QUOTED_ID} { return RULE_YANG_ID; }
-	{SINGLE_QUOTED_STRING} { return RULE_STRING; }
-	
-	{DOUBLE_QUOTED_ID} { return RULE_YANG_ID; }
-	{DOUBLE_QUOTED_STRING} { return RULE_STRING; }	
+ "units"                  {yybegin(BLACK_BOX_STRING); return Units; }
+ "uses"                   {yybegin(BLACK_BOX_STRING); return Uses; }
+ "value"                  {yybegin(BLACK_BOX_STRING); return Value; }
+ "when"                   {yybegin(BLACK_BOX_STRING); return When; }
+ "yang-version"           {yybegin(BLACK_BOX_STRING); return YangVersion; }
+ "yin-element"            {yybegin(BLACK_BOX_STRING); return YinElement; }
+{ID}                      { yybegin(COLON_EXPECTED);  return RULE_ID; }
 	
 	{ML_COMMENT} { return RULE_ML_COMMENT; }
 	{SL_COMMENT} { return RULE_SL_COMMENT; }
 }
-\; { return Semicolon; }
-\{ { return LeftCurlyBracket; }
-\} { return RightCurlyBracket; }
+\; { yybegin(YYINITIAL); return Semicolon; }
+\{ { yybegin(YYINITIAL); return LeftCurlyBracket; }
+\} { yybegin(YYINITIAL); return RightCurlyBracket; }
 {WS} { return RULE_WS; }

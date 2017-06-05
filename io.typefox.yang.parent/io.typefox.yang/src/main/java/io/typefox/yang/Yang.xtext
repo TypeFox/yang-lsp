@@ -1,4 +1,4 @@
-grammar io.typefox.yang.Yang hidden(WS, ML_COMMENT, SL_COMMENT)
+grammar io.typefox.yang.Yang hidden(WS, ML_COMMENT, SL_COMMENT, HIDDEN)
 
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 generate yang "http://www.typefox.io/yang/Yang"
@@ -6,48 +6,70 @@ generate yang "http://www.typefox.io/yang/Yang"
 YangFile:
 	statements+=Statement*;
 	
+fragment StatementEnd returns Statement:
+	('{'
+		subStatements+=Statement*
+	'}' | ';')
+;
+
 Statement:
+	  SchemaNode | 
+	  OtherStatement
+;
+
+
+SchemaNode :
+	DataSchemaNode |
+	Extension |
+	Feature |
+	Grouping |
+	Identity |
+	Notification  |
+	Rpc |
+	Typedef |
+	Unknown
+;
+
+DataSchemaNode :
+	Anyxml |
+	Container |
+	Choice |
+	Case |
+	List |
+	Leaf |
+	LeafList
+;
+
+OtherStatement :
 	  Action
 	| Anydata
-	| Anyxml
 	| Argument
 	| Augment
 	| Base
 	| BelongsTo
 	| Bit
-	| Case
-	| Choice
 	| Config
 	| Contact
-	| Container
 	| Default
 	| Description
 	| Enum
 	| ErrorAppTag
 	| ErrorMessage
-	| Extension
 	| Deviation
 	| Deviate
-	| Feature
 	| FractionDigits
-	| Grouping
-	| Identity
 	| IfFeature
 	| Import
 	| Include
 	| Input
 	| Key
-	| Leaf
-	| LeafList
 	| Length
-	| List
 	| Mandatory
 	| MaxElements
 	| MinElements
 	| Module
 	| Must
 	| Namespace
-	| Notification
 	| OrderedBy
 	| Organization
 	| Output
@@ -62,11 +84,9 @@ Statement:
 	| RequireInstance
 	| Revision
 	| RevisionDate
-	| Rpc
 	| Status
 	| Submodule
 	| Type
-	| Typedef
 	| Unique
 	| Units
 	| Uses
@@ -74,16 +94,6 @@ Statement:
 	| When
 	| YangVersion
 	| YinElement
-;
-
-fragment StatementEnd returns Statement:
-	('{'
-		subStatements+=Statement*
-	'}' | ';')
-;
-
-Node :
-	Module
 ;
 
 // 7.1	
@@ -213,22 +223,18 @@ List:
 
 // 7.8.2
 Key:
-	{Key} 'key' InternalReferences StatementEnd
+	{Key} 'key' DescendantSchemaNodeIdentifierReferences StatementEnd
 ;
 
-fragment InternalReferences :
-	ref+=InternalReference |
-	'"' ref+=InternalReference+ '"'
-	"'" ref+=InternalReference+ "'"
-;
-
-InternalReference :
-	leaf=[Leaf|Identifier]
+fragment DescendantSchemaNodeIdentifierReferences :
+	references+=DescendantSchemaNodeIdentifier |
+	'"' references+=DescendantSchemaNodeIdentifier+ '"'
+	"'" references+=DescendantSchemaNodeIdentifier+ "'"
 ;
 
 // 7.8.3
 Unique:
-	{Unique} 'unique' InternalReferences StatementEnd
+	{Unique} 'unique' DescendantSchemaNodeIdentifierReferences StatementEnd
 ;
 
 // 7.9
@@ -258,12 +264,12 @@ Grouping:
 
 // 7.13
 Uses:
-	'uses' grouping=[Grouping|QualifiedName] StatementEnd
+	'uses' grouping=IdentifierRef StatementEnd
 ;
 
 // 7.13.2
 Refine:
-	'refine' node=[Node|Identifier] StatementEnd
+	'refine' node=DescendantSchemaNodeIdentifier StatementEnd
 ;
 
 // 7.14
@@ -416,26 +422,54 @@ RequireInstance:
 	'require-instance' isRequireInstance=StringValue StatementEnd
 ;
 
-SchemaNodeIdentifier:
-	element+=PathElement |
-	"'" element+=PathElement ('/' element+=PathElement)* "'" |
-	'"' element+=PathElement ('/' element+=PathElement)* '"'
+Unknown:
+	prefix=[Prefix|ID] ':' node=[Extension|ID] name=StringValue? StatementEnd 
 ;
 
-PathElement:
-	node=[Node|Identifier]
+SchemaNodeIdentifier:
+	AbsoluteSchemaNodeIdentifier |
+	DescendantSchemaNodeIdentifier 
 ;
+
+AbsoluteSchemaNodeIdentifier:
+	('/' elements+=IdentifierRef)+
+;
+
+DescendantSchemaNodeIdentifier:
+	elements+=IdentifierRef ('/' elements+=IdentifierRef)*
+;
+
+IdentifierRef:
+	(prefix=[Prefix|Identifier] ':')? node=[SchemaNode|Identifier]
+;
+
+PredicatedIdentifierRef:
+	IdentifierRef ({PredicatedIdentifierRef.ref=current} '[' predicate=Predicate ']')*
+;
+
+Predicate:
+	left=(IdentifierRef|ThisLeafRef) '=' value=STRING
+	| value = POSITIVE_INTEGER_VALUE
+;
+
+ThisLeafRef:
+	{ThisLeafRef} '.'
+;
+
+InstanceIdentifier :
+	('/' elements+=PredicatedIdentifierRef)+
+;
+
+// Leafref path
+
+
 
 Identifier:
-	QualifiedName | YANG_ID | KEYWORD
-;
-
-QualifiedName:
-	YANG_ID ':' YANG_ID
+	STRING
 ;
 
 StringValue :
-	STRING | Identifier
+	STRING
 ;
 
 KEYWORD :
@@ -535,14 +569,14 @@ Expression :
 
 // lexer rules
 
-terminal ID  		: 'an id that occurs in the context of an expression';
-terminal YANG_ID  		: 'same as id, nbut only in outer context';
+terminal ID  		: 'an id';
 terminal STRING : 'an unquoted string';
-terminal QUOTED_STRING	: 'a string';
+terminal POSITIVE_INTEGER_VALUE : 'positive integer value';
 
 terminal ML_COMMENT	: '/*' -> '*/';
 terminal SL_COMMENT 	: '//' !('\n'|'\r')* ('\r'? '\n')?;
 
 terminal WS			: (' '|'\t'|'\r'|'\n')+;
+terminal HIDDEN : 'other hidden tokens';
 
 terminal ANY_OTHER: .;

@@ -22,6 +22,13 @@ class YangParsingTest {
 
 	@Inject extension ParseHelper<YangFile> parser
 	@Inject ValidationTestHelper helper
+	
+	@Test def void testCustom() {
+		val model = '''
+			foo:bar 43tg3g3;
+		'''.parse
+		helper.assertNoErrors(model, Diagnostic.SYNTAX_DIAGNOSTIC)
+	}
 
 	@Test def void testParse() {
 		val model = '''
@@ -56,7 +63,9 @@ class YangParsingTest {
 			         description "Initial revision.";
 			       }
 			
-			       // definitions follow...
+			       my:custom rule {
+			       		other:strange rf3-4.5345we2;
+			       }
 			     }
 		'''.parse
 		helper.assertNoErrors(model, Diagnostic.SYNTAX_DIAGNOSTIC)
@@ -66,16 +75,16 @@ class YangParsingTest {
 		    cref Statement statements [
 		        0: Module {
 		            cref Statement subStatements [
-		                0: YangVersion {
+		                0 : YangVersion {
 		                    attr EString yangVersion '1.1'
 		                }
-		                1: Namespace {
+		                1 : Namespace {
 		                    attr EString uri '"urn:example:system"'
 		                }
-		                2: Prefix {
+		                2 : Prefix {
 		                    attr EString prefix '"sys"'
 		                }
-		                3: Import {
+		                3 : Import {
 		                    cref Statement subStatements [
 		                        0: Prefix {
 		                            attr EString prefix '"yang"'
@@ -86,13 +95,13 @@ class YangParsingTest {
 		                    ]
 		                    ref Module module ref: Module@(unresolved proxy __synthetic0.yang#|0)
 		                }
-		                4: Include {
+		                4 : Include {
 		                    ref Submodule subModule ref: Submodule@(unresolved proxy __synthetic0.yang#|1)
 		                }
-		                5: Organization {
+		                5 : Organization {
 		                    attr EString organization '"Example Inc."'
 		                }
-		                6: Contact {
+		                6 : Contact {
 		                    attr EString contact '"Joe L. User
 		
 		          Example Inc.
@@ -103,16 +112,28 @@ class YangParsingTest {
 		          Phone: +1 800 555 0100
 		          EMail: joe@example.com"'
 		                }
-		                7: Description {
+		                7 : Description {
 		                    attr EString description '"The module for entities implementing the Example system."'
 		                }
-		                8: Revision {
+		                8 : Revision {
 		                    cref Statement subStatements [
 		                        0: Description {
 		                            attr EString description '"Initial revision."'
 		                        }
 		                    ]
 		                    attr EString revision '2007-06-09'
+		                }
+		                9 : Unknown {
+		                    cref Statement subStatements [
+		                        0: Unknown {
+		                            attr EString name 'rf3-4.5345we2'
+		                            ref Prefix prefix ref: Prefix@(unresolved proxy __synthetic0.yang#|4)
+		                            ref Extension node ref: Extension@(unresolved proxy __synthetic0.yang#|5)
+		                        }
+		                    ]
+		                    attr EString name 'rule'
+		                    ref Prefix prefix ref: Prefix@(unresolved proxy __synthetic0.yang#|2)
+		                    ref Extension node ref: Extension@(unresolved proxy __synthetic0.yang#|3)
 		                }
 		            ]
 		            attr EString name 'example-system'
