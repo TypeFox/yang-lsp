@@ -87,9 +87,9 @@ NUMBER= [0-9]+ ("." [0-9]+)? | "." [0-9]+
 
 OPERATOR= "and" | "or" | "mod" | "div" | "*" | "|" | "+" | "-" | "=" | "!=" | "<" | "<=" | ">" | ">="
 
-STRING_CONCAT= \" ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | {SL_COMMENT})* \"
+STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | {SL_COMMENT})*
 
-%s AWAITING_EXPRESSION, IN_EXPRESSION_STRING
+%s EXPRESSION, IN_EXPRESSION_STRING, IN_SQ_EXPRESSION_STRING
 %s COLON_EXPECTED, ID_EXPECTED
 %s BLACK_BOX_STRING
 
@@ -111,11 +111,23 @@ STRING_CONCAT= \" ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT}
 	{SL_COMMENT} { return RULE_SL_COMMENT; }
 }
 
-<AWAITING_EXPRESSION> {
+<EXPRESSION> {
 	{ML_COMMENT} { return RULE_ML_COMMENT; }
 	{SL_COMMENT} { return RULE_SL_COMMENT; }
-	\" {yybegin(IN_EXPRESSION_STRING); return RULE_HIDDEN;}
-	{ID} { yybegin(YYINITIAL); return RULE_ID; }
+	\"          {yybegin(IN_EXPRESSION_STRING); return RULE_HIDDEN;}
+	"'"         {yybegin(IN_SQ_EXPRESSION_STRING); return RULE_HIDDEN;}
+	{OPERATOR}  { return RULE_OPERATOR; }
+	{ID}        { return RULE_ID; }
+	{NUMBER}    { return RULE_NUMBER; }
+	":"         { return Colon; }
+	"("         { return LeftParenthesis; }
+	")"         { return RightParenthesis; }
+	"["         { return LeftSquareBracket; }
+	"]"         { return RightSquareBracket; }
+	"."         { return FullStop; }
+	".."        { return FullStopFullStop; }
+	"/"         { return Solidus; }
+	","         { return Comma; }
 }
 
 <IN_EXPRESSION_STRING> {
@@ -134,8 +146,27 @@ STRING_CONCAT= \" ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT}
 	"/"         { return Solidus; }
 	","         { return Comma; }
 
-	{STRING_CONCAT} { return RULE_HIDDEN; }
-	\"              { yybegin(YYINITIAL); return RULE_HIDDEN; }
+	\" {STRING_CONCAT} { yybegin(EXPRESSION); return RULE_HIDDEN; }
+	\"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
+}
+
+<IN_SQ_EXPRESSION_STRING> {
+	{DOUBLE_QUOTED_STRING}    { return RULE_STRING; }
+	{OPERATOR}  { return RULE_OPERATOR; }
+	{ID}        { return RULE_ID; }
+	{NUMBER}    { return RULE_NUMBER; }
+	":"         { return Colon; }
+	"("         { return LeftParenthesis; }
+	")"         { return RightParenthesis; }
+	"["         { return LeftSquareBracket; }
+	"]"         { return RightSquareBracket; }
+	"."         { return FullStop; }
+	".."        { return FullStopFullStop; }
+	"/"         { return Solidus; }
+	","         { return Comma; }
+
+	"'" {STRING_CONCAT} { yybegin(EXPRESSION); return RULE_HIDDEN; }
+	"'"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
 }
 
 <YYINITIAL> {
@@ -158,17 +189,17 @@ STRING_CONCAT= \" ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT}
  "error-app-tag"          {yybegin(BLACK_BOX_STRING); return ErrorAppTag; }
  "error-message"          {yybegin(BLACK_BOX_STRING); return ErrorMessage; }
  "extension"              {yybegin(BLACK_BOX_STRING); return Extension; }
- "deviation"              {yybegin(AWAITING_EXPRESSION); return Deviation; }
+ "deviation"              {yybegin(EXPRESSION); return Deviation; }
  "deviate"                {yybegin(BLACK_BOX_STRING); return Deviate; }
  "feature"                {yybegin(BLACK_BOX_STRING); return Feature; }
  "fraction-digits"        {yybegin(BLACK_BOX_STRING); return FractionDigits; }
  "grouping"               {yybegin(BLACK_BOX_STRING); return Grouping; }
  "identity"               {yybegin(BLACK_BOX_STRING); return Identity; }
- "if-feature"             {yybegin(AWAITING_EXPRESSION); return IfFeature; }
+ "if-feature"             {yybegin(EXPRESSION); return IfFeature; }
  "import"                 {yybegin(BLACK_BOX_STRING); return Import; }
  "include"                {yybegin(BLACK_BOX_STRING); return Include; }
  "input"                  {yybegin(BLACK_BOX_STRING); return Input; }
- "key"                    {yybegin(AWAITING_EXPRESSION); return Key; }
+ "key"                    {yybegin(EXPRESSION); return Key; }
  "leaf"                   {yybegin(BLACK_BOX_STRING); return Leaf; }
  "leaf-list"              {yybegin(BLACK_BOX_STRING); return LeafList; }
  "length"                 {yybegin(BLACK_BOX_STRING); return Length; }
@@ -177,13 +208,13 @@ STRING_CONCAT= \" ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT}
  "max-elements"           {yybegin(BLACK_BOX_STRING); return MaxElements; }
  "min-elements"           {yybegin(BLACK_BOX_STRING); return MinElements; }
  "module"                 {yybegin(BLACK_BOX_STRING); return Module; }
- "must"                   {yybegin(AWAITING_EXPRESSION); return Must; }
+ "must"                   {yybegin(EXPRESSION); return Must; }
  "namespace"              {yybegin(BLACK_BOX_STRING); return Namespace; }
  "notification"           {yybegin(BLACK_BOX_STRING); return Notification; }
  "ordered-by"             {yybegin(BLACK_BOX_STRING); return OrderedBy; }
  "organization"           {yybegin(BLACK_BOX_STRING); return Organization; }
  "output"                 {yybegin(BLACK_BOX_STRING); return Output; }
- "path"                   {yybegin(AWAITING_EXPRESSION); return Path; }
+ "path"                   {yybegin(EXPRESSION); return Path; }
  "pattern"                {yybegin(BLACK_BOX_STRING); return Pattern; }
  "position"               {yybegin(BLACK_BOX_STRING); return Position; }
  "prefix"                 {yybegin(BLACK_BOX_STRING); return Prefix; }
@@ -199,11 +230,11 @@ STRING_CONCAT= \" ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT}
  "submodule"              {yybegin(BLACK_BOX_STRING); return Submodule; }
  "type"                   {yybegin(BLACK_BOX_STRING); return Type; }
  "typedef"                {yybegin(BLACK_BOX_STRING); return Typedef; }
- "unique"                 {yybegin(AWAITING_EXPRESSION); return Unique; }
+ "unique"                 {yybegin(EXPRESSION); return Unique; }
  "units"                  {yybegin(BLACK_BOX_STRING); return Units; }
  "uses"                   {yybegin(BLACK_BOX_STRING); return Uses; }
  "value"                  {yybegin(BLACK_BOX_STRING); return Value; }
- "when"                   {yybegin(AWAITING_EXPRESSION); return When; }
+ "when"                   {yybegin(EXPRESSION); return When; }
  "yang-version"           {yybegin(BLACK_BOX_STRING); return YangVersion; }
  "yin-element"            {yybegin(BLACK_BOX_STRING); return YinElement; }
 {ID}                      { yybegin(COLON_EXPECTED);  return RULE_ID; }
