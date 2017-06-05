@@ -449,7 +449,7 @@ PredicatedIdentifierRef:
 
 Predicate:
 	left=(IdentifierRef|ThisLeafRef) '=' value=STRING
-	| value = POSITIVE_INTEGER_VALUE
+	| value = NUMBER
 ;
 
 ThisLeafRef:
@@ -564,14 +564,16 @@ STATEMENT_KEYWORD :
 Expression :
 	'"' value=ID '"' |
 	"'"	value=ID "'" |
-	value=ID
+	value=ID |
+	'(' Expression (',' '/' '.' '..')?')'
 ;
 
 // lexer rules
 
-terminal ID  		: 'an id';
-terminal STRING : 'an unquoted string';
-terminal POSITIVE_INTEGER_VALUE : 'positive integer value';
+terminal ID       : 'an id';
+terminal STRING   : 'an unquoted string';
+terminal NUMBER   : 'positive integer value';
+terminal OPERATOR : 'and' | 'or' | 'mod' | 'div' | '*' | '/' | '//' | '|' | '+' | '-' | '=' | '!=' | '<' | '<=' | '>' | '>=';
 
 terminal ML_COMMENT	: '/*' -> '*/';
 terminal SL_COMMENT 	: '//' !('\n'|'\r')* ('\r'? '\n')?;

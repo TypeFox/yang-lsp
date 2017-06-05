@@ -81,6 +81,11 @@ ID= [a-zA-Z] [a-zA-Z0-9_\.\-]*
 STRING=[^\ \n\r\t\{\}\;\'\"]+
 SINGLE_QUOTED_STRING= "'" [^']* "'"?
 DOUBLE_QUOTED_STRING= \" ([^\\\"]|\\.)* \"?
+ESCAPED_DQ_STRING= \\\" [^\\\"]* \\\"?
+
+NUMBER= [0-9]+ ("." [0-9]+)? | "." [0-9]+ 
+
+OPERATOR= "and" | "or" | "mod" | "div" | "*" | "|" | "+" | "-" | "=" | "!=" | "<" | "<=" | ">" | ">="
 
 %s AWAITING_EXPRESSION, IN_EXPRESSION_STRING
 %s COLON_EXPECTED, ID_EXPECTED
@@ -113,8 +118,21 @@ DOUBLE_QUOTED_STRING= \" ([^\\\"]|\\.)* \"?
 
 <IN_EXPRESSION_STRING> {
 	{SINGLE_QUOTED_STRING} { return RULE_STRING; }
-	\" {yybegin(YYINITIAL); return QuotationMark;}
-	{ID} { return RULE_ID; }
+	{ESCAPED_DQ_STRING}    { return RULE_STRING; }
+	{OPERATOR} { return RULE_OPERATOR; }
+	{ID}       { return RULE_ID; }
+	{NUMBER}   { return RULE_NUMBER; }
+	":"         { return Colon; }
+	"("         { return LeftParenthesis; }
+	")"         { return RightParenthesis; }
+	"["         { return LeftSquareBracket; }
+	"]"         { return RightSquareBracket; }
+	"."         { return FullStop; }
+	".."        { return FullStopFullStop; }
+	"/"         { return Solidus; }
+	","         { return Comma; }
+	
+	\"         {yybegin(YYINITIAL); return QuotationMark;}
 }
 
 <YYINITIAL> {
@@ -182,7 +200,7 @@ DOUBLE_QUOTED_STRING= \" ([^\\\"]|\\.)* \"?
  "units"                  {yybegin(BLACK_BOX_STRING); return Units; }
  "uses"                   {yybegin(BLACK_BOX_STRING); return Uses; }
  "value"                  {yybegin(BLACK_BOX_STRING); return Value; }
- "when"                   {yybegin(BLACK_BOX_STRING); return When; }
+ "when"                   {yybegin(AWAITING_EXPRESSION); return When; }
  "yang-version"           {yybegin(BLACK_BOX_STRING); return YangVersion; }
  "yin-element"            {yybegin(BLACK_BOX_STRING); return YinElement; }
 {ID}                      { yybegin(COLON_EXPECTED);  return RULE_ID; }
