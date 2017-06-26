@@ -35,7 +35,7 @@ class YangValidatorTest {
 			  prefix "sys";
 			}
 		'''.parse;
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 7, 14);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 7, 14);
 	}
 
 	@Test
@@ -60,8 +60,8 @@ class YangValidatorTest {
 			  prefix "sys";
 			}
 		'''.parse;
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 26, 17);
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 46, 17);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 26, 17);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 46, 17);
 	}
 
 	@Test
@@ -72,7 +72,7 @@ class YangValidatorTest {
 			  prefix "sys";
 			}
 		'''.parse;
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 7, 14);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 7, 14);
 	}
 
 	@Test
@@ -97,8 +97,8 @@ class YangValidatorTest {
 			  prefix "sys";
 			}
 		'''.parse;
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 46, 31);
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 80, 31);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 46, 31);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 80, 31);
 	}
 
 	@Test
@@ -109,7 +109,7 @@ class YangValidatorTest {
 			  namespace "urn:example:system";
 			}
 		'''.parse;
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 7, 14);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 7, 14);
 	}
 
 	@Test
@@ -134,8 +134,8 @@ class YangValidatorTest {
 			  prefix "sys";
 			}
 		'''.parse;
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 80, 13);
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 96, 13);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 80, 13);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 96, 13);
 	}
 
 	@Test
@@ -174,8 +174,8 @@ class YangValidatorTest {
 			  contact "joe@example.com";
 			}
 		'''.parse;
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 96, 26);
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 125, 26);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 96, 26);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 125, 26);
 	}
 
 	@Test
@@ -217,8 +217,8 @@ class YangValidatorTest {
 				"The module for entities implementing the Example system.";
 			}
 		'''.parse;
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 96, 72);
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 171, 72);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 96, 72);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 171, 72);
 	}
 
 	@Test
@@ -257,8 +257,8 @@ class YangValidatorTest {
 			  organization "Example Inc.";
 			}
 		'''.parse;
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 96, 28);
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 127, 28);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 96, 28);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 127, 28);
 	}
 
 	@Test
@@ -300,8 +300,8 @@ class YangValidatorTest {
 				"RFC 3986: Uniform Resource Identifier (URI): Generic Syntax";
 			}
 		'''.parse;
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 96, 73);
-		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 172, 73);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 96, 73);
+		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 172, 73);
 	}
 
 	@Test

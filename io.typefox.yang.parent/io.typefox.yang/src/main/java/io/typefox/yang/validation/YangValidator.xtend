@@ -3,24 +3,20 @@
  */
 package io.typefox.yang.validation
 
-import com.google.common.collect.ImmutableMap
-import io.typefox.yang.yang.Contact
-import io.typefox.yang.yang.Description
+import com.google.inject.Inject
+import com.google.inject.Singleton
+import io.typefox.yang.YangCardinalitiesHelper
 import io.typefox.yang.yang.Module
-import io.typefox.yang.yang.Namespace
-import io.typefox.yang.yang.Organization
-import io.typefox.yang.yang.Prefix
-import io.typefox.yang.yang.Reference
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.xtext.validation.Check
 
 import static com.google.common.base.CaseFormat.*
-import static com.google.common.collect.Range.closed
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 /**
  * This class contains custom validation rules for the YANG language. 
  */
+@Singleton
 class YangValidator extends AbstractYangValidator {
 
 	/**
@@ -29,9 +25,9 @@ class YangValidator extends AbstractYangValidator {
 	static abstract class YangIssueCodes {
 
 		/**
-		 * Issue code that are entangled with cardinality problems of module sub-statements.
+		 * Issue code that are entangled with cardinality problems of module's sub-statements.
 		 */
-		public static val SUB_STATEMENT_CARDINALITY = 'substatement.cardinality';
+		public static val MODULE_SUB_STATEMENT_CARDINALITY = 'module.substatement.cardinality';
 
 		/**
 		 * Issues code that is used when a module has anything but {@code '1.1'} version.
@@ -39,44 +35,28 @@ class YangValidator extends AbstractYangValidator {
 		public static val INCORRECT_VERSION = 'incorrect.version';
 
 	}
-
-	/**
-	 * Extract of the YANG statement cardinalities:
-	 * <pre>
-	 * +--------------+---------+-------------+
-	 * | substatement | section | cardinality |
-	 * +--------------+---------+-------------+
-	 * | contact      | 7.1.8   | 0..1        |
-	 * | description  | 7.21.3  | 0..1        |
-	 * | namespace    | 7.1.3   | 1           |
-	 * | organization | 7.1.7   | 0..1        |
-	 * | prefix       | 7.1.4   | 1           |
-	 * | reference    | 7.21.4  | 0..1        |
-	 * | yang-version | 7.1.2   | 1           |
-	 * +--------------+---------+-------------+
-	 * </pre>
-	 */
-	static val SUB_STATEMENT_CARDINALITIES = ImmutableMap.builder.put(Contact, closed(0, 1)).put(Description,
-		closed(0, 1)).put(Namespace, closed(1, 1)).put(Organization, closed(0, 1)).put(Prefix, closed(1, 1)).put(
-		Reference, closed(0, 1)).put(YangVersion, closed(1, 1)).build;
-
+	
+	@Inject
+	YangCardinalitiesHelper cardinalitiesHelper;
+		
 	@Check
-	def void checkStatementCardinality(Module module) {
+	def void checkModuleSubStatementCardinality(Module module) {
 		val allStatements = module.subStatements;
-		SUB_STATEMENT_CARDINALITIES.entrySet.forEach [
-			val statements = allStatements.filter(key);
+		cardinalitiesHelper.getCardinalitiesFor(module.eClass).entrySet.forEach [
+			val clazz = key.instanceClass;
+			val statements = allStatements.filter(clazz);
 			val actualCardinality = statements.size;
 			val expectedCardinality = value;
 			if (!expectedCardinality.contains(actualCardinality)) {
-				val statementName = UPPER_CAMEL.converterTo(LOWER_HYPHEN).convert(key.simpleName);
+				val issueCode = YangIssueCodes.MODULE_SUB_STATEMENT_CARDINALITY;
+				val statementName = UPPER_CAMEL.converterTo(LOWER_HYPHEN).convert(clazz.simpleName);
 				val message = '''Expected '«statementName»' with «expectedCardinality» cardinality. Got «actualCardinality» instead.''';
 				if (actualCardinality === 0) {
-					error(message, module, MODULE__NAME, YangIssueCodes.SUB_STATEMENT_CARDINALITY);
+					error(message, module, MODULE__NAME, issueCode);
 				} else {
 					statements.forEach [
 						val index = allStatements.indexOf(it);
-						error(message, module, STATEMENT__SUB_STATEMENTS, index,
-							YangIssueCodes.SUB_STATEMENT_CARDINALITY);
+						error(message, module, STATEMENT__SUB_STATEMENTS, index, issueCode);
 					];
 				}
 			}
@@ -86,7 +66,7 @@ class YangValidator extends AbstractYangValidator {
 	@Check
 	def void checkVersion(YangVersion it) {
 		if (yangVersion != "1.1") {
-			error("Version must be '1.1'.", it, YANG_VERSION__YANG_VERSION, YangIssueCodes.INCORRECT_VERSION);
+			error("The version must be '1.1'.", it, YANG_VERSION__YANG_VERSION, YangIssueCodes.INCORRECT_VERSION);
 		}
 	}
 
