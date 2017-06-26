@@ -512,7 +512,7 @@ class YangValidatorTest {
 	}
 
 	@Test
-	def void checkImport_RevisionDate_Missing() {
+	def void checkImport_Revision_Missing() {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
@@ -533,7 +533,7 @@ class YangValidatorTest {
 	}
 
 	@Test
-	def void checkImport_RevisionDate() {
+	def void checkImport_Revision() {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
@@ -556,7 +556,7 @@ class YangValidatorTest {
 	}
 
 	@Test
-	def void checkImport_RevisionDate_Duplicate() {
+	def void checkImport_Revision_Duplicate() {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
@@ -602,4 +602,78 @@ class YangValidatorTest {
 		'''.parse;
 		result.assertError(IMPORT, INVALID_SUB_STATEMENT, 237, 28);
 	}
+
+	// -------------------
+	@Test
+	def void checkRevision_Description_Missing() {
+		val result = '''
+			revision 2007-06-09 {
+			}
+		'''.parse;
+		result.assertNoErrors;
+	}
+
+	@Test
+	def void checkRevision_Description() {
+		val result = '''
+			revision 2007-06-09 {
+			  description "Some description.";
+			}
+		'''.parse;
+		result.assertNoErrors;
+	}
+
+	@Test
+	def void checkRevision_Description_Duplicate() {
+		val result = '''
+			revision 2007-06-09 {
+			  description "Some description.";
+			  description "Some description.";
+			}
+		'''.parse;
+		result.assertError(REVISION, REVISION_SUB_STATEMENT_CARDINALITY, 24, 32);
+		result.assertError(REVISION, REVISION_SUB_STATEMENT_CARDINALITY, 59, 32);
+	}
+
+	@Test
+	def void checkRevision_Reference_Missing() {
+		val result = '''
+			revision 2007-06-09 {
+			}
+		'''.parse;
+		result.assertNoErrors;
+	}
+
+	@Test
+	def void checkRevision_Reference() {
+		val result = '''
+			revision 2007-06-09 {
+			  reference "Some external reference.";
+			}
+		'''.parse;
+		result.assertNoErrors;
+	}
+
+	@Test
+	def void checkRevision_Reference_Duplicate() {
+		val result = '''
+			revision 2007-06-09 {
+			  reference "Some external reference.";
+			  reference "Some external reference.";
+			}
+		'''.parse;
+		result.assertError(REVISION, REVISION_SUB_STATEMENT_CARDINALITY, 24, 37);
+		result.assertError(REVISION, REVISION_SUB_STATEMENT_CARDINALITY, 64, 37);
+	}
+
+	@Test
+	def void checkRevision_Invalid() {
+		val result = '''
+			revision 2007-06-09 {
+			  organization "Example Inc.";
+			}
+		'''.parse;
+		result.assertError(REVISION, INVALID_SUB_STATEMENT, 24, 28);
+	}
+
 }

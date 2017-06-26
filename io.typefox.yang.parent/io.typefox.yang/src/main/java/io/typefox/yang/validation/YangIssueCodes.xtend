@@ -18,6 +18,11 @@ class YangIssueCodes {
 	public static val IMPORT_SUB_STATEMENT_CARDINALITY = 'import.substatement.cardinality';
 	
 	/**
+	 * Issue code associated with cardinality problems of revision's sub-statements.
+	 */
+	public static val REVISION_SUB_STATEMENT_CARDINALITY = 'revision.substatement.cardinality';
+	
+	/**
 	 * Issue code indicating an invalid sub-statement inside its parent statement container.
 	 */
 	public static val INVALID_SUB_STATEMENT = 'invalid.substatement';

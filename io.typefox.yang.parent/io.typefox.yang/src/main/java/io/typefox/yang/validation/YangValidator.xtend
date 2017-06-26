@@ -8,9 +8,11 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangVersion
 import java.util.Collection
+import java.util.Collections
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EStructuralFeature
@@ -19,7 +21,6 @@ import org.eclipse.xtext.validation.Check
 import static com.google.common.base.CaseFormat.*
 import static io.typefox.yang.validation.YangIssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
-import java.util.Collections
 
 /**
  * This class contains custom validation rules for the YANG language. 
@@ -45,6 +46,11 @@ class YangValidator extends AbstractYangValidator {
 	@Check
 	def void checkImportCardinalities(Import _import) {
 		checkCardinalities(_import, IMPORT_SUB_STATEMENT_CARDINALITY, [_import -> IMPORT__MODULE]);
+	}
+	
+	@Check
+	def void checkImportCardinalities(Revision revision) {
+		checkCardinalities(revision, REVISION_SUB_STATEMENT_CARDINALITY, [revision -> REVISION__REVISION]);
 	}
 
 	private def <S extends Statement> checkCardinalities(S container, String issueCode,

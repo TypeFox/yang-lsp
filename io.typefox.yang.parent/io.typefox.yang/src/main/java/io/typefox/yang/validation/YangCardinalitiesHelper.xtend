@@ -46,10 +46,15 @@ class YangCardinalitiesHelper {
 		REFERENCE -> OPTIONAL, REVISION -> OPTIONAL);
 
 	/**
+	 * The cardinalities of the <a href="https://tools.ietf.org/html/rfc7950#section-7.1.9.1">revision</a>'s sub-statements.
+	 */
+	static val REVISION_SUB_STATEMENT_CARDINALITIES = mapOf(DESCRIPTION -> OPTIONAL, REFERENCE -> OPTIONAL);
+
+	/**
 	 * All cardinality constraints for all statements.
 	 */
 	static val ALL_CARDINALITIES = mapOf(MODULE -> MODULE_SUB_STATEMENT_CARDINALITIES,
-		IMPORT -> IMPORT_SUB_STATEMENT_CARDINALITIES);
+		IMPORT -> IMPORT_SUB_STATEMENT_CARDINALITIES, REVISION -> REVISION_SUB_STATEMENT_CARDINALITIES);
 
 	/**
 	 * Returns with the cardinalities for the given EClass.
