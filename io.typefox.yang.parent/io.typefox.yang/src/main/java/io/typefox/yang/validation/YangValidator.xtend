@@ -4,7 +4,6 @@
 package io.typefox.yang.validation
 
 import com.google.common.collect.ImmutableMap
-import com.google.common.collect.Range
 import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Description
 import io.typefox.yang.yang.Module
@@ -16,55 +15,55 @@ import io.typefox.yang.yang.YangVersion
 import org.eclipse.xtext.validation.Check
 
 import static com.google.common.base.CaseFormat.*
+import static com.google.common.collect.Range.closed
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 /**
  * This class contains custom validation rules for the YANG language. 
  */
 class YangValidator extends AbstractYangValidator {
-	
+
 	/**
 	 * Validation issues codes for the YANG language.
 	 */
 	static abstract class YangIssueCodes {
-		
+
 		/**
-		 * Issue codes that are entangled with cardinality problems of module sub-statements.
+		 * Issue code that are entangled with cardinality problems of module sub-statements.
 		 */
-		public static val SUB_STATEMENT_CARDINALITY = 'statement.cardinality';  
-		
+		public static val SUB_STATEMENT_CARDINALITY = 'substatement.cardinality';
+
+		/**
+		 * Issues code that is used when a module has anything but {@code '1.1'} version.
+		 */
+		public static val INCORRECT_VERSION = 'incorrect.version';
+
 	}
-	
+
 	/**
 	 * Extract of the YANG statement cardinalities:
 	 * <pre>
 	 * +--------------+---------+-------------+
-     * | substatement | section | cardinality |
-     * +--------------+---------+-------------+
-     * | contact      | 7.1.8   | 0..1        |
-     * | description  | 7.21.3  | 0..1        |
-     * | namespace    | 7.1.3   | 1           |
-     * | organization | 7.1.7   | 0..1        |
-     * | prefix       | 7.1.4   | 1           |
-     * | reference    | 7.21.4  | 0..1        |
-     * | yang-version | 7.1.2   | 1           |
-     * +--------------+---------+-------------+
-     * </pre>
+	 * | substatement | section | cardinality |
+	 * +--------------+---------+-------------+
+	 * | contact      | 7.1.8   | 0..1        |
+	 * | description  | 7.21.3  | 0..1        |
+	 * | namespace    | 7.1.3   | 1           |
+	 * | organization | 7.1.7   | 0..1        |
+	 * | prefix       | 7.1.4   | 1           |
+	 * | reference    | 7.21.4  | 0..1        |
+	 * | yang-version | 7.1.2   | 1           |
+	 * +--------------+---------+-------------+
+	 * </pre>
 	 */
-	static val STATEMENT_CARDINALITIES = ImmutableMap.builder
-		.put(Contact, Range.closed(0, 1))
-		.put(Description, Range.closed(0, 1))
-		.put(Namespace, Range.closed(1, 1))
-		.put(Organization, Range.closed(0, 1))
-		.put(Prefix, Range.closed(1, 1))
-		.put(Reference, Range.closed(0, 1))
-		.put(YangVersion, Range.closed(1, 1))
-		.build;
-	
+	static val SUB_STATEMENT_CARDINALITIES = ImmutableMap.builder.put(Contact, closed(0, 1)).put(Description,
+		closed(0, 1)).put(Namespace, closed(1, 1)).put(Organization, closed(0, 1)).put(Prefix, closed(1, 1)).put(
+		Reference, closed(0, 1)).put(YangVersion, closed(1, 1)).build;
+
 	@Check
 	def void checkStatementCardinality(Module module) {
 		val allStatements = module.subStatements;
-		STATEMENT_CARDINALITIES.entrySet.forEach[
+		SUB_STATEMENT_CARDINALITIES.entrySet.forEach [
 			val statements = allStatements.filter(key);
 			val actualCardinality = statements.size;
 			val expectedCardinality = value;
@@ -74,13 +73,21 @@ class YangValidator extends AbstractYangValidator {
 				if (actualCardinality === 0) {
 					error(message, module, MODULE__NAME, YangIssueCodes.SUB_STATEMENT_CARDINALITY);
 				} else {
-					statements.forEach[
+					statements.forEach [
 						val index = allStatements.indexOf(it);
-						error(message, module, STATEMENT__SUB_STATEMENTS, index, YangIssueCodes.SUB_STATEMENT_CARDINALITY);
+						error(message, module, STATEMENT__SUB_STATEMENTS, index,
+							YangIssueCodes.SUB_STATEMENT_CARDINALITY);
 					];
 				}
 			}
 		];
-	} 
-	
+	}
+
+	@Check
+	def void checkVersion(YangVersion it) {
+		if (yangVersion != "1.1") {
+			error("Version must be '1.1'.", it, YANG_VERSION__YANG_VERSION, YangIssueCodes.INCORRECT_VERSION);
+		}
+	}
+
 }

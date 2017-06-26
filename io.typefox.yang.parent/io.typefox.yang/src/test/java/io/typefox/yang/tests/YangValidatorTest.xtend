@@ -296,12 +296,24 @@ class YangValidatorTest {
 			  prefix "sys";
 			  reference
 				"RFC 3986: Uniform Resource Identifier (URI): Generic Syntax";
-			  reference
+				 reference
 				"RFC 3986: Uniform Resource Identifier (URI): Generic Syntax";
 			}
 		'''.parse;
 		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 96, 73);
 		result.assertError(MODULE, SUB_STATEMENT_CARDINALITY, 172, 73);
+	}
+
+	@Test
+	def void checkYangVersion() {
+		val result = '''
+			module example-system {
+			  yang-version 1.2;
+			  namespace "urn:example:system";
+			  prefix "sys";
+			}
+		'''.parse;
+		result.assertError(YANG_VERSION, INCORRECT_VERSION, 39, 3);
 	}
 
 }
