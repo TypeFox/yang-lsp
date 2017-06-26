@@ -394,7 +394,7 @@ Pattern:
 
 // 9.6.4
 Enum:
-	'enum' name=StringValue StatementEnd
+	'enum' name=Identifier StatementEnd
 ;
 
 // 9.6.4.2
@@ -404,7 +404,7 @@ Value:
 
 // 9.7.4
 Bit:
-	'bit' name=StringValue StatementEnd
+	'bit' name=Identifier StatementEnd
 ;
 
 // 9.7.4.2
@@ -440,7 +440,7 @@ DescendantSchemaNodeIdentifier:
 ;
 
 IdentifierRef:
-	(prefix=[Prefix|Identifier] ':')? node=[SchemaNode|Identifier]
+	(prefix=[Prefix|ID] ':')? node=[SchemaNode|ID]
 ;
 
 PredicatedIdentifierRef:
