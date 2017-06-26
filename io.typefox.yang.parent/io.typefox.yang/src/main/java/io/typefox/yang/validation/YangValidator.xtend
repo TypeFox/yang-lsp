@@ -7,10 +7,12 @@ import com.google.inject.Inject
 import com.google.inject.Singleton
 import io.typefox.yang.YangCardinalitiesHelper
 import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.xtext.validation.Check
 
 import static com.google.common.base.CaseFormat.*
+import static io.typefox.yang.validation.YangIssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 /**
@@ -19,55 +21,42 @@ import static io.typefox.yang.yang.YangPackage.Literals.*
 @Singleton
 class YangValidator extends AbstractYangValidator {
 
-	/**
-	 * Validation issues codes for the YANG language.
-	 */
-	static abstract class YangIssueCodes {
-
-		/**
-		 * Issue code that are entangled with cardinality problems of module's sub-statements.
-		 */
-		public static val MODULE_SUB_STATEMENT_CARDINALITY = 'module.substatement.cardinality';
-
-		/**
-		 * Issues code that is used when a module has anything but {@code '1.1'} version.
-		 */
-		public static val INCORRECT_VERSION = 'incorrect.version';
-
-	}
-	
 	@Inject
 	YangCardinalitiesHelper cardinalitiesHelper;
-		
+
 	@Check
-	def void checkModuleSubStatementCardinality(Module module) {
-		val allStatements = module.subStatements;
-		cardinalitiesHelper.getCardinalitiesFor(module.eClass).entrySet.forEach [
+	def void checkVersion(YangVersion it) {
+		if (yangVersion != "1.1") {
+			error("The version must be '1.1'.", it, YANG_VERSION__YANG_VERSION, INCORRECT_VERSION);
+		}
+	}
+
+	@Check
+	def void checkModuleCardinalities(Module module) {
+		checkCardinalities(module, MODULE_SUB_STATEMENT_CARDINALITY, [module]);
+	}
+
+	private def checkCardinalities(Statement container, String issueCode, (Statement)=>Module getModule) {
+		val allStatements = container.subStatements;
+		cardinalitiesHelper.getCardinalitiesFor(container.eClass).entrySet.forEach [
 			val clazz = key.instanceClass;
 			val statements = allStatements.filter(clazz);
 			val actualCardinality = statements.size;
 			val expectedCardinality = value;
 			if (!expectedCardinality.contains(actualCardinality)) {
-				val issueCode = YangIssueCodes.MODULE_SUB_STATEMENT_CARDINALITY;
 				val statementName = UPPER_CAMEL.converterTo(LOWER_HYPHEN).convert(clazz.simpleName);
-				val message = '''Expected '«statementName»' with «expectedCardinality» cardinality. Got «actualCardinality» instead.''';
+				val containerName = container.eClass.instanceClass.simpleName.toLowerCase;
+				val message = '''Expected '«statementName»' with «expectedCardinality» cardinality for «containerName». Got «actualCardinality» instead.''';
 				if (actualCardinality === 0) {
-					error(message, module, MODULE__NAME, issueCode);
+					error(message, getModule.apply(container), MODULE__NAME, issueCode);
 				} else {
 					statements.forEach [
 						val index = allStatements.indexOf(it);
-						error(message, module, STATEMENT__SUB_STATEMENTS, index, issueCode);
+						error(message, container, STATEMENT__SUB_STATEMENTS, index, issueCode);
 					];
 				}
 			}
 		];
-	}
-
-	@Check
-	def void checkVersion(YangVersion it) {
-		if (yangVersion != "1.1") {
-			error("The version must be '1.1'.", it, YANG_VERSION__YANG_VERSION, YangIssueCodes.INCORRECT_VERSION);
-		}
 	}
 
 }

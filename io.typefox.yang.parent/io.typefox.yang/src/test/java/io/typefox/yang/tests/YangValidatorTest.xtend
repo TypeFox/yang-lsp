@@ -9,7 +9,7 @@ import org.eclipse.xtext.testing.validation.ValidationTestHelper
 import org.junit.Test
 import org.junit.runner.RunWith
 
-import static io.typefox.yang.validation.YangValidator.YangIssueCodes.*
+import static io.typefox.yang.validation.YangIssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 /**

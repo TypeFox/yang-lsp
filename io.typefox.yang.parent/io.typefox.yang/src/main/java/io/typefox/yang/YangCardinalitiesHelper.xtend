@@ -24,21 +24,32 @@ class YangCardinalitiesHelper {
 	static val OPTIONAL = closed(0, 1);
 	static val ANY = closed(0, MAX_VALUE);
 
+	private static def <K, V> Map<K, V> mapOf(Pair<K, V>... entries) {
+		val builder = ImmutableMap.builder;
+		entries.forEach[builder.put(key, value)];
+		return builder.build;
+	}
+
 	/**
-	 * The <a href="https://tools.ietf.org/html/rfc7950#section-7.1.1">cardinalities</a> of the module's sub-statements.
+	 * The cardinalities of the <a href="https://tools.ietf.org/html/rfc7950#section-7.1.1">module</a>'s sub-statements.
 	 */
-	static val MODULE_CARDINALITIES = ImmutableMap.builder.put(ANYDATA, ANY).put(ANYXML, ANY).put(AUGMENT, ANY).put(
-		CHOICE, ANY).put(CONTACT, OPTIONAL).put(DESCRIPTION, OPTIONAL).put(DEVIATION, ANY).put(EXTENSION, ANY).put(
-		FEATURE, ANY).put(GROUPING, ANY).put(IDENTITY, ANY).put(IMPORT, ANY).put(INCLUDE, ANY).put(LEAF, ANY).put(
-		LEAF_LIST, ANY).put(LIST, ANY).put(NAMESPACE, REQUIRED).put(NOTIFICATION, ANY).put(ORGANIZATION, OPTIONAL).put(
-		PREFIX, REQUIRED).put(REFERENCE, OPTIONAL).put(REVISION, ANY).put(RPC, ANY).put(TYPEDEF, ANY).put(USES, ANY).
-		put(YANG_VERSION, REQUIRED).build
+	static val MODULE_SUB_STATEMENT_CARDINALITIES = mapOf(ANYDATA -> ANY, ANYXML -> ANY, AUGMENT -> ANY, CHOICE -> ANY,
+		CONTACT -> OPTIONAL, DESCRIPTION -> OPTIONAL, DEVIATION -> ANY, EXTENSION -> ANY, FEATURE -> ANY,
+		GROUPING -> ANY, IDENTITY -> ANY, IMPORT -> ANY, INCLUDE -> ANY, LEAF -> ANY, LEAF_LIST -> ANY, LIST -> ANY,
+		NAMESPACE -> REQUIRED, NOTIFICATION -> ANY, ORGANIZATION -> OPTIONAL, PREFIX -> REQUIRED, REFERENCE -> OPTIONAL,
+		REVISION -> ANY, RPC -> ANY, TYPEDEF -> ANY, USES -> ANY, YANG_VERSION -> REQUIRED);
+
+	/**
+	 * The cardinalities of the <a href="https://tools.ietf.org/html/rfc7950#section-7.1.5">import</a>'s sub-statements.
+	 */
+	static val IMPORT_SUB_STATEMENT_CARDINALITIES = mapOf(DESCRIPTION -> OPTIONAL, PREFIX -> REQUIRED,
+		REFERENCE -> OPTIONAL, REVISION_DATE -> OPTIONAL);
 
 	/**
 	 * All cardinality constraints for all statements.
 	 */
-	static val Map<EClass, Map<EClass, Range<Integer>>> ALL_CARDINALITIES = ImmutableMap.builder.put(MODULE,
-		MODULE_CARDINALITIES).build;
+	static val ALL_CARDINALITIES = mapOf(MODULE -> MODULE_SUB_STATEMENT_CARDINALITIES,
+		IMPORT -> IMPORT_SUB_STATEMENT_CARDINALITIES);
 
 	/**
 	 * Returns with the cardinalities for the given EClass.
