@@ -40,6 +40,15 @@ class YangCardinalitiesHelper {
 		REVISION -> ANY, RPC -> ANY, TYPEDEF -> ANY, USES -> ANY, YANG_VERSION -> REQUIRED);
 
 	/**
+	 * The cardinalities of the <a href="https://tools.ietf.org/html/rfc7950#section-7.2.1">sub-module</a>'s sub-statements.
+	 */
+	static val SUBMODULE_SUB_STATEMENTS_CARDINALITIES = mapOf(ANYDATA -> ANY, ANYXML -> ANY, AUGMENT -> ANY,
+		BELONGS_TO -> REQUIRED, CHOICE -> ANY, CONTACT -> OPTIONAL, CONTAINER -> ANY, DESCRIPTION -> OPTIONAL,
+		DEVIATION -> ANY, EXTENSION -> ANY, FEATURE -> ANY, GROUPING -> ANY, IDENTITY -> ANY, IMPORT -> ANY,
+		INCLUDE -> ANY, LEAF -> ANY, LEAF_LIST -> ANY, LIST -> ANY, NOTIFICATION -> ANY, ORGANIZATION -> OPTIONAL,
+		REFERENCE -> OPTIONAL, REVISION -> ANY, RPC -> ANY, TYPEDEF -> ANY, USES -> ANY, YANG_VERSION -> REQUIRED);
+
+	/**
 	 * The cardinalities of the <a href="https://tools.ietf.org/html/rfc7950#section-7.1.5">import</a>'s sub-statements.
 	 */
 	static val IMPORT_SUB_STATEMENT_CARDINALITIES = mapOf(DESCRIPTION -> OPTIONAL, PREFIX -> REQUIRED,
@@ -54,7 +63,8 @@ class YangCardinalitiesHelper {
 	 * All cardinality constraints for all statements.
 	 */
 	static val ALL_CARDINALITIES = mapOf(MODULE -> MODULE_SUB_STATEMENT_CARDINALITIES,
-		IMPORT -> IMPORT_SUB_STATEMENT_CARDINALITIES, REVISION -> REVISION_SUB_STATEMENT_CARDINALITIES);
+		IMPORT -> IMPORT_SUB_STATEMENT_CARDINALITIES, REVISION -> REVISION_SUB_STATEMENT_CARDINALITIES,
+		SUBMODULE -> SUBMODULE_SUB_STATEMENTS_CARDINALITIES);
 
 	/**
 	 * Returns with the cardinalities for the given EClass.
@@ -64,3 +74,4 @@ class YangCardinalitiesHelper {
 	}
 
 }
+	

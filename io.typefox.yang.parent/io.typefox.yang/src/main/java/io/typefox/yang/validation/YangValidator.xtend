@@ -47,7 +47,7 @@ class YangValidator extends AbstractYangValidator {
 	def void checkImportCardinalities(Import _import) {
 		checkCardinalities(_import, IMPORT_SUB_STATEMENT_CARDINALITY, [_import -> IMPORT__MODULE]);
 	}
-	
+
 	@Check
 	def void checkImportCardinalities(Revision revision) {
 		checkCardinalities(revision, REVISION_SUB_STATEMENT_CARDINALITY, [revision -> REVISION__REVISION]);
@@ -65,8 +65,7 @@ class YangValidator extends AbstractYangValidator {
 			val actualCardinality = statements.size;
 			val expectedCardinality = value;
 			if (!expectedCardinality.contains(actualCardinality)) {
-				val containerName = container.eClass.instanceClass.simpleName.toLowerCase;
-				val message = '''Expected '«clazz.yangName»' with «expectedCardinality» cardinality for «containerName». Got «actualCardinality» instead.''';
+				val message = '''Expected '«clazz.yangName»' with «expectedCardinality» cardinality for «container.yangName». Got «actualCardinality» instead.''';
 				if (actualCardinality === 0) {
 					val issueLocation = issueLocationProvider.apply(container);
 					error(message, issueLocation.key, issueLocation.value, issueCode);
@@ -78,23 +77,28 @@ class YangValidator extends AbstractYangValidator {
 				}
 			}
 		];
-		invalidStatements.forEach[
+		invalidStatements.forEach [
 			val index = allStatements.indexOf(it);
-			error('''Unexpected declaration of '«eClass.yangName»' statement.''', container, STATEMENT__SUB_STATEMENTS, index, INVALID_SUB_STATEMENT);
+			val message = '''Unexpected declaration of '«eClass.yangName»' statement in «container.yangName».''';
+			error(message, container, STATEMENT__SUB_STATEMENTS, index, INVALID_SUB_STATEMENT);
 		]
 	}
-	
+
+	private def dispatch String getYangName(EObject it) {
+		return eClass.instanceClass.yangName;
+	}
+
 	private def dispatch String getYangName(EClass it) {
 		return instanceClass.yangName;
 	}
-	
+
 	private def dispatch String getYangName(Class<?> it) {
-		return UPPER_CAMEL.converterTo(LOWER_HYPHEN).convert(simpleName);
+		return UPPER_CAMEL.converterTo(LOWER_HYPHEN).convert(simpleName).toFirstLower;
 	}
-	
-	private def removeAll(Iterable<?> removeFrom, Iterable<?> removeThese) {
-		removeThese.forEach[
-			Iterables.removeAll(removeFrom, Collections.singleton(it));
+
+	private def removeAll(Iterable<?> removeFromHere, Iterable<?> removeThese) {
+		removeThese.forEach [
+			Iterables.removeAll(removeFromHere, Collections.singleton(it));
 		];
 	}
 

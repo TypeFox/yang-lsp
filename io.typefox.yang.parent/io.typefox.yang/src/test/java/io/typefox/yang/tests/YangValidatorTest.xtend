@@ -312,6 +312,27 @@ class YangValidatorTest {
 		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 96, 72);
 		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 171, 72);
 	}
+	
+	@Test
+	def void checkModule_Invalid() {
+		val result = '''
+			module foo-system {
+			  yang-version 1.1;
+			  namespace "urn:foo:system";
+			  prefix "foo";
+			}
+
+			module example-system {
+			  yang-version 1.1;
+			  namespace "urn:example:system";
+			  prefix "sys";
+			  belongs-to foo-system {
+			    prefix "foo";
+			  }
+			}
+		'''.parse;
+		result.assertError(MODULE, INVALID_SUB_STATEMENT, 185, 45);
+	}
 
 	@Test
 	def void checkImport_Prefix_Missing() {
@@ -603,7 +624,6 @@ class YangValidatorTest {
 		result.assertError(IMPORT, INVALID_SUB_STATEMENT, 237, 28);
 	}
 
-	// -------------------
 	@Test
 	def void checkRevision_Description_Missing() {
 		val result = '''
