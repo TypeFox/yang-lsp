@@ -3,23 +3,84 @@
  */
 package io.typefox.yang.validation
 
+import com.google.common.collect.ImmutableMap
+import com.google.common.collect.Range
+import io.typefox.yang.yang.Contact
+import io.typefox.yang.yang.Description
+import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.Namespace
+import io.typefox.yang.yang.Organization
+import io.typefox.yang.yang.Prefix
+import io.typefox.yang.yang.Reference
+import io.typefox.yang.yang.YangVersion
+import org.eclipse.xtext.validation.Check
+
+import static com.google.common.base.CaseFormat.*
+import static io.typefox.yang.yang.YangPackage.Literals.*
 
 /**
- * This class contains custom validation rules. 
- *
- * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
+ * This class contains custom validation rules for the YANG language. 
  */
 class YangValidator extends AbstractYangValidator {
 	
-//	public static val INVALID_NAME = 'invalidName'
-//
-//	@Check
-//	def checkGreetingStartsWithCapital(Greeting greeting) {
-//		if (!Character.isUpperCase(greeting.name.charAt(0))) {
-//			warning('Name should start with a capital', 
-//					YangPackage.Literals.GREETING__NAME,
-//					INVALID_NAME)
-//		}
-//	}
+	/**
+	 * Validation issues codes for the YANG language.
+	 */
+	static abstract class YangIssueCodes {
+		
+		/**
+		 * Issue codes that are entangled with cardinality problems of module sub-statements.
+		 */
+		public static val SUB_STATEMENT_CARDINALITY = 'statement.cardinality';  
+		
+	}
+	
+	/**
+	 * Extract of the YANG statement cardinalities:
+	 * <pre>
+	 * +--------------+---------+-------------+
+     * | substatement | section | cardinality |
+     * +--------------+---------+-------------+
+     * | contact      | 7.1.8   | 0..1        |
+     * | description  | 7.21.3  | 0..1        |
+     * | namespace    | 7.1.3   | 1           |
+     * | organization | 7.1.7   | 0..1        |
+     * | prefix       | 7.1.4   | 1           |
+     * | reference    | 7.21.4  | 0..1        |
+     * | yang-version | 7.1.2   | 1           |
+     * +--------------+---------+-------------+
+     * </pre>
+	 */
+	static val STATEMENT_CARDINALITIES = ImmutableMap.builder
+		.put(Contact, Range.closed(0, 1))
+		.put(Description, Range.closed(0, 1))
+		.put(Namespace, Range.closed(1, 1))
+		.put(Organization, Range.closed(0, 1))
+		.put(Prefix, Range.closed(1, 1))
+		.put(Reference, Range.closed(0, 1))
+		.put(YangVersion, Range.closed(1, 1))
+		.build;
+	
+	@Check
+	def void checkStatementCardinality(Module module) {
+		val allStatements = module.subStatements;
+		STATEMENT_CARDINALITIES.entrySet.forEach[
+			val statements = allStatements.filter(key);
+			val actualCardinality = statements.size;
+			val expectedCardinality = value;
+			if (!expectedCardinality.contains(actualCardinality)) {
+				val statementName = UPPER_CAMEL.converterTo(LOWER_HYPHEN).convert(key.simpleName);
+				val message = '''Expected '«statementName»' with «expectedCardinality» cardinality. Got «actualCardinality» instead.''';
+				if (actualCardinality === 0) {
+					error(message, module, MODULE__NAME, YangIssueCodes.SUB_STATEMENT_CARDINALITY);
+				} else {
+					statements.forEach[
+						val index = allStatements.indexOf(it);
+						error(message, module, STATEMENT__SUB_STATEMENTS, index, YangIssueCodes.SUB_STATEMENT_CARDINALITY);
+					];
+				}
+			}
+		];
+	} 
 	
 }
