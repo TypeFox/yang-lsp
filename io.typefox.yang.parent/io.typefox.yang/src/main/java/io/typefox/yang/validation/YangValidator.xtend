@@ -5,10 +5,12 @@ package io.typefox.yang.validation
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import io.typefox.yang.YangCardinalitiesHelper
+import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Module
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangVersion
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.xtext.validation.Check
 
 import static com.google.common.base.CaseFormat.*
@@ -33,10 +35,17 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def void checkModuleCardinalities(Module module) {
-		checkCardinalities(module, MODULE_SUB_STATEMENT_CARDINALITY, [module]);
+		checkCardinalities(module, MODULE_SUB_STATEMENT_CARDINALITY, [module -> MODULE__NAME]);
 	}
 
-	private def checkCardinalities(Statement container, String issueCode, (Statement)=>Module getModule) {
+	@Check
+	def void checkImportCardinalities(Import _import) {
+		checkCardinalities(_import, IMPORT_SUB_STATEMENT_CARDINALITY, [_import -> IMPORT__MODULE]);
+	}
+
+	private def <S extends Statement> checkCardinalities(S container, String issueCode,
+		(S)=>Pair<? extends EObject, ? extends EStructuralFeature> issueLocationProvider) {
+
 		val allStatements = container.subStatements;
 		cardinalitiesHelper.getCardinalitiesFor(container.eClass).entrySet.forEach [
 			val clazz = key.instanceClass;
@@ -48,7 +57,8 @@ class YangValidator extends AbstractYangValidator {
 				val containerName = container.eClass.instanceClass.simpleName.toLowerCase;
 				val message = '''Expected '«statementName»' with «expectedCardinality» cardinality for «containerName». Got «actualCardinality» instead.''';
 				if (actualCardinality === 0) {
-					error(message, getModule.apply(container), MODULE__NAME, issueCode);
+					val issueLocation = issueLocationProvider.apply(container);
+					error(message, issueLocation.key, issueLocation.value, issueCode);
 				} else {
 					statements.forEach [
 						val index = allStatements.indexOf(it);
