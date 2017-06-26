@@ -3,12 +3,15 @@
  */
 package io.typefox.yang.validation
 
+import com.google.common.collect.Iterables
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Module
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangVersion
+import java.util.Collection
+import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.xtext.validation.Check
@@ -16,6 +19,7 @@ import org.eclipse.xtext.validation.Check
 import static com.google.common.base.CaseFormat.*
 import static io.typefox.yang.validation.YangIssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
+import java.util.Collections
 
 /**
  * This class contains custom validation rules for the YANG language. 
@@ -47,15 +51,16 @@ class YangValidator extends AbstractYangValidator {
 		(S)=>Pair<? extends EObject, ? extends EStructuralFeature> issueLocationProvider) {
 
 		val allStatements = container.subStatements;
+		val Collection<Statement> invalidStatements = newArrayList(allStatements);
 		cardinalitiesHelper.getCardinalitiesFor(container.eClass).entrySet.forEach [
 			val clazz = key.instanceClass;
 			val statements = allStatements.filter(clazz);
+			invalidStatements.removeAll(statements);
 			val actualCardinality = statements.size;
 			val expectedCardinality = value;
 			if (!expectedCardinality.contains(actualCardinality)) {
-				val statementName = UPPER_CAMEL.converterTo(LOWER_HYPHEN).convert(clazz.simpleName);
 				val containerName = container.eClass.instanceClass.simpleName.toLowerCase;
-				val message = '''Expected '«statementName»' with «expectedCardinality» cardinality for «containerName». Got «actualCardinality» instead.''';
+				val message = '''Expected '«clazz.yangName»' with «expectedCardinality» cardinality for «containerName». Got «actualCardinality» instead.''';
 				if (actualCardinality === 0) {
 					val issueLocation = issueLocationProvider.apply(container);
 					error(message, issueLocation.key, issueLocation.value, issueCode);
@@ -66,6 +71,24 @@ class YangValidator extends AbstractYangValidator {
 					];
 				}
 			}
+		];
+		invalidStatements.forEach[
+			val index = allStatements.indexOf(it);
+			error('''Unexpected declaration of '«eClass.yangName»' statement.''', container, STATEMENT__SUB_STATEMENTS, index, INVALID_SUB_STATEMENT);
+		]
+	}
+	
+	private def dispatch String getYangName(EClass it) {
+		return instanceClass.yangName;
+	}
+	
+	private def dispatch String getYangName(Class<?> it) {
+		return UPPER_CAMEL.converterTo(LOWER_HYPHEN).convert(simpleName);
+	}
+	
+	private def removeAll(Iterable<?> removeFrom, Iterable<?> removeThese) {
+		removeThese.forEach[
+			Iterables.removeAll(removeFrom, Collections.singleton(it));
 		];
 	}
 

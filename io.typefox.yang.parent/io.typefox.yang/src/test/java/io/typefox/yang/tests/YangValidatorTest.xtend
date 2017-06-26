@@ -318,7 +318,7 @@ class YangValidatorTest {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
-			  namespace "urn:example:system";
+			  namespace "urn:yang:types";
 			  prefix "yang";
 			}
 			
@@ -330,7 +330,7 @@ class YangValidatorTest {
 			  }
 			}
 		'''.parse;
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 202, 15);
+		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 198, 15);
 	}
 
 	@Test
@@ -338,7 +338,7 @@ class YangValidatorTest {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
-			  namespace "urn:example:system";
+			  namespace "urn:yang:types";
 			  prefix "yang";
 			}
 			
@@ -359,7 +359,7 @@ class YangValidatorTest {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
-			  namespace "urn:example:system";
+			  namespace "urn:yang:types";
 			  prefix "yang";
 			}
 			
@@ -373,8 +373,8 @@ class YangValidatorTest {
 			  }
 			}
 		'''.parse;
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 223, 14);
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 241, 14);
+		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 219, 14);
+		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 237, 14);
 	}
 
 	@Test
@@ -382,7 +382,7 @@ class YangValidatorTest {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
-			  namespace "urn:example:system";
+			  namespace "urn:yang:types";
 			  prefix "yang";
 			}
 			
@@ -403,7 +403,7 @@ class YangValidatorTest {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
-			  namespace "urn:example:system";
+			  namespace "urn:yang:types";
 			  prefix "yang";
 			}
 			
@@ -425,7 +425,7 @@ class YangValidatorTest {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
-			  namespace "urn:example:system";
+			  namespace "urn:yang:types";
 			  prefix "yang";
 			}
 			
@@ -440,8 +440,8 @@ class YangValidatorTest {
 			  }
 			}
 		'''.parse;
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 241, 40);
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 285, 40);
+		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 237, 40);
+		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 281, 40);
 	}
 
 	@Test
@@ -449,7 +449,7 @@ class YangValidatorTest {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
-			  namespace "urn:example:system";
+			  namespace "urn:yang:types";
 			  prefix "yang";
 			}
 			
@@ -470,7 +470,7 @@ class YangValidatorTest {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
-			  namespace "urn:example:system";
+			  namespace "urn:yang:types";
 			  prefix "yang";
 			}
 			
@@ -492,7 +492,7 @@ class YangValidatorTest {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
-			  namespace "urn:example:system";
+			  namespace "urn:yang:types";
 			  prefix "yang";
 			}
 			
@@ -507,8 +507,8 @@ class YangValidatorTest {
 			  }
 			}
 		'''.parse;
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 241, 72);
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 317, 72);
+		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 237, 72);
+		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 313, 72);
 	}
 
 	@Test
@@ -516,7 +516,7 @@ class YangValidatorTest {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
-			  namespace "urn:example:system";
+			  namespace "urn:yang:types";
 			  prefix "yang";
 			}
 			
@@ -537,7 +537,7 @@ class YangValidatorTest {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
-			  namespace "urn:example:system";
+			  namespace "urn:yang:types";
 			  prefix "yang";
 			}
 			
@@ -560,7 +560,7 @@ class YangValidatorTest {
 		val result = '''
 			module ietf-yang-types {
 			  yang-version 1.1;
-			  namespace "urn:example:system";
+			  namespace "urn:yang:types";
 			  prefix "yang";
 			}
 			
@@ -577,7 +577,29 @@ class YangValidatorTest {
 			  }
 			}
 		'''.parse;
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 241, 26);
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 271, 26);
+		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 237, 26);
+		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 267, 26);
+	}
+
+	@Test
+	def void checkImport_Invalid() {
+		val result = '''
+			module ietf-yang-types {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			}
+			
+			module example-system {
+			  yang-version 1.1;
+			  namespace "urn:example:system";
+			  prefix "sys";
+			  import ietf-yang-types {
+			  	prefix "yang";
+			  	organization "Example Inc.";
+			  }
+			}
+		'''.parse;
+		result.assertError(IMPORT, INVALID_SUB_STATEMENT, 237, 28);
 	}
 }
