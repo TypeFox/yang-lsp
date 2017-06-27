@@ -3,6 +3,11 @@
  */
 package io.typefox.yang.scoping
 
+import io.typefox.yang.yang.Import
+import io.typefox.yang.yang.RevisionDate
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.scoping.IScope
 
 /**
  * This class contains custom scoping description.
@@ -12,4 +17,26 @@ package io.typefox.yang.scoping
  */
 class YangScopeProvider extends AbstractYangScopeProvider {
 
+	override getScope(EObject context, EReference reference) {
+		this.internalGetScope(context, reference)
+	}
+	
+	dispatch def IScope internalGetScope(EObject context, EReference reference) {
+		super.getScope(context, reference)
+	}
+	
+	dispatch def IScope internalGetScope(Import context, EReference reference) {
+		val parent = super.getScope(context, reference)
+		val rev = context.subStatements.filter(RevisionDate).head
+		if (rev === null) {
+			return parent
+		}
+		return new PriorizingScope(parent, [
+			val userData = getUserData(ResourceDescriptionStrategy.REVISION)
+			return userData !== null && userData == rev.date
+		])
+	}
+	
 }
+
+

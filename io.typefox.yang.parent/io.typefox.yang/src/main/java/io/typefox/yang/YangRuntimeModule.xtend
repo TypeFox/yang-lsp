@@ -3,9 +3,15 @@
  */
 package io.typefox.yang
 
+import io.typefox.yang.scoping.ResourceDescriptionStrategy
+import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
  */
 class YangRuntimeModule extends AbstractYangRuntimeModule {
+	
+	def Class<? extends IDefaultResourceDescriptionStrategy> bindIDefaultResourceDescriptionStrategy() {
+		ResourceDescriptionStrategy
+	} 
 }
