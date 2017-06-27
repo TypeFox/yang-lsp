@@ -9,14 +9,18 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="subStatements" upperBound="-1"
         eType="#//Statement" containment="true"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractModule" eSuperTypes="#//OtherStatement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractImport" eSuperTypes="#//OtherStatement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="module" eType="#//AbstractModule"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="SchemaNode" eSuperTypes="#//Statement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="DataSchemaNode" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="OtherStatement" eSuperTypes="#//Statement"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Module" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Module" eSuperTypes="#//AbstractModule"/>
   <eClassifiers xsi:type="ecore:EClass" name="YangVersion" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="yangVersion" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
@@ -26,15 +30,11 @@
   <eClassifiers xsi:type="ecore:EClass" name="Prefix" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="prefix" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Import" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="module" eType="#//Module"/>
-  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Import" eSuperTypes="#//AbstractImport"/>
   <eClassifiers xsi:type="ecore:EClass" name="RevisionDate" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="date" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Include" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="subModule" eType="#//Submodule"/>
-  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Include" eSuperTypes="#//AbstractImport"/>
   <eClassifiers xsi:type="ecore:EClass" name="Organization" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="organization" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
@@ -44,11 +44,9 @@
   <eClassifiers xsi:type="ecore:EClass" name="Revision" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="revision" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Submodule" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Submodule" eSuperTypes="#//AbstractModule"/>
   <eClassifiers xsi:type="ecore:EClass" name="BelongsTo" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="belongsTo" eType="#//Module"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="module" eType="#//Module"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Typedef" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Units" eSuperTypes="#//OtherStatement">

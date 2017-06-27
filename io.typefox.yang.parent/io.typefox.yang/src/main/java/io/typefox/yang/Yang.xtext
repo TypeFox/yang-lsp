@@ -17,6 +17,15 @@ Statement:
 	  OtherStatement
 ;
 
+AbstractModule:
+	Module|
+	Submodule
+;
+
+AbstractImport:
+	  Import
+	| Include
+;
 
 SchemaNode :
 	DataSchemaNode |
@@ -41,7 +50,9 @@ DataSchemaNode :
 ;
 
 OtherStatement :
-	  Action
+	  AbstractModule
+	| AbstractImport
+	| Action
 	| Anydata
 	| Argument
 	| Augment
@@ -59,15 +70,12 @@ OtherStatement :
 	| Deviate
 	| FractionDigits
 	| IfFeature
-	| Import
-	| Include
 	| Input
 	| Key
 	| Length
 	| Mandatory
 	| MaxElements
 	| MinElements
-	| Module
 	| Must
 	| Namespace
 	| OrderedBy
@@ -85,7 +93,6 @@ OtherStatement :
 	| Revision
 	| RevisionDate
 	| Status
-	| Submodule
 	| Type
 	| Unique
 	| Units
@@ -114,7 +121,7 @@ Prefix :
 
 // 7.1.5
 Import:
-	'import' module=[Module|Identifier] StatementEnd;
+	'import' module=[AbstractModule|Identifier] StatementEnd;
 	
 // 7.1.5.1
 RevisionDate:
@@ -123,7 +130,7 @@ RevisionDate:
 
 // 7.1.6
 Include: 
-	'include' subModule=[Submodule|Identifier] StatementEnd ;
+	'include' module=[AbstractModule|Identifier] StatementEnd ;
 
 // 7.1.7
 Organization: 
@@ -143,7 +150,7 @@ Submodule:
 
 // 7.2.2
 BelongsTo : 
-	'belongs-to' belongsTo=[Module|Identifier] StatementEnd;
+	'belongs-to' module=[Module|Identifier] StatementEnd;
 
 // 7.3
 Typedef: 

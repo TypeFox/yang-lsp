@@ -93,10 +93,10 @@ class YangParsingTest {
 		                            attr EString reference '"RFC 6991: Common YANG Data Types"'
 		                        }
 		                    ]
-		                    ref Module module ref: Module@(unresolved proxy __synthetic0.yang#|0)
+		                    ref AbstractModule module ref: AbstractModule@(unresolved proxy __synthetic0.yang#|0)
 		                }
 		                4 : Include {
-		                    ref Submodule subModule ref: Submodule@(unresolved proxy __synthetic0.yang#|1)
+		                    ref AbstractModule module ref: AbstractModule@(unresolved proxy __synthetic0.yang#|1)
 		                }
 		                5 : Organization {
 		                    attr EString organization '"Example Inc."'

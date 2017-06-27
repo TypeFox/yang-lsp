@@ -3,38 +3,43 @@
  */
 package io.typefox.yang.scoping
 
-import io.typefox.yang.yang.Import
-import io.typefox.yang.yang.RevisionDate
+import io.typefox.yang.resource.ScopeContext
+import io.typefox.yang.yang.YangPackage
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
-import org.eclipse.xtext.scoping.IScope
+import org.eclipse.xtext.scoping.IScopeProvider
 
 /**
- * This class contains custom scoping description.
- * 
- * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#scoping
- * on how and when to use it.
+ * Scope provider for YANG, which is based on single batch processing and subsequently caching scopes
  */
-class YangScopeProvider extends AbstractYangScopeProvider {
+class YangScopeProvider implements IScopeProvider {
 
 	override getScope(EObject context, EReference reference) {
-		this.internalGetScope(context, reference)
-	}
-	
-	dispatch def IScope internalGetScope(EObject context, EReference reference) {
-		super.getScope(context, reference)
-	}
-	
-	dispatch def IScope internalGetScope(Import context, EReference reference) {
-		val parent = super.getScope(context, reference)
-		val rev = context.subStatements.filter(RevisionDate).head
-		if (rev === null) {
-			return parent
+		val ctx = findScopeInAdapters(context, reference)
+		switch reference.eClass {
+			case YangPackage.Literals.ABSTRACT_MODULE : {
+				return ctx.moduleScope;
+			}
+			default : {
+				return ctx.definitionScope;
+			}
 		}
-		return new PriorizingScope(parent, [
-			val userData = getUserData(ResourceDescriptionStrategy.REVISION)
-			return userData !== null && userData == rev.date
-		])
+	}
+	
+	protected def ScopeContext findScopeInAdapters(EObject object, EReference reference) {
+		val scopesAdapter = ScopeContext.findInEmfObject(object)
+		if (scopesAdapter !== null) {
+			return scopesAdapter
+		}
+		var container = object.eContainer
+		while (container !== null) {
+			val adapter = ScopeContext.findInEmfObject(object)
+			if (adapter !== null) {
+				return adapter
+			}
+			container = container.eContainer
+		}
+		return ScopeContext.findInEmfObject(object.eResource)
 	}
 	
 }
