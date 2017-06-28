@@ -14,6 +14,13 @@ import org.eclipse.xtext.scoping.IScope
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
 import io.typefox.yang.yang.BelongsTo
+import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.SchemaNode
+import org.eclipse.xtext.resource.EObjectDescription
+import org.eclipse.xtext.naming.QualifiedName
+import io.typefox.yang.yang.Prefix
+import io.typefox.yang.yang.IdentifierRef
+import io.typefox.yang.yang.GroupingRef
 
 class BatchProcessor implements IDerivedStateComputer {
 	
@@ -23,7 +30,8 @@ class BatchProcessor implements IDerivedStateComputer {
 	
 	override installDerivedState(DerivedStateAwareResource resource, boolean preLinkingPhase) {
 		if (!preLinkingPhase) {
-			val resourceScopeCtx = new ScopeContext(IScope.NULLSCOPE, globalScopeProvider.getScope(resource, ABSTRACT_IMPORT__MODULE, [true]))
+			val moduleScope = globalScopeProvider.getScope(resource, ABSTRACT_IMPORT__MODULE, null)
+			val resourceScopeCtx = new ScopeContext(moduleScope, IScope.NULLSCOPE)
 			resourceScopeCtx.attachToEmfObject(resource)
 			this.compute(resource.contents.filter(YangFile).head, resourceScopeCtx)
 		}
@@ -44,8 +52,29 @@ class BatchProcessor implements IDerivedStateComputer {
 		computeChildren(obj, ctx)
 	}
 	
+	dispatch def void internalCompute(AbstractModule module, ScopeContext ctx) {
+		// add top level schema nodes
+		for (node : module.subStatements.filter(SchemaNode)) {
+			val n = QualifiedName.create(node.name)
+			ctx.localNodes.put(n, new EObjectDescription(n, node, emptyMap))
+		}
+		computeChildren(module, ctx)
+	}
+	
+	dispatch def void internalCompute(IdentifierRef ref, ScopeContext ctx) {
+		linker.link(ref, IDENTIFIER_REF__NODE) [ name |
+			ctx.nodeScope.getSingleElement(name)
+		]
+	}
+	
+	dispatch def void internalCompute(GroupingRef ref, ScopeContext ctx) {
+		linker.link(ref, GROUPING_REF__NODE) [ name |
+			ctx.nodeScope.getSingleElement(name)
+		]
+	}
+	
 	dispatch def void internalCompute(AbstractImport element, ScopeContext ctx) {
-		linker.link(element, ABSTRACT_IMPORT__MODULE) [ name |
+		val importedModule = linker.<AbstractModule>link(element, ABSTRACT_IMPORT__MODULE) [ name |
 			val rev = element.subStatements.filter(RevisionDate).head
 			val candidates = ctx.moduleScope.getElements(name)
 			if (rev !== null) {
@@ -58,11 +87,20 @@ class BatchProcessor implements IDerivedStateComputer {
 				}
 				val other = candidates.head
 				if (other !== null) {				
-					validator.addIssue(rev, REVISION_DATE__DATE, "The "+other.getEClass.name.toLowerCase+" '" + name + "' doesn't exist in revision '"+rev.date+"'.", IssueCodes.UNKOWN_REVISION)
+					validator.addIssue(rev, REVISION_DATE__DATE, "The "+other.getEClass.name.toLowerCase+" '" + name + "' doesn't exist in revision '"+rev.date+"'.", IssueCodes.UNKNOWN_REVISION)
 				}
 			}
 			return candidates.head
 		]
+		val prefix = element.subStatements.filter(Prefix).head?.prefix
+		if (prefix === null) {
+			validator.addIssue(element, ABSTRACT_IMPORT__MODULE, "The 'prefix' statement is mandatory.", IssueCodes.MISSING_PREFIX)
+		} else if (importedModule !== null) {			
+			for (node : importedModule.subStatements.filter(SchemaNode)) {
+				val qn = QualifiedName.create(prefix, node.name)
+				ctx.localNodes.put(qn, new EObjectDescription(qn, node, emptyMap))
+			}
+		}
 		computeChildren(element, ctx)
 	}
 	

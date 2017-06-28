@@ -101,7 +101,7 @@
   <eClassifiers xsi:type="ecore:EClass" name="Anyxml" eSuperTypes="#//DataSchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Grouping" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Uses" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="grouping" eType="#//IdentifierRef"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="grouping" eType="#//GroupingRef"
         containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Refine" eSuperTypes="#//OtherStatement">
@@ -190,7 +190,6 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="isRequireInstance" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Unknown" eSuperTypes="#//SchemaNode">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="prefix" eType="#//Prefix"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//Extension"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="SchemaNodeIdentifier">
@@ -199,8 +198,10 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AbsoluteSchemaNodeIdentifier" eSuperTypes="#//SchemaNodeIdentifier"/>
   <eClassifiers xsi:type="ecore:EClass" name="DescendantSchemaNodeIdentifier" eSuperTypes="#//SchemaNodeIdentifier"/>
+  <eClassifiers xsi:type="ecore:EClass" name="GroupingRef">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//Grouping"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="IdentifierRef" eSuperTypes="#//PredicatedIdentifierRef">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="prefix" eType="#//Prefix"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//SchemaNode"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="PredicatedIdentifierRef">

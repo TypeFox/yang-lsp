@@ -271,7 +271,7 @@ Grouping:
 
 // 7.13
 Uses:
-	'uses' grouping=IdentifierRef StatementEnd
+	'uses' grouping=GroupingRef StatementEnd
 ;
 
 // 7.13.2
@@ -430,7 +430,7 @@ RequireInstance:
 ;
 
 Unknown:
-	prefix=[Prefix|ID] ':' node=[Extension|ID] name=StringValue? StatementEnd 
+	node=[Extension|QNAME] name=StringValue? StatementEnd 
 ;
 
 SchemaNodeIdentifier:
@@ -446,8 +446,12 @@ DescendantSchemaNodeIdentifier:
 	elements+=IdentifierRef ('/' elements+=IdentifierRef)*
 ;
 
+GroupingRef:
+	node=[Grouping|QNAME]
+;
+
 IdentifierRef:
-	(prefix=[Prefix|ID] ':')? node=[SchemaNode|ID]
+	node=[SchemaNode|QNAME]
 ;
 
 PredicatedIdentifierRef:
@@ -469,7 +473,9 @@ InstanceIdentifier :
 
 // Leafref path
 
-
+QNAME:
+	(ID ':')? ID
+;
 
 Identifier:
 	STRING

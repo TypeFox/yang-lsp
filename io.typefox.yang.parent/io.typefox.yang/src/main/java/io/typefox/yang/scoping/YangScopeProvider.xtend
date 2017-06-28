@@ -18,10 +18,10 @@ class YangScopeProvider implements IScopeProvider {
 		val ctx = findScopeInAdapters(context, reference)
 		switch reference.eClass {
 			case YangPackage.Literals.ABSTRACT_MODULE : {
-				return ctx.moduleScope;
+				return ctx.moduleScope
 			}
 			default : {
-				return ctx.definitionScope;
+				return ctx.nodeScope
 			}
 		}
 	}

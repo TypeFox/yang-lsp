@@ -1,25 +1,14 @@
 package io.typefox.yang.tests.linking
 
-import com.google.inject.Inject
-import com.google.inject.Provider
 import io.typefox.yang.tests.YangInjectorProvider
-import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.yang.BelongsTo
+import io.typefox.yang.yang.Grouping
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Include
-import io.typefox.yang.yang.YangFile
-import java.util.ArrayList
-import java.util.Collections
-import org.eclipse.emf.common.util.URI
-import org.eclipse.emf.ecore.resource.Resource
-import org.eclipse.xtext.resource.IResourceDescription
-import org.eclipse.xtext.resource.IResourceServiceProvider
-import org.eclipse.xtext.resource.XtextResourceSet
-import org.eclipse.xtext.resource.impl.ResourceDescriptionsData
+import io.typefox.yang.yang.Uses
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
-import org.eclipse.xtext.testing.util.ResourceHelper
-import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
@@ -27,27 +16,7 @@ import static org.junit.Assert.*
 
 @RunWith(XtextRunner)
 @InjectWith(YangInjectorProvider)
-class ModuleLinkingTest {
-	
-	@Inject Provider<XtextResourceSet> resourceSetProvider;
-	@Inject ResourceHelper resourceHelper
-	@Inject IResourceDescription.Manager mnr
-	
-	XtextResourceSet resourceSet
-	
-	@Before def void setup() {
-		resourceSet = resourceSetProvider.get
-		
-	}
-	
-	private def Resource load(CharSequence contents) {
-		val uri = URI.createURI("synthetic:///__synthetic"+resourceSet.resources.size+".yang")
-		return resourceHelper.resource(contents.toString, uri, resourceSet)
-	}
-	
-	private def AbstractModule root(Resource r) {
-		return (r.contents.head as YangFile).statements.head as AbstractModule
-	}
+class ModuleLinkingTest extends AbstractLinkingTest {
 	
 	@Test def void testModuleExport() {
 		val m = load('''
@@ -70,6 +39,15 @@ class ModuleLinkingTest {
 			}
 		''')
 		assertSame(m.root, m2.root.subStatements.filter(Import).head.module)
+	}
+	
+	@Test def void testModuleImport_NoPefix() {
+		val m = load('''
+			module b {
+				import a;
+			}
+		''')
+		assertError(m.root.subStatements.head, IssueCodes.MISSING_PREFIX)
 	}
 	
 	@Test def void testModuleImportWithRevision() {
@@ -101,7 +79,10 @@ class ModuleLinkingTest {
 				}
 			}
 		''')
+		installIndex
 		assertSame(m1.root, m2.root.subStatements.filter(Import).head.module)
+		val uses = m2.root.eAllContents.filter(Uses).head
+		assertSame(m1.root.subStatements.filter(Grouping).head, uses.grouping.node)
 	}
 	
 	@Test def void testModuleImportWithRevision_01() {
@@ -227,22 +208,5 @@ class ModuleLinkingTest {
 		assertSame(m2.root, m.root.subStatements.filter(BelongsTo).head.module)
 	}
 	
-	private def void installIndex() {
-		val index = new ResourceDescriptionsData(Collections.emptyList)
-		val resources = new ArrayList(resourceSet.resources)
-		for (resource : resources) {
-			index(resource, resource.URI, index)
-		}
-		ResourceDescriptionsData.ResourceSetAdapter.installResourceDescriptionsData(resourceSet, index)
-	}
-
-	private def void index(Resource resource, URI uri, ResourceDescriptionsData index) {
-		val serviceProvider = IResourceServiceProvider.Registry.INSTANCE.getResourceServiceProvider(uri)
-		if (serviceProvider !== null) {
-			val resourceDescription = serviceProvider.resourceDescriptionManager.getResourceDescription(resource)
-			if (resourceDescription !== null) {
-				index.addDescription(uri, resourceDescription)
-			}
-		}
-	}
+	
 }

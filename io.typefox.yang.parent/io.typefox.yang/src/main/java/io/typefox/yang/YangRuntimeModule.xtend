@@ -12,6 +12,10 @@ import org.eclipse.xtext.validation.ResourceValidatorImpl
 import org.eclipse.xtext.xbase.annotations.validation.DerivedStateAwareResourceValidator
 import org.eclipse.xtext.resource.IDerivedStateComputer
 import io.typefox.yang.resource.BatchProcessor
+import org.eclipse.xtext.validation.ConfigurableIssueCodesProvider
+import io.typefox.yang.validation.IssueCodes
+import org.eclipse.xtext.naming.IQualifiedNameConverter
+import io.typefox.yang.scoping.QualifiedNameConverter
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
@@ -37,4 +41,13 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 	def Class<? extends ResourceValidatorImpl> bindResourceValidatorImpl() {
 		return DerivedStateAwareResourceValidator
 	}
+	
+	def Class<? extends ConfigurableIssueCodesProvider> bindConfigurableIssueCodes() {
+		IssueCodes
+	}
+	
+	def Class<? extends IQualifiedNameConverter> bindIQualifiedNameConverter() {
+		QualifiedNameConverter
+	}
+	
 }
