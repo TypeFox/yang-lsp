@@ -1,21 +1,15 @@
 package io.typefox.yang.tests.linking
 
-import io.typefox.yang.tests.YangInjectorProvider
 import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.yang.BelongsTo
 import io.typefox.yang.yang.Grouping
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Include
 import io.typefox.yang.yang.Uses
-import org.eclipse.xtext.testing.InjectWith
-import org.eclipse.xtext.testing.XtextRunner
 import org.junit.Test
-import org.junit.runner.RunWith
 
 import static org.junit.Assert.*
 
-@RunWith(XtextRunner)
-@InjectWith(YangInjectorProvider)
 class ModuleLinkingTest extends AbstractLinkingTest {
 	
 	@Test def void testModuleExport() {

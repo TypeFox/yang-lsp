@@ -7,6 +7,7 @@ import org.eclipse.xtext.validation.SeverityConverter
 
 class IssueCodes extends ConfigurableIssueCodesProvider {
 	public static val UNKNOWN_REVISION = 'UNKNOWN_REVISION'
+	public static val DUPLICATE_NAME = 'DUPLICATE_NAME'
 	public static val MISSING_PREFIX = 'MISSING_PREFIX'
 	public static val MISSING_REVISION = 'MISSING_REVISION'
 	public static val IMPORT_NOT_A_MODULE = 'IMPORT_NOT_A_MODULE'
@@ -15,6 +16,7 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	
 	private static Map<String,PreferenceKey> codes = #{
 		error(UNKNOWN_REVISION),
+		error(DUPLICATE_NAME),
 		error(MISSING_PREFIX),
 		warn(MISSING_REVISION),
 		error(IMPORT_NOT_A_MODULE),

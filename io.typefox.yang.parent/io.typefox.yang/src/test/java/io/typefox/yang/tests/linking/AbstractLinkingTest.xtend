@@ -1,5 +1,6 @@
 package io.typefox.yang.tests.linking
 
+import io.typefox.yang.tests.YangInjectorProvider
 import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.YangFile
 import java.util.ArrayList
@@ -12,12 +13,17 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.resource.IResourceDescription
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsData
+import org.eclipse.xtext.testing.InjectWith
+import org.eclipse.xtext.testing.XtextRunner
 import org.eclipse.xtext.testing.util.ResourceHelper
 import org.eclipse.xtext.testing.validation.ValidationTestHelper
-import org.junit.Before
 import org.junit.Assert
+import org.junit.Before
+import org.junit.runner.RunWith
 
-class AbstractLinkingTest {
+@RunWith(XtextRunner)
+@InjectWith(YangInjectorProvider)
+abstract class AbstractLinkingTest {
 	@Inject Provider<XtextResourceSet> resourceSetProvider;
 	@Inject ResourceHelper resourceHelper
 	@Inject protected IResourceDescription.Manager mnr

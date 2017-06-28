@@ -4,28 +4,29 @@ import com.google.inject.Inject
 import io.typefox.yang.scoping.ResourceDescriptionStrategy
 import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.yang.AbstractImport
+import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.BelongsTo
+import io.typefox.yang.yang.GroupingRef
+import io.typefox.yang.yang.IdentifierRef
+import io.typefox.yang.yang.Import
+import io.typefox.yang.yang.Include
+import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.RevisionDate
+import io.typefox.yang.yang.SchemaNode
+import io.typefox.yang.yang.Submodule
 import io.typefox.yang.yang.YangFile
 import org.eclipse.emf.ecore.EObject
+import org.eclipse.xtext.EcoreUtil2
+import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.DerivedStateAwareResource
+import org.eclipse.xtext.resource.EObjectDescription
 import org.eclipse.xtext.resource.IDerivedStateComputer
 import org.eclipse.xtext.scoping.IGlobalScopeProvider
-import org.eclipse.xtext.scoping.IScope
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
-import io.typefox.yang.yang.BelongsTo
-import io.typefox.yang.yang.AbstractModule
-import io.typefox.yang.yang.SchemaNode
-import org.eclipse.xtext.resource.EObjectDescription
-import org.eclipse.xtext.naming.QualifiedName
-import io.typefox.yang.yang.Prefix
-import io.typefox.yang.yang.IdentifierRef
-import io.typefox.yang.yang.GroupingRef
-import org.eclipse.xtext.EcoreUtil2
-import io.typefox.yang.yang.Submodule
-import io.typefox.yang.yang.Import
-import io.typefox.yang.yang.Module
-import io.typefox.yang.yang.Include
+import io.typefox.yang.yang.DataSchemaNode
+import io.typefox.yang.yang.Container
 
 class BatchProcessor implements IDerivedStateComputer {
 	
@@ -36,7 +37,7 @@ class BatchProcessor implements IDerivedStateComputer {
 	override installDerivedState(DerivedStateAwareResource resource, boolean preLinkingPhase) {
 		if (!preLinkingPhase) {
 			val moduleScope = globalScopeProvider.getScope(resource, ABSTRACT_IMPORT__MODULE, null)
-			val resourceScopeCtx = new ScopeContext(moduleScope, IScope.NULLSCOPE)
+			val resourceScopeCtx = new ScopeContext(moduleScope)
 			resourceScopeCtx.attachToEmfObject(resource)
 			this.compute(resource.contents.filter(YangFile).head, resourceScopeCtx)
 		}
@@ -55,6 +56,20 @@ class BatchProcessor implements IDerivedStateComputer {
 	
 	dispatch def void internalCompute(EObject obj, ScopeContext ctx) {		
 		computeChildren(obj, ctx)
+	}
+	
+	dispatch def void internalCompute(Container obj, ScopeContext ctx) {
+		ctx.addNode(obj)
+		computeChildren(obj, ctx.newNodeNamespace(obj))
+	}
+	
+	private def void addNode(ScopeContext ctx, DataSchemaNode node) {
+		val n = QualifiedName.create(node.name)
+		if (ctx.localNodes.containsKey(n)) {
+			validator.addIssue(node, SCHEMA_NODE__NAME, '''A data node with the name '«n»' already exists in this scope.''', IssueCodes.DUPLICATE_NAME)
+		} else {
+			ctx.localNodes.put(n, new EObjectDescription(n, node, emptyMap))
+		}
 	}
 	
 	dispatch def void internalCompute(AbstractModule module, ScopeContext ctx) {

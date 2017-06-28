@@ -127,13 +127,11 @@ class YangParsingTest {
 		                    cref Statement subStatements [
 		                        0: Unknown {
 		                            attr EString name 'rf3-4.5345we2'
-		                            ref Prefix prefix ref: Prefix@(unresolved proxy __synthetic0.yang#|4)
-		                            ref Extension node ref: Extension@(unresolved proxy __synthetic0.yang#|5)
+		                            ref Extension node ref: Extension@(unresolved proxy __synthetic0.yang#|3)
 		                        }
 		                    ]
 		                    attr EString name 'rule'
-		                    ref Prefix prefix ref: Prefix@(unresolved proxy __synthetic0.yang#|2)
-		                    ref Extension node ref: Extension@(unresolved proxy __synthetic0.yang#|3)
+		                    ref Extension node ref: Extension@(unresolved proxy __synthetic0.yang#|2)
 		                }
 		            ]
 		            attr EString name 'example-system'
