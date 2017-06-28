@@ -54,8 +54,8 @@ class YangValidatorTest {
 	def void checkModule_Version() {
 		val result = '''
 			module example-system {
-			  yang-version 1.1;
 			  namespace "urn:example:system";
+			  yang-version 1.1;
 			  prefix "sys";
 			}
 		'''.parse;

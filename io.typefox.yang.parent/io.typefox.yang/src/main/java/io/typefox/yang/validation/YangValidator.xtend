@@ -30,6 +30,9 @@ class YangValidator extends AbstractYangValidator {
 
 	@Inject
 	YangCardinalitiesHelper cardinalitiesHelper;
+	
+	@Inject
+	YangSubstatementRuleProvider substatementRuleProvider;
 
 	@Check
 	def void checkVersion(YangVersion it) {
@@ -56,7 +59,16 @@ class YangValidator extends AbstractYangValidator {
 	private def <S extends Statement> checkCardinalities(S container, String issueCode,
 		(S)=>Pair<? extends EObject, ? extends EStructuralFeature> issueLocationProvider) {
 
+		val rule = substatementRuleProvider.get(container.eClass);
+		if (rule === null) {
+			return;
+		}
+		
+
 		val allStatements = container.subStatements;
+		allStatements.forEach[
+			rule.isValidInContext(it, allStatements);
+		]
 		val Collection<Statement> invalidStatements = newArrayList(allStatements);
 		cardinalitiesHelper.getCardinalitiesFor(container.eClass).entrySet.forEach [
 			val clazz = key.instanceClass;
