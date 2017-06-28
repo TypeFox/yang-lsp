@@ -21,6 +21,11 @@ import org.eclipse.xtext.naming.QualifiedName
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.IdentifierRef
 import io.typefox.yang.yang.GroupingRef
+import org.eclipse.xtext.EcoreUtil2
+import io.typefox.yang.yang.Submodule
+import io.typefox.yang.yang.Import
+import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.Include
 
 class BatchProcessor implements IDerivedStateComputer {
 	
@@ -90,18 +95,47 @@ class BatchProcessor implements IDerivedStateComputer {
 					validator.addIssue(rev, REVISION_DATE__DATE, "The "+other.getEClass.name.toLowerCase+" '" + name + "' doesn't exist in revision '"+rev.date+"'.", IssueCodes.UNKNOWN_REVISION)
 				}
 			}
-			return candidates.head
+			val iter = candidates.iterator
+			val result = if (iter.hasNext) iter.next
+			if (iter.hasNext) {
+				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, '''Multiple revisions are available [«candidates.join(', ')[name.toString]»]''', IssueCodes.MISSING_REVISION)
+			}
+			return result
 		]
 		val prefix = element.subStatements.filter(Prefix).head?.prefix
 		if (prefix === null) {
 			validator.addIssue(element, ABSTRACT_IMPORT__MODULE, "The 'prefix' statement is mandatory.", IssueCodes.MISSING_PREFIX)
-		} else if (importedModule !== null) {			
+		} 
+		if (importedModule !== null) {	
 			for (node : importedModule.subStatements.filter(SchemaNode)) {
 				val qn = QualifiedName.create(prefix, node.name)
 				ctx.localNodes.put(qn, new EObjectDescription(qn, node, emptyMap))
 			}
 		}
+		if (importedModule instanceof Submodule) {
+			if (element instanceof Import) {
+				validator.addIssue(element, null, '''The submodule '«importedModule.name»' needs to be 'included' not 'imported'.''', IssueCodes.IMPORT_NOT_A_MODULE)
+			}
+			val module = findModule(element)
+			val importedBelongsTo = importedModule.subStatements.filter(BelongsTo).head?.module
+			if (importedBelongsTo !== null && importedBelongsTo !== module) {
+				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, '''The imported submodule '«importedModule.name»' belongs to the differet module '«importedBelongsTo.name»'.''', IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)			
+			}
+		}
+		if (importedModule instanceof Module) {
+			if (element instanceof Include) {
+				validator.addIssue(element, null, '''The module '«importedModule.name»' needs to be 'imported' not 'included'.''', IssueCodes.INCLUDE_NOT_A_SUB_MODULE)
+			}
+		}
 		computeChildren(element, ctx)
+	}
+	
+	protected def findModule(EObject obj) {
+		val candidate = EcoreUtil2.getContainerOfType(obj, AbstractModule)
+		if (candidate instanceof Submodule ) {
+			return candidate.subStatements.filter(BelongsTo).head.module
+		}
+		return candidate
 	}
 	
 	dispatch def void internalCompute(BelongsTo element, ScopeContext ctx) {

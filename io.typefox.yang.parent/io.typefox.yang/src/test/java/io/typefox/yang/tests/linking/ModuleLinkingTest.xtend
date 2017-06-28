@@ -113,9 +113,28 @@ class ModuleLinkingTest extends AbstractLinkingTest {
 				}
 			}
 		''')
-		// no explicit revision => should link to any
-		// TODO warning validation (multiple candidates)
+		val imp = m2.root.subStatements.filter(Import).head
+		assertWarning(imp, IssueCodes.MISSING_REVISION)
 		assertFalse(m2.root.subStatements.filter(Import).head.module.eIsProxy)
+	}
+	
+	@Test def void testModuleBelongsToAnotherOne() {
+		load('''
+			module a {
+			}
+		''')
+		val m1 = load('''
+			module b {
+				include c;
+			}
+		''')
+		load('''
+			submodule c {
+				belongs-to a;
+			}
+		''')
+		installIndex
+		assertError(m1.root.subStatements.head, IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)
 	}
 	
 	@Test def void testModuleImportWithRevision_02() {
@@ -186,8 +205,10 @@ class ModuleLinkingTest extends AbstractLinkingTest {
 				}
 			}
 		''')
-		// links to the module but should be erroneous
-		assertFalse(m2.root.subStatements.filter(Import).head.module.eIsProxy)
+		val imp = m2.root.subStatements.filter(Import).head
+		assertError(imp, IssueCodes.MISSING_PREFIX)
+		assertError(imp, IssueCodes.IMPORT_NOT_A_MODULE)
+		assertFalse(imp.module.eIsProxy)
 	}
 	
 	@Test def void testSubModuleBelongsTo() {

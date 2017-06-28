@@ -42,6 +42,7 @@ class Linker {
 					return resolved as T
 				} else {
 					addLinkingIssue(element.eResource as XtextResource, node, "Unknown symbol '" + symbol + "'.")
+					(element.eResource as YangResource).unresolvableURIFragments.add(uri.fragment)
 				}
 			}
 		}

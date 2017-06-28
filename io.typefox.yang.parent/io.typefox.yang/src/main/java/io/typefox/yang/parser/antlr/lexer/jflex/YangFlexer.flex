@@ -232,7 +232,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "typedef"                {yybegin(BLACK_BOX_STRING); return Typedef; }
  "unique"                 {yybegin(EXPRESSION); return Unique; }
  "units"                  {yybegin(BLACK_BOX_STRING); return Units; }
- "uses"                   {yybegin(BLACK_BOX_STRING); return Uses; }
+ "uses"                   {yybegin(EXPRESSION); return Uses; }
  "value"                  {yybegin(BLACK_BOX_STRING); return Value; }
  "when"                   {yybegin(EXPRESSION); return When; }
  "yang-version"           {yybegin(BLACK_BOX_STRING); return YangVersion; }

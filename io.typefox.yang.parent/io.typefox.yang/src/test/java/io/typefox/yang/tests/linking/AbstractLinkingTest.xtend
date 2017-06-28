@@ -7,14 +7,15 @@ import java.util.Collections
 import javax.inject.Inject
 import javax.inject.Provider
 import org.eclipse.emf.common.util.URI
+import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.resource.IResourceDescription
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsData
 import org.eclipse.xtext.testing.util.ResourceHelper
-import org.junit.Before
 import org.eclipse.xtext.testing.validation.ValidationTestHelper
-import org.eclipse.emf.ecore.EObject
+import org.junit.Before
+import org.junit.Assert
 
 class AbstractLinkingTest {
 	@Inject Provider<XtextResourceSet> resourceSetProvider;
@@ -32,9 +33,16 @@ class AbstractLinkingTest {
 		validator.assertError(obj, obj.eClass, code)
 	}
 	
+	protected def assertWarning(EObject obj, String code) {
+		validator.assertWarning(obj, obj.eClass, code)
+	}
+	
 	protected def Resource load(CharSequence contents) {
 		val uri = URI.createURI("synthetic:///__synthetic"+resourceSet.resources.size+".yang")
-		return resourceHelper.resource(contents.toString, uri, resourceSet)
+		val resource = resourceHelper.resource(contents.toString, uri, resourceSet)
+		resource.load(emptyMap)
+		Assert.assertTrue(resource.errors.join('\n')[message], resource.errors.empty)
+		return resource
 	}
 	
 	protected def AbstractModule root(Resource r) {

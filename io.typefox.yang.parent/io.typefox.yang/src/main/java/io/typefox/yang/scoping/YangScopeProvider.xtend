@@ -8,6 +8,7 @@ import io.typefox.yang.yang.YangPackage
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.scoping.IScopeProvider
+import org.eclipse.xtext.scoping.IScope
 
 /**
  * Scope provider for YANG, which is based on single batch processing and subsequently caching scopes
@@ -16,6 +17,9 @@ class YangScopeProvider implements IScopeProvider {
 
 	override getScope(EObject context, EReference reference) {
 		val ctx = findScopeInAdapters(context, reference)
+		if (ctx === null) {
+			return IScope.NULLSCOPE
+		}
 		switch reference.eClass {
 			case YangPackage.Literals.ABSTRACT_MODULE : {
 				return ctx.moduleScope
