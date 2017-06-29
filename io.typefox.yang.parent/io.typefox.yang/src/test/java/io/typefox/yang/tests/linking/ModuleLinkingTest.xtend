@@ -36,6 +36,10 @@ class ModuleLinkingTest extends AbstractLinkingTest {
 	}
 	
 	@Test def void testModuleImport_NoPefix() {
+		load('''
+			module a {
+			}
+		''')
 		val m = load('''
 			module b {
 				import a;
@@ -200,7 +204,6 @@ class ModuleLinkingTest extends AbstractLinkingTest {
 			}
 		''')
 		val imp = m2.root.subStatements.filter(Import).head
-		assertError(imp, IssueCodes.MISSING_PREFIX)
 		assertError(imp, IssueCodes.IMPORT_NOT_A_MODULE)
 		assertFalse(imp.module.eIsProxy)
 	}

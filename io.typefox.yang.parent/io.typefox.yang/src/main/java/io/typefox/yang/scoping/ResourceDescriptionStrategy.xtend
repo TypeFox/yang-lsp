@@ -17,7 +17,7 @@ class ResourceDescriptionStrategy extends DefaultResourceDescriptionStrategy {
 	
 	override createEObjectDescriptions(EObject m, IAcceptor<IEObjectDescription> acceptor) {
 		if (m instanceof AbstractModule) {
-			val revision = m.subStatements.filter(Revision).head
+			val revision = m.subStatements.filter(Revision).sortBy[revision].reverse.head
 			var data = emptyMap
 			if (revision !== null) {
 				data = #{
