@@ -1,9 +1,10 @@
 package io.typefox.yang.tests.linking
 
-import org.junit.Test
+import io.typefox.yang.tests.AbstractYangTest
 import io.typefox.yang.validation.IssueCodes
+import org.junit.Test
 
-class NodeLinkingTest extends AbstractLinkingTest {
+class NodeLinkingTest extends AbstractYangTest {
 	
 			
 	@Test def void testDuplicateNodeNames_01() {

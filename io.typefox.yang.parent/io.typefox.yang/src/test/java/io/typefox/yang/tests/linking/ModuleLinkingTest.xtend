@@ -1,5 +1,6 @@
 package io.typefox.yang.tests.linking
 
+import io.typefox.yang.tests.AbstractYangTest
 import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.yang.BelongsTo
 import io.typefox.yang.yang.Grouping
@@ -10,7 +11,7 @@ import org.junit.Test
 
 import static org.junit.Assert.*
 
-class ModuleLinkingTest extends AbstractLinkingTest {
+class ModuleLinkingTest extends AbstractYangTest {
 	
 	@Test def void testModuleExport() {
 		val m = load('''

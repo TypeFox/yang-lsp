@@ -1,4 +1,4 @@
-package io.typefox.yang.tests.linking
+package io.typefox.yang.tests
 
 import io.typefox.yang.tests.YangInjectorProvider
 import io.typefox.yang.yang.AbstractModule
@@ -23,7 +23,8 @@ import org.junit.runner.RunWith
 
 @RunWith(XtextRunner)
 @InjectWith(YangInjectorProvider)
-abstract class AbstractLinkingTest {
+abstract class AbstractYangTest {
+
 	@Inject Provider<XtextResourceSet> resourceSetProvider;
 	@Inject ResourceHelper resourceHelper
 	@Inject protected IResourceDescription.Manager mnr
@@ -39,8 +40,24 @@ abstract class AbstractLinkingTest {
 		validator.assertError(obj, obj.eClass, code)
 	}
 	
+	protected def assertError(EObject obj, String code, int offset, int length, String... messageParts) {
+		validator.assertError(obj, obj.eClass, code, offset, length, messageParts)
+	}
+	
 	protected def assertWarning(EObject obj, String code) {
 		validator.assertWarning(obj, obj.eClass, code)
+	}
+	
+	protected def assertWarning(EObject obj, String code, int offset, int length, String... messageParts) {
+		validator.assertWarning(obj, obj.eClass, code, offset, length, messageParts)
+	}
+	
+	protected def assertNoErrors(Resource resource) {
+		validator.assertNoErrors(resource)
+	}
+	
+	protected def assertNoErrors(EObject eObject) {
+		validator.assertNoErrors(eObject)
 	}
 	
 	protected def Resource load(CharSequence contents) {

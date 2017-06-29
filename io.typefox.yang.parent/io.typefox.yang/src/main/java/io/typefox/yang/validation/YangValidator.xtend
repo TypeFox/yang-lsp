@@ -36,12 +36,12 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def void checkModuleCardinalities(Module module) {
-		checkCardinalities(module, [module -> MODULE__NAME]);
+		checkCardinalities(module, [module -> ABSTRACT_MODULE__NAME]);
 	}
 
 	@Check
 	def void checkImportCardinalities(Import _import) {
-		checkCardinalities(_import, [_import -> IMPORT__MODULE]);
+		checkCardinalities(_import, [_import -> ABSTRACT_IMPORT__MODULE]);
 	}
 
 	@Check
