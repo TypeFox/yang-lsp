@@ -3,22 +3,18 @@
  */
 package io.typefox.yang.validation
 
-import com.google.common.collect.Iterables
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import io.typefox.yang.validation.SubstatementValidationHelper.MultiStatus
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Module
 import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangVersion
-import java.util.Collection
-import java.util.Collections
-import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.xtext.validation.Check
 
-import static com.google.common.base.CaseFormat.*
 import static io.typefox.yang.validation.YangIssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
@@ -28,9 +24,6 @@ import static io.typefox.yang.yang.YangPackage.Literals.*
 @Singleton
 class YangValidator extends AbstractYangValidator {
 
-	@Inject
-	YangCardinalitiesHelper cardinalitiesHelper;
-	
 	@Inject
 	YangSubstatementRuleProvider substatementRuleProvider;
 
@@ -43,74 +36,42 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def void checkModuleCardinalities(Module module) {
-		checkCardinalities(module, MODULE_SUB_STATEMENT_CARDINALITY, [module -> MODULE__NAME]);
+		checkCardinalities(module, [module -> MODULE__NAME]);
 	}
 
 	@Check
 	def void checkImportCardinalities(Import _import) {
-		checkCardinalities(_import, IMPORT_SUB_STATEMENT_CARDINALITY, [_import -> IMPORT__MODULE]);
+		checkCardinalities(_import, [_import -> IMPORT__MODULE]);
 	}
 
 	@Check
 	def void checkImportCardinalities(Revision revision) {
-		checkCardinalities(revision, REVISION_SUB_STATEMENT_CARDINALITY, [revision -> REVISION__REVISION]);
+		checkCardinalities(revision, [revision -> REVISION__REVISION]);
 	}
 
-	private def <S extends Statement> checkCardinalities(S container, String issueCode,
+	private def <S extends Statement> checkCardinalities(S container,
 		(S)=>Pair<? extends EObject, ? extends EStructuralFeature> issueLocationProvider) {
 
 		val rule = substatementRuleProvider.get(container.eClass);
 		if (rule === null) {
 			return;
 		}
-		
-
-		val allStatements = container.subStatements;
-		allStatements.forEach[
-			rule.isValidInContext(it, allStatements);
-		]
-		val Collection<Statement> invalidStatements = newArrayList(allStatements);
-		cardinalitiesHelper.getCardinalitiesFor(container.eClass).entrySet.forEach [
-			val clazz = key.instanceClass;
-			val statements = allStatements.filter(clazz);
-			invalidStatements.removeAll(statements);
-			val actualCardinality = statements.size;
-			val expectedCardinality = value;
-			if (!expectedCardinality.contains(actualCardinality)) {
-				val message = '''Expected '«clazz.yangName»' with «expectedCardinality» cardinality for «container.yangName». Got «actualCardinality» instead.''';
-				if (actualCardinality === 0) {
-					val issueLocation = issueLocationProvider.apply(container);
+	
+		val globalStatus = rule.checkContext(container);
+		if (!globalStatus.OK) {
+			if (globalStatus instanceof MultiStatus) {
+				val issueLocation = issueLocationProvider.apply(container);
+				globalStatus.children.forEach[
 					error(message, issueLocation.key, issueLocation.value, issueCode);
-				} else {
-					statements.forEach [
-						val index = allStatements.indexOf(it);
-						error(message, container, STATEMENT__SUB_STATEMENTS, index, issueCode);
-					];
-				}
+				];
 			}
-		];
-		invalidStatements.forEach [
-			val index = allStatements.indexOf(it);
-			val message = '''Unexpected declaration of '«eClass.yangName»' statement in «container.yangName».''';
-			error(message, container, STATEMENT__SUB_STATEMENTS, index, INVALID_SUB_STATEMENT);
-		]
-	}
+		}		
 
-	private def dispatch String getYangName(EObject it) {
-		return eClass.instanceClass.yangName;
-	}
-
-	private def dispatch String getYangName(EClass it) {
-		return instanceClass.yangName;
-	}
-
-	private def dispatch String getYangName(Class<?> it) {
-		return UPPER_CAMEL.converterTo(LOWER_HYPHEN).convert(simpleName).toFirstLower;
-	}
-
-	private def removeAll(Iterable<?> removeFromHere, Iterable<?> removeThese) {
-		removeThese.forEach [
-			Iterables.removeAll(removeFromHere, Collections.singleton(it));
+		container.subStatements.forEach[statement, index |
+			val status = rule.checkStatementInContext(statement, container);
+			if (!status.OK) {
+				error(status.message, container, STATEMENT__SUB_STATEMENTS, index, status.issueCode);
+			}
 		];
 	}
 

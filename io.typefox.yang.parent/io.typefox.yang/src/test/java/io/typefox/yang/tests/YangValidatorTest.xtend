@@ -47,15 +47,15 @@ class YangValidatorTest {
 			  prefix "sys";
 			}
 		'''.parse;
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 7, 14);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 7, 14);
 	}
 
 	@Test
 	def void checkModule_Version() {
 		val result = '''
 			module example-system {
-			  namespace "urn:example:system";
 			  yang-version 1.1;
+			  namespace "urn:example:system";
 			  prefix "sys";
 			}
 		'''.parse;
@@ -72,8 +72,8 @@ class YangValidatorTest {
 			  prefix "sys";
 			}
 		'''.parse;
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 26, 17);
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 46, 17);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 26, 17);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 46, 17);
 	}
 
 	@Test
@@ -84,7 +84,7 @@ class YangValidatorTest {
 			  prefix "sys";
 			}
 		'''.parse;
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 7, 14);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 7, 14);
 	}
 
 	@Test
@@ -109,8 +109,8 @@ class YangValidatorTest {
 			  prefix "sys";
 			}
 		'''.parse;
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 46, 31);
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 80, 31);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 46, 31);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 80, 31);
 	}
 
 	@Test
@@ -121,7 +121,7 @@ class YangValidatorTest {
 			  namespace "urn:example:system";
 			}
 		'''.parse;
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 7, 14);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 7, 14);
 	}
 
 	@Test
@@ -146,8 +146,8 @@ class YangValidatorTest {
 			  prefix "sys";
 			}
 		'''.parse;
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 80, 13);
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 96, 13);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 80, 13);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 96, 13);
 	}
 
 	@Test
@@ -186,8 +186,8 @@ class YangValidatorTest {
 			  contact "joe@example.com";
 			}
 		'''.parse;
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 96, 26);
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 125, 26);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 96, 26);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 125, 26);
 	}
 
 	@Test
@@ -229,8 +229,8 @@ class YangValidatorTest {
 				"The module for entities implementing the Example system.";
 			}
 		'''.parse;
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 96, 72);
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 171, 72);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 96, 72);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 171, 72);
 	}
 
 	@Test
@@ -269,8 +269,8 @@ class YangValidatorTest {
 			  organization "Example Inc.";
 			}
 		'''.parse;
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 96, 28);
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 127, 28);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 96, 28);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 127, 28);
 	}
 
 	@Test
@@ -309,8 +309,8 @@ class YangValidatorTest {
 			  reference "RFC 3986: Uniform Resource Identifier (URI): Generic Syntax";
 			}
 		'''.parse;
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 96, 72);
-		result.assertError(MODULE, MODULE_SUB_STATEMENT_CARDINALITY, 171, 72);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 96, 72);
+		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 171, 72);
 	}
 	
 	@Test
@@ -331,7 +331,7 @@ class YangValidatorTest {
 			  }
 			}
 		'''.parse;
-		result.assertError(MODULE, INVALID_SUB_STATEMENT, 185, 45);
+		result.assertError(MODULE, UNEXPECTED_SUBSTATEMENT, 185, 45);
 	}
 
 	@Test
@@ -351,7 +351,7 @@ class YangValidatorTest {
 			  }
 			}
 		'''.parse;
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 198, 15);
+		result.assertError(IMPORT, SUBSTATEMENT_CARDINALITY, 198, 15);
 	}
 
 	@Test
@@ -394,8 +394,8 @@ class YangValidatorTest {
 			  }
 			}
 		'''.parse;
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 219, 14);
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 237, 14);
+		result.assertError(IMPORT, SUBSTATEMENT_CARDINALITY, 219, 14);
+		result.assertError(IMPORT, SUBSTATEMENT_CARDINALITY, 237, 14);
 	}
 
 	@Test
@@ -461,8 +461,8 @@ class YangValidatorTest {
 			  }
 			}
 		'''.parse;
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 237, 40);
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 281, 40);
+		result.assertError(IMPORT, SUBSTATEMENT_CARDINALITY, 237, 40);
+		result.assertError(IMPORT, SUBSTATEMENT_CARDINALITY, 281, 40);
 	}
 
 	@Test
@@ -528,8 +528,8 @@ class YangValidatorTest {
 			  }
 			}
 		'''.parse;
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 237, 72);
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 313, 72);
+		result.assertError(IMPORT, SUBSTATEMENT_CARDINALITY, 237, 72);
+		result.assertError(IMPORT, SUBSTATEMENT_CARDINALITY, 313, 72);
 	}
 
 	@Test
@@ -568,8 +568,7 @@ class YangValidatorTest {
 			  prefix "sys";
 			  import ietf-yang-types {
 			  	prefix "yang";
-			  	revision 2007-06-09 {
-			  	}
+			  	revision-date 2008-01-01;
 			  }
 			}
 		'''.parse;
@@ -591,15 +590,13 @@ class YangValidatorTest {
 			  prefix "sys";
 			  import ietf-yang-types {
 			  	prefix "yang";
-			  	revision 2007-06-09 {
-			  	}
-			  	revision 2007-06-09 {
-			  	}
+			  	revision-date 2008-01-01;
+			  	revision-date 2008-01-01;
 			  }
 			}
 		'''.parse;
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 237, 26);
-		result.assertError(IMPORT, IMPORT_SUB_STATEMENT_CARDINALITY, 267, 26);
+		result.assertError(IMPORT, SUBSTATEMENT_CARDINALITY, 237, 25);
+		result.assertError(IMPORT, SUBSTATEMENT_CARDINALITY, 266, 25);
 	}
 
 	@Test
@@ -621,7 +618,7 @@ class YangValidatorTest {
 			  }
 			}
 		'''.parse;
-		result.assertError(IMPORT, INVALID_SUB_STATEMENT, 237, 28);
+		result.assertError(IMPORT, UNEXPECTED_SUBSTATEMENT, 237, 28);
 	}
 
 	@Test
@@ -651,8 +648,8 @@ class YangValidatorTest {
 			  description "Some description.";
 			}
 		'''.parse;
-		result.assertError(REVISION, REVISION_SUB_STATEMENT_CARDINALITY, 24, 32);
-		result.assertError(REVISION, REVISION_SUB_STATEMENT_CARDINALITY, 59, 32);
+		result.assertError(REVISION, SUBSTATEMENT_CARDINALITY, 24, 32);
+		result.assertError(REVISION, SUBSTATEMENT_CARDINALITY, 59, 32);
 	}
 
 	@Test
@@ -682,8 +679,8 @@ class YangValidatorTest {
 			  reference "Some external reference.";
 			}
 		'''.parse;
-		result.assertError(REVISION, REVISION_SUB_STATEMENT_CARDINALITY, 24, 37);
-		result.assertError(REVISION, REVISION_SUB_STATEMENT_CARDINALITY, 64, 37);
+		result.assertError(REVISION, SUBSTATEMENT_CARDINALITY, 24, 37);
+		result.assertError(REVISION, SUBSTATEMENT_CARDINALITY, 64, 37);
 	}
 
 	@Test
@@ -693,7 +690,7 @@ class YangValidatorTest {
 			  organization "Example Inc.";
 			}
 		'''.parse;
-		result.assertError(REVISION, INVALID_SUB_STATEMENT, 24, 28);
+		result.assertError(REVISION, UNEXPECTED_SUBSTATEMENT, 24, 28);
 	}
 
 }

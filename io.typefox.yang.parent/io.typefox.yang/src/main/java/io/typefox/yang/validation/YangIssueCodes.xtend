@@ -8,24 +8,19 @@ package io.typefox.yang.validation
 class YangIssueCodes {
 
 	/**
-	 * Issue code that are entangled with cardinality problems of module's sub-statements.
+	 * Issue code that are entangled with cardinality problems of container statement's sub-statements.
 	 */
-	public static val MODULE_SUB_STATEMENT_CARDINALITY = 'module.substatement.cardinality';
-	
-	/**
-	 * Issue code associated with cardinality problems of import's sub-statements.
-	 */
-	public static val IMPORT_SUB_STATEMENT_CARDINALITY = 'import.substatement.cardinality';
-	
-	/**
-	 * Issue code associated with cardinality problems of revision's sub-statements.
-	 */
-	public static val REVISION_SUB_STATEMENT_CARDINALITY = 'revision.substatement.cardinality';
+	public static val SUBSTATEMENT_CARDINALITY = 'substatement.cardinality';
 	
 	/**
 	 * Issue code indicating an invalid sub-statement inside its parent statement container.
 	 */
-	public static val INVALID_SUB_STATEMENT = 'invalid.substatement';
+	public static val UNEXPECTED_SUBSTATEMENT = 'unexpected.substatement';
+	
+	/**
+	 * Issue code for cases when a sub-statement incorrectly precedes another sub-statement.
+	 */
+	public static val SUBSTATEMENT_ORDERING = 'substatement.ordering';
 
 	/**
 	 * Issues code that is used when a module has anything but {@code '1.1'} version.

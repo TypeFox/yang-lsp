@@ -2,7 +2,7 @@ package io.typefox.yang.validation
 
 import com.google.common.collect.ImmutableMap
 import com.google.inject.Singleton
-import io.typefox.yang.validation.SubstatementRule.SubstatementGroup
+import io.typefox.yang.validation.SubstatementValidationHelper.SubstatementGroup
 import java.util.Map
 import org.eclipse.emf.ecore.EClass
 
