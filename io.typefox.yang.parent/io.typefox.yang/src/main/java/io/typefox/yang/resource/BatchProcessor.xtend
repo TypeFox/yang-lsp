@@ -22,8 +22,8 @@ class BatchProcessor implements IDerivedStateComputer {
 		if (!preLinkingPhase) {
 			val module = resource.contents.head.eContents.filter(AbstractModule).head
 			if (module !== null) {
-				val moduleScope = scopeComputer.getModuleScope(module)
-				this.doLinking(module, moduleScope)
+				val scopeContext = scopeComputer.getScopeContext(module)
+				this.doLinking(module, scopeContext)
 			}
 		}
 	}

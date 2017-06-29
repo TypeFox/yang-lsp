@@ -20,45 +20,50 @@ import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Submodule
 import io.typefox.yang.yang.Typedef
+import io.typefox.yang.yang.YangPackage
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.naming.QualifiedName
-import org.eclipse.xtext.scoping.IGlobalScopeProvider
+import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider
+import org.eclipse.xtext.scoping.IScope
+import org.eclipse.xtext.scoping.impl.SelectableBasedScope
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
+import org.eclipse.emf.ecore.resource.Resource
 
 class ScopeComputer {
 
 	@Inject Validator validator
 	@Inject Linker linker
-	@Inject IGlobalScopeProvider globalScopeProvider
+	@Inject ResourceDescriptionsProvider indexProvider
 	
-	def dispatch ScopeContext getModuleScope(Module module) {
+	def dispatch ScopeContext getScopeContext(Module module) {
 		var result = ScopeContext.findInEmfObject(module)
-		if (result !== null) return result
-		
-		val moduleScope = globalScopeProvider.getScope(module.eResource, ABSTRACT_IMPORT__MODULE, null)
+		if (result !== null) {
+			return result
+		}
+		val moduleScope = module.eResource.moduleScope
 		result = new ScopeContext(moduleScope)
 		result.attachToEmfObject(module)
-		computeScope(module, result)
+		computeChildren(module, result)
 		return result
 	}
 	
-	def dispatch ScopeContext getModuleScope(Submodule submodule) {
+	private def IScope getModuleScope(Resource resource) {
+		val index = indexProvider.getResourceDescriptions(resource)
+		return SelectableBasedScope.createScope(IScope.NULLSCOPE, index, YangPackage.Literals.ABSTRACT_MODULE, false)
+	}
+	
+	def dispatch ScopeContext getScopeContext(Submodule submodule) {
 		var result = ScopeContext.findInEmfObject(submodule)
-		if (result !== null) return result
-		
-		val belongsTo = submodule.subStatements.filter(BelongsTo).head
-		var Module module = null
-		val moduleScope = globalScopeProvider.getScope(submodule.eResource, ABSTRACT_IMPORT__MODULE, null)
-		if (belongsTo !== null) {
-			module = linker.link(belongsTo, BELONGS_TO__MODULE) [ name |
-				val candidates = moduleScope.getElements(name)
-				return candidates.head
-			]
-			if (module !== null) {
-				getModuleScope(module)
-			}
+		if (result !== null) {
+			return result
+		}
+		// if not yet computed, trigger scope computation for main module
+		val moduleScope = submodule.eResource.moduleScope
+		var Module module = submodule.getBelongingModule(moduleScope)
+		if (module !== null) {
+			getScopeContext(module)
 		}
 		// now check again
 		result = ScopeContext.findInEmfObject(submodule)
@@ -66,30 +71,42 @@ class ScopeComputer {
 		
 		// still no ctx, means that this submodule either has no module it belongs to or it is not imported by it.
 		// let's go with an empty parent scope
-		result = new ScopeContext(moduleScope).newSubmoduleNamespace(submodule)
-		computeScope(submodule, result)
+		computeScope(submodule, new ScopeContext(moduleScope))
 		return result
 	}
 	
-	protected def addLocalNames(ScopeContext ctx, Statement stmnt) {
-		addLocalNames(ctx, stmnt, null)
+	private def Module getBelongingModule(Submodule submodule, IScope moduleScope) {
+		val belongsTo = submodule.subStatements.filter(BelongsTo).head
+		if (belongsTo === null) {
+			return null
+		}
+		if (!belongsTo.module.eIsProxy) {
+			return belongsTo.module
+		} else {
+			return linker.link(belongsTo, BELONGS_TO__MODULE) [ name |
+				val candidates = moduleScope.getElements(name)
+				return candidates.head
+			]
+		}
 	}
 	
-	protected def addLocalNames(ScopeContext ctx, Statement stmnt, String prefix) {
-		for (node : stmnt.subStatements.filter(SchemaNode)) {
-			val n = if (prefix === null) QualifiedName.create(node.name) else QualifiedName.create(prefix, node.name) 
-			val scopeAndName = switch node {
-				DataSchemaNode : ctx.nodeScope -> 'A node'
-				Grouping : ctx.groupingScope -> 'A grouping'
-				Typedef : ctx.typeScope -> 'A type'
-				Identity : ctx.identityScope -> 'An identity'
-				Extension : ctx.extensionScope -> 'An extension'
-				Feature : ctx.featureScope -> 'A feature'
-			}
-			if (scopeAndName !== null) {
-				if (!scopeAndName.key.tryAddLocal(n, node)) {
-					validator.addIssue(node, SCHEMA_NODE__NAME, '''«scopeAndName.value» with the name '«n»' already exists.''', IssueCodes.DUPLICATE_NAME)
-				}
+	protected def addLocalName(ScopeContext ctx, SchemaNode node) {
+		addLocalName(ctx, node, null)
+	}
+	
+	protected def addLocalName(ScopeContext ctx, SchemaNode node, String prefix) {
+		val n = if (prefix === null) QualifiedName.create(node.name) else QualifiedName.create(prefix, node.name) 
+		val scopeAndName = switch node {
+			DataSchemaNode : ctx.nodeScope -> 'A node'
+			Grouping : ctx.groupingScope -> 'A grouping'
+			Typedef : ctx.typeScope -> 'A type'
+			Identity : ctx.identityScope -> 'An identity'
+			Extension : ctx.extensionScope -> 'An extension'
+			Feature : ctx.featureScope -> 'A feature'
+		}
+		if (scopeAndName !== null) {
+			if (!scopeAndName.key.tryAddLocal(n, node)) {
+				validator.addIssue(node, SCHEMA_NODE__NAME, '''«scopeAndName.value» with the name '«n»' already exists.''', IssueCodes.DUPLICATE_NAME)
 			}
 		}
 	}
@@ -97,17 +114,27 @@ class ScopeComputer {
 	protected dispatch def void computeScope(EObject module, ScopeContext ctx) {
 	}
 	
-	protected dispatch def void computeScope(AbstractModule module, ScopeContext ctx) {
-		ctx.addLocalNames(module)
-		for (child : module.subStatements) {
-			computeScope(child, ctx.newNodeNamespace(child))
-		}
+	protected dispatch def void computeScope(Submodule module, ScopeContext ctx) {
+		computeChildren(module, ctx.newSubmoduleNamespace(module))
+	}
+	
+	protected dispatch def void computeScope(Module module, ScopeContext ctx) {
+		computeChildren(module, ctx)
+	}
+	
+	protected dispatch def void computeScope(SchemaNode node, ScopeContext ctx) {
+		ctx.addLocalName(node)
+		computeChildren(node, ctx)
 	}
 	
 	protected dispatch def void computeScope(DataSchemaNode module, ScopeContext ctx) {
-		ctx.addLocalNames(module)
-		for (child : module.subStatements) {
-			computeScope(child, ctx.newNodeNamespace(child))
+		ctx.addLocalName(module)
+		computeChildren(module, ctx.newNodeNamespace(module))
+	}
+	
+	protected def void computeChildren(Statement statement, ScopeContext ctx) {
+		for (child : statement.subStatements) {
+			computeScope(child, ctx)
 		}
 	}
 	
@@ -142,11 +169,11 @@ class ScopeComputer {
 				validator.addIssue(element, null, '''The submodule '«importedModule.name»' needs to be 'included' not 'imported'.''', IssueCodes.IMPORT_NOT_A_MODULE)
 			}
 			val module = findContainingModule(element)
-			val importedBelongsTo = importedModule.subStatements.filter(BelongsTo).head?.module
-			if (importedBelongsTo !== null && importedBelongsTo !== module) {
-				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, '''The imported submodule '«importedModule.name»' belongs to the differet module '«importedBelongsTo.name»'.''', IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)			
+			val belongingModule = importedModule.getBelongingModule(ctx.moduleScope)
+			if (belongingModule !== null && belongingModule !== module) {
+				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, '''The imported submodule '«importedModule.name»' belongs to the differet module '«belongingModule.name»'.''', IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)			
 			} else {	
-				computeScope(importedModule, ctx.newSubmoduleNamespace(importedModule))
+				computeScope(importedModule, ctx)
 			}
 		}
 		if (importedModule instanceof Module) {
@@ -156,7 +183,7 @@ class ScopeComputer {
 			if (prefix === null) {
 				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, "The 'prefix' statement is mandatory.", IssueCodes.MISSING_PREFIX)
 			} else {	
-				ctx.importedModules.put(prefix, getModuleScope(importedModule))
+				ctx.importedModules.put(prefix, getScopeContext(importedModule))
 			}
 		}
 	}

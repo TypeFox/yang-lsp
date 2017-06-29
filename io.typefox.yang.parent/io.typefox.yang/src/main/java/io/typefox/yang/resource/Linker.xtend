@@ -46,7 +46,7 @@ class Linker {
 				}
 			}
 		}
-		return null
+		return proxy as T
 	}
 
 }

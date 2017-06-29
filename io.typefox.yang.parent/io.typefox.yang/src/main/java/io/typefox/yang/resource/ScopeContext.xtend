@@ -65,7 +65,7 @@ import io.typefox.yang.yang.BelongsTo
 	
 	def ScopeContext newSubmoduleNamespace(Submodule submodule) {
 		val result = new ScopeContext(moduleScope, nodeScope, groupingScope, typeScope, identityScope, featureScope, extensionScope, newHashMap())
-		try {		
+		try {
 			result.attachToEmfObject(submodule)
 		} catch (IllegalStateException e) {
 			// This can only happen when the submodule doesn't have a single belongsTo statement.
