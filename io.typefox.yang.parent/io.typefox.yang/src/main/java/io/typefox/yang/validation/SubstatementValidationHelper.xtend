@@ -51,6 +51,10 @@ abstract class SubstatementValidationHelper {
 		def must(EClass clazz) {
 			return add(clazz, Cardinality.MUST);
 		}
+		
+		def atLeastOne(EClass clazz) {
+			return add(clazz, Cardinality.AT_LEAST_ONE);
+		}
 
 		private def add(EClass clazz, Cardinality cardinality) {
 			val constraint = new SubstatementConstraint(clazz, cardinality);
@@ -167,6 +171,7 @@ abstract class SubstatementValidationHelper {
 		public static val ANY = new Cardinality(Range.closed(0, Integer.MAX_VALUE));
 		public static val OPTIONAL = new Cardinality(Range.closed(0, 1));
 		public static val MUST = new Cardinality(Range.closed(1, 1));
+		public static val AT_LEAST_ONE = new Cardinality(Range.closed(1, Integer.MAX_VALUE));
 
 		val Range<Integer> delegate;
 
