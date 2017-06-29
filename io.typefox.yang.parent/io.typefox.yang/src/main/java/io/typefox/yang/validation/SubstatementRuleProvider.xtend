@@ -9,7 +9,7 @@ import org.eclipse.emf.ecore.EClass
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 @Singleton
-class YangSubstatementRuleProvider {
+class SubstatementRuleProvider {
 	
 	static def newRule() {
 		return new SubstatementGroup();

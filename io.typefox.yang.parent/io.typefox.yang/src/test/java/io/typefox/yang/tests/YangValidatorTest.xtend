@@ -137,6 +137,18 @@ class YangValidatorTest {
 	}
 
 	@Test
+	def void checkModule_Prefix_Order() {
+		val result = '''
+			module example-system {
+			  namespace "urn:example:system";
+			  yang-version 1.1;
+			  prefix "sys";
+			}
+		'''.parse;
+		result.assertError(MODULE, SUBSTATEMENT_ORDERING, 60, 17);
+	}
+
+	@Test
 	def void checkModule_Prefix_Duplicate() {
 		val result = '''
 			module example-system {
@@ -312,7 +324,7 @@ class YangValidatorTest {
 		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 96, 72);
 		result.assertError(MODULE, SUBSTATEMENT_CARDINALITY, 171, 72);
 	}
-	
+
 	@Test
 	def void checkModule_Invalid() {
 		val result = '''
@@ -321,7 +333,7 @@ class YangValidatorTest {
 			  namespace "urn:foo:system";
 			  prefix "foo";
 			}
-
+			
 			module example-system {
 			  yang-version 1.1;
 			  namespace "urn:example:system";

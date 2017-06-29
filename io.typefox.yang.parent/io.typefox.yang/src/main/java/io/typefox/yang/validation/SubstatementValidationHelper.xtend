@@ -1,6 +1,5 @@
 package io.typefox.yang.validation
 
-import com.google.common.base.Preconditions
 import com.google.common.base.Splitter
 import com.google.common.collect.ImmutableList
 import com.google.common.collect.Range
@@ -134,14 +133,13 @@ abstract class SubstatementValidationHelper {
 			val ordinals = [Splitter.on(".").trimResults.splitToList(it).map[parseInt]];
 			val leftOrdinals = ordinals.apply(left);
 			val rightOrdinals = ordinals.apply(right);
-			Preconditions.checkArgument(!leftOrdinals.nullOrEmpty, '''Cannot parse ordinals: «left».''');
-			Preconditions.checkArgument(!rightOrdinals.nullOrEmpty, '''Cannot parse ordinals: «right».''');
 			for (var i = 0; i < leftOrdinals.size; i++) {
 				if (rightOrdinals.size > i) {
-					if (leftOrdinals.get(i) > rightOrdinals.get(i)) {
-						return true;
-					} else if (leftOrdinals.get(i) < rightOrdinals.get(i)) {
+					val result = Integer.compare(leftOrdinals.get(i), rightOrdinals.get(i));
+					if (result < 0) {
 						return false;
+					} else if (result > 0) {
+						return true;
 					}
 				} else {
 					return false;

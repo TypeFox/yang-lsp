@@ -25,7 +25,7 @@ import static io.typefox.yang.yang.YangPackage.Literals.*
 class YangValidator extends AbstractYangValidator {
 
 	@Inject
-	YangSubstatementRuleProvider substatementRuleProvider;
+	SubstatementRuleProvider substatementRuleProvider;
 
 	@Check
 	def void checkVersion(YangVersion it) {
