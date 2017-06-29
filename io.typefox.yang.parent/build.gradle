@@ -4,6 +4,7 @@ buildscript {
 		mavenLocal()
 	}
 	dependencies {
+		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
 		classpath 'org.xtext:xtext-gradle-plugin:1.0.15'
 	}
 }
@@ -24,6 +25,7 @@ subprojects {
 	apply from: "${rootDir}/gradle/maven-deployment.gradle"
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
+	apply plugin: 'com.github.johnrengelman.shadow'
 	
 	group = 'io.typefox.yang'
 	version = '1.0.0-SNAPSHOT'
@@ -34,4 +36,9 @@ subprojects {
 	configurations.all {
 		exclude group: 'asm'
 	}
+}
+
+// Workaround for issue https://github.com/researchgate/gradle-release/issues/144
+task build {
+	dependsOn subprojects.findResults { it.tasks.findByName('build') }
 }

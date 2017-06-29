@@ -17,6 +17,15 @@ Statement:
 	  OtherStatement
 ;
 
+AbstractModule:
+	Module|
+	Submodule
+;
+
+AbstractImport:
+	  Import
+	| Include
+;
 
 SchemaNode :
 	DataSchemaNode |
@@ -41,7 +50,9 @@ DataSchemaNode :
 ;
 
 OtherStatement :
-	  Action
+	  AbstractModule
+	| AbstractImport
+	| Action
 	| Anydata
 	| Argument
 	| Augment
@@ -59,15 +70,12 @@ OtherStatement :
 	| Deviate
 	| FractionDigits
 	| IfFeature
-	| Import
-	| Include
 	| Input
 	| Key
 	| Length
 	| Mandatory
 	| MaxElements
 	| MinElements
-	| Module
 	| Must
 	| Namespace
 	| OrderedBy
@@ -85,7 +93,6 @@ OtherStatement :
 	| Revision
 	| RevisionDate
 	| Status
-	| Submodule
 	| Type
 	| Unique
 	| Units
@@ -114,7 +121,7 @@ Prefix :
 
 // 7.1.5
 Import:
-	'import' module=[Module|Identifier] StatementEnd;
+	'import' module=[AbstractModule|Identifier] StatementEnd;
 	
 // 7.1.5.1
 RevisionDate:
@@ -123,7 +130,7 @@ RevisionDate:
 
 // 7.1.6
 Include: 
-	'include' subModule=[Submodule|Identifier] StatementEnd ;
+	'include' module=[AbstractModule|Identifier] StatementEnd ;
 
 // 7.1.7
 Organization: 
@@ -143,7 +150,7 @@ Submodule:
 
 // 7.2.2
 BelongsTo : 
-	'belongs-to' belongsTo=[Module|Identifier] StatementEnd;
+	'belongs-to' module=[Module|Identifier] StatementEnd;
 
 // 7.3
 Typedef: 
@@ -159,7 +166,12 @@ Default:
 
 // 7.4
 Type:
-	'type' baseType=[Typedef|Identifier] StatementEnd;
+	'type' typeRef=TypeReference StatementEnd;
+	
+TypeReference:                            
+	builtin=BUILTIN_TYPE |
+	type=[Typedef|QualifiedTypeName]
+;
 
 // 7.5
 Container:
@@ -264,7 +276,7 @@ Grouping:
 
 // 7.13
 Uses:
-	'uses' grouping=IdentifierRef StatementEnd
+	'uses' grouping=GroupingRef StatementEnd
 ;
 
 // 7.13.2
@@ -394,7 +406,7 @@ Pattern:
 
 // 9.6.4
 Enum:
-	'enum' name=StringValue StatementEnd
+	'enum' name=Identifier StatementEnd
 ;
 
 // 9.6.4.2
@@ -404,7 +416,7 @@ Value:
 
 // 9.7.4
 Bit:
-	'bit' name=StringValue StatementEnd
+	'bit' name=Identifier StatementEnd
 ;
 
 // 9.7.4.2
@@ -423,7 +435,11 @@ RequireInstance:
 ;
 
 Unknown:
-	prefix=[Prefix|ID] ':' node=[Extension|ID] name=StringValue? StatementEnd 
+	node=[Extension|ExtensionName] name=StringValue? StatementEnd 
+;
+
+ExtensionName:
+	IdOrKw ':' IdOrKw
 ;
 
 SchemaNodeIdentifier:
@@ -439,8 +455,12 @@ DescendantSchemaNodeIdentifier:
 	elements+=IdentifierRef ('/' elements+=IdentifierRef)*
 ;
 
+GroupingRef:
+	node=[Grouping|QNAME]
+;
+
 IdentifierRef:
-	(prefix=[Prefix|Identifier] ':')? node=[SchemaNode|Identifier]
+	node=[SchemaNode|QNAME]
 ;
 
 PredicatedIdentifierRef:
@@ -462,7 +482,9 @@ InstanceIdentifier :
 
 // Leafref path
 
-
+QNAME:
+	(IdOrKw ':')? IdOrKw
+;
 
 Identifier:
 	STRING
@@ -470,6 +492,36 @@ Identifier:
 
 StringValue :
 	STRING
+;
+
+IdOrKw :
+	ID | BUILTIN_TYPE | KEYWORD
+;
+
+QualifiedTypeName:
+	((ID | KEYWORD) ':')? (ID|KEYWORD)
+;
+
+BUILTIN_TYPE :
+   'binary' | 
+   'bits' |
+   'boolean' |
+   'decimal64' |
+   'empty' |
+   'enumeration' |
+   'identityref' |
+   'instance-identifier' |
+   'int8' |
+   'int16' |
+   'int32' |
+   'int64' |
+   'leafref'|
+   'string'|
+   'uint8' |
+   'uint16' |
+   'uint32' |
+   'uint64' |
+   'union'
 ;
 
 KEYWORD :

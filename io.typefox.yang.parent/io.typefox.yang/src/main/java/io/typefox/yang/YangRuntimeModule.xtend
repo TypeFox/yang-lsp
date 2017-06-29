@@ -3,9 +3,45 @@
  */
 package io.typefox.yang
 
+import io.typefox.yang.resource.BatchProcessor
+import io.typefox.yang.resource.YangResource
+import io.typefox.yang.scoping.QualifiedNameConverter
+import io.typefox.yang.scoping.ResourceDescriptionStrategy
+import io.typefox.yang.validation.IssueCodes
+import org.eclipse.xtext.naming.IQualifiedNameConverter
+import org.eclipse.xtext.resource.DerivedStateAwareResourceDescriptionManager
+import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy
+import org.eclipse.xtext.resource.IDerivedStateComputer
+import org.eclipse.xtext.resource.IResourceDescription
+import org.eclipse.xtext.validation.ConfigurableIssueCodesProvider
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
  */
 class YangRuntimeModule extends AbstractYangRuntimeModule {
+	
+	def Class<? extends IDefaultResourceDescriptionStrategy> bindIDefaultResourceDescriptionStrategy() {
+		ResourceDescriptionStrategy
+	} 
+	
+	override bindXtextResource() {
+		YangResource
+	}
+	
+	def Class<? extends IDerivedStateComputer> bindIDerivedStateComputer() {
+		return BatchProcessor
+	}
+	
+	def Class<? extends IResourceDescription.Manager> bindIResourcedesceriptionManager() {
+		return DerivedStateAwareResourceDescriptionManager
+	}
+	
+	def Class<? extends ConfigurableIssueCodesProvider> bindConfigurableIssueCodes() {
+		IssueCodes
+	}
+	
+	def Class<? extends IQualifiedNameConverter> bindIQualifiedNameConverter() {
+		QualifiedNameConverter
+	}
+	
 }

@@ -9,14 +9,18 @@
     <eStructuralFeatures xsi:type="ecore:EReference" name="subStatements" upperBound="-1"
         eType="#//Statement" containment="true"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractModule" eSuperTypes="#//OtherStatement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractImport" eSuperTypes="#//OtherStatement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="module" eType="#//AbstractModule"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="SchemaNode" eSuperTypes="#//Statement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="DataSchemaNode" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="OtherStatement" eSuperTypes="#//Statement"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Module" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Module" eSuperTypes="#//AbstractModule"/>
   <eClassifiers xsi:type="ecore:EClass" name="YangVersion" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="yangVersion" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
@@ -26,15 +30,11 @@
   <eClassifiers xsi:type="ecore:EClass" name="Prefix" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="prefix" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Import" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="module" eType="#//Module"/>
-  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Import" eSuperTypes="#//AbstractImport"/>
   <eClassifiers xsi:type="ecore:EClass" name="RevisionDate" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="date" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Include" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="subModule" eType="#//Submodule"/>
-  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Include" eSuperTypes="#//AbstractImport"/>
   <eClassifiers xsi:type="ecore:EClass" name="Organization" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="organization" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
@@ -44,11 +44,9 @@
   <eClassifiers xsi:type="ecore:EClass" name="Revision" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="revision" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Submodule" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Submodule" eSuperTypes="#//AbstractModule"/>
   <eClassifiers xsi:type="ecore:EClass" name="BelongsTo" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="belongsTo" eType="#//Module"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="module" eType="#//Module"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Typedef" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Units" eSuperTypes="#//OtherStatement">
@@ -58,7 +56,12 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="defaultStringValue" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Type" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="baseType" eType="#//Typedef"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="typeRef" eType="#//TypeReference"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="TypeReference">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="builtin" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="type" eType="#//Typedef"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Container" eSuperTypes="#//DataSchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Must" eSuperTypes="#//OtherStatement">
@@ -103,7 +106,7 @@
   <eClassifiers xsi:type="ecore:EClass" name="Anyxml" eSuperTypes="#//DataSchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Grouping" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Uses" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="grouping" eType="#//IdentifierRef"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="grouping" eType="#//GroupingRef"
         containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Refine" eSuperTypes="#//OtherStatement">
@@ -192,7 +195,6 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="isRequireInstance" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Unknown" eSuperTypes="#//SchemaNode">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="prefix" eType="#//Prefix"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//Extension"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="SchemaNodeIdentifier">
@@ -201,8 +203,10 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AbsoluteSchemaNodeIdentifier" eSuperTypes="#//SchemaNodeIdentifier"/>
   <eClassifiers xsi:type="ecore:EClass" name="DescendantSchemaNodeIdentifier" eSuperTypes="#//SchemaNodeIdentifier"/>
+  <eClassifiers xsi:type="ecore:EClass" name="GroupingRef">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//Grouping"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="IdentifierRef" eSuperTypes="#//PredicatedIdentifierRef">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="prefix" eType="#//Prefix"/>
     <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//SchemaNode"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="PredicatedIdentifierRef">

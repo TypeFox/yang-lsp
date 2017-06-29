@@ -93,10 +93,10 @@ class YangParsingTest {
 		                            attr EString reference '"RFC 6991: Common YANG Data Types"'
 		                        }
 		                    ]
-		                    ref Module module ref: Module@(unresolved proxy __synthetic0.yang#|0)
+		                    ref AbstractModule module ref: AbstractModule@(unresolved proxy __synthetic0.yang#|0)
 		                }
 		                4 : Include {
-		                    ref Submodule subModule ref: Submodule@(unresolved proxy __synthetic0.yang#|1)
+		                    ref AbstractModule module ref: AbstractModule@(unresolved proxy __synthetic0.yang#|1)
 		                }
 		                5 : Organization {
 		                    attr EString organization '"Example Inc."'
@@ -127,13 +127,11 @@ class YangParsingTest {
 		                    cref Statement subStatements [
 		                        0: Unknown {
 		                            attr EString name 'rf3-4.5345we2'
-		                            ref Prefix prefix ref: Prefix@(unresolved proxy __synthetic0.yang#|4)
-		                            ref Extension node ref: Extension@(unresolved proxy __synthetic0.yang#|5)
+		                            ref Extension node ref: Extension@(unresolved proxy __synthetic0.yang#|3)
 		                        }
 		                    ]
 		                    attr EString name 'rule'
-		                    ref Prefix prefix ref: Prefix@(unresolved proxy __synthetic0.yang#|2)
-		                    ref Extension node ref: Extension@(unresolved proxy __synthetic0.yang#|3)
+		                    ref Extension node ref: Extension@(unresolved proxy __synthetic0.yang#|2)
 		                }
 		            ]
 		            attr EString name 'example-system'

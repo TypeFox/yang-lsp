@@ -117,6 +117,25 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	\"          {yybegin(IN_EXPRESSION_STRING); return RULE_HIDDEN;}
 	"'"         {yybegin(IN_SQ_EXPRESSION_STRING); return RULE_HIDDEN;}
 	{OPERATOR}  { return RULE_OPERATOR; }
+	"binary"                {return Binary;}
+	"bits"                  {return Bits;}
+	"boolean"               {return Boolean;}
+	"decimal64"             {return Decimal64;}
+	"empty"                 {return Empty;}
+	"enumeration"           {return Enumeration;}
+	"identityref"           {return Identityref;}
+	"instance-identifier"   {return InstanceIdentifier;}
+	"int8"                  {return Int8;}
+	"int16"                 {return Int16;}
+	"int32"                 {return Int32;}
+	"int64"                 {return Int64;}
+	"leafref"               {return Leafref;}
+	"string"                {return String;}
+	"uint8"                 {return Uint8;}
+	"uint16"                {return Uint16;}
+	"uint32"                {return Uint32;}
+	"uint64"                {return Uint64;}
+	"union"                 {return Union;}
 	{ID}        { return RULE_ID; }
 	{NUMBER}    { return RULE_NUMBER; }
 	":"         { return Colon; }
@@ -174,7 +193,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 "anydata"                 {yybegin(BLACK_BOX_STRING); return Anydata; }
 "anyxml"                  {yybegin(BLACK_BOX_STRING); return Anyxml; }
 "argument"                {yybegin(BLACK_BOX_STRING); return Argument; }
-"augment"                 {yybegin(BLACK_BOX_STRING); return Augment; }
+"augment"                 {yybegin(EXPRESSION); return Augment; }
 "base"                    {yybegin(BLACK_BOX_STRING); return Base; }
 "belongs-to"              {yybegin(BLACK_BOX_STRING); return BelongsTo; }
 "bit"                     {yybegin(BLACK_BOX_STRING); return Bit; }
@@ -221,22 +240,23 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "presence"               {yybegin(BLACK_BOX_STRING); return Presence; }
  "range"                  {yybegin(BLACK_BOX_STRING); return Range; }
  "reference"              {yybegin(BLACK_BOX_STRING); return Reference; }
- "refine"                 {yybegin(BLACK_BOX_STRING); return Refine; }
+ "refine"                 {yybegin(EXPRESSION); return Refine; }
  "require-instance"       {yybegin(BLACK_BOX_STRING); return RequireInstance; }
  "revision"               {yybegin(BLACK_BOX_STRING); return Revision; }
  "revision-date"          {yybegin(BLACK_BOX_STRING); return RevisionDate; }
  "rpc"                    {yybegin(BLACK_BOX_STRING); return Rpc; }
  "status"                 {yybegin(BLACK_BOX_STRING); return Status; }
  "submodule"              {yybegin(BLACK_BOX_STRING); return Submodule; }
- "type"                   {yybegin(BLACK_BOX_STRING); return Type; }
+ "type"                   {yybegin(EXPRESSION); return Type; }
  "typedef"                {yybegin(BLACK_BOX_STRING); return Typedef; }
  "unique"                 {yybegin(EXPRESSION); return Unique; }
  "units"                  {yybegin(BLACK_BOX_STRING); return Units; }
- "uses"                   {yybegin(BLACK_BOX_STRING); return Uses; }
+ "uses"                   {yybegin(EXPRESSION); return Uses; }
  "value"                  {yybegin(BLACK_BOX_STRING); return Value; }
  "when"                   {yybegin(EXPRESSION); return When; }
  "yang-version"           {yybegin(BLACK_BOX_STRING); return YangVersion; }
  "yin-element"            {yybegin(BLACK_BOX_STRING); return YinElement; }
+ 
 {ID}                      { yybegin(COLON_EXPECTED);  return RULE_ID; }
 	
 	{ML_COMMENT} { return RULE_ML_COMMENT; }

@@ -12,14 +12,18 @@
     <genClasses ecoreClass="Yang.ecore#//Statement">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Statement/subStatements"/>
     </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//AbstractModule">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//AbstractModule/name"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//AbstractImport">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//AbstractImport/module"/>
+    </genClasses>
     <genClasses ecoreClass="Yang.ecore#//SchemaNode">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//SchemaNode/name"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//DataSchemaNode"/>
     <genClasses ecoreClass="Yang.ecore#//OtherStatement"/>
-    <genClasses ecoreClass="Yang.ecore#//Module">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Module/name"/>
-    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Module"/>
     <genClasses ecoreClass="Yang.ecore#//YangVersion">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//YangVersion/yangVersion"/>
     </genClasses>
@@ -29,15 +33,11 @@
     <genClasses ecoreClass="Yang.ecore#//Prefix">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Prefix/prefix"/>
     </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//Import">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//Import/module"/>
-    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Import"/>
     <genClasses ecoreClass="Yang.ecore#//RevisionDate">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//RevisionDate/date"/>
     </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//Include">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//Include/subModule"/>
-    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Include"/>
     <genClasses ecoreClass="Yang.ecore#//Organization">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Organization/organization"/>
     </genClasses>
@@ -47,11 +47,9 @@
     <genClasses ecoreClass="Yang.ecore#//Revision">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Revision/revision"/>
     </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//Submodule">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Submodule/name"/>
-    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Submodule"/>
     <genClasses ecoreClass="Yang.ecore#//BelongsTo">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//BelongsTo/belongsTo"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//BelongsTo/module"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Typedef"/>
     <genClasses ecoreClass="Yang.ecore#//Units">
@@ -61,7 +59,11 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Default/defaultStringValue"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Type">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//Type/baseType"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Type/typeRef"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//TypeReference">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//TypeReference/builtin"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//TypeReference/type"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Container"/>
     <genClasses ecoreClass="Yang.ecore#//Must">
@@ -186,7 +188,6 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//RequireInstance/isRequireInstance"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Unknown">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//Unknown/prefix"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//Unknown/node"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//SchemaNodeIdentifier">
@@ -194,8 +195,10 @@
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//AbsoluteSchemaNodeIdentifier"/>
     <genClasses ecoreClass="Yang.ecore#//DescendantSchemaNodeIdentifier"/>
+    <genClasses ecoreClass="Yang.ecore#//GroupingRef">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//GroupingRef/node"/>
+    </genClasses>
     <genClasses ecoreClass="Yang.ecore#//IdentifierRef">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//IdentifierRef/prefix"/>
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//IdentifierRef/node"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//PredicatedIdentifierRef">

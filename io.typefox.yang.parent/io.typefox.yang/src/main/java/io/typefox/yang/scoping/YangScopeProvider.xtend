@@ -3,13 +3,49 @@
  */
 package io.typefox.yang.scoping
 
+import io.typefox.yang.resource.ScopeContext
+import io.typefox.yang.yang.YangPackage
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.scoping.IScopeProvider
+import org.eclipse.xtext.scoping.IScope
 
 /**
- * This class contains custom scoping description.
- * 
- * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#scoping
- * on how and when to use it.
+ * Scope provider for YANG, which is based on single batch processing and subsequently caching scopes
  */
-class YangScopeProvider extends AbstractYangScopeProvider {
+class YangScopeProvider implements IScopeProvider {
 
+	override getScope(EObject context, EReference reference) {
+		val ctx = findScopeInAdapters(context, reference)
+		if (ctx === null) {
+			return IScope.NULLSCOPE
+		}
+		switch reference.eClass {
+			case YangPackage.Literals.ABSTRACT_MODULE : {
+				return ctx.moduleScope
+			}
+			default : {
+				return ctx.nodeScope
+			}
+		}
+	}
+	
+	protected def ScopeContext findScopeInAdapters(EObject object, EReference reference) {
+		val scopesAdapter = ScopeContext.findInEmfObject(object)
+		if (scopesAdapter !== null) {
+			return scopesAdapter
+		}
+		var container = object.eContainer
+		while (container !== null) {
+			val adapter = ScopeContext.findInEmfObject(object)
+			if (adapter !== null) {
+				return adapter
+			}
+			container = container.eContainer
+		}
+		return ScopeContext.findInEmfObject(object.eResource)
+	}
+	
 }
+
+
