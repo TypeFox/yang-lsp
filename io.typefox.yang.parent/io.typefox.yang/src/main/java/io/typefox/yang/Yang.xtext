@@ -166,7 +166,12 @@ Default:
 
 // 7.4
 Type:
-	'type' baseType=[Typedef|Identifier] StatementEnd;
+	'type' typeRef=TypeReference StatementEnd;
+	
+TypeReference:                            
+	builtin=BUILTIN_TYPE |
+	type=[Typedef|QualifiedTypeName]
+;
 
 // 7.5
 Container:
@@ -430,7 +435,11 @@ RequireInstance:
 ;
 
 Unknown:
-	node=[Extension|QNAME] name=StringValue? StatementEnd 
+	node=[Extension|ExtensionName] name=StringValue? StatementEnd 
+;
+
+ExtensionName:
+	IdOrKw ':' IdOrKw
 ;
 
 SchemaNodeIdentifier:
@@ -474,7 +483,7 @@ InstanceIdentifier :
 // Leafref path
 
 QNAME:
-	(ID ':')? ID
+	(IdOrKw ':')? IdOrKw
 ;
 
 Identifier:
@@ -483,6 +492,36 @@ Identifier:
 
 StringValue :
 	STRING
+;
+
+IdOrKw :
+	ID | BUILTIN_TYPE | KEYWORD
+;
+
+QualifiedTypeName:
+	((ID | KEYWORD) ':')? (ID|KEYWORD)
+;
+
+BUILTIN_TYPE :
+   'binary' | 
+   'bits' |
+   'boolean' |
+   'decimal64' |
+   'empty' |
+   'enumeration' |
+   'identityref' |
+   'instance-identifier' |
+   'int8' |
+   'int16' |
+   'int32' |
+   'int64' |
+   'leafref'|
+   'string'|
+   'uint8' |
+   'uint16' |
+   'uint32' |
+   'uint64' |
+   'union'
 ;
 
 KEYWORD :

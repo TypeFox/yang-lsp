@@ -36,7 +36,7 @@ Workflow {
             }
             parserGenerator = {
                 combinedGrammar = false
-//                debugGrammar = true
+                debugGrammar = true
             }
             fragment = JFlexFragment {
             		fullFlexFile = "./src/main/java/io/typefox/yang/parser/antlr/lexer/jflex/YangFlexer.flex"
