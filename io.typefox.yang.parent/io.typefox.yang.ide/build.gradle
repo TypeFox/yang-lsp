@@ -3,3 +3,13 @@ dependencies {
 	compile "org.eclipse.xtext:org.eclipse.xtext.ide:${xtextVersion}"
 	compile "org.eclipse.xtext:org.eclipse.xtext.xbase.ide:${xtextVersion}"
 }
+
+shadowJar {
+    baseName = 'yang-language-server'
+    classifier = null
+    version = null
+    append 'plugin.properties'
+    manifest {
+        attributes 'Main-Class': 'org.eclipse.xtext.ide.server.ServerLauncher'
+    }
+}
