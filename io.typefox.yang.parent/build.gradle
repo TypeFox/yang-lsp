@@ -1,7 +1,6 @@
 buildscript {
 	repositories.jcenter()
 	dependencies {
-		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
 		classpath 'org.xtext:xtext-gradle-plugin:1.0.17'
 	}
 }

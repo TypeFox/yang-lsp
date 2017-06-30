@@ -1,4 +1,4 @@
-apply plugin: 'com.github.johnrengelman.shadow'
+apply plugin: 'application'
 
 dependencies {
 	compile project(':io.typefox.yang')
@@ -7,12 +7,6 @@ dependencies {
 	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
 }
 
-shadowJar {
-    baseName = 'yang-language-server'
-    classifier = null
-    version = null
-    append 'plugin.properties'
-    manifest {
-        attributes 'Main-Class': 'org.eclipse.xtext.ide.server.ServerLauncher'
-    }
-}
+mainClassName = 'org.eclipse.xtext.ide.server.ServerLauncher'
+applicationName = 'yang-language-server'
+applicationDefaultJvmArgs = ['-agentlib:jdwp=transport=dt_socket,address=localhost:8787,server=y,suspend=n,quiet=y']

@@ -10,6 +10,6 @@ dependencies {
 	testCompile 'junit:junit:4.12'
 }
 
-mainClassName = 'io.typefox.yang.server.YangServerLauncher'
-applicationName = 'yang-server'
+mainClassName = 'io.typefox.yang.diagram.YangServerLauncher'
+applicationName = 'yang-language-server'
 applicationDefaultJvmArgs = ['-agentlib:jdwp=transport=dt_socket,address=localhost:8787,server=y,suspend=n,quiet=y']
