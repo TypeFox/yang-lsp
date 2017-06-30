@@ -76,6 +76,7 @@ OtherStatement :
 	| Mandatory
 	| MaxElements
 	| MinElements
+	| Modifier
 	| Must
 	| Namespace
 	| OrderedBy
@@ -402,6 +403,11 @@ Length:
 // 9.4.5
 Pattern:
 	'pattern' regexp=StringValue StatementEnd
+;
+
+// 9.4.5
+Modifier:
+	'modifier' modifier=StringValue StatementEnd
 ;
 
 // 9.6.4

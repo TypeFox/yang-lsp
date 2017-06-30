@@ -169,6 +169,9 @@
     <genClasses ecoreClass="Yang.ecore#//Pattern">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Pattern/regexp"/>
     </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Modifier">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Modifier/modifier"/>
+    </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Enum">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Enum/name"/>
     </genClasses>

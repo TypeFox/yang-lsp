@@ -9,9 +9,12 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.DerivedStateAwareResource
 import org.eclipse.xtext.resource.IDerivedStateComputer
+import org.eclipse.xtext.util.internal.Log
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
+import io.typefox.yang.resource.ScopeContext.YangScopeKind
 
+@Log
 class BatchProcessor implements IDerivedStateComputer {
 	
 	@Inject Validator validator
@@ -34,20 +37,23 @@ class BatchProcessor implements IDerivedStateComputer {
 	
 	dispatch def void doLinking(IdentifierRef ref, ScopeContext ctx) {
 		linker.link(ref, IDENTIFIER_REF__NODE) [ name |
-			ctx.forName(name).nodeScope.getSingleElement(QualifiedName.create(name.lastSegment))
+			ctx.getFull(YangScopeKind.NODE).getSingleElement(name)
 		]
 	}
 	
 	dispatch def void doLinking(GroupingRef ref, ScopeContext ctx) {
 		linker.link(ref, GROUPING_REF__NODE) [ name |
-			ctx.forName(name).groupingScope.getSingleElement(QualifiedName.create(name.lastSegment))
+			ctx.getFull(YangScopeKind.GROUPING).getSingleElement(name)
 		]
 	}
 	
 	dispatch def void doLinking(EObject obj, ScopeContext ctx) {
 		var context = ctx
 		if (obj instanceof DataSchemaNode) {
-			context = ScopeContext.findInEmfObject(obj)
+			context = ScopeContext.findInEmfObject(obj) ?: {
+				LOG.error('''«obj.eClass.name» had no context attached''')
+				ctx
+			}
 		}
 		for (child : obj.eContents) {
 			doLinking(child, context)

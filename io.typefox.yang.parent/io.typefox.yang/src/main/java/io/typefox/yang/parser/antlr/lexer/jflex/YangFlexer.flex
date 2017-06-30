@@ -76,7 +76,7 @@ WS=[\ \n\r\t]+
 ML_COMMENT="/*" ~"*/"
 SL_COMMENT="/""/"[^\r\n]*(\r?\n)?
 
-ID= [a-zA-Z] [a-zA-Z0-9_\.\-]*
+ID= [a-zA-Z_] [a-zA-Z0-9_\.\-]*
 
 STRING=[^\ \n\r\t\{\}\;\'\"]+
 SINGLE_QUOTED_STRING= "'" [^']* "'"?
@@ -226,6 +226,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "mandatory"              {yybegin(BLACK_BOX_STRING); return Mandatory; }
  "max-elements"           {yybegin(BLACK_BOX_STRING); return MaxElements; }
  "min-elements"           {yybegin(BLACK_BOX_STRING); return MinElements; }
+ "modifier"               {yybegin(BLACK_BOX_STRING); return Modifier; }
  "module"                 {yybegin(BLACK_BOX_STRING); return Module; }
  "must"                   {yybegin(EXPRESSION); return Must; }
  "namespace"              {yybegin(BLACK_BOX_STRING); return Namespace; }
@@ -266,3 +267,4 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 \{ { yybegin(YYINITIAL); return LeftCurlyBracket; }
 \} { yybegin(YYINITIAL); return RightCurlyBracket; }
 {WS} { return RULE_WS; }
+. { return RULE_ANY_OTHER; }
