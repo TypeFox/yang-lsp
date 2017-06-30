@@ -15,7 +15,7 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.xtext.validation.Check
 
-import static io.typefox.yang.validation.YangIssueCodes.*
+import static io.typefox.yang.validation.IssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 /**

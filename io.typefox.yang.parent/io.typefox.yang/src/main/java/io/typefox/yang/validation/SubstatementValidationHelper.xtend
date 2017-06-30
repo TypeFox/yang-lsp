@@ -10,7 +10,7 @@ import org.eclipse.emf.ecore.EClass
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.diagnostics.Severity
 
-import static io.typefox.yang.validation.YangIssueCodes.*
+import static io.typefox.yang.validation.IssueCodes.*
 
 import static extension io.typefox.yang.utils.YangNameUtils.*
 import static extension java.lang.Integer.parseInt

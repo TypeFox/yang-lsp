@@ -4,7 +4,7 @@ import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.YangVersion
 import org.junit.Test
 
-import static io.typefox.yang.validation.YangIssueCodes.*
+import static io.typefox.yang.validation.IssueCodes.*
 
 /**
  * Validation test for the YANG language.
