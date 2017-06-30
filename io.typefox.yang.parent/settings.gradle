@@ -1,2 +1,5 @@
+rootProject.name = 'yang-lsp'
+
 include 'io.typefox.yang'
 include 'io.typefox.yang.ide'
+include 'io.typefox.yang.diagram'

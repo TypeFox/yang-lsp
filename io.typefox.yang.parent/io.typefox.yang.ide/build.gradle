@@ -1,9 +1,10 @@
+apply plugin: 'com.github.johnrengelman.shadow'
+
 dependencies {
-	testCompile "junit:junit:4.12"
-	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${xtextVersion}"
-	
 	compile project(':io.typefox.yang')
-	compile "org.eclipse.xtext:org.eclipse.xtext.ide:${xtextVersion}"
+	compile "org.eclipse.xtext:org.eclipse.xtext.ide:${versions.xtext}"
+	testCompile "junit:junit:4.12"
+	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
 }
 
 shadowJar {
