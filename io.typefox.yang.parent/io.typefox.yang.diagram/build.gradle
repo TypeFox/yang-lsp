@@ -1,0 +1,15 @@
+apply plugin: 'application'
+
+dependencies {
+	compile project(':io.typefox.yang.ide')
+	compile "org.eclipse.lsp4j:org.eclipse.lsp4j:${versions.lsp4j}"
+	compile "org.eclipse.elk:org.eclipse.elk.alg.layered:${versions.elk}"
+	compile "io.typefox.sprotty:diagram-server:${versions.sprotty}"
+	compile "io.typefox.sprotty:diagram-layout-engine:${versions.sprotty}"
+	compile "com.google.inject:guice:4.1.0"
+	testCompile 'junit:junit:4.12'
+}
+
+mainClassName = 'io.typefox.yang.server.YangServerLauncher'
+applicationName = 'yang-server'
+applicationDefaultJvmArgs = ['-agentlib:jdwp=transport=dt_socket,address=localhost:8787,server=y,suspend=n,quiet=y']
