@@ -1,4 +1,5 @@
-bin
-build
-xtend-gen
-xtext-gen
+/.gradle/
+build/
+bin/
+xtend-gen/
+xtext-gen/

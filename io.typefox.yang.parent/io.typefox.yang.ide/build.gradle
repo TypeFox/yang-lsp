@@ -1,17 +1,12 @@
+apply plugin: 'application'
+
 dependencies {
-	testCompile "junit:junit:4.12"
-	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${xtextVersion}"
-	
 	compile project(':io.typefox.yang')
-	compile "org.eclipse.xtext:org.eclipse.xtext.ide:${xtextVersion}"
+	compile "org.eclipse.xtext:org.eclipse.xtext.ide:${versions.xtext}"
+	testCompile "junit:junit:4.12"
+	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
 }
 
-shadowJar {
-    baseName = 'yang-language-server'
-    classifier = null
-    version = null
-    append 'plugin.properties'
-    manifest {
-        attributes 'Main-Class': 'org.eclipse.xtext.ide.server.ServerLauncher'
-    }
-}
+mainClassName = 'org.eclipse.xtext.ide.server.ServerLauncher'
+applicationName = 'yang-language-server'
+applicationDefaultJvmArgs = ['-agentlib:jdwp=transport=dt_socket,address=localhost:8787,server=y,suspend=n,quiet=y']
