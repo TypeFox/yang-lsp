@@ -9,6 +9,7 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.scoping.IScopeProvider
 import org.eclipse.xtext.scoping.IScope
+import io.typefox.yang.resource.ScopeContext.YangScopeKind
 
 /**
  * Scope provider for YANG, which is based on single batch processing and subsequently caching scopes
@@ -25,7 +26,7 @@ class YangScopeProvider implements IScopeProvider {
 				return ctx.moduleScope
 			}
 			default : {
-				return ctx.nodeScope
+				return ctx.getFull(YangScopeKind.NODE)
 			}
 		}
 	}

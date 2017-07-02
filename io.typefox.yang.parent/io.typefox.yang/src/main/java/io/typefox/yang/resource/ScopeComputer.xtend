@@ -30,14 +30,19 @@ import org.eclipse.xtext.scoping.impl.SelectableBasedScope
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
 import org.eclipse.emf.ecore.resource.Resource
+import io.typefox.yang.yang.Unknown
+import io.typefox.yang.resource.ScopeContext.YangScopeKind
 
+/**
+ * Links the imported modules and included submodules, as well as computing the ScopeContext for them. 
+ */
 class ScopeComputer {
 
 	@Inject Validator validator
 	@Inject Linker linker
 	@Inject ResourceDescriptionsProvider indexProvider
 	
-	def dispatch ScopeContext getScopeContext(Module module) {
+	def ScopeContext getScopeContext(AbstractModule module) {
 		var result = ScopeContext.findInEmfObject(module)
 		if (result !== null) {
 			return result
@@ -52,27 +57,6 @@ class ScopeComputer {
 	private def IScope getModuleScope(Resource resource) {
 		val index = indexProvider.getResourceDescriptions(resource)
 		return SelectableBasedScope.createScope(IScope.NULLSCOPE, index, YangPackage.Literals.ABSTRACT_MODULE, false)
-	}
-	
-	def dispatch ScopeContext getScopeContext(Submodule submodule) {
-		var result = ScopeContext.findInEmfObject(submodule)
-		if (result !== null) {
-			return result
-		}
-		// if not yet computed, trigger scope computation for main module
-		val moduleScope = submodule.eResource.moduleScope
-		var Module module = submodule.getBelongingModule(moduleScope)
-		if (module !== null) {
-			getScopeContext(module)
-		}
-		// now check again
-		result = ScopeContext.findInEmfObject(submodule)
-		if (result !== null) return result
-		
-		// still no ctx, means that this submodule either has no module it belongs to or it is not imported by it.
-		// let's go with an empty parent scope
-		computeScope(submodule, new ScopeContext(moduleScope))
-		return result
 	}
 	
 	private def Module getBelongingModule(Submodule submodule, IScope moduleScope) {
@@ -95,14 +79,18 @@ class ScopeComputer {
 	}
 	
 	protected def addLocalName(ScopeContext ctx, SchemaNode node, String prefix) {
+		if (node.name === null) {
+			// broken model be graceful
+			return;
+		}
 		val n = if (prefix === null) QualifiedName.create(node.name) else QualifiedName.create(prefix, node.name) 
 		val scopeAndName = switch node {
-			DataSchemaNode : ctx.nodeScope -> 'A node'
-			Grouping : ctx.groupingScope -> 'A grouping'
-			Typedef : ctx.typeScope -> 'A type'
-			Identity : ctx.identityScope -> 'An identity'
-			Extension : ctx.extensionScope -> 'An extension'
-			Feature : ctx.featureScope -> 'A feature'
+			DataSchemaNode : ctx.getLocal(YangScopeKind.NODE) -> 'A node'
+			Grouping : ctx.getLocal(YangScopeKind.GROUPING) -> 'A grouping'
+			Typedef : ctx.getLocal(YangScopeKind.TYPES) -> 'A type'
+			Identity : ctx.getLocal(YangScopeKind.IDENTITY) -> 'An identity'
+			Extension : ctx.getLocal(YangScopeKind.EXTENSION) -> 'An extension'
+			Feature : ctx.getLocal(YangScopeKind.FEATURE) -> 'A feature'
 		}
 		if (scopeAndName !== null) {
 			if (!scopeAndName.key.tryAddLocal(n, node)) {
@@ -114,15 +102,16 @@ class ScopeComputer {
 	protected dispatch def void computeScope(EObject module, ScopeContext ctx) {
 	}
 	
-	protected dispatch def void computeScope(Submodule module, ScopeContext ctx) {
-		computeChildren(module, ctx.newSubmoduleNamespace(module))
-	}
-	
-	protected dispatch def void computeScope(Module module, ScopeContext ctx) {
+	protected dispatch def void computeScope(AbstractModule module, ScopeContext ctx) {
 		computeChildren(module, ctx)
 	}
 	
 	protected dispatch def void computeScope(SchemaNode node, ScopeContext ctx) {
+		ctx.addLocalName(node)
+		computeChildren(node, ctx)
+	}
+	
+	protected dispatch def void computeScope(Unknown node, ScopeContext ctx) {
 		ctx.addLocalName(node)
 		computeChildren(node, ctx)
 	}
@@ -173,7 +162,7 @@ class ScopeComputer {
 			if (belongingModule !== null && belongingModule !== module) {
 				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, '''The imported submodule '«importedModule.name»' belongs to the differet module '«belongingModule.name»'.''', IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)			
 			} else {	
-				computeScope(importedModule, ctx)
+				ctx.otherFileScopes.add(getScopeContext(importedModule))
 			}
 		}
 		if (importedModule instanceof Module) {

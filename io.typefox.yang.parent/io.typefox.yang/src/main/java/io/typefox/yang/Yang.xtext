@@ -76,6 +76,7 @@ OtherStatement :
 	| Mandatory
 	| MaxElements
 	| MinElements
+	| Modifier
 	| Must
 	| Namespace
 	| OrderedBy
@@ -404,6 +405,11 @@ Pattern:
 	'pattern' regexp=StringValue StatementEnd
 ;
 
+// 9.4.5
+Modifier:
+	'modifier' modifier=StringValue StatementEnd
+;
+
 // 9.6.4
 Enum:
 	'enum' name=Identifier StatementEnd
@@ -435,11 +441,7 @@ RequireInstance:
 ;
 
 Unknown:
-	node=[Extension|ExtensionName] name=StringValue? StatementEnd 
-;
-
-ExtensionName:
-	IdOrKw ':' IdOrKw
+	node=[Extension|EXTENSION_NAME] name=StringValue? StatementEnd 
 ;
 
 SchemaNodeIdentifier:
@@ -614,15 +616,13 @@ STATEMENT_KEYWORD :
 ;
 
 Expression :
-	'"' value=ID '"' |
-	"'"	value=ID "'" |
-	value=ID |
-	'(' Expression (',' '/' '.' '..')?')'
+	(OPERATOR | BUILTIN_TYPE | ID | NUMBER | ':' |'('|')'|'['|']'|'.'|'..'|'/'|','| STRING)+
 ;
 
 // lexer rules
 
 terminal ID       : 'an id';
+terminal EXTENSION_NAME : 'ID:ID // only valid on statement ctx';
 terminal STRING   : 'an unquoted string';
 terminal NUMBER   : 'positive integer value';
 terminal OPERATOR : 'and' | 'or' | 'mod' | 'div' | '*' | '/' | '//' | '|' | '+' | '-' | '=' | '!=' | '<' | '<=' | '>' | '>=';

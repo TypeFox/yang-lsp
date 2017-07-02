@@ -157,9 +157,7 @@ class LexerTest {
 		l.charStream = new ANTLRStringStream('''
 			foo:bar 'holz';
 		''')
-		l.assertNextToken(RULE_ID,'foo')
-		l.assertNextToken(Colon,':')
-		l.assertNextToken(RULE_ID,'bar')
+		l.assertNextToken(RULE_EXTENSION_NAME,'foo:bar')
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(RULE_STRING,"'holz'")
 		l.assertNextToken(Semicolon,';')
