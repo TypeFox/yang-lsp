@@ -67,7 +67,7 @@
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Container"/>
     <genClasses ecoreClass="Yang.ecore#//Must">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Must/constraint"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Must/constraint"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//ErrorMessage">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//ErrorMessage/message"/>
@@ -134,7 +134,7 @@
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Feature"/>
     <genClasses ecoreClass="Yang.ecore#//IfFeature">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//IfFeature/condition"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//IfFeature/condition"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Deviation">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Deviation/reference"/>
@@ -155,7 +155,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Reference/reference"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//When">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//When/condition"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//When/condition"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Range">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Range/range"/>
@@ -185,7 +185,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Position/position"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Path">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Path/reference"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Path/reference"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//RequireInstance">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//RequireInstance/isRequireInstance"/>
@@ -215,9 +215,6 @@
     <genClasses ecoreClass="Yang.ecore#//ThisLeafRef"/>
     <genClasses ecoreClass="Yang.ecore#//InstanceIdentifier">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//InstanceIdentifier/elements"/>
-    </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//Expression">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Expression/value"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

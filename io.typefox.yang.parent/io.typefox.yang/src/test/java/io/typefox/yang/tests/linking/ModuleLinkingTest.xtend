@@ -107,6 +107,35 @@ class ModuleLinkingTest extends AbstractLinkingTest {
 		assertSame(m1.root.subStatements.filter(Grouping).head, uses.grouping.node)
 	}
 	
+	@Test def void testImportGroupingFromSubModule() {
+		val m1 = load('''
+			submodule asub {
+				belongs-to a;
+				grouping a {
+					leaf eh {  }
+				}
+			}
+		''')
+		load('''
+			module a {
+				include asub;
+			}
+		''')
+		val m3 = load('''
+			module b {
+				import a {
+					prefix apref;
+				}
+				container bee {
+					uses apref:a;
+				}
+			}
+		''')
+		installIndex
+		val uses = m3.root.eAllContents.filter(Uses).head
+		assertSame(m1.root.subStatements.filter(Grouping).head, uses.grouping.node)
+	}
+	
 	@Test def void testModuleImportWithRevision_01() {
 		load('''
 			module a {

@@ -86,7 +86,7 @@ import org.eclipse.xtext.util.internal.EmfAdaptable
 				if (imported === null) {
 					return emptyList
 				}
-				return imported.getLocal(kind).getElements(QualifiedName.create(name.lastSegment))
+				return imported.getFull(kind).getElements(QualifiedName.create(name.lastSegment))
 			}
 
 			val result = ctx.otherFileScopes.map[getLocal(kind)].map[getElements(name)].fold(

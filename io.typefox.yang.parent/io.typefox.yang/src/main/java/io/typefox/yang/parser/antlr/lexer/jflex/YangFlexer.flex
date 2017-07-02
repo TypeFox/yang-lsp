@@ -78,6 +78,8 @@ SL_COMMENT="/""/"[^\r\n]*(\r?\n)?
 
 ID= [a-zA-Z_] [a-zA-Z0-9_\.\-]*
 
+EXTENSION_NAME={ID} ":" {ID}
+
 STRING=[^\ \n\r\t\{\}\;\'\"]+
 SINGLE_QUOTED_STRING= "'" [^']* "'"?
 DOUBLE_QUOTED_STRING= \" ([^\\\"]|\\.)* \"?
@@ -94,13 +96,6 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 %s BLACK_BOX_STRING
 
 %%
-
-<COLON_EXPECTED> {
-	\: {yybegin(ID_EXPECTED); return Colon;}
-}
-<ID_EXPECTED> {
-	{ID} {yybegin(BLACK_BOX_STRING); return RULE_ID;}
-}
 
 <BLACK_BOX_STRING> {
 	{STRING} { return RULE_STRING; }	
@@ -258,7 +253,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "yang-version"           {yybegin(BLACK_BOX_STRING); return YangVersion; }
  "yin-element"            {yybegin(BLACK_BOX_STRING); return YinElement; }
  
-{ID}                      { yybegin(COLON_EXPECTED);  return RULE_ID; }
+{EXTENSION_NAME}          { yybegin(BLACK_BOX_STRING);  return RULE_EXTENSION_NAME; }
 	
 	{ML_COMMENT} { return RULE_ML_COMMENT; }
 	{SL_COMMENT} { return RULE_SL_COMMENT; }

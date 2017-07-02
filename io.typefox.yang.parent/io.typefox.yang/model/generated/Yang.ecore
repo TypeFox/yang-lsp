@@ -65,8 +65,7 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Container" eSuperTypes="#//DataSchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Must" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="constraint" eType="#//Expression"
-        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="constraint" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ErrorMessage" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="message" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -137,8 +136,7 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Feature" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="IfFeature" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="#//Expression"
-        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="condition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Deviation" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EReference" name="reference" eType="#//SchemaNodeIdentifier"
@@ -160,8 +158,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="reference" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="When" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="#//Expression"
-        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="condition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Range" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="range" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -191,8 +188,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="position" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Path" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="reference" eType="#//Expression"
-        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="reference" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="RequireInstance" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="isRequireInstance" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -227,8 +223,5 @@
   <eClassifiers xsi:type="ecore:EClass" name="InstanceIdentifier">
     <eStructuralFeatures xsi:type="ecore:EReference" name="elements" upperBound="-1"
         eType="#//PredicatedIdentifierRef" containment="true"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Expression">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
 </ecore:EPackage>
