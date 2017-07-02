@@ -104,7 +104,9 @@ class YangServerLauncher extends ServerLauncher {
 		
 		val jsonHandler = new MessageJsonHandler(supportedMethods) {
 			override getDefaultGsonBuilder() {
-				ActionTypeAdapter.configureGson(super.defaultGsonBuilder)
+				val gsonBuilder = super.defaultGsonBuilder
+				ActionTypeAdapter.configureGson(gsonBuilder)
+				return gsonBuilder
 			}
 		}
 		val outGoingMessageStream = wrapper.apply(new StreamMessageConsumer(out, jsonHandler))
