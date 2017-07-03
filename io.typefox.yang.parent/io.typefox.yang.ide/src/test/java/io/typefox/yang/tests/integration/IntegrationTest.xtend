@@ -18,7 +18,7 @@ import org.junit.runners.Parameterized.Parameters
 
 @FinalFieldsConstructor
 @RunWith(Parameterized)
-class LexerIntegrationTest {
+class IntegrationTest {
 	
 	@Parameters(name= "{0}")
 	static def Collection<Object[]> getFiles() {
