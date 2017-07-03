@@ -24,7 +24,7 @@ class SubstatementRuleProvider {
 		return new SubstatementGroup(true);
 	}
 
-	static val MODULE_HEADER_RULE = newRule()
+	static val MODULE_HEADER_RULE = newOrderedRule()
 		.optional(YANG_VERSION)
 		.must(NAMESPACE)
 		.must(PREFIX);
