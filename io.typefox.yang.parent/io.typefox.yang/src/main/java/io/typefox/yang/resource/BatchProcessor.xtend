@@ -20,6 +20,7 @@ import org.eclipse.xtext.resource.IDerivedStateComputer
 import org.eclipse.xtext.util.internal.Log
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
+import io.typefox.yang.yang.Base
 
 @Log
 class BatchProcessor implements IDerivedStateComputer {
@@ -34,7 +35,7 @@ class BatchProcessor implements IDerivedStateComputer {
 			if (module !== null) {
 				// compute the scopes and resolved module links
 				val scopeContext = scopeComputer.getScopeContext(module)
-				// link extensions, types and groupings
+				// link extensions, types, identities and groupings
 				this.doPrimaryLinking(module, scopeContext)
 				// resolve the node links and xpath expressions
 				this.doResolveAll(module, scopeContext)
@@ -46,9 +47,9 @@ class BatchProcessor implements IDerivedStateComputer {
 		// do nothing
 	}
 	
-	dispatch def void doPrimaryLinking(IdentifierRef ref, ScopeContext ctx) {
-		linker.link(ref, IDENTIFIER_REF__NODE) [ name |
-			ctx.getFull(YangScopeKind.NODE).getSingleElement(name)
+	dispatch def void doPrimaryLinking(Base ref, ScopeContext ctx) {
+		linker.link(ref, BASE__REFERENCE) [ name |
+			ctx.getFull(YangScopeKind.IDENTITY).getSingleElement(name)
 		]
 	}
 	

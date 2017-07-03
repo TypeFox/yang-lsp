@@ -324,7 +324,7 @@ Identity:
 
 // 7.18.2
 Base:
-	'base' reference=[Identity| StringValue] StatementEnd
+	'base' reference=[Identity| QNAME] StatementEnd
 ;
 
 // 7.19
