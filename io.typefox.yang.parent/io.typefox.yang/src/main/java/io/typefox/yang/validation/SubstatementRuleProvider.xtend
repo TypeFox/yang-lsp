@@ -30,7 +30,7 @@ class SubstatementRuleProvider {
 		.must(PREFIX);
 
 	static val SUBMODULE_HEADER_RULE = newOrderedRule()
-		.must(YANG_VERSION)
+		.optional(YANG_VERSION)
 		.must(BELONGS_TO);
 
 	static val LINKAGE_RULE = newOrderedRule()

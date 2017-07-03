@@ -50,9 +50,12 @@ class SubstatementFeatureMapper implements Function1<EClass, EStructuralFeature>
 			ORDERED_BY -> ORDERED_BY__ORDERED_BY,
 			LIST -> SCHEMA_NODE__NAME,
 <<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
+<<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
 =======
 			KEY -> KEY__REFERENCES,
 >>>>>>> 2b286b5 some minor fixes for substatement validation
+=======
+>>>>>>> 9c77029 GH-12: Added YANG version aware cardinality constraints.
 			UNIQUE -> DESCENDANT_SCHEMA_NODE_IDENTIFIER_REFERENCES__REFERENCES,
 			CHOICE -> SCHEMA_NODE__NAME,
 			CASE -> SCHEMA_NODE__NAME,

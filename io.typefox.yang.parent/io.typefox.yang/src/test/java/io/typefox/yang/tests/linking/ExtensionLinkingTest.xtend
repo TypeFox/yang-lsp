@@ -29,6 +29,10 @@ class ExtensionLinkingTest extends AbstractYangTest {
 			}
 		''')
 		val unk = m.root.substatementsOfType(Unknown).head
+<<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
 		Assert.assertSame(unk.extension, m.root.substatementsOfType(Extension).head)
+=======
+		Assert.assertSame(unk.extension, m.root.substatements.filter(Extension).head)
+>>>>>>> 9c77029 GH-12: Added YANG version aware cardinality constraints.
 	}
 }

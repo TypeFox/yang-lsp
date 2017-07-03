@@ -16,7 +16,6 @@ import static io.typefox.yang.validation.IssueCodes.*
 
 import static extension io.typefox.yang.utils.YangNameUtils.*
 import static extension java.lang.Integer.parseInt
-import io.typefox.yang.yang.YangPackage
 
 /**
  * YANG sub-statement validation helper for checking sub-statement ordering and cardinality.
@@ -98,10 +97,14 @@ class SubstatementGroup {
 		(EClass)=>EStructuralFeature featureMapper) {
 
 <<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
+<<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
 		val substatements = substatementContainer.substatements;
 =======
 		val substatements = substatementContainer.subStatements;
 >>>>>>> 1df3039 Fixed invalid test case. Fixed feature mapping for any-data.
+=======
+		val substatements = substatementContainer.substatements;
+>>>>>>> 9c77029 GH-12: Added YANG version aware cardinality constraints.
 		val substatementTypes = substatements.toMap([eClass]);
 		constraintMapping.filter[clazz, constraint|constraint.cardinality === Cardinality.MUST].keySet.filter [
 			!substatementTypes.containsKey(it);
@@ -120,10 +123,6 @@ class SubstatementGroup {
 
 		val substatements = substatementContainer.substatements;
 		val clazz = statement.eClass
-		if (clazz === YangPackage.Literals.UNKNOWN) {
-			// extensions are fine anywhere
-			return;
-		}
 		val constraint = constraintMapping.get(clazz);
 		val feature = featureMapper.apply(clazz);
 		val version11 = statement.isVersion11;
