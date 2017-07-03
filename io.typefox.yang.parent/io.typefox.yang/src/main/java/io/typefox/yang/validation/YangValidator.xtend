@@ -5,13 +5,8 @@ package io.typefox.yang.validation
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import io.typefox.yang.yang.Import
-import io.typefox.yang.yang.Module
-import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangVersion
-import org.eclipse.emf.ecore.EObject
-import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.xtext.validation.Check
 
 import static io.typefox.yang.validation.IssueCodes.*
@@ -37,29 +32,13 @@ class YangValidator extends AbstractYangValidator {
 	}
 
 	@Check
-	def void checkModuleCardinalities(Module module) {
-		checkCardinalities(module, [module -> ABSTRACT_MODULE__NAME]);
-	}
-
-	@Check
-	def void checkImportCardinalities(Import _import) {
-		checkCardinalities(_import, [_import -> ABSTRACT_IMPORT__MODULE]);
-	}
-
-	@Check
-	def void checkImportCardinalities(Revision revision) {
-		checkCardinalities(revision, [revision -> REVISION__REVISION]);
-	}
-
-	private def <S extends Statement> checkCardinalities(S container,
-		(S)=>Pair<? extends EObject, ? extends EStructuralFeature> issueLocationProvider) {
-
-		val rule = substatementRuleProvider.get(container.eClass);
+	def void checkSubstatements(Statement it) {
+		val rule = substatementRuleProvider.get(eClass);
 		if (rule === null) {
 			return;
 		}
 		
-		rule.checkSubstatements(container, this, featureMapper);
+		rule.checkSubstatements(it, this, featureMapper);
 	}
 
 }
