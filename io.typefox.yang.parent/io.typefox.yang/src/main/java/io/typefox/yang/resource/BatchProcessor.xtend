@@ -68,6 +68,9 @@ class BatchProcessor implements IDerivedStateComputer {
 		linker.link(unknown, UNKNOWN__EXTENSION) [ name |
 			ctx.getFull(YangScopeKind.EXTENSION).getSingleElement(name)
 		]
+		for (child : unknown.eContents) {
+			doPrimaryLinking(child, ctx)
+		}
 	}
 	
 	dispatch def void doPrimaryLinking(EObject obj, ScopeContext ctx) {
