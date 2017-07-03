@@ -52,7 +52,7 @@ class GoodTests {
 	val protected String simpleName // only used in value of @Parameters
 	
 	@Ignore("TODO")
-	@Test def void runGoodTests() {
+	@Test def void checkDiagnostics() {
 		val issues = diagnostics.sortBy[range.start.line].sortBy[range.start.character].toList
 		val inserts = newArrayList()
 		val lines = Files.readAllLines(new File(URI.createURI(uri).toFileString).toPath)

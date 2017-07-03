@@ -236,10 +236,10 @@ List:
 
 // 7.8.2
 Key:
-	{Key} 'key' (references+=LeafReference)+ StatementEnd
+	{Key} 'key' (references+=KeyReference)+ StatementEnd
 ;
 
-LeafReference:
+KeyReference:
 	node=[Leaf|QNAME]
 ;
 
