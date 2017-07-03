@@ -80,7 +80,7 @@ class SubstatementGroup {
 		(EClass)=>EStructuralFeature featureMapper) {
 
 		val substatements = substatementContainer.subStatements;
-		val substatementTypes = substatementContainer.subStatements.toMap([eClass]);
+		val substatementTypes = substatements.toMap([eClass]);
 		constraintMapping.filter[clazz, constraint|constraint.cardinality === Cardinality.MUST].keySet.filter [
 			!substatementTypes.containsKey(it);
 		].forEach [
