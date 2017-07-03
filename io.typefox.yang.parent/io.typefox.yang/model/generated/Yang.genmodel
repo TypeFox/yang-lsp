@@ -93,7 +93,12 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//OrderedBy/orderedBy"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//List"/>
-    <genClasses ecoreClass="Yang.ecore#//Key"/>
+    <genClasses ecoreClass="Yang.ecore#//Key">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Key/references"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//LeafReference">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//LeafReference/node"/>
+    </genClasses>
     <genClasses ecoreClass="Yang.ecore#//DescendantSchemaNodeIdentifierReferences">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//DescendantSchemaNodeIdentifierReferences/references"/>
     </genClasses>

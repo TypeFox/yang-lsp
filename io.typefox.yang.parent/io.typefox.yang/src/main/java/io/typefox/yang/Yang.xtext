@@ -221,7 +221,7 @@ MinElements:
 
 // 7.7.6
 MaxElements:
-	'may-elements' maxElements=StringValue StatementEnd
+	'max-elements' maxElements=StringValue StatementEnd
 ;
 
 // 7.7.7
@@ -236,13 +236,15 @@ List:
 
 // 7.8.2
 Key:
-	{Key} 'key' DescendantSchemaNodeIdentifierReferences StatementEnd
+	{Key} 'key' (references+=LeafReference)+ StatementEnd
+;
+
+LeafReference:
+	node=[Leaf|QNAME]
 ;
 
 fragment DescendantSchemaNodeIdentifierReferences :
-	references+=DescendantSchemaNodeIdentifier |
-	'"' references+=DescendantSchemaNodeIdentifier+ '"'
-	"'" references+=DescendantSchemaNodeIdentifier+ "'"
+	references+=DescendantSchemaNodeIdentifier+
 ;
 
 // 7.8.3
@@ -357,7 +359,7 @@ Deviation:
 
 // 7.20.3.2
 Deviate:
-	'deviate' argument=StringValue
+	'deviate' argument=StringValue StatementEnd
 ;
 
 // Common Statement
@@ -489,11 +491,11 @@ QNAME:
 ;
 
 Identifier:
-	STRING
+	STRING+
 ;
 
 StringValue :
-	STRING
+	STRING+
 ;
 
 IdOrKw :

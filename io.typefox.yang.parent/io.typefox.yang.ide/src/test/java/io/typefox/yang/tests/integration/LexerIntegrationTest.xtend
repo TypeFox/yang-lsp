@@ -1,10 +1,15 @@
 package io.typefox.yang.tests.integration
 
+import io.typefox.yang.YangStandaloneSetup
 import io.typefox.yang.parser.antlr.lexer.jflex.JFlexBasedInternalYangLexer
 import java.io.File
+import java.nio.file.Files
 import java.util.Collection
 import org.antlr.runtime.ANTLRFileStream
+import org.eclipse.emf.common.util.URI
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
+import org.eclipse.xtext.resource.XtextResourceSet
+import org.eclipse.xtext.resource.XtextSyntaxDiagnostic
 import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
@@ -61,6 +66,17 @@ class LexerIntegrationTest {
 			} catch (Error e) {
 			}
 		}
+	}
+	val injector = new YangStandaloneSetup().createInjectorAndDoEMFRegistration
+	val rs = injector.getInstance(XtextResourceSet)
+	
+	@Test def void testParsing() {
+		val resource = rs.getResource(URI.createFileURI(this.file.absolutePath), true)
+		for (issue : resource.errors.filter(XtextSyntaxDiagnostic)) {
+			val contents = new String(Files.readAllBytes(this.file.toPath))
+			Assert.assertEquals(contents, '''«contents.substring(0, issue.offset)»!«contents.substring(issue.offset, issue.offset+issue.length)»!{«issue.message»}«contents.substring(issue.offset+issue.length)»'''.toString)
+		}
+		Assert.assertTrue(resource.errors.join(","), resource.errors.isEmpty)
 	}
 	
 }

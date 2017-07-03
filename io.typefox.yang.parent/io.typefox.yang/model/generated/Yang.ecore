@@ -91,7 +91,13 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="orderedBy" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="List" eSuperTypes="#//DataSchemaNode"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Key" eSuperTypes="#//OtherStatement #//DescendantSchemaNodeIdentifierReferences"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Key" eSuperTypes="#//OtherStatement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="references" upperBound="-1"
+        eType="#//LeafReference" containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="LeafReference">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//Leaf"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="DescendantSchemaNodeIdentifierReferences">
     <eStructuralFeatures xsi:type="ecore:EReference" name="references" upperBound="-1"
         eType="#//DescendantSchemaNodeIdentifier" containment="true"/>
