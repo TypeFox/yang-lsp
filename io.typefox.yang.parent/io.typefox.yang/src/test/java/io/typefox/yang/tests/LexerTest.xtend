@@ -45,6 +45,21 @@ class LexerTest {
 		l.assertNextToken(Semicolon,';')
 	}
 	
+	@Test def void testKeyExpression() {
+		val l = lexer.get
+		l.charStream = new ANTLRStringStream('''
+			key "k1 k2";
+		''')
+		l.assertNextToken(Key,'key')
+		l.assertNextToken(RULE_WS,' ')
+		l.assertNextToken(RULE_HIDDEN,'"')
+		l.assertNextToken(RULE_ID,'k1')
+		l.assertNextToken(RULE_WS,' ')
+		l.assertNextToken(RULE_ID,'k2')
+		l.assertNextToken(RULE_HIDDEN,'"')
+		l.assertNextToken(Semicolon,';')
+	}
+	
 	@Test def void testNonExpression() {
 		val l = lexer.get
 		l.charStream = new ANTLRStringStream('''
@@ -54,6 +69,20 @@ class LexerTest {
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(RULE_STRING,'./myFunction(23.4,.5+(.45div(23)))')
 		l.assertNextToken(Semicolon,';')
+	}
+	
+	
+	
+	@Test def void testBlackBoxDQString() {
+		val l = lexer.get
+		l.charStream = new ANTLRStringStream('''
+			  revision 2015-05-26 {
+			    description
+			      "Formal Project Review Draft 1.";
+			    reference "EVC Ethernet Services Definitions YANG Modules " +
+			    		"(MEF XX), TBD";
+			  }
+		''')	
 	}
 	
 	@Test def void testExpressionSQString() {
@@ -157,9 +186,7 @@ class LexerTest {
 		l.charStream = new ANTLRStringStream('''
 			foo:bar 'holz';
 		''')
-		l.assertNextToken(RULE_ID,'foo')
-		l.assertNextToken(Colon,':')
-		l.assertNextToken(RULE_ID,'bar')
+		l.assertNextToken(RULE_EXTENSION_NAME,'foo:bar')
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(RULE_STRING,"'holz'")
 		l.assertNextToken(Semicolon,';')

@@ -76,7 +76,9 @@ WS=[\ \n\r\t]+
 ML_COMMENT="/*" ~"*/"
 SL_COMMENT="/""/"[^\r\n]*(\r?\n)?
 
-ID= [a-zA-Z] [a-zA-Z0-9_\.\-]*
+ID= [a-zA-Z_] [a-zA-Z0-9_\.\-]*
+
+EXTENSION_NAME={ID} ":" {ID}
 
 STRING=[^\ \n\r\t\{\}\;\'\"]+
 SINGLE_QUOTED_STRING= "'" [^']* "'"?
@@ -95,17 +97,11 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 
 %%
 
-<COLON_EXPECTED> {
-	\: {yybegin(ID_EXPECTED); return Colon;}
-}
-<ID_EXPECTED> {
-	{ID} {yybegin(BLACK_BOX_STRING); return RULE_ID;}
-}
-
 <BLACK_BOX_STRING> {
 	{STRING} { return RULE_STRING; }	
 	{SINGLE_QUOTED_STRING} { return RULE_STRING; }
 	{DOUBLE_QUOTED_STRING} { return RULE_STRING; }
+	"+" { return RULE_HIDDEN;}
 	
 	{ML_COMMENT} { return RULE_ML_COMMENT; }
 	{SL_COMMENT} { return RULE_SL_COMMENT; }
@@ -226,6 +222,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "mandatory"              {yybegin(BLACK_BOX_STRING); return Mandatory; }
  "max-elements"           {yybegin(BLACK_BOX_STRING); return MaxElements; }
  "min-elements"           {yybegin(BLACK_BOX_STRING); return MinElements; }
+ "modifier"               {yybegin(BLACK_BOX_STRING); return Modifier; }
  "module"                 {yybegin(BLACK_BOX_STRING); return Module; }
  "must"                   {yybegin(EXPRESSION); return Must; }
  "namespace"              {yybegin(BLACK_BOX_STRING); return Namespace; }
@@ -257,7 +254,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "yang-version"           {yybegin(BLACK_BOX_STRING); return YangVersion; }
  "yin-element"            {yybegin(BLACK_BOX_STRING); return YinElement; }
  
-{ID}                      { yybegin(COLON_EXPECTED);  return RULE_ID; }
+{EXTENSION_NAME}          { yybegin(BLACK_BOX_STRING);  return RULE_EXTENSION_NAME; }
 	
 	{ML_COMMENT} { return RULE_ML_COMMENT; }
 	{SL_COMMENT} { return RULE_SL_COMMENT; }
@@ -266,3 +263,4 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 \{ { yybegin(YYINITIAL); return LeftCurlyBracket; }
 \} { yybegin(YYINITIAL); return RightCurlyBracket; }
 {WS} { return RULE_WS; }
+. { return RULE_ANY_OTHER; }

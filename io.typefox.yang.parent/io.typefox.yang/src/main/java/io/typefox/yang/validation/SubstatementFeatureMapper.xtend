@@ -86,7 +86,7 @@ class SubstatementFeatureMapper implements Function1<EClass, EStructuralFeature>
 			POSITION -> POSITION__POSITION,
 			PATH -> PATH__REFERENCE,
 			REQUIRE_INSTANCE -> REQUIRE_INSTANCE__IS_REQUIRE_INSTANCE,
-			UNKNOWN -> UNKNOWN__NODE
+			UNKNOWN -> UNKNOWN__EXTENSION
 		};
 	}
 	

@@ -37,6 +37,10 @@ class ModuleLinkingTest extends AbstractYangTest {
 	}
 	
 	@Test def void testModuleImport_NoPefix() {
+		load('''
+			module a {
+			}
+		''')
 		val m = load('''
 			module b {
 				import a;
@@ -77,6 +81,59 @@ class ModuleLinkingTest extends AbstractYangTest {
 		installIndex
 		assertSame(m1.root, m2.root.subStatements.filter(Import).head.module)
 		val uses = m2.root.eAllContents.filter(Uses).head
+		assertSame(m1.root.subStatements.filter(Grouping).head, uses.grouping.node)
+	}
+	
+	@Test def void testModuleNamespace() {
+		val m1 = load('''
+			submodule asub {
+				belongs-to a;
+				grouping a {
+					leaf eh {  }
+				}
+			}
+		''')
+		val m2 = load('''
+			module a {
+				include asub;
+			
+				container bee {
+					uses a;
+				}
+			}
+		''')
+		installIndex
+		assertSame(m1.root, m2.root.subStatements.filter(Include).head.module)
+		val uses = m2.root.eAllContents.filter(Uses).head
+		assertSame(m1.root.subStatements.filter(Grouping).head, uses.grouping.node)
+	}
+	
+	@Test def void testImportGroupingFromSubModule() {
+		val m1 = load('''
+			submodule asub {
+				belongs-to a;
+				grouping a {
+					leaf eh {  }
+				}
+			}
+		''')
+		load('''
+			module a {
+				include asub;
+			}
+		''')
+		val m3 = load('''
+			module b {
+				import a {
+					prefix apref;
+				}
+				container bee {
+					uses apref:a;
+				}
+			}
+		''')
+		installIndex
+		val uses = m3.root.eAllContents.filter(Uses).head
 		assertSame(m1.root.subStatements.filter(Grouping).head, uses.grouping.node)
 	}
 	
@@ -201,7 +258,6 @@ class ModuleLinkingTest extends AbstractYangTest {
 			}
 		''')
 		val imp = m2.root.subStatements.filter(Import).head
-		assertError(imp, IssueCodes.MISSING_PREFIX)
 		assertError(imp, IssueCodes.IMPORT_NOT_A_MODULE)
 		assertFalse(imp.module.eIsProxy)
 	}

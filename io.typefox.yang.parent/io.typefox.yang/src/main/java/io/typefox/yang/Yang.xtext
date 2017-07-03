@@ -76,6 +76,7 @@ OtherStatement :
 	| Mandatory
 	| MaxElements
 	| MinElements
+	| Modifier
 	| Must
 	| Namespace
 	| OrderedBy
@@ -105,7 +106,7 @@ OtherStatement :
 
 // 7.1	
 Module:
-	'module' name=Identifier StatementEnd;
+	'module' name=StringValue StatementEnd;
 
 // 7.1.2 
 YangVersion : 
@@ -117,11 +118,11 @@ Namespace :
 
 // 7.1.4
 Prefix : 
-	'prefix' prefix=Identifier StatementEnd ;
+	'prefix' prefix=StringValue StatementEnd ;
 
 // 7.1.5
 Import:
-	'import' module=[AbstractModule|Identifier] StatementEnd;
+	'import' module=[AbstractModule|StringValue] StatementEnd;
 	
 // 7.1.5.1
 RevisionDate:
@@ -130,7 +131,7 @@ RevisionDate:
 
 // 7.1.6
 Include: 
-	'include' module=[AbstractModule|Identifier] StatementEnd ;
+	'include' module=[AbstractModule|StringValue] StatementEnd ;
 
 // 7.1.7
 Organization: 
@@ -146,15 +147,15 @@ Revision :
 
 // 7.2
 Submodule:
-	'submodule' name=Identifier StatementEnd;
+	'submodule' name=StringValue StatementEnd;
 
 // 7.2.2
 BelongsTo : 
-	'belongs-to' module=[Module|Identifier] StatementEnd;
+	'belongs-to' module=[Module|StringValue] StatementEnd;
 
 // 7.3
 Typedef: 
-	'typedef' name=Identifier StatementEnd;
+	'typedef' name=StringValue StatementEnd;
 	
 // 7.3.3
 Units:
@@ -175,7 +176,7 @@ TypeReference:
 
 // 7.5
 Container:
-	'container' name=Identifier StatementEnd
+	'container' name=StringValue StatementEnd
 ;
 
 // 7.5.3
@@ -200,17 +201,17 @@ Presence :
 
 // 7.6
 Leaf :
-	'leaf' name=Identifier StatementEnd 
+	'leaf' name=StringValue StatementEnd 
 ;
 
 // 7.6.5
 Mandatory :
-	'mandatory' isMandatory=Identifier StatementEnd
+	'mandatory' isMandatory=StringValue StatementEnd
 ;
 
 // 7.7
 LeafList:
-	'leaf-list' name=Identifier StatementEnd
+	'leaf-list' name=StringValue StatementEnd
 ;
 
 // 7.7.5
@@ -225,23 +226,25 @@ MaxElements:
 
 // 7.7.7
 OrderedBy:
-	'ordered-by' orderedBy=Identifier StatementEnd
+	'ordered-by' orderedBy=StringValue StatementEnd
 ;
 
 // 7.8
 List:
-	'list' name=Identifier StatementEnd
+	'list' name=StringValue StatementEnd
 ;
 
 // 7.8.2
 Key:
-	{Key} 'key' DescendantSchemaNodeIdentifierReferences StatementEnd
+	{Key} 'key' (references+=KeyReference)+ StatementEnd
+;
+
+KeyReference:
+	node=[Leaf|QNAME]
 ;
 
 fragment DescendantSchemaNodeIdentifierReferences :
-	references+=DescendantSchemaNodeIdentifier |
-	'"' references+=DescendantSchemaNodeIdentifier+ '"'
-	"'" references+=DescendantSchemaNodeIdentifier+ "'"
+	references+=DescendantSchemaNodeIdentifier+
 ;
 
 // 7.8.3
@@ -251,27 +254,27 @@ Unique:
 
 // 7.9
 Choice:
-	'choice' name=Identifier StatementEnd
+	'choice' name=StringValue StatementEnd
 ;
 
 // 7.9.2
 Case:
-	'case' name=Identifier StatementEnd
+	'case' name=StringValue StatementEnd
 ;
 
 // 7.10
 Anydata:
-	'anydata' name=Identifier StatementEnd
+	'anydata' name=StringValue StatementEnd
 ;
 
 // 7.11
 Anyxml:
-	'anyxml' name=Identifier StatementEnd
+	'anyxml' name=StringValue StatementEnd
 ;
 
 // 7.12
 Grouping:
-	'grouping' name=Identifier StatementEnd
+	'grouping' name=StringValue StatementEnd
 ;
 
 // 7.13
@@ -286,7 +289,7 @@ Refine:
 
 // 7.14
 Rpc:
-	'rpc' name=Identifier StatementEnd
+	'rpc' name=StringValue StatementEnd
 ;
 
 // 7.14.2
@@ -301,12 +304,12 @@ Output:
 
 // 7.15
 Action:
-	'action' name=Identifier StatementEnd
+	'action' name=StringValue StatementEnd
 ;
 
 // 7.16
 Notification:
-	'notification' name=Identifier StatementEnd
+	'notification' name=StringValue StatementEnd
 ;
 
 // 7.17
@@ -316,17 +319,17 @@ Augment:
 
 // 7.18
 Identity:
-	'identity' name=Identifier StatementEnd
+	'identity' name=StringValue StatementEnd
 ;
 
 // 7.18.2
 Base:
-	'base' reference=[Identity| Identifier] StatementEnd
+	'base' reference=[Identity| StringValue] StatementEnd
 ;
 
 // 7.19
 Extension:
-	'extension' name=Identifier StatementEnd
+	'extension' name=StringValue StatementEnd
 ;
 
 // 7.19.2
@@ -336,12 +339,12 @@ Argument:
 
 // 7.19.3
 YinElement:
-	'yin-element' isYinElement=Identifier StatementEnd
+	'yin-element' isYinElement=StringValue StatementEnd
 ;
 
 // 7.20.1
 Feature:
-	'feature' name=Identifier StatementEnd
+	'feature' name=StringValue StatementEnd
 ;
 
 // 7.20.2
@@ -356,7 +359,7 @@ Deviation:
 
 // 7.20.3.2
 Deviate:
-	'deviate' argument=StringValue
+	'deviate' argument=StringValue StatementEnd
 ;
 
 // Common Statement
@@ -404,9 +407,14 @@ Pattern:
 	'pattern' regexp=StringValue StatementEnd
 ;
 
+// 9.4.5
+Modifier:
+	'modifier' modifier=StringValue StatementEnd
+;
+
 // 9.6.4
 Enum:
-	'enum' name=Identifier StatementEnd
+	'enum' name=StringValue StatementEnd
 ;
 
 // 9.6.4.2
@@ -416,7 +424,7 @@ Value:
 
 // 9.7.4
 Bit:
-	'bit' name=Identifier StatementEnd
+	'bit' name=StringValue StatementEnd
 ;
 
 // 9.7.4.2
@@ -435,11 +443,7 @@ RequireInstance:
 ;
 
 Unknown:
-	node=[Extension|ExtensionName] name=StringValue? StatementEnd 
-;
-
-ExtensionName:
-	IdOrKw ':' IdOrKw
+	extension=[Extension|EXTENSION_NAME] name=StringValue? StatementEnd 
 ;
 
 SchemaNodeIdentifier:
@@ -486,12 +490,8 @@ QNAME:
 	(IdOrKw ':')? IdOrKw
 ;
 
-Identifier:
-	STRING
-;
-
 StringValue :
-	STRING
+	STRING+
 ;
 
 IdOrKw :
@@ -614,15 +614,13 @@ STATEMENT_KEYWORD :
 ;
 
 Expression :
-	'"' value=ID '"' |
-	"'"	value=ID "'" |
-	value=ID |
-	'(' Expression (',' '/' '.' '..')?')'
+	(OPERATOR | BUILTIN_TYPE | ID | NUMBER | ':' |'('|')'|'['|']'|'.'|'..'|'/'|','| STRING)+
 ;
 
 // lexer rules
 
 terminal ID       : 'an id';
+terminal EXTENSION_NAME : 'ID:ID // only valid on statement ctx';
 terminal STRING   : 'an unquoted string';
 terminal NUMBER   : 'positive integer value';
 terminal OPERATOR : 'and' | 'or' | 'mod' | 'div' | '*' | '/' | '//' | '|' | '+' | '-' | '=' | '!=' | '<' | '<=' | '>' | '>=';

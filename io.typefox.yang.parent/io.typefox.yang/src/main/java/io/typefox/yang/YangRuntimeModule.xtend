@@ -44,4 +44,8 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 		QualifiedNameConverter
 	}
 	
+	override bindIValueConverterService() {
+		YangValueConverterService
+	}
+	
 }

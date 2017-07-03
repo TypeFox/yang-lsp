@@ -67,7 +67,7 @@
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Container"/>
     <genClasses ecoreClass="Yang.ecore#//Must">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Must/constraint"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Must/constraint"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//ErrorMessage">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//ErrorMessage/message"/>
@@ -93,7 +93,12 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//OrderedBy/orderedBy"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//List"/>
-    <genClasses ecoreClass="Yang.ecore#//Key"/>
+    <genClasses ecoreClass="Yang.ecore#//Key">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Key/references"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//KeyReference">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//KeyReference/node"/>
+    </genClasses>
     <genClasses ecoreClass="Yang.ecore#//DescendantSchemaNodeIdentifierReferences">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//DescendantSchemaNodeIdentifierReferences/references"/>
     </genClasses>
@@ -134,7 +139,7 @@
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Feature"/>
     <genClasses ecoreClass="Yang.ecore#//IfFeature">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//IfFeature/condition"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//IfFeature/condition"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Deviation">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Deviation/reference"/>
@@ -155,7 +160,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Reference/reference"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//When">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//When/condition"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//When/condition"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Range">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Range/range"/>
@@ -168,6 +173,9 @@
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Pattern">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Pattern/regexp"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Modifier">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Modifier/modifier"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Enum">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Enum/name"/>
@@ -182,13 +190,13 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Position/position"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Path">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Path/reference"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Path/reference"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//RequireInstance">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//RequireInstance/isRequireInstance"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Unknown">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//Unknown/node"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//Unknown/extension"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//SchemaNodeIdentifier">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//SchemaNodeIdentifier/elements"/>
@@ -212,9 +220,6 @@
     <genClasses ecoreClass="Yang.ecore#//ThisLeafRef"/>
     <genClasses ecoreClass="Yang.ecore#//InstanceIdentifier">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//InstanceIdentifier/elements"/>
-    </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//Expression">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Expression/value"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

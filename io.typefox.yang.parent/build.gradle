@@ -1,41 +1,39 @@
 buildscript {
-	repositories {
-		jcenter()
-		mavenLocal()
-	}
+	repositories.jcenter()
 	dependencies {
-		classpath 'com.github.jengelman.gradle.plugins:shadow:1.2.4'
-		classpath 'org.xtext:xtext-gradle-plugin:1.0.15'
+		classpath 'org.xtext:xtext-gradle-plugin:1.0.17'
 	}
 }
 
+ext.versions = [
+    xtext: '2.13.0-SNAPSHOT',
+    lsp4j: '0.3.0-SNAPSHOT',
+    sprotty: '0.2.0-SNAPSHOT',
+    elk: '0.3.0-SNAPSHOT'
+]
+
 subprojects {
-	ext.xtextVersion = '2.13.0-SNAPSHOT'
 	repositories {
 		jcenter()
 		mavenLocal()
 		maven {
+			name 'sonatype-snapshots'
 			url 'https://oss.sonatype.org/content/repositories/snapshots'
 		}
 	}
 	
 	apply plugin: 'java'
 	apply plugin: 'org.xtext.xtend'
-	apply from: "${rootDir}/gradle/source-layout.gradle"
-	apply from: "${rootDir}/gradle/maven-deployment.gradle"
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
-	apply plugin: 'com.github.johnrengelman.shadow'
+
+	apply from: "${rootDir}/gradle/source-layout.gradle"
+	apply from: "${rootDir}/gradle/maven-deployment.gradle"
 	
 	group = 'io.typefox.yang'
-	version = '1.0.0-SNAPSHOT'
+	version = '0.1.0-SNAPSHOT'
 	
 	sourceCompatibility = '1.8'
-	targetCompatibility = '1.8'
-	
-	configurations.all {
-		exclude group: 'asm'
-	}
 }
 
 // Workaround for issue https://github.com/researchgate/gradle-release/issues/144
