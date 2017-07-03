@@ -6,7 +6,6 @@ import java.util.Map
 import org.eclipse.emf.ecore.EClass
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
-import static io.typefox.yang.utils.YangExtensions.YANG_1_1
 
 /**
  * Provides YANG sub-statement rules for a given statement given as an EClass.
@@ -17,11 +16,11 @@ import static io.typefox.yang.utils.YangExtensions.YANG_1_1
 class SubstatementRuleProvider {
 
 	static def newRule() {
-		return new SubstatementGroup();
+		return new SubstatementGroup(false);
 	}
 
-	static def newUnorderedRule() {
-		return new SubstatementGroup(false);
+	static def newOrderedRule() {
+		return new SubstatementGroup(true);
 	}
 
 	static val MODULE_HEADER_RULE = newRule()
@@ -29,15 +28,15 @@ class SubstatementRuleProvider {
 		.must(NAMESPACE)
 		.must(PREFIX);
 
-	static val SUBMODULE_HEADER_RULE = newRule()
+	static val SUBMODULE_HEADER_RULE = newOrderedRule()
 		.must(YANG_VERSION)
 		.must(BELONGS_TO);
 
-	static val LINKAGE_RULE = newRule()
+	static val LINKAGE_RULE = newOrderedRule()
 		.any(IMPORT)
 		.any(INCLUDE);
 
-	static val META_RULE = newRule()
+	static val META_RULE = newOrderedRule()
 		.optional(ORGANIZATION)
 		.optional(CONTACT)
 		.optional(DESCRIPTION)
@@ -49,7 +48,7 @@ class SubstatementRuleProvider {
 		.any(LEAF_LIST)
 		.any(LIST)
 		.any(CHOICE)
-		.any(YANG_1_1, ANYDATA)
+		.any(ANYDATA)
 		.any(ANYXML)
 		.any(USES);
 
@@ -69,30 +68,30 @@ class SubstatementRuleProvider {
 		.optional(DESCRIPTION)
 		.optional(REFERENCE);
 
-	static val MODULE_RULE = newRule()
+	static val MODULE_RULE = newOrderedRule()
 		.with(MODULE_HEADER_RULE)
 		.with(LINKAGE_RULE)
 		.with(META_RULE)
-		.with(REVISION_RULE)
+		.any(REVISION)
 		.with(BODY_RULE);
 
-	static val SUBMODULE_RULE = newRule()
+	static val SUBMODULE_RULE = newOrderedRule()
 		.with(SUBMODULE_HEADER_RULE)
 		.with(LINKAGE_RULE)
 		.with(META_RULE)
-		.with(REVISION_RULE)
+		.any(REVISION)
 		.with(BODY_RULE);
 
 	static val IMPORT_RULE = newRule()
 		.must(PREFIX)
 		.optional(REVISION_DATE)
-		.optional(YANG_1_1, DESCRIPTION)
-		.optional(YANG_1_1, REFERENCE);
+		.optional(DESCRIPTION)
+		.optional(REFERENCE);
 
 	static val INCLUDE_RULE = newRule()
 		.optional(REVISION_DATE)
-		.optional(YANG_1_1, DESCRIPTION)
-		.optional(YANG_1_1, REFERENCE);
+		.optional(DESCRIPTION)
+		.optional(REFERENCE);
 
 	static val BELONGS_TO_RULE = newRule()
 		.must(PREFIX);
@@ -113,7 +112,7 @@ class SubstatementRuleProvider {
 		.optional(REFERENCE);
 
 	static val IDENTITY_RULE = newRule()
-		.any(YANG_1_1, IF_FEATURE)
+		.any(IF_FEATURE)
 		.optional(STATUS)
 		.optional(DESCRIPTION)
 		.optional(REFERENCE);
@@ -126,7 +125,7 @@ class SubstatementRuleProvider {
 		.optional(DESCRIPTION)
 		.optional(REFERENCE);
 
-	static val TYPE_RULE = newUnorderedRule()
+	static val TYPE_RULE = newRule()
 		.optional(FRACTION_DIGITS)
 		.optional(RANGE)
 		.optional(LENGTH)
@@ -151,7 +150,7 @@ class SubstatementRuleProvider {
 		.optional(REFERENCE);
 
 	static val PATTERN_RULE = newRule()
-		.optional(YANG_1_1, MODIFIER)
+//		.optional(MODIFIER) // TODO add modifier to grammar.
 		.optional(ERROR_MESSAGE)
 		.optional(ERROR_APP_TAG)
 		.optional(DESCRIPTION)
@@ -159,14 +158,14 @@ class SubstatementRuleProvider {
 
 	static val ENUM_RULE = newRule()
 		.optional(VALUE)
-		.any(YANG_1_1, IF_FEATURE)
+		.any(IF_FEATURE)
 		.optional(STATUS)
 		.optional(DESCRIPTION)
 		.optional(REFERENCE);
 
 	static val BIT_RULE = newRule()
 		.optional(POSITION)
-		.any(YANG_1_1, IF_FEATURE)
+		.any(IF_FEATURE)
 		.optional(STATUS)
 		.optional(DESCRIPTION)
 		.optional(REFERENCE);
@@ -184,8 +183,8 @@ class SubstatementRuleProvider {
 		.any(TYPEDEF)
 		.any(GROUPING)
 		.with(DATA_RULE)
-		.optional(YANG_1_1, ACTION)
-		.optional(YANG_1_1, NOTIFICATION);
+		.optional(ACTION)
+		.optional(NOTIFICATION);
 
 	static val CONTAINER_RULE = newRule()
 		.optional(WHEN)
@@ -199,8 +198,8 @@ class SubstatementRuleProvider {
 		.any(TYPEDEF)
 		.any(GROUPING)
 		.with(DATA_RULE)
-		.any(YANG_1_1, ACTION)
-		.any(YANG_1_1, NOTIFICATION);
+		.any(ACTION)
+		.any(NOTIFICATION);
 
 	static val LEAF_RULE = newRule()
 		.optional(WHEN)
@@ -245,8 +244,8 @@ class SubstatementRuleProvider {
 		.any(TYPEDEF)
 		.any(GROUPING)
 		.with(DATA_RULE)
-		.any(YANG_1_1, ACTION)
-		.any(YANG_1_1, NOTIFICATION);
+		.any(ACTION)
+		.any(NOTIFICATION);
 
 	static val CHOICE_RULE = newRule()
 		.optional(WHEN)
@@ -259,12 +258,12 @@ class SubstatementRuleProvider {
 		.optional(DESCRIPTION)
 		.optional(REFERENCE)
 		.any(CASE)
-		.any(YANG_1_1, CHOICE)
+		.any(CHOICE)
 		.any(CONTAINER)
 		.any(LEAF)
 		.any(LEAF_LIST)
 		.any(LIST)
-		.any(YANG_1_1, ANYDATA)
+		.any(ANYDATA)
 		.any(ANYXML);
 
 	static val CASE_RULE = newRule()
@@ -306,7 +305,7 @@ class SubstatementRuleProvider {
 
 	static val REFINE_RULE = newRule()
 		.any(MUST)
-		.any(YANG_1_1, IF_FEATURE)
+		.any(IF_FEATURE)
 		.optional(PRESENCE)
 		.optional(DEFAULT)
 		.optional(CONFIG)
@@ -324,8 +323,8 @@ class SubstatementRuleProvider {
 		.optional(REFERENCE)
 		.any(CASE)
 		.with(DATA_RULE)
-		.any(YANG_1_1, ACTION)
-		.any(YANG_1_1, NOTIFICATION);
+		.any(ACTION)
+		.any(NOTIFICATION);
 	
 	static val WHEN_RULE = newRule()
 		.optional(DESCRIPTION)
@@ -352,20 +351,20 @@ class SubstatementRuleProvider {
 		.optional(OUTPUT);
 
 	static val INPUT_RULE = newRule()
-		.any(YANG_1_1, MUST)
+		.any(MUST)
 		.any(TYPEDEF)
 		.any(GROUPING)
 		.with(DATA_RULE);
 
 	static val OUTPUT_RULE = newRule()
-		.any(YANG_1_1, MUST)
+		.any(MUST)
 		.any(TYPEDEF)
 		.any(GROUPING)
 		.with(DATA_RULE);
 
 	static val NOTIFICATION_RULE = newRule()
 		.any(IF_FEATURE)
-		.any(YANG_1_1, MUST)
+		.any(MUST)
 		.optional(STATUS)
 		.optional(DESCRIPTION)
 		.optional(REFERENCE)

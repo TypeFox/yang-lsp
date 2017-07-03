@@ -8,6 +8,7 @@ import io.typefox.yang.yang.YangVersion
 import org.junit.Test
 
 import static io.typefox.yang.validation.IssueCodes.*
+import org.junit.Ignore
 
 /**
  * Validation test for the YANG language.
@@ -28,6 +29,7 @@ class YangValidatorTest extends AbstractYangTest {
 		assertError(root.substatementsOfType(YangVersion).head, INCORRECT_VERSION, "1.2");
 	}
 
+	@Ignore("TODO")
 	@Test
 	def void checkSubstatement_Cardinality_MissingMandatory() {
 		val it = load('''

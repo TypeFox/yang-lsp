@@ -49,6 +49,10 @@ class SubstatementFeatureMapper implements Function1<EClass, EStructuralFeature>
 			MAX_ELEMENTS -> MAX_ELEMENTS__MAX_ELEMENTS,
 			ORDERED_BY -> ORDERED_BY__ORDERED_BY,
 			LIST -> SCHEMA_NODE__NAME,
+<<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
+=======
+			KEY -> KEY__REFERENCES,
+>>>>>>> 2b286b5 some minor fixes for substatement validation
 			UNIQUE -> DESCENDANT_SCHEMA_NODE_IDENTIFIER_REFERENCES__REFERENCES,
 			CHOICE -> SCHEMA_NODE__NAME,
 			CASE -> SCHEMA_NODE__NAME,
