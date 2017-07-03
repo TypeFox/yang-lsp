@@ -1,11 +1,12 @@
 package io.typefox.yang.tests.linking
 
+import io.typefox.yang.tests.AbstractYangTest
 import io.typefox.yang.yang.Extension
 import io.typefox.yang.yang.Unknown
 import org.junit.Assert
 import org.junit.Test
 
-class ExtensionLinkingTest extends AbstractLinkingTest {
+class ExtensionLinkingTest extends AbstractYangTest {
 
 	@Test def void testLocalExtension() {
 		val m = load('''

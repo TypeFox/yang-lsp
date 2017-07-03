@@ -1,12 +1,13 @@
 package io.typefox.yang.tests.linking
 
-import org.junit.Test
-import org.junit.Assert
+import io.typefox.yang.tests.AbstractYangTest
 import io.typefox.yang.yang.Leaf
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
+import org.junit.Assert
+import org.junit.Test
 
-class TypeLinkingTest extends AbstractLinkingTest {
+class TypeLinkingTest extends AbstractYangTest {
 	
 	@Test def void testTypeLinking() {
 		val m = load('''

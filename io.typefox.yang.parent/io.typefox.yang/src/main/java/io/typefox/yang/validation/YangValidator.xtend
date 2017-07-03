@@ -3,23 +3,42 @@
  */
 package io.typefox.yang.validation
 
+import com.google.inject.Inject
+import com.google.inject.Singleton
+import io.typefox.yang.yang.Statement
+import io.typefox.yang.yang.YangVersion
+import org.eclipse.xtext.validation.Check
+
+import static io.typefox.yang.validation.IssueCodes.*
+import static io.typefox.yang.yang.YangPackage.Literals.*
 
 /**
- * This class contains custom validation rules. 
- *
- * See https://www.eclipse.org/Xtext/documentation/303_runtime_concepts.html#validation
+ * This class contains custom validation rules for the YANG language. 
  */
+@Singleton
 class YangValidator extends AbstractYangValidator {
+
+	@Inject
+	SubstatementRuleProvider substatementRuleProvider;
 	
-//	public static val INVALID_NAME = 'invalidName'
-//
-//	@Check
-//	def checkGreetingStartsWithCapital(Greeting greeting) {
-//		if (!Character.isUpperCase(greeting.name.charAt(0))) {
-//			warning('Name should start with a capital', 
-//					YangPackage.Literals.GREETING__NAME,
-//					INVALID_NAME)
-//		}
-//	}
-	
+	@Inject
+	SubstatementFeatureMapper featureMapper;
+
+	@Check
+	def void checkVersion(YangVersion it) {
+		if (yangVersion != "1.1") {
+			error("The version must be '1.1'.", it, YANG_VERSION__YANG_VERSION, INCORRECT_VERSION);
+		}
+	}
+
+	@Check
+	def void checkSubstatements(Statement it) {
+		val rule = substatementRuleProvider.get(eClass);
+		if (rule === null) {
+			return;
+		}
+		
+		rule.checkSubstatements(it, this, featureMapper);
+	}
+
 }

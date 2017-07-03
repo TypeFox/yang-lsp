@@ -22,11 +22,3 @@ jar {
 		attributes 'Bundle-SymbolicName': project.name
 	}
 }
-
-plugins.withId('war') {
-	webAppDirName = "src/main/webapp"
-}
-
-plugins.withId('org.xtext.idea-plugin') {
-	assembleSandbox.metaInf.from('src/main/resources/META-INF')
-}
