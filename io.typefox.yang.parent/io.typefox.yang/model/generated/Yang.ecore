@@ -6,7 +6,7 @@
         eType="#//Statement" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Statement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="subStatements" upperBound="-1"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="substatements" upperBound="-1"
         eType="#//Statement" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AbstractModule" eSuperTypes="#//OtherStatement">

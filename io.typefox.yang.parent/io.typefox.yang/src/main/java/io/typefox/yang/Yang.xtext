@@ -8,7 +8,7 @@ YangFile:
 	
 fragment StatementEnd returns Statement:
 	('{'
-		subStatements+=Statement*
+		substatements+=Statement*
 	'}' | ';')
 ;
 

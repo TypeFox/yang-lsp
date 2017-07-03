@@ -1,6 +1,7 @@
 package io.typefox.yang.resource
 
 import com.google.inject.Inject
+import io.typefox.yang.resource.ScopeContext.YangScopeKind
 import io.typefox.yang.scoping.ResourceDescriptionStrategy
 import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.yang.AbstractImport
@@ -20,8 +21,10 @@ import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Submodule
 import io.typefox.yang.yang.Typedef
+import io.typefox.yang.yang.Unknown
 import io.typefox.yang.yang.YangPackage
 import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider
@@ -29,9 +32,6 @@ import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.impl.SelectableBasedScope
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
-import org.eclipse.emf.ecore.resource.Resource
-import io.typefox.yang.yang.Unknown
-import io.typefox.yang.resource.ScopeContext.YangScopeKind
 
 /**
  * Links the imported modules and included submodules, as well as computing the ScopeContext for them. 
@@ -50,7 +50,7 @@ class ScopeComputer {
 		val moduleScope = module.eResource.moduleScope
 		result = new ScopeContext(moduleScope)
 		result.attachToEmfObject(module)
-		val prefix = module.subStatements.filter(Prefix).head
+		val prefix = module.substatements.filter(Prefix).head
 		if (prefix !== null) {
 			result.localPrefix = prefix.prefix
 		}
@@ -64,7 +64,7 @@ class ScopeComputer {
 	}
 	
 	private def Module getBelongingModule(Submodule submodule, IScope moduleScope) {
-		val belongsTo = submodule.subStatements.filter(BelongsTo).head
+		val belongsTo = submodule.substatements.filter(BelongsTo).head
 		if (belongsTo === null) {
 			return null
 		}
@@ -122,14 +122,14 @@ class ScopeComputer {
 	}
 	
 	protected def void computeChildren(Statement statement, ScopeContext ctx) {
-		for (child : statement.subStatements) {
+		for (child : statement.substatements) {
 			computeScope(child, ctx)
 		}
 	}
 	
 	protected dispatch def void computeScope(AbstractImport element, ScopeContext ctx) {
 		val importedModule = linker.<AbstractModule>link(element, ABSTRACT_IMPORT__MODULE) [ name |
-			val rev = element.subStatements.filter(RevisionDate).head
+			val rev = element.substatements.filter(RevisionDate).head
 			val candidates = ctx.moduleScope.getElements(name)
 			if (rev !== null) {
 				val match = candidates.filter[
@@ -151,7 +151,7 @@ class ScopeComputer {
 			}
 			return result
 		]
-		val prefix = element.subStatements.filter(Prefix).head?.prefix
+		val prefix = element.substatements.filter(Prefix).head?.prefix
 		
 		if (importedModule instanceof Submodule) {
 			if (element instanceof Import) {
@@ -179,8 +179,8 @@ class ScopeComputer {
 	
 	protected def findContainingModule(EObject obj) {
 		val candidate = EcoreUtil2.getContainerOfType(obj, AbstractModule)
-		if (candidate instanceof Submodule ) {
-			return candidate.subStatements.filter(BelongsTo).head.module
+		if (candidate instanceof Submodule) {
+			return candidate.substatements.filter(BelongsTo).head.module
 		}
 		return candidate
 	}	

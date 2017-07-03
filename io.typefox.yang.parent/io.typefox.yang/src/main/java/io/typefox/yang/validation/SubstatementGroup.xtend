@@ -2,12 +2,14 @@ package io.typefox.yang.validation
 
 import com.google.common.base.Splitter
 import com.google.common.collect.Range
+import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.yang.Statement
 import java.util.Map
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.xtend.lib.annotations.Data
+import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.validation.ValidationMessageAcceptor
 
 import static io.typefox.yang.validation.IssueCodes.*
@@ -39,23 +41,39 @@ class SubstatementGroup {
 	}
 
 	def any(EClass clazz) {
-		return add(clazz, Cardinality.ANY);
+		return any(null, clazz);
 	}
 
-	def optional(EClass clazz) {
-		return add(clazz, Cardinality.OPTIONAL);
+	def any(String version, EClass clazz) {
+		return add(version, clazz, Cardinality.ANY);
 	}
 
 	def must(EClass clazz) {
-		return add(clazz, Cardinality.MUST);
+		return must(null, clazz);
+	}
+
+	def must(String version, EClass clazz) {
+		return add(version, clazz, Cardinality.MUST);
 	}
 
 	def atLeastOne(EClass clazz) {
-		return add(clazz, Cardinality.AT_LEAST_ONE);
+		return atLeastOne(null, clazz);
 	}
 
-	private def add(EClass clazz, Cardinality cardinality) {
-		val constraint = new SubstatementConstraint(clazz, cardinality);
+	def atLeastOne(String version, EClass clazz) {
+		return add(version, clazz, Cardinality.AT_LEAST_ONE);
+	}
+
+	def optional(EClass clazz) {
+		return optional(null, clazz);
+	}
+
+	def optional(String version, EClass clazz) {
+		return add(version, clazz, Cardinality.OPTIONAL);
+	}
+
+	private def add(String version, EClass clazz, Cardinality cardinality) {
+		val constraint = new SubstatementConstraint(version, clazz, cardinality);
 		constraintMapping.put(clazz, constraint);
 		orderedConstraint.put(constraint, '''«ordinal»''');
 		if (ordered) {
@@ -78,8 +96,8 @@ class SubstatementGroup {
 	def void checkSubstatements(Statement substatementContainer, ValidationMessageAcceptor acceptor,
 		(EClass)=>EStructuralFeature featureMapper) {
 
-		val substatements = substatementContainer.subStatements;
-		val substatementTypes = substatementContainer.subStatements.toMap([eClass]);
+		val substatements = substatementContainer.substatements;
+		val substatementTypes = substatements.toMap([eClass]);
 		constraintMapping.filter[clazz, constraint|constraint.cardinality === Cardinality.MUST].keySet.filter [
 			!substatementTypes.containsKey(it);
 		].forEach [
@@ -95,10 +113,11 @@ class SubstatementGroup {
 	private def void checkStatementInContext(Statement statement, Statement substatementContainer,
 		ValidationMessageAcceptor acceptor, (EClass)=>EStructuralFeature featureMapper) {
 
-		val substatements = substatementContainer.subStatements;
+		val substatements = substatementContainer.substatements;
 		val clazz = statement.eClass
 		val constraint = constraintMapping.get(clazz);
 		val feature = featureMapper.apply(clazz);
+		val version11 = statement.isVersion11;
 
 		// Unexpected statement.
 		if (constraint === null) {
@@ -112,6 +131,13 @@ class SubstatementGroup {
 		val elementCount = substatements.filter(clazz.instanceClass).size;
 		if (!cardinality.contains(elementCount)) {
 			val message = '''Expected '«clazz.yangName»' with «cardinality» cardinality. Got «elementCount» instead.''';
+			acceptor.acceptError(message, statement, feature, SUBSTATEMENT_CARDINALITY);
+			return;
+		}
+		
+		// YANG version aware cardinality issue.
+		if (constraint.version11 && !version11) {
+			val message = '''Statment '«clazz.yangName»' requires explicit YANG version «YangExtensions.YANG_1_1».''';
 			acceptor.acceptError(message, statement, feature, SUBSTATEMENT_CARDINALITY);
 			return;
 		}
@@ -161,20 +187,36 @@ class SubstatementGroup {
 		}
 		return rightOrdinals.size > leftOrdinals.size;
 	}
+	
+	private def isVersion11(EObject it) {
+		val resource = it?.eResource
+		if (resource instanceof XtextResource) {
+			val yangExtensions = resource.resourceServiceProvider.get(YangExtensions);
+			val version = yangExtensions.getVersion(it);
+			return YangExtensions.YANG_1_1 == version;
+		}
+		return false;
+	}
 
 	private def acceptError(ValidationMessageAcceptor it, String message, EObject object, EStructuralFeature feature,
 		String code) {
+
 		acceptError(message, object, feature, -1, code);
 	}
 
 	@Data
 	public static class SubstatementConstraint {
 
+		val String version;
 		val EClass clazz;
 		val Cardinality cardinality;
 
 		override toString() {
-			return '''«clazz.instanceClass.simpleName» «cardinality»'''
+			return '''«clazz.yangName» «cardinality»«IF !version.nullOrEmpty» [Version: «version»]«ENDIF»''';
+		}
+		
+		def boolean isVersion11() {
+			return YangExtensions.YANG_1_1 == version;
 		}
 
 	}

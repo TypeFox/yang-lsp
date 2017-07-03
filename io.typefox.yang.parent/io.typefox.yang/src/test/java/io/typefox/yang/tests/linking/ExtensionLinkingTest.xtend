@@ -28,7 +28,7 @@ class ExtensionLinkingTest extends AbstractYangTest {
 			  }
 			}
 		''')
-		val unk = m.root.subStatements.filter(Unknown).head
-		Assert.assertSame(unk.extension, m.root.subStatements.filter(Extension).head)
+		val unk = m.root.substatementsOfType(Unknown).head
+		Assert.assertSame(unk.extension, m.root.substatements.filter(Extension).head)
 	}
 }

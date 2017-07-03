@@ -74,7 +74,7 @@ class YangParsingTest {
 		YangFile {
 		    cref Statement statements [
 		        0: Module {
-		            cref Statement subStatements [
+		            cref Statement substatements [
 		                0 : YangVersion {
 		                    attr EString yangVersion '1.1'
 		                }
@@ -85,7 +85,7 @@ class YangParsingTest {
 		                    attr EString prefix 'sys'
 		                }
 		                3 : Import {
-		                    cref Statement subStatements [
+		                    cref Statement substatements [
 		                        0: Prefix {
 		                            attr EString prefix 'yang'
 		                        }
@@ -116,7 +116,7 @@ class YangParsingTest {
 		                    attr EString description 'The module for entities implementing the Example system.'
 		                }
 		                8 : Revision {
-		                    cref Statement subStatements [
+		                    cref Statement substatements [
 		                        0: Description {
 		                            attr EString description 'Initial revision.'
 		                        }
@@ -124,7 +124,7 @@ class YangParsingTest {
 		                    attr EString revision '2007-06-09'
 		                }
 		                9 : Unknown {
-		                    cref Statement subStatements [
+		                    cref Statement substatements [
 		                        0: Unknown {
 		                            attr EString name 'rf3-4.5345we2'
 		                            ref Extension extension ref: Extension@(unresolved proxy __synthetic0.yang#|3)

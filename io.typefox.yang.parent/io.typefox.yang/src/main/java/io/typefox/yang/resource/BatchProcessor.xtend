@@ -3,9 +3,9 @@ package io.typefox.yang.resource
 import com.google.inject.Inject
 import io.typefox.yang.resource.ScopeContext.YangScopeKind
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Base
 import io.typefox.yang.yang.DataSchemaNode
 import io.typefox.yang.yang.GroupingRef
-import io.typefox.yang.yang.IdentifierRef
 import io.typefox.yang.yang.KeyReference
 import io.typefox.yang.yang.Leaf
 import io.typefox.yang.yang.SchemaNode
@@ -20,7 +20,6 @@ import org.eclipse.xtext.resource.IDerivedStateComputer
 import org.eclipse.xtext.util.internal.Log
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
-import io.typefox.yang.yang.Base
 
 @Log
 class BatchProcessor implements IDerivedStateComputer {
