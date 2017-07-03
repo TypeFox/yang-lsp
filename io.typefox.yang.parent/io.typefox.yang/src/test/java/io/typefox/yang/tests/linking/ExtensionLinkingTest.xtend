@@ -29,6 +29,6 @@ class ExtensionLinkingTest extends AbstractYangTest {
 			}
 		''')
 		val unk = m.root.substatementsOfType(Unknown).head
-		Assert.assertSame(unk.extension, m.root.substatements.filter(Extension).head)
+		Assert.assertSame(unk.extension, m.root.substatementsOfType(Extension).head)
 	}
 }
