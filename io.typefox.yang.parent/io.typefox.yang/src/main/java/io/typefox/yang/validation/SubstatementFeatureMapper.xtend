@@ -56,6 +56,10 @@ class SubstatementFeatureMapper implements Function1<EClass, EStructuralFeature>
 			UNIQUE -> DESCENDANT_SCHEMA_NODE_IDENTIFIER_REFERENCES__REFERENCES,
 			CHOICE -> SCHEMA_NODE__NAME,
 			CASE -> SCHEMA_NODE__NAME,
+<<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
+=======
+			ANYDATA -> ANYDATA__NAME,
+>>>>>>> 1df3039 Fixed invalid test case. Fixed feature mapping for any-data.
 			ANYXML -> SCHEMA_NODE__NAME,
 			GROUPING -> SCHEMA_NODE__NAME,
 			USES -> USES__GROUPING,
