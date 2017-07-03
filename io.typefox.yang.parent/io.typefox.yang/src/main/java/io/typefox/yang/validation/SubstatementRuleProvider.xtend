@@ -2,7 +2,6 @@ package io.typefox.yang.validation
 
 import com.google.common.collect.ImmutableMap
 import com.google.inject.Singleton
-import io.typefox.yang.validation.SubstatementValidationHelper.SubstatementGroup
 import java.util.Map
 import org.eclipse.emf.ecore.EClass
 
@@ -301,7 +300,7 @@ class SubstatementRuleProvider {
 		.optional(STATUS)
 		.optional(DESCRIPTION)
 		.optional(REFERENCE)
-// 		.any(REFINE) // TODO add refine.
+ 		.any(REFINE)
 		.any(AUGMENT);
 
 	static val REFINE_RULE = newRule()

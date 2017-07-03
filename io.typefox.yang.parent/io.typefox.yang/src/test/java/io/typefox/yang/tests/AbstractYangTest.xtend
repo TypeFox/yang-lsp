@@ -1,7 +1,8 @@
 package io.typefox.yang.tests
 
-import io.typefox.yang.tests.YangInjectorProvider
+import com.google.common.base.Preconditions
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangFile
 import java.util.ArrayList
 import java.util.Collections
@@ -11,6 +12,7 @@ import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.resource.IResourceDescription
+import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsData
 import org.eclipse.xtext.testing.InjectWith
@@ -40,16 +42,22 @@ abstract class AbstractYangTest {
 		validator.assertError(obj, obj.eClass, code)
 	}
 	
-	protected def assertError(EObject obj, String code, int offset, int length, String... messageParts) {
-		validator.assertError(obj, obj.eClass, code, offset, length, messageParts)
+	protected def assertError(EObject obj, String code, String searchTerm, String... messageParts) {
+		val parsedText = (obj.eResource as XtextResource).parseResult?.rootNode?.text;
+		val offset = parsedText.indexOf(searchTerm);
+		Preconditions.checkArgument(offset >= 0, '''The '«searchTerm»' is not conatined in '«code»'.''');
+		validator.assertError(obj, obj.eClass, code, offset, searchTerm.length, messageParts);
 	}
 	
 	protected def assertWarning(EObject obj, String code) {
 		validator.assertWarning(obj, obj.eClass, code)
 	}
 	
-	protected def assertWarning(EObject obj, String code, int offset, int length, String... messageParts) {
-		validator.assertWarning(obj, obj.eClass, code, offset, length, messageParts)
+	protected def assertWarning(EObject obj, String code, String searchTerm, String... messageParts) {
+		val parsedText = (obj.eResource as XtextResource).parseResult?.rootNode?.text;
+		val offset = parsedText.indexOf(searchTerm);
+		Preconditions.checkArgument(offset >= 0, '''The '«searchTerm»' is not conatined in '«code»'.''');
+		validator.assertWarning(obj, obj.eClass, code, offset, searchTerm.length, messageParts);
 	}
 	
 	protected def assertNoErrors(Resource resource) {
@@ -70,6 +78,10 @@ abstract class AbstractYangTest {
 	
 	protected def AbstractModule root(Resource r) {
 		return (r.contents.head as YangFile).statements.head as AbstractModule
+	}
+	
+	protected def <S extends Statement> Iterable<S> subStatementsOfType(AbstractModule m, Class<S> clazz) {
+		return m?.subStatements.filter(clazz)
 	}
 	
 	protected def void installIndex() {

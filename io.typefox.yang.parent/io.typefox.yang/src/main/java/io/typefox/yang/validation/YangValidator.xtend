@@ -5,7 +5,6 @@ package io.typefox.yang.validation
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import io.typefox.yang.validation.SubstatementValidationHelper.MultiStatus
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Module
 import io.typefox.yang.yang.Revision
@@ -26,6 +25,9 @@ class YangValidator extends AbstractYangValidator {
 
 	@Inject
 	SubstatementRuleProvider substatementRuleProvider;
+	
+	@Inject
+	SubstatementFeatureMapper featureMapper;
 
 	@Check
 	def void checkVersion(YangVersion it) {
@@ -56,23 +58,8 @@ class YangValidator extends AbstractYangValidator {
 		if (rule === null) {
 			return;
 		}
-	
-		val globalStatus = rule.checkContext(container);
-		if (!globalStatus.OK) {
-			if (globalStatus instanceof MultiStatus) {
-				val issueLocation = issueLocationProvider.apply(container);
-				globalStatus.children.forEach[
-					error(message, issueLocation.key, issueLocation.value, issueCode);
-				];
-			}
-		}		
-
-		container.subStatements.forEach[statement, index |
-			val status = rule.checkStatementInContext(statement, container);
-			if (!status.OK) {
-				error(status.message, container, STATEMENT__SUB_STATEMENTS, index, status.issueCode);
-			}
-		];
+		
+		rule.checkSubstatements(container, this, featureMapper);
 	}
 
 }

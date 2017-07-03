@@ -220,7 +220,7 @@ MinElements:
 
 // 7.7.6
 MaxElements:
-	'may-elements' maxElements=StringValue StatementEnd
+	'max-elements' maxElements=StringValue StatementEnd
 ;
 
 // 7.7.7
