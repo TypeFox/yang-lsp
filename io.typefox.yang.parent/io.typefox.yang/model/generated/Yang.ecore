@@ -200,7 +200,7 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="isRequireInstance" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Unknown" eSuperTypes="#//SchemaNode">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//Extension"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="extension" eType="#//Extension"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="SchemaNodeIdentifier">
     <eStructuralFeatures xsi:type="ecore:EReference" name="elements" upperBound="-1"

@@ -27,6 +27,7 @@ import org.eclipse.xtext.util.internal.EmfAdaptable
 	IScope moduleScope
 	Map<YangScopeKind, MapScope> scopes = new HashMap
 	Map<String, ScopeContext> importedModules
+	@Accessors String localPrefix = null
 	/**
 	 * the scopes from other files belonging to the same module
 	 */
@@ -60,10 +61,16 @@ import org.eclipse.xtext.util.internal.EmfAdaptable
 	}
 
 	def ScopeContext newNodeNamespace(EObject node) {
-		val result = new ScopeContext(moduleScope, new MapScope(getLocal(YangScopeKind.NODE)),
-			new MapScope(getLocal(YangScopeKind.GROUPING)), new MapScope(getLocal(YangScopeKind.TYPES)),
-			getLocal(YangScopeKind.IDENTITY), getLocal(YangScopeKind.FEATURE), getLocal(YangScopeKind.EXTENSION),
-			importedModules, otherFileScopes)
+		val result = new ScopeContext(moduleScope, 
+			new MapScope(getLocal(YangScopeKind.NODE)),
+			new MapScope(getLocal(YangScopeKind.GROUPING)), 
+			new MapScope(getLocal(YangScopeKind.TYPES)),
+			getLocal(YangScopeKind.IDENTITY), 
+			getLocal(YangScopeKind.FEATURE), 
+			getLocal(YangScopeKind.EXTENSION),
+			importedModules, 
+			otherFileScopes)
+		result.localPrefix = this.localPrefix
 		result.attachToEmfObject(node)
 		return result;
 	}
@@ -82,6 +89,9 @@ import org.eclipse.xtext.util.internal.EmfAdaptable
 			// qualified names
 			if (name.segmentCount == 2) {
 				val first = name.firstSegment
+				if (first == this.ctx.localPrefix) {
+					return this.ctx.getLocal(kind).getElements(QualifiedName.create(name.lastSegment))
+				}
 				val imported = this.ctx.importedModules.get(first)
 				if (imported === null) {
 					return emptyList

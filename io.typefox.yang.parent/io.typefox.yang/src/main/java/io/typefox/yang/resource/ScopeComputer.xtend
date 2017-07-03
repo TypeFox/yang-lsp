@@ -50,6 +50,10 @@ class ScopeComputer {
 		val moduleScope = module.eResource.moduleScope
 		result = new ScopeContext(moduleScope)
 		result.attachToEmfObject(module)
+		val prefix = module.subStatements.filter(Prefix).head
+		if (prefix !== null) {
+			result.localPrefix = prefix.prefix
+		}
 		computeChildren(module, result)
 		return result
 	}
@@ -100,10 +104,6 @@ class ScopeComputer {
 	}
 	
 	protected dispatch def void computeScope(EObject module, ScopeContext ctx) {
-	}
-	
-	protected dispatch def void computeScope(AbstractModule module, ScopeContext ctx) {
-		computeChildren(module, ctx)
 	}
 	
 	protected dispatch def void computeScope(SchemaNode node, ScopeContext ctx) {

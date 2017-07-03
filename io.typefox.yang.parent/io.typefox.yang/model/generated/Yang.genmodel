@@ -196,7 +196,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//RequireInstance/isRequireInstance"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Unknown">
-      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//Unknown/node"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//Unknown/extension"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//SchemaNodeIdentifier">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//SchemaNodeIdentifier/elements"/>

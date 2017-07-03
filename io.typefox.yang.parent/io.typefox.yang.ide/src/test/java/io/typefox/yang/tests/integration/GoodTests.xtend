@@ -10,11 +10,11 @@ import org.eclipse.lsp4j.Position
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.eclipse.xtext.testing.AbstractLanguageServerTest
+import org.junit.Assert
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
-import org.junit.Assert
 import org.junit.Ignore
 
 @FinalFieldsConstructor

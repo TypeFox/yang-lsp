@@ -79,18 +79,18 @@ class YangParsingTest {
 		                    attr EString yangVersion '1.1'
 		                }
 		                1 : Namespace {
-		                    attr EString uri '"urn:example:system"'
+		                    attr EString uri 'urn:example:system'
 		                }
 		                2 : Prefix {
-		                    attr EString prefix '"sys"'
+		                    attr EString prefix 'sys'
 		                }
 		                3 : Import {
 		                    cref Statement subStatements [
 		                        0: Prefix {
-		                            attr EString prefix '"yang"'
+		                            attr EString prefix 'yang'
 		                        }
 		                        1: Reference {
-		                            attr EString reference '"RFC 6991: Common YANG Data Types"'
+		                            attr EString reference 'RFC 6991: Common YANG Data Types'
 		                        }
 		                    ]
 		                    ref AbstractModule module ref: AbstractModule@(unresolved proxy __synthetic0.yang#|0)
@@ -99,10 +99,10 @@ class YangParsingTest {
 		                    ref AbstractModule module ref: AbstractModule@(unresolved proxy __synthetic0.yang#|1)
 		                }
 		                5 : Organization {
-		                    attr EString organization '"Example Inc."'
+		                    attr EString organization 'Example Inc.'
 		                }
 		                6 : Contact {
-		                    attr EString contact '"Joe L. User
+		                    attr EString contact 'Joe L. User
 		
 		          Example Inc.
 		          42 Anywhere Drive
@@ -110,15 +110,15 @@ class YangParsingTest {
 		          USA
 		
 		          Phone: +1 800 555 0100
-		          EMail: joe@example.com"'
+		          EMail: joe@example.com'
 		                }
 		                7 : Description {
-		                    attr EString description '"The module for entities implementing the Example system."'
+		                    attr EString description 'The module for entities implementing the Example system.'
 		                }
 		                8 : Revision {
 		                    cref Statement subStatements [
 		                        0: Description {
-		                            attr EString description '"Initial revision."'
+		                            attr EString description 'Initial revision.'
 		                        }
 		                    ]
 		                    attr EString revision '2007-06-09'
@@ -127,11 +127,11 @@ class YangParsingTest {
 		                    cref Statement subStatements [
 		                        0: Unknown {
 		                            attr EString name 'rf3-4.5345we2'
-		                            ref Extension node ref: Extension@(unresolved proxy __synthetic0.yang#|3)
+		                            ref Extension extension ref: Extension@(unresolved proxy __synthetic0.yang#|3)
 		                        }
 		                    ]
 		                    attr EString name 'rule'
-		                    ref Extension node ref: Extension@(unresolved proxy __synthetic0.yang#|2)
+		                    ref Extension extension ref: Extension@(unresolved proxy __synthetic0.yang#|2)
 		                }
 		            ]
 		            attr EString name 'example-system'
