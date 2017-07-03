@@ -105,9 +105,7 @@
     <genClasses ecoreClass="Yang.ecore#//Unique"/>
     <genClasses ecoreClass="Yang.ecore#//Choice"/>
     <genClasses ecoreClass="Yang.ecore#//Case"/>
-    <genClasses ecoreClass="Yang.ecore#//Anydata">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Anydata/name"/>
-    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Anydata"/>
     <genClasses ecoreClass="Yang.ecore#//Anyxml"/>
     <genClasses ecoreClass="Yang.ecore#//Grouping"/>
     <genClasses ecoreClass="Yang.ecore#//Uses">

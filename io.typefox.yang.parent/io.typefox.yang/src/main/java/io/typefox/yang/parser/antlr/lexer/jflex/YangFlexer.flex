@@ -190,7 +190,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 "anyxml"                  {yybegin(BLACK_BOX_STRING); return Anyxml; }
 "argument"                {yybegin(BLACK_BOX_STRING); return Argument; }
 "augment"                 {yybegin(EXPRESSION); return Augment; }
-"base"                    {yybegin(BLACK_BOX_STRING); return Base; }
+"base"                    {yybegin(EXPRESSION); return Base; }
 "belongs-to"              {yybegin(BLACK_BOX_STRING); return BelongsTo; }
 "bit"                     {yybegin(BLACK_BOX_STRING); return Bit; }
 "case"                    {yybegin(BLACK_BOX_STRING); return Case; }

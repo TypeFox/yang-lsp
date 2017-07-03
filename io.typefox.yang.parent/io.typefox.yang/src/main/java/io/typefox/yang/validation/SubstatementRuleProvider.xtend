@@ -16,27 +16,27 @@ import static io.typefox.yang.yang.YangPackage.Literals.*
 class SubstatementRuleProvider {
 
 	static def newRule() {
-		return new SubstatementGroup();
-	}
-
-	static def newUnorderedRule() {
 		return new SubstatementGroup(false);
 	}
 
-	static val MODULE_HEADER_RULE = newRule()
-		.must(YANG_VERSION)
+	static def newOrderedRule() {
+		return new SubstatementGroup(true);
+	}
+
+	static val MODULE_HEADER_RULE = newOrderedRule()
+		.optional(YANG_VERSION)
 		.must(NAMESPACE)
 		.must(PREFIX);
 
-	static val SUBMODULE_HEADER_RULE = newRule()
+	static val SUBMODULE_HEADER_RULE = newOrderedRule()
 		.must(YANG_VERSION)
 		.must(BELONGS_TO);
 
-	static val LINKAGE_RULE = newRule()
+	static val LINKAGE_RULE = newOrderedRule()
 		.any(IMPORT)
 		.any(INCLUDE);
 
-	static val META_RULE = newRule()
+	static val META_RULE = newOrderedRule()
 		.optional(ORGANIZATION)
 		.optional(CONTACT)
 		.optional(DESCRIPTION)
@@ -68,18 +68,18 @@ class SubstatementRuleProvider {
 		.optional(DESCRIPTION)
 		.optional(REFERENCE);
 
-	static val MODULE_RULE = newRule()
+	static val MODULE_RULE = newOrderedRule()
 		.with(MODULE_HEADER_RULE)
 		.with(LINKAGE_RULE)
 		.with(META_RULE)
-		.with(REVISION_RULE)
+		.any(REVISION)
 		.with(BODY_RULE);
 
-	static val SUBMODULE_RULE = newRule()
+	static val SUBMODULE_RULE = newOrderedRule()
 		.with(SUBMODULE_HEADER_RULE)
 		.with(LINKAGE_RULE)
 		.with(META_RULE)
-		.with(REVISION_RULE)
+		.any(REVISION)
 		.with(BODY_RULE);
 
 	static val IMPORT_RULE = newRule()
@@ -125,7 +125,7 @@ class SubstatementRuleProvider {
 		.optional(DESCRIPTION)
 		.optional(REFERENCE);
 
-	static val TYPE_RULE = newUnorderedRule()
+	static val TYPE_RULE = newRule()
 		.optional(FRACTION_DIGITS)
 		.optional(RANGE)
 		.optional(LENGTH)

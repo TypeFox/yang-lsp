@@ -105,9 +105,7 @@
   <eClassifiers xsi:type="ecore:EClass" name="Unique" eSuperTypes="#//OtherStatement #//DescendantSchemaNodeIdentifierReferences"/>
   <eClassifiers xsi:type="ecore:EClass" name="Choice" eSuperTypes="#//DataSchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Case" eSuperTypes="#//DataSchemaNode"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Anydata" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Anydata" eSuperTypes="#//DataSchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Anyxml" eSuperTypes="#//DataSchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Grouping" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Uses" eSuperTypes="#//OtherStatement">

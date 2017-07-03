@@ -26,8 +26,8 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def void checkVersion(YangVersion it) {
-		if (yangVersion != "1.1") {
-			error("The version must be '1.1'.", it, YANG_VERSION__YANG_VERSION, INCORRECT_VERSION);
+		if (yangVersion != "1.1" || yangVersion != "1") {
+			error("The version must be either '1' or '1.1'.", it, YANG_VERSION__YANG_VERSION, INCORRECT_VERSION);
 		}
 	}
 

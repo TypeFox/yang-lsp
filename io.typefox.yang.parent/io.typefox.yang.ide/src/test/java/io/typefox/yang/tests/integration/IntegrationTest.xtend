@@ -67,7 +67,7 @@ class IntegrationTest {
 			}
 		}
 	}
-	val injector = new YangStandaloneSetup().createInjectorAndDoEMFRegistration
+	val static injector = new YangStandaloneSetup().createInjectorAndDoEMFRegistration
 	val rs = injector.getInstance(XtextResourceSet)
 	
 	@Test def void testParsing() {
