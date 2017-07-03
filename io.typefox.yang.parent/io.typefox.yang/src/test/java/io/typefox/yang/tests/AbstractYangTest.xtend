@@ -45,7 +45,7 @@ abstract class AbstractYangTest {
 	protected def assertError(EObject obj, String code, String searchTerm, String... messageParts) {
 		val parsedText = (obj.eResource as XtextResource).parseResult?.rootNode?.text;
 		val offset = parsedText.indexOf(searchTerm);
-		Preconditions.checkArgument(offset >= 0, '''The '«searchTerm»' is not conatined in '«code»'.''');
+		Preconditions.checkArgument(offset >= 0, '''The '«searchTerm»' is not conatined in '«parsedText»'.''');
 		validator.assertError(obj, obj.eClass, code, offset, searchTerm.length, messageParts);
 	}
 	
@@ -56,7 +56,7 @@ abstract class AbstractYangTest {
 	protected def assertWarning(EObject obj, String code, String searchTerm, String... messageParts) {
 		val parsedText = (obj.eResource as XtextResource).parseResult?.rootNode?.text;
 		val offset = parsedText.indexOf(searchTerm);
-		Preconditions.checkArgument(offset >= 0, '''The '«searchTerm»' is not conatined in '«code»'.''');
+		Preconditions.checkArgument(offset >= 0, '''The '«searchTerm»' is not conatined in '«parsedText»'.''');
 		validator.assertWarning(obj, obj.eClass, code, offset, searchTerm.length, messageParts);
 	}
 	
