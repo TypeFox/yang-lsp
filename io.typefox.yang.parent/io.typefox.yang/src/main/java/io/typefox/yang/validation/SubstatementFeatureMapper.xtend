@@ -49,32 +49,6 @@ class SubstatementFeatureMapper implements Function1<EClass, EStructuralFeature>
 			MAX_ELEMENTS -> MAX_ELEMENTS__MAX_ELEMENTS,
 			ORDERED_BY -> ORDERED_BY__ORDERED_BY,
 			LIST -> SCHEMA_NODE__NAME,
-<<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
-<<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
-<<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
-<<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
-=======
-			KEY -> KEY__REFERENCES,
->>>>>>> 2b286b5 some minor fixes for substatement validation
-=======
->>>>>>> 9c77029 GH-12: Added YANG version aware cardinality constraints.
-=======
-=======
-			KEY -> KEY__REFERENCES,
->>>>>>> 2b286b5 some minor fixes for substatement validation
->>>>>>> e2fb7bc some minor fixes for substatement validation
-=======
->>>>>>> 2827b02 GH-12: Added YANG version aware cardinality constraints.
-			UNIQUE -> DESCENDANT_SCHEMA_NODE_IDENTIFIER_REFERENCES__REFERENCES,
-			CHOICE -> SCHEMA_NODE__NAME,
-			CASE -> SCHEMA_NODE__NAME,
-<<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
-<<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
-=======
-			ANYDATA -> ANYDATA__NAME,
->>>>>>> 1df3039 Fixed invalid test case. Fixed feature mapping for any-data.
-=======
->>>>>>> 402b24e Fixed compiler error in feature mapper due to grammar changes.
 			ANYXML -> SCHEMA_NODE__NAME,
 			GROUPING -> SCHEMA_NODE__NAME,
 			USES -> USES__GROUPING,

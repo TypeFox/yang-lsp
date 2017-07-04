@@ -5,8 +5,8 @@ import com.google.inject.Singleton
 import java.util.Map
 import org.eclipse.emf.ecore.EClass
 
-import static io.typefox.yang.yang.YangPackage.Literals.*
 import static io.typefox.yang.utils.YangExtensions.YANG_1_1
+import static io.typefox.yang.yang.YangPackage.Literals.*
 
 /**
  * Provides YANG sub-statement rules for a given statement given as an EClass.
@@ -18,13 +18,6 @@ class SubstatementRuleProvider {
 
 	static def newRule() {
 		return new SubstatementGroup(false);
-<<<<<<< Upstream, based on master
-=======
-	}
-
-	static def newOrderedRule() {
-		return new SubstatementGroup(true);
->>>>>>> f23c5e0 some minor fixes for substatement validation
 	}
 
 	static def newOrderedRule() {
@@ -37,11 +30,7 @@ class SubstatementRuleProvider {
 		.must(PREFIX);
 
 	static val SUBMODULE_HEADER_RULE = newOrderedRule()
-<<<<<<< Upstream, based on master
 		.optional(YANG_VERSION)
-=======
-		.must(YANG_VERSION)
->>>>>>> f23c5e0 some minor fixes for substatement validation
 		.must(BELONGS_TO);
 
 	static val LINKAGE_RULE = newOrderedRule()

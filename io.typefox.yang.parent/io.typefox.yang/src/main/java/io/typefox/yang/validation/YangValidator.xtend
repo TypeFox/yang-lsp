@@ -27,18 +27,8 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def void checkVersion(YangVersion it) {
-<<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
-<<<<<<< Upstream, based on branch 'GH-12' of https://github.com/yang-tools/yang-lsp.git
 		if (yangVersion != YANG_1 && yangVersion != YANG_1_1) {
 			error('''The version must be either '«YANG_1»' or '«YANG_1_1»'.''', it, YANG_VERSION__YANG_VERSION, INCORRECT_VERSION);
-=======
-		if (yangVersion != "1.1" || yangVersion != "1") {
-			error("The version must be either '1' or '1.1'.", it, YANG_VERSION__YANG_VERSION, INCORRECT_VERSION);
->>>>>>> 2b286b5 some minor fixes for substatement validation
-=======
-		if (yangVersion != YANG_1 && yangVersion != YANG_1_1) {
-			error('''The version must be either '«YANG_1»' or '«YANG_1_1»'.''', it, YANG_VERSION__YANG_VERSION, INCORRECT_VERSION);
->>>>>>> 9c77029 GH-12: Added YANG version aware cardinality constraints.
 		}
 	}
 
