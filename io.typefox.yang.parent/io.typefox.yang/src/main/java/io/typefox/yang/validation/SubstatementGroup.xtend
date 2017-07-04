@@ -86,11 +86,15 @@ class SubstatementGroup {
 	def with(SubstatementGroup ruleGroup) {
 		constraintMapping.putAll(ruleGroup.constraintMapping);
 		ruleGroup.orderedConstraint.forEach [ constraint, ordinal |
-			if (ordered) {
-				orderedConstraint.put(constraint, '''«this.ordinal».«ordinal»''');	
+			// If the constraint we are adding is contained in an unordered group and
+			// we are processing an unordered group too, then do not convert ordinal `0`
+			// into `0.0` but leave as is.
+			val mergedOrdinal = if (!ordered && this.ordinal.toString == ordinal) {
+				'''«this.ordinal»''';
 			} else {
-				orderedConstraint.put(constraint, '''«IF this.ordinal.toString == ordinal»«this.ordinal»«ELSE»«this.ordinal».«ordinal»«ENDIF»''');
-			}
+				'''«this.ordinal».«ordinal»''';
+			};
+			orderedConstraint.put(constraint, mergedOrdinal);	
 		];
 		if (ordered) {
 			ordinal++;

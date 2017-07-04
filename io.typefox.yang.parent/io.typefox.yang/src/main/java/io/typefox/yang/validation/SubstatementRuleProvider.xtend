@@ -113,6 +113,7 @@ class SubstatementRuleProvider {
 		.optional(REFERENCE);
 
 	static val IDENTITY_RULE = newRule()
+		.any(BASE)
 		.any(YANG_1_1, IF_FEATURE)
 		.optional(STATUS)
 		.optional(DESCRIPTION)
