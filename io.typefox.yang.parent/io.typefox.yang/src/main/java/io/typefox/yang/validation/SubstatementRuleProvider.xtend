@@ -24,20 +24,20 @@ class SubstatementRuleProvider {
 		return new SubstatementGroup(true);
 	}
 
-	static val MODULE_HEADER_RULE = newOrderedRule()
+	static val MODULE_HEADER_RULE = newRule()
 		.optional(YANG_VERSION)
 		.must(NAMESPACE)
 		.must(PREFIX);
 
-	static val SUBMODULE_HEADER_RULE = newOrderedRule()
+	static val SUBMODULE_HEADER_RULE = newRule()
 		.optional(YANG_VERSION)
 		.must(BELONGS_TO);
 
-	static val LINKAGE_RULE = newOrderedRule()
+	static val LINKAGE_RULE = newRule()
 		.any(IMPORT)
 		.any(INCLUDE);
 
-	static val META_RULE = newOrderedRule()
+	static val META_RULE = newRule()
 		.optional(ORGANIZATION)
 		.optional(CONTACT)
 		.optional(DESCRIPTION)
@@ -136,7 +136,7 @@ class SubstatementRuleProvider {
 		.any(BIT)
 		.optional(PATH)
 		.optional(REQUIRE_INSTANCE)
-		.optional(BASE)
+		.any(BASE)
 		.any(TYPE); 
 
 	static val RANGE_RULE = newRule()
@@ -222,7 +222,7 @@ class SubstatementRuleProvider {
 		.must(TYPE)
 		.optional(UNITS)
 		.any(MUST)
-		.optional(DEFAULT)
+		.any(YANG_1_1, DEFAULT)
 		.optional(CONFIG)
 		.optional(MIN_ELEMENTS)
 		.optional(MAX_ELEMENTS)

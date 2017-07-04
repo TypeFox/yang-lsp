@@ -59,10 +59,11 @@ class YangValidatorTest extends AbstractYangTest {
 			module example-system {
 			  namespace "urn:example:system";
 			  yang-version 1.1;
-			  prefix "sys";
+			  contact "joe@example.com";
+			  prefix "asd";
 			}
 		''');
-		assertError(root.substatementsOfType(YangVersion).head, SUBSTATEMENT_ORDERING, "1.1");
+		assertError(root.substatementsOfType(Prefix).head, SUBSTATEMENT_ORDERING, '''"asd"''');
 	}
 
 	@Test
