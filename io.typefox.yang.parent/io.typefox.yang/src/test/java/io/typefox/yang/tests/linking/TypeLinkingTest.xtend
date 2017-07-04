@@ -20,9 +20,9 @@ class TypeLinkingTest extends AbstractYangTest {
 				}
 			}
 		''')
-		val leafs = m.root.subStatements.filter(Leaf).iterator
-		val typeDef = m.root.subStatements.filter(Typedef).head
-		Assert.assertSame(typeDef, leafs.next.subStatements.filter(Type).head.typeRef.type)
-		Assert.assertSame(typeDef, leafs.next.subStatements.filter(Type).head.typeRef.type)
+		val leafs = m.root.substatementsOfType(Leaf).iterator
+		val typeDef = m.root.substatementsOfType(Typedef).head
+		Assert.assertSame(typeDef, leafs.next.substatementsOfType(Type).head.typeRef.type)
+		Assert.assertSame(typeDef, leafs.next.substatementsOfType(Type).head.typeRef.type)
 	}
 }

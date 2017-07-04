@@ -1,8 +1,8 @@
 package io.typefox.yang.tests
 
 import com.google.common.base.Preconditions
+import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.yang.AbstractModule
-import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangFile
 import java.util.ArrayList
 import java.util.Collections
@@ -27,10 +27,11 @@ import org.junit.runner.RunWith
 @InjectWith(YangInjectorProvider)
 abstract class AbstractYangTest {
 
-	@Inject Provider<XtextResourceSet> resourceSetProvider;
+	@Inject Provider<XtextResourceSet> resourceSetProvider
 	@Inject ResourceHelper resourceHelper
 	@Inject protected IResourceDescription.Manager mnr
 	@Inject protected ValidationTestHelper validator
+	@Inject extension protected YangExtensions
 	
 	XtextResourceSet resourceSet
 	
@@ -78,10 +79,6 @@ abstract class AbstractYangTest {
 	
 	protected def AbstractModule root(Resource r) {
 		return (r.contents.head as YangFile).statements.head as AbstractModule
-	}
-	
-	protected def <S extends Statement> Iterable<S> subStatementsOfType(AbstractModule m, Class<S> clazz) {
-		return m?.subStatements.filter(clazz)
 	}
 	
 	protected def void installIndex() {

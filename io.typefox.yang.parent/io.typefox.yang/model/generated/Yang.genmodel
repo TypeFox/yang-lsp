@@ -10,7 +10,7 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//YangFile/statements"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Statement">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Statement/subStatements"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Statement/substatements"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//AbstractModule">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//AbstractModule/name"/>

@@ -5,6 +5,7 @@ import com.google.inject.Singleton
 import java.util.Map
 import org.eclipse.emf.ecore.EClass
 
+import static io.typefox.yang.utils.YangExtensions.YANG_1_1
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 /**
@@ -29,7 +30,7 @@ class SubstatementRuleProvider {
 		.must(PREFIX);
 
 	static val SUBMODULE_HEADER_RULE = newOrderedRule()
-		.must(YANG_VERSION)
+		.optional(YANG_VERSION)
 		.must(BELONGS_TO);
 
 	static val LINKAGE_RULE = newOrderedRule()
@@ -48,7 +49,7 @@ class SubstatementRuleProvider {
 		.any(LEAF_LIST)
 		.any(LIST)
 		.any(CHOICE)
-		.any(ANYDATA)
+		.any(YANG_1_1, ANYDATA)
 		.any(ANYXML)
 		.any(USES);
 
@@ -85,13 +86,13 @@ class SubstatementRuleProvider {
 	static val IMPORT_RULE = newRule()
 		.must(PREFIX)
 		.optional(REVISION_DATE)
-		.optional(DESCRIPTION)
-		.optional(REFERENCE);
+		.optional(YANG_1_1, DESCRIPTION)
+		.optional(YANG_1_1, REFERENCE);
 
 	static val INCLUDE_RULE = newRule()
 		.optional(REVISION_DATE)
-		.optional(DESCRIPTION)
-		.optional(REFERENCE);
+		.optional(YANG_1_1, DESCRIPTION)
+		.optional(YANG_1_1, REFERENCE);
 
 	static val BELONGS_TO_RULE = newRule()
 		.must(PREFIX);
@@ -112,7 +113,7 @@ class SubstatementRuleProvider {
 		.optional(REFERENCE);
 
 	static val IDENTITY_RULE = newRule()
-		.any(IF_FEATURE)
+		.any(YANG_1_1, IF_FEATURE)
 		.optional(STATUS)
 		.optional(DESCRIPTION)
 		.optional(REFERENCE);
@@ -150,7 +151,7 @@ class SubstatementRuleProvider {
 		.optional(REFERENCE);
 
 	static val PATTERN_RULE = newRule()
-//		.optional(MODIFIER) // TODO add modifier to grammar.
+		.optional(YANG_1_1, MODIFIER)
 		.optional(ERROR_MESSAGE)
 		.optional(ERROR_APP_TAG)
 		.optional(DESCRIPTION)
@@ -158,14 +159,14 @@ class SubstatementRuleProvider {
 
 	static val ENUM_RULE = newRule()
 		.optional(VALUE)
-		.any(IF_FEATURE)
+		.any(YANG_1_1, IF_FEATURE)
 		.optional(STATUS)
 		.optional(DESCRIPTION)
 		.optional(REFERENCE);
 
 	static val BIT_RULE = newRule()
 		.optional(POSITION)
-		.any(IF_FEATURE)
+		.any(YANG_1_1, IF_FEATURE)
 		.optional(STATUS)
 		.optional(DESCRIPTION)
 		.optional(REFERENCE);
@@ -183,8 +184,8 @@ class SubstatementRuleProvider {
 		.any(TYPEDEF)
 		.any(GROUPING)
 		.with(DATA_RULE)
-		.optional(ACTION)
-		.optional(NOTIFICATION);
+		.optional(YANG_1_1, ACTION)
+		.optional(YANG_1_1, NOTIFICATION);
 
 	static val CONTAINER_RULE = newRule()
 		.optional(WHEN)
@@ -198,8 +199,8 @@ class SubstatementRuleProvider {
 		.any(TYPEDEF)
 		.any(GROUPING)
 		.with(DATA_RULE)
-		.any(ACTION)
-		.any(NOTIFICATION);
+		.any(YANG_1_1, ACTION)
+		.any(YANG_1_1, NOTIFICATION);
 
 	static val LEAF_RULE = newRule()
 		.optional(WHEN)
@@ -244,8 +245,8 @@ class SubstatementRuleProvider {
 		.any(TYPEDEF)
 		.any(GROUPING)
 		.with(DATA_RULE)
-		.any(ACTION)
-		.any(NOTIFICATION);
+		.any(YANG_1_1, ACTION)
+		.any(YANG_1_1, NOTIFICATION);
 
 	static val CHOICE_RULE = newRule()
 		.optional(WHEN)
@@ -258,12 +259,12 @@ class SubstatementRuleProvider {
 		.optional(DESCRIPTION)
 		.optional(REFERENCE)
 		.any(CASE)
-		.any(CHOICE)
+		.any(YANG_1_1, CHOICE)
 		.any(CONTAINER)
 		.any(LEAF)
 		.any(LEAF_LIST)
 		.any(LIST)
-		.any(ANYDATA)
+		.any(YANG_1_1, ANYDATA)
 		.any(ANYXML);
 
 	static val CASE_RULE = newRule()
@@ -305,7 +306,7 @@ class SubstatementRuleProvider {
 
 	static val REFINE_RULE = newRule()
 		.any(MUST)
-		.any(IF_FEATURE)
+		.any(YANG_1_1, IF_FEATURE)
 		.optional(PRESENCE)
 		.optional(DEFAULT)
 		.optional(CONFIG)
@@ -323,8 +324,8 @@ class SubstatementRuleProvider {
 		.optional(REFERENCE)
 		.any(CASE)
 		.with(DATA_RULE)
-		.any(ACTION)
-		.any(NOTIFICATION);
+		.any(YANG_1_1, ACTION)
+		.any(YANG_1_1, NOTIFICATION);
 	
 	static val WHEN_RULE = newRule()
 		.optional(DESCRIPTION)
@@ -351,20 +352,20 @@ class SubstatementRuleProvider {
 		.optional(OUTPUT);
 
 	static val INPUT_RULE = newRule()
-		.any(MUST)
+		.any(YANG_1_1, MUST)
 		.any(TYPEDEF)
 		.any(GROUPING)
 		.with(DATA_RULE);
 
 	static val OUTPUT_RULE = newRule()
-		.any(MUST)
+		.any(YANG_1_1, MUST)
 		.any(TYPEDEF)
 		.any(GROUPING)
 		.with(DATA_RULE);
 
 	static val NOTIFICATION_RULE = newRule()
 		.any(IF_FEATURE)
-		.any(MUST)
+		.any(YANG_1_1, MUST)
 		.optional(STATUS)
 		.optional(DESCRIPTION)
 		.optional(REFERENCE)

@@ -33,7 +33,7 @@ class ModuleLinkingTest extends AbstractYangTest {
 				}
 			}
 		''')
-		assertSame(m.root, m2.root.subStatements.filter(Import).head.module)
+		assertSame(m.root, m2.root.substatementsOfType(Import).head.module)
 	}
 	
 	@Test def void testModuleImport_NoPefix() {
@@ -46,7 +46,7 @@ class ModuleLinkingTest extends AbstractYangTest {
 				import a;
 			}
 		''')
-		assertError(m.root.subStatements.head, IssueCodes.MISSING_PREFIX)
+		assertError(m.root.substatements.head, IssueCodes.MISSING_PREFIX)
 	}
 	
 	@Test def void testModuleImportWithRevision() {
@@ -79,9 +79,9 @@ class ModuleLinkingTest extends AbstractYangTest {
 			}
 		''')
 		installIndex
-		assertSame(m1.root, m2.root.subStatements.filter(Import).head.module)
+		assertSame(m1.root, m2.root.substatementsOfType(Import).head.module)
 		val uses = m2.root.eAllContents.filter(Uses).head
-		assertSame(m1.root.subStatements.filter(Grouping).head, uses.grouping.node)
+		assertSame(m1.root.substatementsOfType(Grouping).head, uses.grouping.node)
 	}
 	
 	@Test def void testModuleNamespace() {
@@ -103,9 +103,9 @@ class ModuleLinkingTest extends AbstractYangTest {
 			}
 		''')
 		installIndex
-		assertSame(m1.root, m2.root.subStatements.filter(Include).head.module)
+		assertSame(m1.root, m2.root.substatementsOfType(Include).head.module)
 		val uses = m2.root.eAllContents.filter(Uses).head
-		assertSame(m1.root.subStatements.filter(Grouping).head, uses.grouping.node)
+		assertSame(m1.root.substatementsOfType(Grouping).head, uses.grouping.node)
 	}
 	
 	@Test def void testImportGroupingFromSubModule() {
@@ -134,7 +134,7 @@ class ModuleLinkingTest extends AbstractYangTest {
 		''')
 		installIndex
 		val uses = m3.root.eAllContents.filter(Uses).head
-		assertSame(m1.root.subStatements.filter(Grouping).head, uses.grouping.node)
+		assertSame(m1.root.substatementsOfType(Grouping).head, uses.grouping.node)
 	}
 	
 	@Test def void testModuleImportWithRevision_01() {
@@ -165,9 +165,9 @@ class ModuleLinkingTest extends AbstractYangTest {
 				}
 			}
 		''')
-		val imp = m2.root.subStatements.filter(Import).head
+		val imp = m2.root.substatementsOfType(Import).head
 		assertWarning(imp, IssueCodes.MISSING_REVISION)
-		assertFalse(m2.root.subStatements.filter(Import).head.module.eIsProxy)
+		assertFalse(m2.root.substatementsOfType(Import).head.module.eIsProxy)
 	}
 	
 	@Test def void testModuleBelongsToAnotherOne() {
@@ -186,7 +186,7 @@ class ModuleLinkingTest extends AbstractYangTest {
 			}
 		''')
 		installIndex
-		assertError(m1.root.subStatements.head, IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)
+		assertError(m1.root.substatements.head, IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)
 	}
 	
 	@Test def void testModuleImportWithRevision_02() {
@@ -220,7 +220,7 @@ class ModuleLinkingTest extends AbstractYangTest {
 		''')
 		// no matching revision => should link to any
 		// TODO error validation on unmatched revision
-		assertFalse(m2.root.subStatements.filter(Import).head.module.eIsProxy)
+		assertFalse(m2.root.substatementsOfType(Import).head.module.eIsProxy)
 	}
 	
 	@Test def void testSubModuleExport() {
@@ -243,7 +243,7 @@ class ModuleLinkingTest extends AbstractYangTest {
 				}
 			}
 		''')
-		assertSame(m.root, m2.root.subStatements.filter(Include).head.module)
+		assertSame(m.root, m2.root.substatementsOfType(Include).head.module)
 	}
 	
 	@Test def void testSubModuleCannotbeImported() {
@@ -257,7 +257,7 @@ class ModuleLinkingTest extends AbstractYangTest {
 				}
 			}
 		''')
-		val imp = m2.root.subStatements.filter(Import).head
+		val imp = m2.root.substatementsOfType(Import).head
 		assertError(imp, IssueCodes.IMPORT_NOT_A_MODULE)
 		assertFalse(imp.module.eIsProxy)
 	}
@@ -276,8 +276,8 @@ class ModuleLinkingTest extends AbstractYangTest {
 			}
 		''')
 		installIndex
-		assertSame(m.root, m2.root.subStatements.filter(Include).head.module)
-		assertSame(m2.root, m.root.subStatements.filter(BelongsTo).head.module)
+		assertSame(m.root, m2.root.substatementsOfType(Include).head.module)
+		assertSame(m2.root, m.root.substatementsOfType(BelongsTo).head.module)
 	}
 	
 	

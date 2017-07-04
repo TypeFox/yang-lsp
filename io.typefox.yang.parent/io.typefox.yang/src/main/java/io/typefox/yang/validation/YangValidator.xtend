@@ -9,6 +9,7 @@ import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.xtext.validation.Check
 
+import static io.typefox.yang.utils.YangExtensions.*
 import static io.typefox.yang.validation.IssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
@@ -26,19 +27,14 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def void checkVersion(YangVersion it) {
-		if (yangVersion != "1.1" || yangVersion != "1") {
-			error("The version must be either '1' or '1.1'.", it, YANG_VERSION__YANG_VERSION, INCORRECT_VERSION);
+		if (yangVersion != YANG_1 && yangVersion != YANG_1_1) {
+			error('''The version must be either '«YANG_1»' or '«YANG_1_1»'.''', it, YANG_VERSION__YANG_VERSION, INCORRECT_VERSION);
 		}
 	}
 
 	@Check
 	def void checkSubstatements(Statement it) {
-		val rule = substatementRuleProvider.get(eClass);
-		if (rule === null) {
-			return;
-		}
-		
-		rule.checkSubstatements(it, this, featureMapper);
+		substatementRuleProvider.get(eClass)?.checkSubstatements(it, this, featureMapper);
 	}
 
 }
