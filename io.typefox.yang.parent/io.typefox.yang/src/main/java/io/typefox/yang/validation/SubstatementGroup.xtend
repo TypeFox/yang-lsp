@@ -86,7 +86,11 @@ class SubstatementGroup {
 	def with(SubstatementGroup ruleGroup) {
 		constraintMapping.putAll(ruleGroup.constraintMapping);
 		ruleGroup.orderedConstraint.forEach [ constraint, ordinal |
-			orderedConstraint.put(constraint, '''«this.ordinal».«ordinal»''');
+			if (ordered) {
+				orderedConstraint.put(constraint, '''«this.ordinal».«ordinal»''');	
+			} else {
+				orderedConstraint.put(constraint, '''«IF this.ordinal.toString == ordinal»«this.ordinal»«ELSE»«this.ordinal».«ordinal»«ENDIF»''');
+			}
 		];
 		if (ordered) {
 			ordinal++;
