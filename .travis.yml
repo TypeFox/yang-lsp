@@ -1,0 +1,23 @@
+language: java
+
+jdk:
+  - oraclejdk8
+
+os:
+  - linux
+
+branches:
+  only:
+    - master
+
+cache:
+  directories:
+  - $HOME/.gradle
+  - $HOME/.m2/repository
+
+before_script:
+  - git clone https://github.com/TypeFox/xtext-jflex.git
+  - mvn -f ./xtext-jflex/jflex-fragment/pom.xml clean install
+
+script:
+  - ./io.typefox.yang.parent/gradlew -p io.typefox.yang.parent build
