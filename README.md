@@ -1,4 +1,6 @@
 # yang-lsp
+[![Build Status](https://travis-ci.org/yang-tools/yang-lsp.svg?branch=master)](https://travis-ci.org/yang-tools/yang-lsp)
+
 A Language Server for YANG
 
 ## Build
