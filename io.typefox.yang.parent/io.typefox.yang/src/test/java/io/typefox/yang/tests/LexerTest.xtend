@@ -235,11 +235,63 @@ class LexerTest {
 		l.assertNextToken(RULE_STRING, "'foo-bar42'")
 	}
 	
+	@Test def void test_MinMaxRangeExpression() {
+		val l = lexer.get
+		l.charStream = new ANTLRStringStream('''
+			range 1 | min..2|3..max|min..max  |  min .. max
+		''')
+		l.assertNextToken(Range, 'range')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(RULE_NUMBER, '1')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(RULE_OPERATOR, '|')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(Min, 'min')
+		l.assertNextToken(FullStopFullStop, '..')
+		l.assertNextToken(RULE_NUMBER, '2')
+		l.assertNextToken(RULE_OPERATOR, '|')
+		l.assertNextToken(RULE_NUMBER, '3')
+		l.assertNextToken(FullStopFullStop, '..')
+		l.assertNextToken(Max, 'max')
+		l.assertNextToken(RULE_OPERATOR, '|')
+		l.assertNextToken(Min, 'min')
+		l.assertNextToken(FullStopFullStop, '..')
+		l.assertNextToken(Max, 'max')
+		l.assertNextToken(RULE_WS, '  ')
+		l.assertNextToken(RULE_OPERATOR, '|')
+		l.assertNextToken(RULE_WS, '  ')
+		l.assertNextToken(Min, 'min')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(FullStopFullStop, '..')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(Max, 'max')
+	}
+	
+	@Test def void test_SignedRangeExpression() {
+		val l = lexer.get
+		l.charStream = new ANTLRStringStream('''
+			range -1 | -2..2|+3..4
+		''')
+		l.assertNextToken(Range, 'range')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(RULE_NUMBER, '-1')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(RULE_OPERATOR, '|')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(RULE_NUMBER, '-2')
+		l.assertNextToken(FullStopFullStop, '..')
+		l.assertNextToken(RULE_NUMBER, '2')
+		l.assertNextToken(RULE_OPERATOR, '|')
+		l.assertNextToken(RULE_NUMBER, '+3')
+		l.assertNextToken(FullStopFullStop, '..')
+		l.assertNextToken(RULE_NUMBER, '4')
+	}
+	
 	
 	private def void assertNextToken(Lexer it, int id, String text) {
 		val t = nextToken
-		assertEquals(text, t.text)
 		assertEquals(id, t.type)
+		assertEquals(text, t.text)
 	}
 	
 }

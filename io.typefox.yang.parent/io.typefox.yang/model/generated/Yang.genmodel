@@ -161,8 +161,9 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//When/condition"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Range">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Range/range"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Range/expression"/>
     </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Expression"/>
     <genClasses ecoreClass="Yang.ecore#//FractionDigits">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//FractionDigits/range"/>
     </genClasses>
@@ -219,5 +220,15 @@
     <genClasses ecoreClass="Yang.ecore#//InstanceIdentifier">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//InstanceIdentifier/elements"/>
     </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//BinaryOperation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//BinaryOperation/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//BinaryOperation/operator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//BinaryOperation/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Literal">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Literal/value"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Min"/>
+    <genClasses ecoreClass="Yang.ecore#//Max"/>
   </genPackages>
 </genmodel:GenModel>

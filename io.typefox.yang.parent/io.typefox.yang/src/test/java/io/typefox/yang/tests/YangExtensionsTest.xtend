@@ -23,7 +23,7 @@ class YangExtensionsTest extends AbstractYangTest {
 			module example-system {
 			}
 		''');
-		assertEquals(YangExtensions.YANG_1, root.version);
+		assertEquals(YangExtensions.YANG_1, root.yangVersion);
 	}
 
 	@Test
@@ -33,7 +33,7 @@ class YangExtensionsTest extends AbstractYangTest {
 			  yang-version 1;
 			}
 		''');
-		assertEquals(YangExtensions.YANG_1, root.version);
+		assertEquals(YangExtensions.YANG_1, root.yangVersion);
 	}
 
 	@Test
@@ -43,7 +43,7 @@ class YangExtensionsTest extends AbstractYangTest {
 			  yang-version 1.1;
 			}
 		''');
-		assertEquals(YangExtensions.YANG_1_1, root.version);
+		assertEquals(YangExtensions.YANG_1_1, root.yangVersion);
 	}
 
 	@Test
@@ -53,12 +53,12 @@ class YangExtensionsTest extends AbstractYangTest {
 			  yang-version 1.2;
 			}
 		''');
-		assertEquals(null, root.version);
+		assertEquals(null, root.yangVersion);
 	}
 
 	@Test
 	def void checkExplicitVersion_Broken_Expect_Null() {
-		assertEquals(null, YangFactory.eINSTANCE.createYangVersion.version);
+		assertEquals(null, YangFactory.eINSTANCE.createYangVersion.yangVersion);
 	}
 
 }

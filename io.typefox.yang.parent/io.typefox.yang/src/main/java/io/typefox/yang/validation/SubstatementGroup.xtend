@@ -31,10 +31,6 @@ class SubstatementGroup {
 
 	var ordinal = 0;
 
-	package new() {
-		this(true);
-	}
-
 	package new(boolean ordered) {
 		this.ordered = ordered;
 		this.orderedConstraint = newHashMap();
@@ -205,7 +201,7 @@ class SubstatementGroup {
 		val resource = it?.eResource
 		if (resource instanceof XtextResource) {
 			val yangExtensions = resource.resourceServiceProvider.get(YangExtensions);
-			val version = yangExtensions.getVersion(it);
+			val version = yangExtensions.getYangVersion(it);
 			return YangExtensions.YANG_1_1 == version;
 		}
 		return false;
@@ -218,7 +214,7 @@ class SubstatementGroup {
 	}
 
 	@Data
-	public static class SubstatementConstraint {
+	private static class SubstatementConstraint {
 
 		val String version;
 		val EClass clazz;
@@ -234,7 +230,7 @@ class SubstatementGroup {
 
 	}
 
-	public static class Cardinality {
+	private static class Cardinality {
 
 		public static val ANY = new Cardinality(Range.closed(0, Integer.MAX_VALUE));
 		public static val OPTIONAL = new Cardinality(Range.closed(0, 1));

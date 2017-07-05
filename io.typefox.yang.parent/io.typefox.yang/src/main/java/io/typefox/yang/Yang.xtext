@@ -389,7 +389,19 @@ When :
 
 // 9.2.4 
 Range:
-	'range' range=StringValue StatementEnd
+	'range' expression=DisjointExpression StatementEnd
+;
+
+DisjointExpression returns Expression:
+	RangeExpression ({BinaryOperation.left=current} operator=OPERATOR right=RangeExpression)*
+;
+
+RangeExpression returns Expression:
+	RangeBoundaryExpression ({BinaryOperation.left=current} operator='..' right=RangeBoundaryExpression)*
+;
+
+RangeBoundaryExpression returns Expression:
+	{Literal} value = NUMBER | {Min} 'min' | {Max} 'max'
 ;
 
 // 9.3.4

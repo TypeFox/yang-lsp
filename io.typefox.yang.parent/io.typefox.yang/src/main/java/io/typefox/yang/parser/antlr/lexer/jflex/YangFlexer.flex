@@ -85,13 +85,14 @@ SINGLE_QUOTED_STRING= "'" [^']* "'"?
 DOUBLE_QUOTED_STRING= \" ([^\\\"]|\\.)* \"?
 ESCAPED_DQ_STRING= \\\" [^\\\"]* \\\"?
 
-NUMBER= [0-9]+ ("." [0-9]+)? | "." [0-9]+ 
+NUMBER= ("+"|"-")?[0-9]+ ("." [0-9]+)? | "." [0-9]+ 
 
 OPERATOR= "and" | "or" | "mod" | "div" | "*" | "|" | "+" | "-" | "=" | "!=" | "<" | "<=" | ">" | ">="
 
 STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | {SL_COMMENT})*
 
 %s EXPRESSION, IN_EXPRESSION_STRING, IN_SQ_EXPRESSION_STRING
+%s RANGE_EXPRESSION, IN_RANGE_EXPRESSION_STRING, IN_SQ_RANGE_EXPRESSION_STRING
 %s COLON_EXPECTED, ID_EXPECTED
 %s BLACK_BOX_STRING
 
@@ -132,6 +133,8 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	"uint32"                {return Uint32;}
 	"uint64"                {return Uint64;}
 	"union"                 {return Union;}
+	"min"                   {return Min;}
+	"max"                   {return Max;}
 	{ID}        { return RULE_ID; }
 	{NUMBER}    { return RULE_NUMBER; }
 	":"         { return Colon; }
@@ -149,6 +152,27 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	{SINGLE_QUOTED_STRING} { return RULE_STRING; }
 	{ESCAPED_DQ_STRING}    { return RULE_STRING; }
 	{OPERATOR}  { return RULE_OPERATOR; }
+	"binary"                {return Binary;}
+	"bits"                  {return Bits;}
+	"boolean"               {return Boolean;}
+	"decimal64"             {return Decimal64;}
+	"empty"                 {return Empty;}
+	"enumeration"           {return Enumeration;}
+	"identityref"           {return Identityref;}
+	"instance-identifier"   {return InstanceIdentifier;}
+	"int8"                  {return Int8;}
+	"int16"                 {return Int16;}
+	"int32"                 {return Int32;}
+	"int64"                 {return Int64;}
+	"leafref"               {return Leafref;}
+	"string"                {return String;}
+	"uint8"                 {return Uint8;}
+	"uint16"                {return Uint16;}
+	"uint32"                {return Uint32;}
+	"uint64"                {return Uint64;}
+	"union"                 {return Union;}
+	"min"                   {return Min;}
+	"max"                   {return Max;}
 	{ID}        { return RULE_ID; }
 	{NUMBER}    { return RULE_NUMBER; }
 	":"         { return Colon; }
@@ -168,6 +192,27 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 <IN_SQ_EXPRESSION_STRING> {
 	{DOUBLE_QUOTED_STRING}    { return RULE_STRING; }
 	{OPERATOR}  { return RULE_OPERATOR; }
+	"binary"                {return Binary;}
+	"bits"                  {return Bits;}
+	"boolean"               {return Boolean;}
+	"decimal64"             {return Decimal64;}
+	"empty"                 {return Empty;}
+	"enumeration"           {return Enumeration;}
+	"identityref"           {return Identityref;}
+	"instance-identifier"   {return InstanceIdentifier;}
+	"int8"                  {return Int8;}
+	"int16"                 {return Int16;}
+	"int32"                 {return Int32;}
+	"int64"                 {return Int64;}
+	"leafref"               {return Leafref;}
+	"string"                {return String;}
+	"uint8"                 {return Uint8;}
+	"uint16"                {return Uint16;}
+	"uint32"                {return Uint32;}
+	"uint64"                {return Uint64;}
+	"union"                 {return Union;}
+	"min"                   {return Min;}
+	"max"                   {return Max;}
 	{ID}        { return RULE_ID; }
 	{NUMBER}    { return RULE_NUMBER; }
 	":"         { return Colon; }
@@ -181,6 +226,43 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	","         { return Comma; }
 
 	"'" {STRING_CONCAT} { yybegin(EXPRESSION); return RULE_HIDDEN; }
+	"'"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
+}
+
+<RANGE_EXPRESSION> {
+	{ML_COMMENT} { return RULE_ML_COMMENT; }
+	{SL_COMMENT} { return RULE_SL_COMMENT; }
+	\"          {yybegin(IN_RANGE_EXPRESSION_STRING); return RULE_HIDDEN;}
+	"'"         {yybegin(IN_SQ_RANGE_EXPRESSION_STRING); return RULE_HIDDEN;}
+	{NUMBER}    { return RULE_NUMBER; }
+	{OPERATOR}  { return RULE_OPERATOR; }
+	"min"                   {return Min;}
+	"max"                   {return Max;}
+	".."        { return FullStopFullStop; }
+}
+
+<IN_RANGE_EXPRESSION_STRING> {
+	{SINGLE_QUOTED_STRING} { return RULE_STRING; }
+	{ESCAPED_DQ_STRING}    { return RULE_STRING; }
+	{NUMBER}    { return RULE_NUMBER; }
+	{OPERATOR}  { return RULE_OPERATOR; }
+	"min"                   {return Min;}
+	"max"                   {return Max;}
+	".."        { return FullStopFullStop; }
+
+	\" {STRING_CONCAT} { yybegin(RANGE_EXPRESSION); return RULE_HIDDEN; }
+	\"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
+}
+
+<IN_SQ_RANGE_EXPRESSION_STRING> {
+	{DOUBLE_QUOTED_STRING}    { return RULE_STRING; }
+	{NUMBER}    { return RULE_NUMBER; }
+	{OPERATOR}  { return RULE_OPERATOR; }
+	"min"                   {return Min;}
+	"max"                   {return Max;}
+	".."        { return FullStopFullStop; }
+
+	"'" {STRING_CONCAT} { yybegin(RANGE_EXPRESSION); return RULE_HIDDEN; }
 	"'"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
 }
 
@@ -235,7 +317,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "position"               {yybegin(BLACK_BOX_STRING); return Position; }
  "prefix"                 {yybegin(BLACK_BOX_STRING); return Prefix; }
  "presence"               {yybegin(BLACK_BOX_STRING); return Presence; }
- "range"                  {yybegin(BLACK_BOX_STRING); return Range; }
+ "range"                  {yybegin(RANGE_EXPRESSION); return Range; }
  "reference"              {yybegin(BLACK_BOX_STRING); return Reference; }
  "refine"                 {yybegin(EXPRESSION); return Refine; }
  "require-instance"       {yybegin(BLACK_BOX_STRING); return RequireInstance; }

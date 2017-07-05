@@ -2,14 +2,18 @@ package io.typefox.yang.utils
 
 import com.google.inject.Singleton
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Range
 import io.typefox.yang.yang.Statement
+import io.typefox.yang.yang.Type
+import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.emf.ecore.EObject
+import org.eclipse.xtext.EcoreUtil2
 
 import static extension org.eclipse.xtext.EcoreUtil2.getContainerOfType
 
 /**
- * Contains a couple of extension methods for the YANG language.
+ * Convenient extension methods for the YANG language.
  * 
  * @author akos.kitta 
  */
@@ -35,12 +39,12 @@ class YangExtensions {
 	 * Returns with {@code 1.1} if the container module has declared YANG version, and that equals to {@code 1.1},
 	 * otherwise returns with {@code null}. Also returns with {@code null}, if the argument is not contained in a module.
 	 */
-	def getVersion(EObject it) {
+	def getYangVersion(EObject it) {
 		val module = getContainerOfType(AbstractModule);
 		if (module === null) {
 			return null;
 		}
-		val version = module.substatementsOfType(YangVersion).head?.yangVersion;
+		val version = module.firstSubstatementsOfType(YangVersion)?.yangVersion;
 		if (null === version || YANG_1 == version) {
 			return YANG_1;
 		}
@@ -52,6 +56,27 @@ class YangExtensions {
 	 */
 	def <S extends Statement> substatementsOfType(Statement it, Class<S> clazz) {
 		return substatements.filter(clazz);
+	}
+	
+	/**
+	 * Returns with the first sub-statement of a given type for the statement argument or {@code null}.
+	 */
+	def <S extends Statement> firstSubstatementsOfType(Statement it, Class<S> clazz) {
+		return substatementsOfType(clazz).head;
+	}
+	
+	/**
+	 * Returns with the {@code type of t}
+	 */
+	def Type getType(Typedef it) {
+		return substatementsOfType(Type).head;
+	}
+	
+	/**
+	 * Returns with the container type of the range argument.
+	 */
+	def Type getType(Range it) {
+		return EcoreUtil2.getContainerOfType(it, Type);
 	}
 
 }

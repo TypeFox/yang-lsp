@@ -139,4 +139,130 @@ class YangParsingTest {
 		    ]
 		}'''.toString, EmfFormatter.objToStr(model))
 	}
+	
+	@Test
+	def void testParseRange_01() {
+		'''
+		typedef foo {
+		  type int32 {
+		    range 1;
+		  }
+		}'''.assertNoParserErrors;
+	}
+
+	@Test
+	def void testParseRange_02() {
+		'''
+		typedef foo {
+		  type int32 {
+		    range '1';
+		  }
+		}'''.assertNoParserErrors;
+	}
+
+	@Test
+	def void testParseRange_03() {
+		'''
+		typedef foo {
+		  type int32 {
+		    range "1";
+		  }
+		}'''.assertNoParserErrors;
+	}
+	
+	@Test
+	def void testParseRange_04() {
+		'''
+		typedef foo {
+		  type int32 {
+		    range '1 | 2';
+		  }
+		}'''.assertNoParserErrors;
+	}
+
+	@Test
+	def void testParseRange_05() {
+		'''
+		typedef foo {
+		  type int32 {
+		    range "1 | 2..4";
+		  }
+		}'''.assertNoParserErrors;
+	}
+	
+	@Test
+	def void testParseRange_06() {
+		'''
+		typedef foo {
+		  type int32 {
+		    range '1 | 2..4';
+		  }
+		}'''.assertNoParserErrors;
+	}
+	
+	@Test
+	def void testParseRange_07() {
+		'''
+		typedef foo {
+		  type int32 {
+		    range "1 | 2..4 | 5";
+		  }
+		}'''.assertNoParserErrors;
+	}
+	
+	@Test
+	def void testParseRange_08() {
+		'''
+		typedef foo {
+		  type int32 {
+		    range "1 | 2..max | 5";
+		  }
+		}'''.assertNoParserErrors;
+	}
+
+
+	@Test
+	def void testParseRange_09() {
+		'''
+		typedef foo {
+		  type int32 {
+		    range "1 | min..4 | 5";
+		  }
+		}'''.assertNoParserErrors;
+	}
+	
+	@Test
+	def void testParseRange_10() {
+		'''
+		typedef foo {
+		  type int32 {
+		    range "1 | min..max | 5";
+		  }
+		}'''.assertNoParserErrors;
+	}
+	
+	@Test
+	def void testParseRange_11() {
+		'''
+		typedef foo {
+		  type int32 {
+		    range '1 | min  ..  max | 5';
+		  }
+		}'''.assertNoParserErrors;
+	}
+	
+	@Test
+	def void testParseRange_12() {
+		'''
+		typedef foo {
+		  type int32 {
+		    range '1 | 2 ..  3|4 ..  5      | 6 | 7..  max';
+		  }
+		}'''.assertNoParserErrors;
+	}
+
+
+	private def assertNoParserErrors(CharSequence it) {
+		helper.assertNoErrors(parse, Diagnostic.SYNTAX_DIAGNOSTIC);
+	}
 }
