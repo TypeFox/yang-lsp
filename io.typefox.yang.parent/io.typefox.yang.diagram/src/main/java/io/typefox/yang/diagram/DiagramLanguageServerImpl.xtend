@@ -18,7 +18,6 @@ import java.util.List
 import java.util.Map
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.lsp4j.jsonrpc.Endpoint
-import org.eclipse.lsp4j.jsonrpc.services.JsonNotification
 import org.eclipse.lsp4j.jsonrpc.services.ServiceEndpoints
 import org.eclipse.xtext.diagnostics.Severity
 import org.eclipse.xtext.ide.server.ILanguageServerAccess
@@ -77,7 +76,6 @@ class DiagramLanguageServerImpl implements DiagramEndpoint, ILanguageServerExten
 		}
 	}
 	
-	@JsonNotification
 	override void accept(ActionMessage message) {
 		val server = getDiagramServer(message.clientId)
 		server.accept(message)
@@ -88,10 +86,11 @@ class DiagramLanguageServerImpl implements DiagramEndpoint, ILanguageServerExten
 			uri.doRead [ context |
 				context.resource?.generateDiagram(context.cancelChecker)
 			].thenAccept[ newRoot |
-				val server = getDiagramServer(uri)
-				if (server.model !== null)
+				if (newRoot !== null) {
+					val server = getDiagramServer(uri)
 					LayoutUtil.copyLayoutData(server.model, newRoot)
-				server.updateModel(newRoot)
+					server.updateModel(newRoot)
+				}
 			]
 		}
 	}

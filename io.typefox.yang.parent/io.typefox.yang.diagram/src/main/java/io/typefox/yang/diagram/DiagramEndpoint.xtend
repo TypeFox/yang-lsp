@@ -12,9 +12,9 @@ import org.eclipse.lsp4j.jsonrpc.services.JsonSegment
 import java.util.function.Consumer
 
 @JsonSegment('diagram')
-interface DiagramEndpoint extends Consumer<ActionMessage> {
+interface DiagramEndpoint {
 
 	@JsonNotification
-	override accept(ActionMessage actionMessage);
+	def void accept(ActionMessage actionMessage);
 
 }
