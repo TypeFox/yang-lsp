@@ -6,18 +6,25 @@
  */
 package io.typefox.yang.diagram
 
-import io.typefox.sprotty.api.SEdge
+import io.typefox.sprotty.api.Point
+import io.typefox.sprotty.api.SCompartment
+import io.typefox.sprotty.api.SLabel
 import io.typefox.sprotty.api.SModelRoot
-import io.typefox.sprotty.api.SNode
+import io.typefox.yang.yang.Module
 import io.typefox.yang.yang.YangFile
 import org.eclipse.xtext.util.CancelIndicator
-import io.typefox.sprotty.api.Point
-import io.typefox.sprotty.api.SLabel
-import io.typefox.sprotty.api.SCompartment
 
 class YangDiagramGenerator {
 
 	def SModelRoot generateDiagram(YangFile file, CancelIndicator cancelIndicator) {
+		for (statement : file.statements) {
+			if (statement instanceof Module) {
+				
+			}
+			for (sub : statement.substatements) {
+				
+			}
+		}
 		val container1 = new SLayoutNode => [
 			id = 'node0'
 			type = 'node:class'
@@ -57,7 +64,7 @@ class YangDiagramGenerator {
 		val diagram = new SModelRoot => [
 			type = 'graph'
 			id = 'yang'
-			children = #[]
+			children = #[container1]
 		]
 		return diagram
 	}
