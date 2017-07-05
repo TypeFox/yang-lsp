@@ -1,0 +1,28 @@
+module foo {
+    yang-version 1.1;
+    namespace "foo:bar";
+    prefix x;
+    include foosub;
+
+    typedef foo {
+        type int32 {
+            range "1..4 | 20..30";
+        }
+    } 
+    typedef foo2 {
+        type foo {
+            range "4..20";
+        }
+    }
+    typedef foo3 {
+        type foo2 {
+            range "3..21";
+        }
+    }
+    augment "/c12" {
+        container bla {}
+    }
+    container bla {
+
+    }
+}

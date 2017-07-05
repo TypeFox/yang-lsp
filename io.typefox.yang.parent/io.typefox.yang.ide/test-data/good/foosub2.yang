@@ -1,0 +1,15 @@
+submodule foosub2 {
+    yang-version 1.1;
+    belongs-to foo {
+        prefix "fooprefix";
+    }
+    grouping mygrouping2 {
+        container c12 {
+        }
+    }
+    uses "fooprefix:mygrouping2" {
+        augment "c12" {
+            container augmented {}
+        }
+    }
+}

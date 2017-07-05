@@ -2,15 +2,16 @@ package io.typefox.yang.utils
 
 import com.google.inject.Singleton
 import io.typefox.yang.yang.AbstractModule
-import io.typefox.yang.yang.Range
 import io.typefox.yang.yang.Statement
-import io.typefox.yang.yang.Type
-import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.emf.ecore.EObject
-import org.eclipse.xtext.EcoreUtil2
 
 import static extension org.eclipse.xtext.EcoreUtil2.getContainerOfType
+import io.typefox.yang.yang.Submodule
+import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.BelongsTo
+import io.typefox.yang.yang.Prefix
+import io.typefox.yang.yang.Import
 
 /**
  * Convenient extension methods for the YANG language.
@@ -66,17 +67,39 @@ class YangExtensions {
 	}
 	
 	/**
-	 * Returns with the {@code type of t}
+	 * Returns with the last sub-statement of a given type for the statement argument or {@code null}.
 	 */
-	def Type getType(Typedef it) {
-		return substatementsOfType(Type).head;
+	def <S extends Statement> lastSubstatementsOfType(Statement it, Class<S> clazz) {
+		return substatementsOfType(clazz).last;
+	}
+
+	/**
+	 * Returns the main module this element belongs to
+	 * Returns the containing module, or the belongs-to module of this element is contained in a submodule.
+	 */	
+	def dispatch Module getMainModule(EObject obj) {
+		return obj.eContainer.mainModule
+	}
+	def dispatch Module getMainModule(Module obj) {
+		return obj
+	}
+	def dispatch Module getMainModule(Submodule obj) {
+		return obj.substatements.filter(BelongsTo).head?.module
 	}
 	
 	/**
-	 * Returns with the container type of the range argument.
+	 * Returns the prefix of an element
 	 */
-	def Type getType(Range it) {
-		return EcoreUtil2.getContainerOfType(it, Type);
+	def dispatch String getPrefix(Module it) {
+		substatements.filter(Prefix).head?.prefix
 	}
-
+	def dispatch String getPrefix(Submodule it) {
+		substatements.filter(BelongsTo).head?.prefix
+	}
+	def dispatch String getPrefix(BelongsTo it) {
+		substatements.filter(Prefix).head?.prefix
+	}
+	def dispatch String getPrefix(Import it) {
+		substatements.filter(Prefix).head?.prefix
+	}
 }

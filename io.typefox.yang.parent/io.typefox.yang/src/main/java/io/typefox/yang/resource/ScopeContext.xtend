@@ -11,6 +11,8 @@ import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.impl.MapBasedScope
 import org.eclipse.xtext.util.internal.EmfAdaptable
+import org.eclipse.xtend.lib.annotations.Data
+import com.google.common.collect.Iterables
 
 @EmfAdaptable
 @Accessors(PUBLIC_GETTER) class ScopeContext {
@@ -28,6 +30,7 @@ import org.eclipse.xtext.util.internal.EmfAdaptable
 	Map<YangScopeKind, MapScope> scopes = new HashMap
 	Map<String, ScopeContext> importedModules
 	@Accessors String localPrefix = null
+	@Accessors String moduleName = null
 	/**
 	 * the scopes from other files belonging to the same module
 	 */
@@ -56,13 +59,16 @@ import org.eclipse.xtext.util.internal.EmfAdaptable
 		return this.scopes.get(kind)
 	}
 
-	def YangScope getFull(YangScopeKind kind) {
+	def IScope getFull(YangScopeKind kind) {
+		if (kind === YangScopeKind.NODE) {
+			return new DelegatingScope(#[this.getLocal(kind)] + importedModules.values.map[getLocal(kind)])
+		}
 		return new YangScope(this, kind)
 	}
-
+	
 	def ScopeContext newNodeNamespace(EObject node) {
-		val result = new ScopeContext(moduleScope, 
-			new MapScope(getLocal(YangScopeKind.NODE)),
+		val result = new ScopeContext(moduleScope,
+			getLocal(YangScopeKind.NODE),
 			new MapScope(getLocal(YangScopeKind.GROUPING)), 
 			new MapScope(getLocal(YangScopeKind.TYPES)),
 			getLocal(YangScopeKind.IDENTITY), 
@@ -154,4 +160,29 @@ import org.eclipse.xtext.util.internal.EmfAdaptable
 		}
 	}
 
+	@Data static class DelegatingScope implements IScope {
+		Iterable<? extends IScope> scopes
+		
+		override getAllElements() {
+			Iterables.concat(scopes.map[allElements])
+		}
+		
+		override getElements(QualifiedName name) {
+			Iterables.concat(scopes.map[getElements(name)])
+		}
+		
+		override getElements(EObject object) {
+			Iterables.concat(scopes.map[getElements(object)])
+		}
+		
+		override getSingleElement(QualifiedName name) {
+			scopes.map[getSingleElement(name)].filterNull.head
+		}
+		
+		override getSingleElement(EObject object) {
+			scopes.map[getSingleElement(object)].filterNull.head
+		}
+		
+	}
 }
+

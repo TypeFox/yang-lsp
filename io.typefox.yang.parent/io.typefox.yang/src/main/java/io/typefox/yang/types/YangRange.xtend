@@ -1,33 +1,45 @@
 package io.typefox.yang.types
 
-import com.google.common.collect.ImmutableList
+import com.google.common.base.Splitter
 import com.google.common.collect.Lists
-import com.google.common.collect.Range
+import io.typefox.yang.yang.BinaryOperation
+import io.typefox.yang.yang.Literal
+import io.typefox.yang.yang.Max
+import io.typefox.yang.yang.Min
+import io.typefox.yang.yang.Range
+import io.typefox.yang.yang.util.YangSwitch
+import java.math.BigDecimal
 import java.util.List
+import org.eclipse.xtext.xbase.lib.Functions.Function1
+
+import static com.google.common.collect.Range.closed
+
+import static extension com.google.common.collect.ImmutableList.copyOf
 
 /**
  * Immutable representation of a <a href="https://tools.ietf.org/html/rfc7950#section-9.2.4">YANG range</a>.
  * 
  * @author akos.kitta
  */
-class YangRange<C extends Comparable<C>> {
+class YangRange {
 
-	val List<Range<C>> disjoints;
+	val List<com.google.common.collect.Range<BigDecimal>> disjoints;
 
-	static def create(io.typefox.yang.yang.Range range) {
-		
+	static def create(Range range, YangRange parentRange) {
+		return new YangRange(new RangeTransformer(parentRange).apply(range));
 	}
 
-	new(C first, C... rest) {
-		this(first.singleValueOf, rest.map[singleValueOf]);
-	}
-
-	new(Range<C> first, Range<C>... rest) {
+	/**
+	 * Where each string argument represent either range ({@code NUMBER .. NUMBER}) or an concrete value ({@code NUMBER}). 
+	 */
+	new(String first, String... rest) {
 		this(Lists.asList(first, rest));
 	}
-	
-	private new(Iterable<Range<C>> ranges) {
-		disjoints = ImmutableList.copyOf(ranges);
+
+	private new(Iterable<String> ranges) {
+		disjoints = ranges.map[Splitter.on('..').omitEmptyStrings.trimResults.split(it)].map [
+			closed(new BigDecimal(head), new BigDecimal(if(size === 1) head else last));
+		].copyOf;
 	}
 
 	def boolean isValid() {
@@ -45,10 +57,18 @@ class YangRange<C extends Comparable<C>> {
 				// MUST be in ascending order.
 				if (previous.upperBoundType >= current.lowerBoundType) {
 					return false;
-				} 
+				}
 			}
 		}
 		return true;
+	}
+
+	def getMin() {
+		return disjoints.head.lowerEndpoint;
+	}
+
+	def getMax() {
+		return disjoints.last.upperEndpoint;
 	}
 
 	override toString() {
@@ -56,12 +76,45 @@ class YangRange<C extends Comparable<C>> {
 	}
 
 	// Label pattern: `36` or `0..36`.
-	private def getLabel(Range<C> it) {
-		return '''«lowerBoundType»«IF lowerEndpoint != upperEndpoint»..«upperEndpoint»«ENDIF»''';
+	private def getLabel(com.google.common.collect.Range<?> it) {
+		return '''«lowerEndpoint»«IF lowerEndpoint != upperEndpoint»..«upperEndpoint»«ENDIF»''';
 	}
 
-	private static def <C extends Comparable<C>> singleValueOf(C c) {
-		return Range.closed(c, c);
+	/**
+	 * YANG range visitor that transforms the AST nodes into a list of range strings. 
+	 */
+	private static class RangeTransformer extends YangSwitch<String> implements Function1<Range, Iterable<String>> {
+
+		val YangRange parentRange;
+
+		private new(YangRange parentRange) {
+			this.parentRange = parentRange;
+		}
+
+		override apply(Range it) {
+			return Splitter.on('|').omitEmptyStrings.trimResults.split(doSwitch);
+		}
+
+		override caseRange(Range it) {
+			return doSwitch(expression);
+		}
+
+		override caseBinaryOperation(BinaryOperation it) {
+			return '''«doSwitch(left)»«operator.trim»«doSwitch(right)»''';
+		}
+
+		override caseMin(Min object) {
+			return '''«parentRange.min»''';
+		}
+
+		override caseMax(Max object) {
+			return '''«parentRange.max»''';
+		}
+
+		override caseLiteral(Literal it) {
+			return value;
+		}
+
 	}
 
 }

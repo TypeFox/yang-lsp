@@ -1,0 +1,15 @@
+module foo_augment2 {
+    yang-version 1.1;
+    namespace "http://23fewfwefeferf";
+    prefix "aug2";
+    import foo {
+        prefix "foo";
+    }
+    import foo_augment {
+        prefix "aug";
+    }
+
+    augment "/foo:c12/foo:cool/aug:augmented" {
+        container augmented {}
+    }
+}

@@ -32,6 +32,7 @@ import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.impl.SelectableBasedScope
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
+import io.typefox.yang.utils.YangExtensions
 
 /**
  * Links the imported modules and included submodules, as well as computing the ScopeContext for them. 
@@ -41,6 +42,7 @@ class ScopeComputer {
 	@Inject Validator validator
 	@Inject Linker linker
 	@Inject ResourceDescriptionsProvider indexProvider
+	@Inject extension YangExtensions
 	
 	def ScopeContext getScopeContext(AbstractModule module) {
 		var result = ScopeContext.findInEmfObject(module)
@@ -50,10 +52,9 @@ class ScopeComputer {
 		val moduleScope = module.eResource.moduleScope
 		result = new ScopeContext(moduleScope)
 		result.attachToEmfObject(module)
-		val prefix = module.substatements.filter(Prefix).head
-		if (prefix !== null) {
-			result.localPrefix = prefix.prefix
-		}
+		result.localPrefix = module.prefix
+		result.moduleName = module.mainModule?.name ?: module.name
+		
 		computeChildren(module, result)
 		return result
 	}
@@ -117,7 +118,6 @@ class ScopeComputer {
 	}
 	
 	protected dispatch def void computeScope(DataSchemaNode module, ScopeContext ctx) {
-		ctx.addLocalName(module)
 		computeChildren(module, ctx.newNodeNamespace(module))
 	}
 	

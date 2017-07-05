@@ -33,7 +33,7 @@ class YangDiagramGenerator {
 			children = #[
 				new SLabel => [
 					id = 'container1'
-					type = 'label=heading'
+					type = 'label:heading'
 					text = 'Container: Foo'
 				],
 				new SCompartment => [
