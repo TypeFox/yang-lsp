@@ -30,7 +30,6 @@ import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.validation.CheckMode
 import org.eclipse.xtext.validation.IResourceValidator
 
-@Singleton
 class DiagramLanguageServerImpl implements DiagramEndpoint, ILanguageServerExtension, IDiagramServer.Provider, IBuildListener {
 	
 	@Inject extension IResourceValidator
@@ -77,7 +76,6 @@ class DiagramLanguageServerImpl implements DiagramEndpoint, ILanguageServerExten
 		}
 	}
 	
-	@JsonNotification
 	override void accept(ActionMessage message) {
 		val server = getDiagramServer(message.clientId)
 		server.accept(message)
