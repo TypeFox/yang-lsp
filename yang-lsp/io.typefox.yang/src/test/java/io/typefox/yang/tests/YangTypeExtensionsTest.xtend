@@ -38,7 +38,7 @@ class YangTypeExtensionsTest extends AbstractYangTest {
 			module foo {
 			  typedef my-type1 {
 			    type my-base-int32-type {
-			      range "11..max"; // 11..20
+			      range "11..max";
 			    }
 			  }
 			}

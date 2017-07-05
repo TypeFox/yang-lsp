@@ -27,6 +27,12 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 */
 	public static val INCORRECT_VERSION = 'INCORRECT_VERSION';
 	
+	/**
+	 * Represents a "fake" syntax error. Our grammar is relaxed and this kind of error code should
+	 * be reported to indicate if a construct does not comply the YANG grammar.
+	 */
+	public static val SYNTAX_ERROR = 'SYNTAX_ERROR';
+	
 	public static val UNKNOWN_REVISION = 'UNKNOWN_REVISION'
 	public static val DUPLICATE_NAME = 'DUPLICATE_NAME'
 	public static val MISSING_PREFIX = 'MISSING_PREFIX'
@@ -46,7 +52,8 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 		error(SUBSTATEMENT_CARDINALITY),
 		error(UNEXPECTED_SUBSTATEMENT),
 		error(SUBSTATEMENT_ORDERING),
-		error(INCORRECT_VERSION)
+		error(INCORRECT_VERSION),
+		error(SYNTAX_ERROR)
 	}
 	
 	private static def Pair<String, PreferenceKey> error(String code) {

@@ -1,10 +1,12 @@
 package io.typefox.yang.tests
 
+import io.typefox.yang.yang.BinaryOperation
 import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Description
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.YangVersion
+import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
 
 import static io.typefox.yang.validation.IssueCodes.*
@@ -25,7 +27,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  prefix "sys";
 			}
 		''');
-		assertError(root.substatementsOfType(YangVersion).head, INCORRECT_VERSION, "1.2");
+		assertError(root.firstSubstatementsOfType(YangVersion), INCORRECT_VERSION, "1.2");
 	}
 
 	@Test
@@ -49,8 +51,8 @@ class YangValidatorTest extends AbstractYangTest {
 			  prefix "sys";
 			}
 		''');
-		assertError(root.substatementsOfType(Prefix).head, SUBSTATEMENT_CARDINALITY);
-		assertError(root.substatementsOfType(Prefix).last, SUBSTATEMENT_CARDINALITY);
+		assertError(root.firstSubstatementsOfType(Prefix), SUBSTATEMENT_CARDINALITY);
+		assertError(root.lastSubstatementsOfType(Prefix), SUBSTATEMENT_CARDINALITY);
 	}
 
 	@Test
@@ -63,7 +65,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  prefix "asd";
 			}
 		''');
-		assertError(root.substatementsOfType(Prefix).head, SUBSTATEMENT_ORDERING, '''"asd"''');
+		assertError(root.firstSubstatementsOfType(Prefix), SUBSTATEMENT_ORDERING, '''"asd"''');
 	}
 
 	@Test
@@ -77,8 +79,8 @@ class YangValidatorTest extends AbstractYangTest {
 			  contact "joe@example.com";
 			}
 		''');
-		assertError(root.substatementsOfType(Contact).head, SUBSTATEMENT_CARDINALITY);
-		assertError(root.substatementsOfType(Contact).last, SUBSTATEMENT_CARDINALITY);
+		assertError(root.firstSubstatementsOfType(Contact), SUBSTATEMENT_CARDINALITY);
+		assertError(root.lastSubstatementsOfType(Contact), SUBSTATEMENT_CARDINALITY);
 	}
 
 	@Test
@@ -99,9 +101,10 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(root.substatementsOfType(Import).head.substatementsOfType(Description).head, SUBSTATEMENT_CARDINALITY);
+		assertError(root.firstSubstatementsOfType(Import).firstSubstatementsOfType(Description),
+			SUBSTATEMENT_CARDINALITY);
 	}
-	
+
 	@Test
 	def void checkSubstatement_VersionAwareCardinality_Invalid_02() {
 		load('''
@@ -121,9 +124,10 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(root.substatementsOfType(Import).head.substatementsOfType(Description).head, SUBSTATEMENT_CARDINALITY);
+		assertError(root.firstSubstatementsOfType(Import).firstSubstatementsOfType(Description),
+			SUBSTATEMENT_CARDINALITY);
 	}
-	
+
 	@Test
 	def void checkSubstatement_VersionAwareCardinality_Valid() {
 		load('''
@@ -145,6 +149,23 @@ class YangValidatorTest extends AbstractYangTest {
 			}
 		''');
 		assertNoErrors;
+	}
+
+	@Test
+	def void checkRangeOperator_Invalid() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-int32-type {
+			    type int32 {
+			      range "1 + 4";
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, BinaryOperation).head,SYNTAX_ERROR, "+");
 	}
 
 }

@@ -12,6 +12,7 @@ import org.eclipse.xtext.validation.Check
 import static io.typefox.yang.utils.YangExtensions.*
 import static io.typefox.yang.validation.IssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
+import io.typefox.yang.yang.BinaryOperation
 
 /**
  * This class contains custom validation rules for the YANG language. 
@@ -35,6 +36,13 @@ class YangValidator extends AbstractYangValidator {
 	@Check
 	def void checkSubstatements(Statement it) {
 		substatementRuleProvider.get(eClass)?.checkSubstatements(it, this, featureMapper);
+	}
+	
+	@Check
+	def void checkRangeOperator(BinaryOperation it) {
+		if (operator != '|') {
+			error('''Syntax error. Expected '|' for range disjoint separation.''', it, BINARY_OPERATION__OPERATOR, SYNTAX_ERROR);
+		}
 	}
 
 }
