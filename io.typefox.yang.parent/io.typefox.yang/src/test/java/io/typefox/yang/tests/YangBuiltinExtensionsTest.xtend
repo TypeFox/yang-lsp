@@ -1,12 +1,14 @@
 package io.typefox.yang.tests
 
 import com.google.inject.Inject
-import io.typefox.yang.utils.YangBuiltinExtensions
+import io.typefox.yang.utils.YangTypeExtensions
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import org.junit.Test
 
 import static extension org.junit.Assert.*
+import org.junit.Assert
+import org.junit.Ignore
 
 /**
  * Test for the YANG built-in type extensions.
@@ -16,7 +18,7 @@ import static extension org.junit.Assert.*
 class YangBuiltinExtensionsTest extends AbstractYangTest {
 
 	@Inject
-	extension YangBuiltinExtensions;
+	extension YangTypeExtensions;
 
 	@Test
 	def void checkBuiltin_True() {
@@ -28,7 +30,7 @@ class YangBuiltinExtensionsTest extends AbstractYangTest {
 			    }
 			  }
 			}
-		'''.load.root.substatementsOfType(Typedef).head.builtin.assertTrue;
+		'''.load.root.firstSubstatementsOfType(Typedef).builtin.assertTrue;
 	}
 
 	@Test
@@ -41,7 +43,7 @@ class YangBuiltinExtensionsTest extends AbstractYangTest {
 			    }
 			  }
 			}
-		'''.load.root.substatementsOfType(Typedef).head.builtin.assertFalse;
+		'''.load.root.firstSubstatementsOfType(Typedef).builtin.assertFalse;
 	}
 
 	@Test
@@ -54,9 +56,9 @@ class YangBuiltinExtensionsTest extends AbstractYangTest {
 			    }
 			  }
 			}
-		'''.load.root.substatementsOfType(Typedef).head.substatementsOfType(Type).head.subtypeOfInteger.assertTrue;
+		'''.load.root.firstSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).subtypeOfInteger.assertTrue;
 	}
-	
+
 	@Test
 	def void checkSubtypeOfInteger_02() {
 		'''
@@ -67,9 +69,9 @@ class YangBuiltinExtensionsTest extends AbstractYangTest {
 			    }
 			  }
 			}
-		'''.load.root.substatementsOfType(Typedef).head.substatementsOfType(Type).head.subtypeOfInteger.assertFalse;
+		'''.load.root.firstSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).subtypeOfInteger.assertFalse;
 	}
-	
+
 	@Test
 	def void checkSubtypeOfInteger_03() {
 		'''
@@ -79,16 +81,16 @@ class YangBuiltinExtensionsTest extends AbstractYangTest {
 			      range "1..4 | 10..20";
 			    }
 			  }
-
+			
 			  typedef my-type1 {
-			    type my-base-int32-type {
-			      range "11..max";
-			    }
+			  type my-base-int32-type {
+			    range "11..max";
+			  }
 			  }
 			}
-		'''.load.root.substatementsOfType(Typedef).last.substatementsOfType(Type).head.subtypeOfInteger.assertTrue;
+		'''.load.root.lastSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).subtypeOfInteger.assertTrue;
 	}
-	
+
 	@Test
 	def void checkSubtypeOfInteger_04() {
 		'''
@@ -98,14 +100,71 @@ class YangBuiltinExtensionsTest extends AbstractYangTest {
 			      range "1..4 | 10..20";
 			    }
 			  }
-
+			
 			  typedef my-type1 {
-			    type my-base-int32-type {
-			      range "11..max";
+			  type my-base-int32-type {
+			    range "11..max";
+			  }
+			  }
+			}
+		'''.load.root.lastSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).subtypeOfInteger.assertFalse;
+	}
+
+	@Test
+	def void checkYangRange_01() {
+		'''
+			module foo {
+			  typedef my-base-int32-type {
+			    type int32 {
+			      range "1..4";
 			    }
 			  }
 			}
-		'''.load.root.substatementsOfType(Typedef).last.substatementsOfType(Type).head.subtypeOfInteger.assertFalse;
+		'''.load.root.firstSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).range.yangRange.toString.
+			assertEquals('1..4');
+	}
+
+	@Test
+	def void checkYangRange_02() {
+		'''
+			module foo {
+			  typedef my-base-int32-type {
+			    type int32 {
+			      range "1 | 2 | 4..5 | 6";
+			    }
+			  }
+			}
+		'''.load.root.firstSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).range.yangRange.toString.
+			assertEquals('1 | 2 | 4..5 | 6');
+	}
+
+	@Ignore("min/max should be the min(current min, parent min). same for max")
+	@Test
+	def void checkYangRange_03() {
+		'''
+			module c {
+			  typedef my-base-int32-type {
+			    type int32 {
+			      range "1..4 | 10..200";
+			    }
+			  }
+			  typedef my-type1 {
+			    type my-base-int32-type {
+			      range "2..max";
+			    }
+			  }
+			  typedef my-type2 {
+			    type my-base-int32-type {
+			      range "min..max";
+			    }
+			  }
+			}
+		'''.load.root.lastSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).range.yangRange.toString.
+			assertEquals('2..200')
+	}
+
+	private def assertEquals(CharSequence actual, CharSequence expected) {
+		Assert.assertEquals(expected, actual);
 	}
 
 }

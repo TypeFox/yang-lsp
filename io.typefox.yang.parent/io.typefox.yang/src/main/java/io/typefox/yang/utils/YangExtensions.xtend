@@ -2,13 +2,9 @@ package io.typefox.yang.utils
 
 import com.google.inject.Singleton
 import io.typefox.yang.yang.AbstractModule
-import io.typefox.yang.yang.Range
 import io.typefox.yang.yang.Statement
-import io.typefox.yang.yang.Type
-import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.emf.ecore.EObject
-import org.eclipse.xtext.EcoreUtil2
 
 import static extension org.eclipse.xtext.EcoreUtil2.getContainerOfType
 import io.typefox.yang.yang.Submodule
@@ -71,17 +67,10 @@ class YangExtensions {
 	}
 	
 	/**
-	 * Returns with the {@code type of t}
+	 * Returns with the last sub-statement of a given type for the statement argument or {@code null}.
 	 */
-	def Type getType(Typedef it) {
-		return substatementsOfType(Type).head;
-	}
-	
-	/**
-	 * Returns with the container type of the range argument.
-	 */
-	def Type getType(Range it) {
-		return EcoreUtil2.getContainerOfType(it, Type);
+	def <S extends Statement> lastSubstatementsOfType(Statement it, Class<S> clazz) {
+		return substatementsOfType(clazz).last;
 	}
 
 	/**
