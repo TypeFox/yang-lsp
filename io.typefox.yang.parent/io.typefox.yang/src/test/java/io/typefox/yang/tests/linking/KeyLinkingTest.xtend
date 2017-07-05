@@ -14,7 +14,7 @@ class KeyLinkingTest extends AbstractYangTest {
 				namespace "urn:ietf:params:xml:ns:yang:deepkey";
 				prefix "d";
 				list myList {
-					key "bar baz";
+					key "bar d:baz";
 					container foo {
 						leaf bar {
 							type string;

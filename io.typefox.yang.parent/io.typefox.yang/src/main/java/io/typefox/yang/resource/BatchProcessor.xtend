@@ -3,12 +3,15 @@ package io.typefox.yang.resource
 import com.google.inject.Inject
 import io.typefox.yang.resource.ScopeContext.YangScopeKind
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Base
 import io.typefox.yang.yang.DataSchemaNode
 import io.typefox.yang.yang.GroupingRef
 import io.typefox.yang.yang.KeyReference
 import io.typefox.yang.yang.Leaf
+import io.typefox.yang.yang.Refine
 import io.typefox.yang.yang.SchemaNode
+import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.TypeReference
 import io.typefox.yang.yang.Unknown
 import io.typefox.yang.yang.Uses
@@ -17,6 +20,8 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.resource.DerivedStateAwareResource
 import org.eclipse.xtext.resource.EObjectDescription
 import org.eclipse.xtext.resource.IDerivedStateComputer
+import org.eclipse.xtext.scoping.IScope
+import org.eclipse.xtext.scoping.Scopes
 import org.eclipse.xtext.util.internal.Log
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
@@ -27,6 +32,7 @@ class BatchProcessor implements IDerivedStateComputer {
 //	@Inject Validator validator
 	@Inject Linker linker
 	@Inject ScopeComputer scopeComputer
+	@Inject DataSchemaScopeComputer schemaScopeComputer
 	
 	override installDerivedState(DerivedStateAwareResource resource, boolean preLinkingPhase) {
 		if (!preLinkingPhase) {
@@ -36,6 +42,11 @@ class BatchProcessor implements IDerivedStateComputer {
 				val scopeContext = scopeComputer.getScopeContext(module)
 				// link extensions, types, identities and groupings
 				this.doPrimaryLinking(module, scopeContext)
+				// now compute the data schema tree
+				schemaScopeComputer.buildDataSchemaScope(module, scopeContext)
+				
+				// now resolve the pathes
+				schemaScopeComputer.resolvePathes(module, scopeContext)
 				// resolve the node links and xpath expressions
 				this.doResolveAll(module, scopeContext)
 			}
@@ -92,9 +103,44 @@ class BatchProcessor implements IDerivedStateComputer {
 		}
 	}
 	
+	dispatch def void doResolveAll(Refine refine, ScopeContext ctx) {
+		val scope = if (refine.eContainer instanceof Uses) {
+			val uses = refine.eContainer as Uses
+			Scopes.scopeFor(uses.grouping.node.substatements.filter(SchemaNode))
+		} else {
+			LOG.error("Refine not a child of 'uses'.")
+			return;
+		}
+		refine.node.resolve(scope)
+	}
+	
+	dispatch def void doResolveAll(Augment augment, ScopeContext ctx) {
+		val scope = if (augment.eContainer instanceof Uses) {
+			val uses = augment.eContainer as Uses
+			Scopes.scopeFor(uses.grouping.node.substatements.filter(SchemaNode))
+		} else {
+			ctx.getFull(YangScopeKind.NODE)
+		}
+		augment.path.resolve(scope)
+	}
+	
+	def void resolve(SchemaNodeIdentifier identifier, IScope initialScope) {
+		var scope = initialScope
+		for (ref : identifier.elements) {
+			val currentScope = scope
+			val linked = this.linker.<SchemaNode>link(ref, IDENTIFIER_REF__NODE) [ name |
+				currentScope.getSingleElement(name)
+			]
+			if (linked === null) {
+				return
+			}
+			scope = Scopes.scopeFor(linked.substatements.filter(SchemaNode))
+		}
+	}
+	
 	dispatch def void doResolveAll(KeyReference key, ScopeContext ctx) {
 		linker.link(key, KEY_REFERENCE__NODE) [ name |
-			val leaf = findLeaf(key.eContainer.eContainer as SchemaNode, name.toString, newHashSet)
+			val leaf = findLeaf(key.eContainer.eContainer as SchemaNode, name.lastSegment.toString, newHashSet)
 			if (leaf === null) {
 				return null
 			}

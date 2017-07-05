@@ -11,6 +11,11 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.EcoreUtil2
 
 import static extension org.eclipse.xtext.EcoreUtil2.getContainerOfType
+import io.typefox.yang.yang.Submodule
+import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.BelongsTo
+import io.typefox.yang.yang.Prefix
+import io.typefox.yang.yang.Import
 
 /**
  * Convenient extension methods for the YANG language.
@@ -79,4 +84,33 @@ class YangExtensions {
 		return EcoreUtil2.getContainerOfType(it, Type);
 	}
 
+	/**
+	 * Returns the main module this element belongs to
+	 * Returns the containing module, or the belongs-to module of this element is contained in a submodule.
+	 */	
+	def dispatch Module getMainModule(EObject obj) {
+		return obj.eContainer.mainModule
+	}
+	def dispatch Module getMainModule(Module obj) {
+		return obj
+	}
+	def dispatch Module getMainModule(Submodule obj) {
+		return obj.substatements.filter(BelongsTo).head?.module
+	}
+	
+	/**
+	 * Returns the prefix of an element
+	 */
+	def dispatch String getPrefix(Module it) {
+		substatements.filter(Prefix).head?.prefix
+	}
+	def dispatch String getPrefix(Submodule it) {
+		substatements.filter(BelongsTo).head?.prefix
+	}
+	def dispatch String getPrefix(BelongsTo it) {
+		substatements.filter(Prefix).head?.prefix
+	}
+	def dispatch String getPrefix(Import it) {
+		substatements.filter(Prefix).head?.prefix
+	}
 }

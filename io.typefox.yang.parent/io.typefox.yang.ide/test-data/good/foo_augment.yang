@@ -1,0 +1,11 @@
+module foo_augment {
+    namespace "http://www.dfefge.rf/dsfdf/sdf";
+    prefix "aug";
+    import foo {
+        prefix "foo";
+    }
+
+    augment "/foo:c12/foo:cool" {
+        container augmented {}
+    }
+}
