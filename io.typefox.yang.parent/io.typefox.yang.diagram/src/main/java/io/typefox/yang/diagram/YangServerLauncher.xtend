@@ -19,6 +19,8 @@ import java.util.LinkedHashMap
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 import java.util.function.Function
+import org.apache.log4j.FileAppender
+import org.apache.log4j.Logger
 import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer
 import org.eclipse.lsp4j.jsonrpc.RemoteEndpoint
@@ -41,6 +43,13 @@ import org.eclipse.xtext.util.Modules2
 class YangServerLauncher extends ServerLauncher {
 	
 	def static void main(String[] args) {
+		// Redirect Log4J output to a file
+		Logger.rootLogger => [
+			val defaultAppender = getAppender('default')
+			removeAllAppenders()
+			addAppender(new FileAppender(defaultAppender.layout, 'yang-server.log', false))
+		]
+		
 		// Do a manual setup that includes the Yang diagram module
 		new YangIdeSetup {
 			override createInjector() {
