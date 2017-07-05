@@ -5,14 +5,19 @@ package io.typefox.yang.validation
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import io.typefox.yang.utils.YangTypeExtensions
+import io.typefox.yang.yang.BinaryOperation
+import io.typefox.yang.yang.Range
 import io.typefox.yang.yang.Statement
+import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.xtext.validation.Check
 
 import static io.typefox.yang.utils.YangExtensions.*
 import static io.typefox.yang.validation.IssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
-import io.typefox.yang.yang.BinaryOperation
+
+import static extension org.eclipse.xtext.EcoreUtil2.getAllContentsOfType
 
 /**
  * This class contains custom validation rules for the YANG language. 
@@ -21,15 +26,19 @@ import io.typefox.yang.yang.BinaryOperation
 class YangValidator extends AbstractYangValidator {
 
 	@Inject
+	extension YangTypeExtensions;
+
+	@Inject
 	SubstatementRuleProvider substatementRuleProvider;
-	
+
 	@Inject
 	SubstatementFeatureMapper featureMapper;
 
 	@Check
 	def void checkVersion(YangVersion it) {
 		if (yangVersion != YANG_1 && yangVersion != YANG_1_1) {
-			error('''The version must be either '«YANG_1»' or '«YANG_1_1»'.''', it, YANG_VERSION__YANG_VERSION, INCORRECT_VERSION);
+			error('''The version must be either '«YANG_1»' or '«YANG_1_1»'.''', it, YANG_VERSION__YANG_VERSION,
+				INCORRECT_VERSION);
 		}
 	}
 
@@ -37,11 +46,23 @@ class YangValidator extends AbstractYangValidator {
 	def void checkSubstatements(Statement it) {
 		substatementRuleProvider.get(eClass)?.checkSubstatements(it, this, featureMapper);
 	}
-	
+
 	@Check
 	def void checkRangeOperator(BinaryOperation it) {
 		if (operator != '|') {
-			error('''Syntax error. Expected '|' for range disjoint separation.''', it, BINARY_OPERATION__OPERATOR, SYNTAX_ERROR);
+			error('''Syntax error. Expected '|' for range disjoint separation.''', it, BINARY_OPERATION__OPERATOR,
+				SYNTAX_ERROR);
+		}
+	}
+
+	@Check
+	def void checkTypeRestriction(Type it) {
+		// https://tools.ietf.org/html/rfc7950#section-9.2.3
+		if (!subTypeOfNumber) {
+			getAllContentsOfType(Range).forEach [
+				error('''Only integer and decimal types can be restricted with the "range" statement.''', it,
+					RANGE__EXPRESSION, SYNTAX_ERROR);
+			];
 		}
 	}
 

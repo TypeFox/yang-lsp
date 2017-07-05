@@ -5,6 +5,7 @@ import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Description
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Prefix
+import io.typefox.yang.yang.Range
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
@@ -152,7 +153,7 @@ class YangValidatorTest extends AbstractYangTest {
 	}
 
 	@Test
-	def void checkRangeOperator_Invalid() {
+	def void checkRangeOperator() {
 		val it = load('''
 			module foo {
 			  yang-version 1.1;
@@ -165,7 +166,24 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, BinaryOperation).head,SYNTAX_ERROR, "+");
+		assertError(EcoreUtil2.getAllContentsOfType(root, BinaryOperation).head, SYNTAX_ERROR, "+");
+	}
+
+	@Test
+	def void checkTypeRestriction() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-int32-type {
+			    type string {
+			      range "1 | 4";
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Range).head, SYNTAX_ERROR, '''1 | 4''');
 	}
 
 }

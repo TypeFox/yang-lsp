@@ -95,6 +95,13 @@ class YangTypeExtensions {
 	}
 
 	/**
+	 * Sugar for {@code isSubtypeOfInteger(Type) || isSubtypeOfDecimal(Type)}.
+	 */
+	def boolean isSubTypeOfNumber(Type it) {
+		return isSubtypeOf[integerBuiltin || decimalBuiltin];
+	}
+
+	/**
 	 * Returns {@code true} if the type argument is a subtype of any built-in integer types or derived from it.
 	 */
 	def boolean isSubtypeOfInteger(Type it) {
@@ -168,7 +175,7 @@ class YangTypeExtensions {
 	 */
 	def getYangRange(Range it) {
 		val type = type;
-		if (!type.subtypeOfInteger.xor(type.subtypeOfDecimal)) {
+		if (!type.subTypeOfNumber) {
 			return null;
 		}
 
