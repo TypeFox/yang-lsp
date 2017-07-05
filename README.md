@@ -6,7 +6,7 @@ A Language Server for YANG
 ## Build
 
     git clone https://github.com/TypeFox/yang-lsp.git \
-    && cd yang-lsp/io.typefox.yang.parent \
+    && cd yang-lsp/yang-lsp \
     && ./gradlew build
 
 ### Troubleshooting

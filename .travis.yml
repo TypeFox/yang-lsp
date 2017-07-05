@@ -20,4 +20,4 @@ before_script:
   - mvn -f ./xtext-jflex/jflex-fragment/pom.xml clean install
 
 script:
-  - ./io.typefox.yang.parent/gradlew -p io.typefox.yang.parent build
+  - ./yang-lsp/gradlew -p yang-lsp build
