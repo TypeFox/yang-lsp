@@ -3,14 +3,10 @@
  */
 package io.typefox.yang.formatting2
 
-import com.google.inject.Inject
-import io.typefox.yang.services.YangGrammarAccess
 import org.eclipse.xtext.formatting2.AbstractFormatter2
 import org.eclipse.xtext.formatting2.IFormattableDocument
 
 class YangFormatter extends AbstractFormatter2 {
-	
-	@Inject extension YangGrammarAccess
 	
 	override format(Object obj, IFormattableDocument document) {
 		throw new UnsupportedOperationException("TODO: auto-generated method stub")

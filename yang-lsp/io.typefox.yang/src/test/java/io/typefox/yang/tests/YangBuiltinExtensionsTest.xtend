@@ -4,11 +4,10 @@ import com.google.inject.Inject
 import io.typefox.yang.utils.YangTypeExtensions
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
+import org.junit.Assert
 import org.junit.Test
 
 import static extension org.junit.Assert.*
-import org.junit.Assert
-import org.junit.Ignore
 
 /**
  * Test for the YANG built-in type extensions.
@@ -138,7 +137,6 @@ class YangBuiltinExtensionsTest extends AbstractYangTest {
 			assertEquals('1 | 2 | 4..5 | 6');
 	}
 
-	@Ignore("min/max should be the min(current min, parent min). same for max")
 	@Test
 	def void checkYangRange_03() {
 		'''
@@ -154,7 +152,7 @@ class YangBuiltinExtensionsTest extends AbstractYangTest {
 			    }
 			  }
 			  typedef my-type2 {
-			    type my-base-int32-type {
+			    type my-type1 {
 			      range "min..max";
 			    }
 			  }

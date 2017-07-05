@@ -1,18 +1,17 @@
 package io.typefox.yang.types
 
 import com.google.common.base.Splitter
-import com.google.common.collect.Lists
+import com.google.common.base.Supplier
+import com.google.common.base.Suppliers
 import io.typefox.yang.yang.BinaryOperation
 import io.typefox.yang.yang.Literal
 import io.typefox.yang.yang.Max
 import io.typefox.yang.yang.Min
 import io.typefox.yang.yang.Range
 import io.typefox.yang.yang.util.YangSwitch
-import java.math.BigDecimal
+import java.util.Collections
 import java.util.List
 import org.eclipse.xtext.xbase.lib.Functions.Function1
-
-import static com.google.common.collect.Range.closed
 
 import static extension com.google.common.collect.ImmutableList.copyOf
 
@@ -23,52 +22,55 @@ import static extension com.google.common.collect.ImmutableList.copyOf
  */
 class YangRange {
 
-	val List<com.google.common.collect.Range<BigDecimal>> disjoints;
+	static val MIN = 'min';
+	static val MAX = 'max';
+
+	val List<Pair<String, String>> disjoints;
+	val YangRange parentRange;
+	val Supplier<String> minSupplier;
+	val Supplier<String> maxSupplier;
 
 	static def create(Range range, YangRange parentRange) {
-		return new YangRange(new RangeTransformer(parentRange).apply(range));
+		return new YangRange(new RangeTransformer(parentRange).apply(range), parentRange);
 	}
 
-	/**
-	 * Where each string argument represent either range ({@code NUMBER .. NUMBER}) or an concrete value ({@code NUMBER}). 
-	 */
-	new(String first, String... rest) {
-		this(Lists.asList(first, rest));
+	static def createBuiltin(String range) {
+		return new YangRange(Collections.singleton(range), null);
 	}
 
-	private new(Iterable<String> ranges) {
+	private new(Iterable<String> ranges, YangRange parentRange) {
 		disjoints = ranges.map[Splitter.on('..').omitEmptyStrings.trimResults.split(it)].map [
-			closed(new BigDecimal(head), new BigDecimal(if(size === 1) head else last));
+			head -> if(size === 1) head else last;
 		].copyOf;
-	}
-
-	def boolean isValid() {
-		// TODO consider concrete value case that exceeds the built-in range.
-		if (disjoints.size > 1) {
-			val itr = disjoints.listIterator;
-			itr.next; // Skip the first item. We always compare the actual one with the previous element.
-			while (itr.hasNext) {
-				val previous = itr.previous;
-				val current = itr.next;
-				// MUST be disjoint.
-				if (!previous.intersection(current).empty) {
-					return false;
+		this.parentRange = parentRange;
+		maxSupplier = Suppliers.memoize [
+			val max = disjoints.last.value;
+			if (max == MAX) {
+				if (parentRange === null) {
+					throw new IllegalStateException('''Cannot use 'min' keyword when parent range is not specified.''');
 				}
-				// MUST be in ascending order.
-				if (previous.upperBoundType >= current.lowerBoundType) {
-					return false;
-				}
+				return parentRange.max;
 			}
-		}
-		return true;
+			return max;
+		];
+		minSupplier = Suppliers.memoize [
+			val min = disjoints.head.key;
+			if (min == MIN) {
+				if (parentRange === null) {
+					throw new IllegalStateException('''Cannot use 'min' keyword when parent range is not specified.''');
+				}
+				return parentRange.min;
+			}
+			return min;
+		];
 	}
 
-	def getMin() {
-		return disjoints.head.lowerEndpoint;
+	def String getMin() {
+		return minSupplier.get;
 	}
 
-	def getMax() {
-		return disjoints.last.upperEndpoint;
+	def String getMax() {
+		return maxSupplier.get;
 	}
 
 	override toString() {
@@ -76,8 +78,15 @@ class YangRange {
 	}
 
 	// Label pattern: `36` or `0..36`.
-	private def getLabel(com.google.common.collect.Range<?> it) {
-		return '''«lowerEndpoint»«IF lowerEndpoint != upperEndpoint»..«upperEndpoint»«ENDIF»''';
+	private def getLabel(Pair<?, ?> it) {
+		val bounds = #[key, value].map [
+			switch (it) {
+				case MIN: min
+				case MAX: max
+				default: it
+			}
+		];
+		return '''«bounds.head»«IF bounds.head != bounds.last»..«bounds.last»«ENDIF»''';
 	}
 
 	/**
@@ -104,11 +113,11 @@ class YangRange {
 		}
 
 		override caseMin(Min object) {
-			return '''«parentRange.min»''';
+			return MIN;
 		}
 
 		override caseMax(Max object) {
-			return '''«parentRange.max»''';
+			return MAX;
 		}
 
 		override caseLiteral(Literal it) {

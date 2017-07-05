@@ -9,7 +9,6 @@ package io.typefox.yang.diagram
 import io.typefox.sprotty.api.ActionMessage
 import org.eclipse.lsp4j.jsonrpc.services.JsonNotification
 import org.eclipse.lsp4j.jsonrpc.services.JsonSegment
-import java.util.function.Consumer
 
 @JsonSegment('diagram')
 interface DiagramEndpoint {
