@@ -14,7 +14,7 @@ import static extension org.junit.Assert.*
  * 
  * @author akos.kitta
  */
-class YangBuiltinExtensionsTest extends AbstractYangTest {
+class YangTypeExtensionsTest extends AbstractYangTest {
 
 	@Inject
 	extension YangTypeExtensions;

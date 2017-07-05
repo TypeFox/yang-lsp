@@ -205,14 +205,14 @@ class YangTypeExtensions {
 	 */
 	static abstract class BuiltinRanges {
 
-		static val INT_8 = YangRange.createBuiltin("-128 .. 127");
-		static val INT_16 = YangRange.createBuiltin("-32768 .. 32767");
-		static val INT_32 = YangRange.createBuiltin("-2147483648 .. 2147483647");
-		static val INT_64 = YangRange.createBuiltin("-9223372036854775808 .. 9223372036854775807");
-		static val UINT_8 = YangRange.createBuiltin("0 .. 255");
-		static val UINT_16 = YangRange.createBuiltin("0 .. 65535");
-		static val UINT_32 = YangRange.createBuiltin("0 .. 4294967295");
-		static val UINT_64 = YangRange.createBuiltin("0 .. 18446744073709551615");
+		static val INT_8 = YangRange.createBuiltin("-128", "127");
+		static val INT_16 = YangRange.createBuiltin("-32768", "32767");
+		static val INT_32 = YangRange.createBuiltin("-2147483648", "2147483647");
+		static val INT_64 = YangRange.createBuiltin("-9223372036854775808", "9223372036854775807");
+		static val UINT_8 = YangRange.createBuiltin("0", "255");
+		static val UINT_16 = YangRange.createBuiltin("0", "65535");
+		static val UINT_32 = YangRange.createBuiltin("0", "4294967295");
+		static val UINT_64 = YangRange.createBuiltin("0", "18446744073709551615");
 
 	}
 
