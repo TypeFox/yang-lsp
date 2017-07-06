@@ -3,6 +3,7 @@ package io.typefox.yang.tests
 import io.typefox.yang.yang.BinaryOperation
 import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Description
+import io.typefox.yang.yang.Expression
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Range
@@ -11,7 +12,6 @@ import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
 
 import static io.typefox.yang.validation.IssueCodes.*
-import io.typefox.yang.yang.Expression
 
 /**
  * Validation test for the YANG language.
@@ -154,7 +154,7 @@ class YangValidatorTest extends AbstractYangTest {
 	}
 
 	@Test
-	def void checkRangeOperator() {
+	def void checkRangeOperator_01() {
 		val it = load('''
 			module foo {
 			  yang-version 1.1;
@@ -168,6 +168,40 @@ class YangValidatorTest extends AbstractYangTest {
 			}
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, BinaryOperation).head, SYNTAX_ERROR, "+");
+	}
+	
+	@Test
+	def void checkRangeOperator_02() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-int32-type {
+			    type int32 {
+			      range "1 .. 4";
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
+	}
+	
+	@Test
+	def void checkRangeOperator_03() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-int32-type {
+			    type int32 {
+			      range "1 | 4";
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
 	}
 
 	@Test
@@ -186,7 +220,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Range).head, SYNTAX_ERROR, '''1 | 4''');
 	}
-	
+
 	@Test
 	def void checkRange_01() {
 		val it = load('''

@@ -61,7 +61,6 @@ class YangRange {
 		}
 	];
 
-	val Range range;
 	val YangRange parentRange;
 	val List<Segment> segments;
 	val Supplier<String> minSupplier;
@@ -72,17 +71,17 @@ class YangRange {
 	 */
 	static def create(Range range, YangRange parentRange) {
 		Preconditions.checkNotNull(parentRange, 'parentRange');
-		return new YangRange(new RangeTransformer().apply(range), range, parentRange);
+		return new YangRange(new RangeTransformer().apply(range), parentRange);
 	}
 
 	/**
 	 * This should be used only for built-in type definition.
 	 */
 	static def createBuiltin(String lowerBound, String upperBound) {
-		return new YangRange(#[new Cut(lowerBound, null), new Cut('..', null), new Cut(upperBound, null)], null, null);
+		return new YangRange(#[new Cut(lowerBound, null), new Cut('..', null), new Cut(upperBound, null)], null);
 	}
 
-	private new(Iterable<Cut> segments, Range range, YangRange parentRange) {
+	private new(Iterable<Cut> segments, YangRange parentRange) {
 		val builder = ImmutableList.builder;
 		val itr = segments.toList.listIterator;
 		while (itr.hasNext) {
@@ -99,7 +98,6 @@ class YangRange {
 			}
 		}
 		this.segments = builder.build;
-		this.range = range;
 		this.parentRange = parentRange;
 		maxSupplier = Suppliers.memoize [
 			val max = this.segments.last.upperBound;
@@ -156,30 +154,41 @@ class YangRange {
 	 * 
 	 * See: https://tools.ietf.org/html/rfc7950#section-9.2.4 
 	 */
-	private def checkContains(YangRange other, extension ValidationMessageAcceptorExt acceptor) {
+	private def checkContains(YangRange other, ValidationMessageAcceptorExt acceptor) {
 		segments.map[substitute(this)].forEach [ currentSegment |
-			other.segments.map[substitute(other)].forEach [ otherSegment |
-				if (!otherSegment.lowerBound.isLessThanOrEqual(currentSegment.lowerBound)) {
-					currentSegment.lowerBound.node.acceptError(acceptor);
-				}
-				if (!currentSegment.upperBound.isLessThanOrEqual(otherSegment.upperBound)) {
-					currentSegment.upperBound.node.acceptError(acceptor);
-				}
-			];
+			if (!other.segments.map[substitute(other)].exists[ otherSegment |
+				// parent lower is less than or equals to the current lower
+				otherSegment.lowerBound.isLessThanOrEqual(currentSegment.lowerBound)
+				// and the current upper is less than the or equal to the parent upper
+				&& currentSegment.upperBound.isLessThanOrEqual(otherSegment.upperBound);
+			]) {
+				// Use the lower bound for both ranges and concrete values to log the error.
+				currentSegment.acceptError(acceptor);
+			}
 		];
 		return !acceptor.hasError;
 	}
 
-	private def acceptError(EObject object, extension ValidationMessageAcceptor acceptor) {
+	private def acceptError(Segment segment, extension ValidationMessageAcceptor acceptor) {
+		val lowerBound = segment.lowerBound;
+		val astNode = lowerBound.node;
 		val issueCode = INVALID_TYPE_RESTRICTION;
 		val index = ValidationMessageAcceptor.INSIGNIFICANT_INDEX;
-		val message = '''Range restriction must be equally limiting or more limiting.'''
+		val message = '''The «IF segment.range»range«ELSE»explicit value«ENDIF» "«segment»" is not valid for the base type.'''
+		val object = if (astNode.eContainer instanceof BinaryOperation) {
+			astNode.eContainer;
+		} else {
+			astNode;
+		}
 		if (object instanceof Literal) {
 			acceptError(message, object, LITERAL__VALUE, index, issueCode);			
 		} else if (object instanceof Min || object instanceof Max) {
 			val op = object.eContainer as BinaryOperation;
 			val feature = if (op.right === object) BINARY_OPERATION__RIGHT else  BINARY_OPERATION__RIGHT;
 			acceptError(message, op, feature, index, issueCode);
+		} else if (object instanceof BinaryOperation) {
+			val feature = if (object.right === astNode) BINARY_OPERATION__RIGHT else  BINARY_OPERATION__RIGHT;
+			acceptError(message, object, feature, index, issueCode);
 		}
 	}
 
@@ -208,7 +217,7 @@ class YangRange {
 		}
 
 		private def boolean isLessThanOrEqual(Cut o) {
-			return compareTo(o) > 0;
+			return !(compareTo(o) > 0);
 		}
 
 		private def Cut substitute(YangRange conatiner) {
@@ -233,6 +242,14 @@ class YangRange {
 				return new Segment(sLoweBound, sUpperBound);
 			}
 			return this;
+		}
+		
+		private def isRange() {
+			return lowerBound.endpoint != upperBound.endpoint;
+		}
+		
+		override toString() {
+			return '''«lowerBound.endpoint»«IF range»..«upperBound.endpoint»«ENDIF»''';	
 		}
 
 	}

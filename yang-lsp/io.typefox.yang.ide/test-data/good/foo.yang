@@ -2,11 +2,10 @@ module foo {
     yang-version 1.1;
     namespace "foo:bar";
     prefix x;
-    include foosub;
 
     typedef foo {
         type int32 {
-            range "1..4 | 20..30";
+            range "1..40 | 60..100";
         }
     } 
     typedef foo2 {
@@ -16,13 +15,7 @@ module foo {
     }
     typedef foo3 {
         type foo2 {
-            range "3..21";
+            range "5..15";
         }
-    }
-    augment "/c12" {
-        container bla {}
-    }
-    container bla {
-
     }
 }

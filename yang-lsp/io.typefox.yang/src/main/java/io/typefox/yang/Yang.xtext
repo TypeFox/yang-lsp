@@ -397,7 +397,7 @@ DisjointExpression returns Expression:
 ;
 
 RangeExpression returns Expression:
-	RangeBoundaryExpression ({BinaryOperation.left=current} operator='..' right=RangeBoundaryExpression)*
+	RangeBoundaryExpression ({BinaryOperation.left=current} operator='..' right=RangeBoundaryExpression)?
 ;
 
 RangeBoundaryExpression returns Expression:

@@ -24,6 +24,8 @@ import static extension org.eclipse.xtext.EcoreUtil2.getAllContentsOfType
  */
 @Singleton
 class YangValidator extends AbstractYangValidator {
+	
+	static val RANGE_BINARY_OPERATORS = #{'|', '..'};
 
 	@Inject
 	extension YangTypeExtensions;
@@ -37,8 +39,8 @@ class YangValidator extends AbstractYangValidator {
 	@Check
 	def void checkVersion(YangVersion it) {
 		if (yangVersion != YANG_1 && yangVersion != YANG_1_1) {
-			error('''The version must be either '«YANG_1»' or '«YANG_1_1»'.''', it, YANG_VERSION__YANG_VERSION,
-				INCORRECT_VERSION);
+			val message = '''The version must be either '«YANG_1»' or '«YANG_1_1»'.''';
+			error(message, it, YANG_VERSION__YANG_VERSION, INCORRECT_VERSION);
 		}
 	}
 
@@ -48,28 +50,35 @@ class YangValidator extends AbstractYangValidator {
 	}
 
 	@Check
-	def void checkRangeOperator(BinaryOperation it) {
-		if (operator != '|') {
-			error('''Syntax error. Expected '|' for range disjoint separation.''', it, BINARY_OPERATION__OPERATOR,
-				SYNTAX_ERROR);
-		}
-	}
-
-	@Check
 	def void checkTypeRestriction(Type it) {
 		// https://tools.ietf.org/html/rfc7950#section-9.2.3
 		// https://tools.ietf.org/html/rfc7950#section-9.3.3
 		if (!subTypeOfNumber) {
 			getAllContentsOfType(Range).forEach [
-				error('''Only integer and decimal types can be restricted with the 'range' statement.''', it,
-					RANGE__EXPRESSION, SYNTAX_ERROR);
+				val message = '''Only integer and decimal types can be restricted with the 'range' statement.''';
+				error(message, it, RANGE__EXPRESSION, SYNTAX_ERROR);
 			];
 		}
 	}
-	
+
 	@Check
-	def void checkRange(Range it) {
-		yangRange?.validate(this);
+	def checkRange(Range it) {
+		if (checkSyntax) {
+			val yangRange = yangRange;
+			if (yangRange !== null) {
+				yangRange.validate(this);
+			}
+		}
+		checkSyntax && yangRange.validate(this);
+	}
+
+	private def boolean checkSyntax(Range it) {
+		val invalidOperations = getAllContentsOfType(BinaryOperation).filter[!RANGE_BINARY_OPERATORS.contains(operator)];
+		invalidOperations.forEach [
+			val message = '''Syntax error. Unexpected operator "«operator»".''';
+			error(message, it, BINARY_OPERATION__OPERATOR, SYNTAX_ERROR);
+		];
+		return invalidOperations.nullOrEmpty;
 	}
 
 }
