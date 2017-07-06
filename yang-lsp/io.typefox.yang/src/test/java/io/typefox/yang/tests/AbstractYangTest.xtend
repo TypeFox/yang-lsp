@@ -3,7 +3,6 @@ package io.typefox.yang.tests
 import com.google.common.base.Preconditions
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.yang.AbstractModule
-import io.typefox.yang.yang.YangFile
 import java.util.ArrayList
 import java.util.Collections
 import javax.inject.Inject
@@ -78,10 +77,23 @@ abstract class AbstractYangTest {
 	}
 	
 	protected def AbstractModule root(Resource r) {
-		return (r.contents.head as YangFile).statements.head as AbstractModule
+		fullyResolve
+		return r.contents.head as AbstractModule
 	}
 	
-	protected def void installIndex() {
+	var isFullyResolved = false
+	
+	private def void fullyResolve() {
+		if (isFullyResolved)
+			return;
+		isFullyResolved = true
+		installIndex
+		this.resourceSet.resources.forEach [
+			this.validator.validate(it)
+		]
+	}
+	
+	private def void installIndex() {
 		val index = new ResourceDescriptionsData(Collections.emptyList)
 		val resources = new ArrayList(resourceSet.resources)
 		for (resource : resources) {

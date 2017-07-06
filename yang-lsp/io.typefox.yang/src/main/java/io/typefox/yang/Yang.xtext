@@ -3,8 +3,10 @@ grammar io.typefox.yang.Yang hidden(WS, ML_COMMENT, SL_COMMENT, HIDDEN)
 import "http://www.eclipse.org/emf/2002/Ecore" as ecore
 generate yang "http://www.typefox.io/yang/Yang"
 
-YangFile:
-	statements+=Statement*;
+AbstractModule:
+	Module|
+	Submodule
+;
 	
 fragment StatementEnd returns Statement:
 	('{'
@@ -15,11 +17,6 @@ fragment StatementEnd returns Statement:
 Statement:
 	  SchemaNode | 
 	  OtherStatement
-;
-
-AbstractModule:
-	Module|
-	Submodule
 ;
 
 AbstractImport:
@@ -35,8 +32,9 @@ SchemaNode :
 	Identity |
 	Notification  |
 	Rpc |
-	Typedef |
-	Unknown
+	Input |
+	Output |
+	Typedef
 ;
 
 DataSchemaNode :
@@ -70,7 +68,6 @@ OtherStatement :
 	| Deviate
 	| FractionDigits
 	| IfFeature
-	| Input
 	| Key
 	| Length
 	| Mandatory
@@ -81,7 +78,6 @@ OtherStatement :
 	| Namespace
 	| OrderedBy
 	| Organization
-	| Output
 	| Path
 	| Pattern
 	| Position
@@ -97,6 +93,7 @@ OtherStatement :
 	| Type
 	| Unique
 	| Units
+	| Unknown
 	| Uses
 	| Value
 	| When
@@ -292,14 +289,15 @@ Rpc:
 	'rpc' name=StringValue StatementEnd
 ;
 
+// input and output should never have name, but we want it to be a subtype of SchemaNode
 // 7.14.2
 Input:
-	{Input} 'input' StatementEnd
+	{Input} 'input' (name=StringValue)? StatementEnd
 ;
 
 // 7.14.3
 Output:
-	{Output} 'output' StatementEnd
+	{Output} 'output' (name=StringValue)? StatementEnd
 ;
 
 // 7.15

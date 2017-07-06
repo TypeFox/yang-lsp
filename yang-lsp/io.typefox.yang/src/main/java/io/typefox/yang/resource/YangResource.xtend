@@ -1,11 +1,35 @@
 package io.typefox.yang.resource
 
-import org.eclipse.xtext.resource.DerivedStateAwareResource
+import com.google.inject.Inject
+import io.typefox.yang.scoping.ScopeContextProvider
+import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.YangPackage
+import org.eclipse.emf.ecore.EObject
+import org.eclipse.emf.ecore.EReference
+import org.eclipse.xtext.linking.lazy.LazyLinkingResource
+import org.eclipse.xtext.nodemodel.INode
+import org.eclipse.xtext.util.Triple
 
-class YangResource extends DerivedStateAwareResource {
+class YangResource extends LazyLinkingResource {
 	
-	override public getUnresolvableURIFragments() {
-		super.getUnresolvableURIFragments()
+	@Inject ScopeContextProvider provider
+	
+	override protected getEObject(String uriFragment, Triple<EObject, EReference, INode> triple) throws AssertionError {
+		// ensure proper initialization
+		
+		val ctx = provider.getScopeContext(this.contents.head as AbstractModule)
+		switch triple.second.EReferenceType {
+			case YangPackage.Literals.SCHEMA_NODE,
+			case YangPackage.Literals.LEAF :
+				ctx.resolveAll
+			default:
+				ctx.resolveDefinitionPhase // does definition linking
+		}
+		val result = triple.first.eGet(triple.second, false)
+		if (result instanceof EObject && !(result as EObject).eIsProxy) {
+			return result as EObject;
+		}
+		super.getEObject(uriFragment, triple)
 	}
 	
 }

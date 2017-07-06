@@ -18,4 +18,8 @@ module foo {
             range "5..15";
         }
     }
+    
+    container c12 {
+    		container cool {}
+    }
 }

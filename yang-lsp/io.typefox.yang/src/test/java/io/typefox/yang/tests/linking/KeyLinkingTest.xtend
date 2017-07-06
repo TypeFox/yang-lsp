@@ -31,7 +31,7 @@ class KeyLinkingTest extends AbstractYangTest {
 				}
 			}
 		''')
-		val k = m.allContents.filter(Key).head
+		val k = m.root.eAllContents.filter(Key).head
 		Assert.assertTrue(k.references.get(0).node.eContainer instanceof Container)
 		Assert.assertTrue(k.references.get(1).node.eContainer instanceof Container)
 	}

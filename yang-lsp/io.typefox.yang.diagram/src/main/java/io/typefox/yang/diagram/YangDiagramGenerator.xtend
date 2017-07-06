@@ -16,6 +16,7 @@ import io.typefox.sprotty.api.SModelElement
 import io.typefox.sprotty.api.SModelRoot
 import io.typefox.sprotty.api.SNode
 import io.typefox.sprotty.server.xtext.IDiagramGenerator
+import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.Container
 import io.typefox.yang.yang.DataSchemaNode
 import io.typefox.yang.yang.Leaf
@@ -23,7 +24,6 @@ import io.typefox.yang.yang.LeafList
 import io.typefox.yang.yang.Module
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Statement
-import io.typefox.yang.yang.YangFile
 import java.util.ArrayList
 import java.util.List
 import org.eclipse.emf.ecore.resource.Resource
@@ -33,10 +33,11 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	
 	override generate(Resource resource, CancelIndicator cancelIndicator) {
 		val content = resource.contents.head
-		if (content instanceof YangFile) {
+		if (content instanceof AbstractModule) {
 			generateDiagram(content, cancelIndicator)
 		}
 	}
+
 
 	def boolean isClassMember(Statement statement) {
 //		val List<Class> types = #[Leaf, LeafList]
@@ -131,13 +132,13 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		}
 	}
 
-	def SModelRoot generateDiagram(YangFile file, CancelIndicator cancelIndicator) {
+	def SModelRoot generateDiagram(AbstractModule module, CancelIndicator cancelIndicator) {
 		val diagram = new SGraph => [
 			type = 'graph'
 			id = 'yang'
 		]
 
-		val rootChildren = createChildElements(diagram, file.statements, 0)
+		val rootChildren = createChildElements(diagram, #[module], 0)
 		diagram.children = rootChildren
 		return diagram
 	}

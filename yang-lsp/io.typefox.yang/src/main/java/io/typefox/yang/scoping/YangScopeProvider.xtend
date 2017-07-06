@@ -3,48 +3,50 @@
  */
 package io.typefox.yang.scoping
 
-import io.typefox.yang.resource.ScopeContext
+import com.google.inject.Inject
+import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.YangPackage
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.xtext.scoping.IScopeProvider
-import org.eclipse.xtext.scoping.IScope
-import io.typefox.yang.resource.ScopeContext.YangScopeKind
 
 /**
  * Scope provider for YANG, which is based on single batch processing and subsequently caching scopes
  */
 class YangScopeProvider implements IScopeProvider {
+	
+	@Inject ScopeContextProvider provider
 
 	override getScope(EObject context, EReference reference) {
 		val ctx = findScopeInAdapters(context, reference)
-		if (ctx === null) {
-			return IScope.NULLSCOPE
-		}
 		switch reference.eClass {
 			case YangPackage.Literals.ABSTRACT_MODULE : {
 				return ctx.moduleScope
 			}
+			case YangPackage.Literals.GROUPING : {
+				return ctx.groupingScope
+			}
+			case YangPackage.Literals.TYPE : {
+				return ctx.typeScope
+			}
+			case YangPackage.Literals.FEATURE : {
+				return ctx.featureScope
+			}
+			case YangPackage.Literals.IDENTITY : {
+				return ctx.identityScope
+			}
+			case YangPackage.Literals.EXTENSION : {
+				return ctx.extensionScope
+			}
 			default : {
-				return ctx.getFull(YangScopeKind.NODE)
+				return ctx.nodeScope
 			}
 		}
 	}
 	
-	protected def ScopeContext findScopeInAdapters(EObject object, EReference reference) {
-		val scopesAdapter = ScopeContext.findInEmfObject(object)
-		if (scopesAdapter !== null) {
-			return scopesAdapter
-		}
-		var container = object.eContainer
-		while (container !== null) {
-			val adapter = ScopeContext.findInEmfObject(object)
-			if (adapter !== null) {
-				return adapter
-			}
-			container = container.eContainer
-		}
-		return ScopeContext.findInEmfObject(object.eResource)
+	protected def IScopeContext findScopeInAdapters(EObject object, EReference reference) {
+		val m = object.eResource.contents.head as AbstractModule
+		return provider.getScopeContext(m)
 	}
 	
 }

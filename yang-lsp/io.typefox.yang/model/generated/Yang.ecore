@@ -1,16 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ecore:EPackage xmi:version="2.0" xmlns:xmi="http://www.omg.org/XMI" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xmlns:ecore="http://www.eclipse.org/emf/2002/Ecore" name="yang" nsURI="http://www.typefox.io/yang/Yang" nsPrefix="yang">
-  <eClassifiers xsi:type="ecore:EClass" name="YangFile">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="statements" upperBound="-1"
-        eType="#//Statement" containment="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="AbstractModule" eSuperTypes="#//OtherStatement">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Statement">
     <eStructuralFeatures xsi:type="ecore:EReference" name="substatements" upperBound="-1"
         eType="#//Statement" containment="true"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="AbstractModule" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="AbstractImport" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EReference" name="module" eType="#//AbstractModule"/>
@@ -117,8 +113,8 @@
         containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Rpc" eSuperTypes="#//SchemaNode"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Input" eSuperTypes="#//OtherStatement"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Output" eSuperTypes="#//OtherStatement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Input" eSuperTypes="#//SchemaNode"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Output" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Action" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
@@ -197,8 +193,9 @@
   <eClassifiers xsi:type="ecore:EClass" name="RequireInstance" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="isRequireInstance" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Unknown" eSuperTypes="#//SchemaNode">
+  <eClassifiers xsi:type="ecore:EClass" name="Unknown" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EReference" name="extension" eType="#//Extension"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="SchemaNodeIdentifier">
     <eStructuralFeatures xsi:type="ecore:EReference" name="elements" upperBound="-1"

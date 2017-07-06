@@ -78,7 +78,6 @@ class ModuleLinkingTest extends AbstractYangTest {
 				}
 			}
 		''')
-		installIndex
 		assertSame(m1.root, m2.root.substatementsOfType(Import).head.module)
 		val uses = m2.root.eAllContents.filter(Uses).head
 		assertSame(m1.root.substatementsOfType(Grouping).head, uses.grouping.node)
@@ -102,7 +101,6 @@ class ModuleLinkingTest extends AbstractYangTest {
 				}
 			}
 		''')
-		installIndex
 		assertSame(m1.root, m2.root.substatementsOfType(Include).head.module)
 		val uses = m2.root.eAllContents.filter(Uses).head
 		assertSame(m1.root.substatementsOfType(Grouping).head, uses.grouping.node)
@@ -132,7 +130,6 @@ class ModuleLinkingTest extends AbstractYangTest {
 				}
 			}
 		''')
-		installIndex
 		val uses = m3.root.eAllContents.filter(Uses).head
 		assertSame(m1.root.substatementsOfType(Grouping).head, uses.grouping.node)
 	}
@@ -185,7 +182,6 @@ class ModuleLinkingTest extends AbstractYangTest {
 				belongs-to a;
 			}
 		''')
-		installIndex
 		assertError(m1.root.substatements.head, IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)
 	}
 	
@@ -275,7 +271,6 @@ class ModuleLinkingTest extends AbstractYangTest {
 				}
 			}
 		''')
-		installIndex
 		assertSame(m.root, m2.root.substatementsOfType(Include).head.module)
 		assertSame(m2.root, m.root.substatementsOfType(BelongsTo).head.module)
 	}

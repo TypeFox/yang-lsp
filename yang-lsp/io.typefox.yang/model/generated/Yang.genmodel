@@ -6,14 +6,11 @@
     copyrightFields="false" runtimeVersion="2.12">
   <genPackages prefix="Yang" basePackage="io.typefox.yang" disposableProviderFactory="true"
       fileExtensions="yang" ecorePackage="Yang.ecore#/">
-    <genClasses ecoreClass="Yang.ecore#//YangFile">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//YangFile/statements"/>
+    <genClasses ecoreClass="Yang.ecore#//AbstractModule">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//AbstractModule/name"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Statement">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Statement/substatements"/>
-    </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//AbstractModule">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//AbstractModule/name"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//AbstractImport">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//AbstractImport/module"/>
@@ -194,6 +191,7 @@
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Unknown">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//Unknown/extension"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Unknown/name"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//SchemaNodeIdentifier">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//SchemaNodeIdentifier/elements"/>

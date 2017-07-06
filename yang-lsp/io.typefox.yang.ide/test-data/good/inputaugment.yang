@@ -1,0 +1,17 @@
+module inputaugment {
+    namespace "foo:inputaugment";
+    prefix "ia";
+
+    augment "/foo/input/param" {
+        leaf l {
+            type string;
+        }
+    }
+
+    rpc foo {
+        input {
+            container param {
+            }
+        }
+    }
+}

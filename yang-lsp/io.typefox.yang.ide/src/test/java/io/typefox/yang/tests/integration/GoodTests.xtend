@@ -15,7 +15,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
-import org.junit.Ignore
 
 @FinalFieldsConstructor
 @RunWith(Parameterized)
@@ -51,8 +50,11 @@ class GoodTests {
 	val List<Diagnostic> diagnostics
 	val protected String simpleName // only used in value of @Parameters
 	
-	@Ignore("TODO")
 	@Test def void checkDiagnostics() {
+		if (this.simpleName == 'yt2.yang') {
+			// ignored
+			return;
+		}
 		val issues = diagnostics.sortBy[range.start.line].sortBy[range.start.character].toList
 		val inserts = newArrayList()
 		val lines = Files.readAllLines(new File(URI.createURI(uri).toFileString).toPath)

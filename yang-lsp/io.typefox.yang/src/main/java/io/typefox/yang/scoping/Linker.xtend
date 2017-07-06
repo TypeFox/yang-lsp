@@ -1,4 +1,4 @@
-package io.typefox.yang.resource
+package io.typefox.yang.scoping
 
 import com.google.inject.Inject
 import org.eclipse.emf.ecore.EObject

@@ -4,7 +4,7 @@
 package io.typefox.yang.tests
 
 import com.google.inject.Inject
-import io.typefox.yang.yang.YangFile
+import io.typefox.yang.yang.AbstractModule
 import org.eclipse.xtext.diagnostics.Diagnostic
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
@@ -20,13 +20,13 @@ import static org.junit.Assert.*
 @InjectWith(YangInjectorProvider)
 class YangParsingTest {
 
-	@Inject extension ParseHelper<YangFile> parser
+	@Inject extension ParseHelper<AbstractModule> parser
 	@Inject ValidationTestHelper helper
 	
 	@Test def void testCustom() {
 		val model = '''
 			foo:bar 43tg3g3;
-		'''.parse
+		'''.wrapModule.parse
 		helper.assertNoErrors(model, Diagnostic.SYNTAX_DIAGNOSTIC)
 	}
 
@@ -71,38 +71,36 @@ class YangParsingTest {
 		helper.assertNoErrors(model, Diagnostic.SYNTAX_DIAGNOSTIC)
 
 		assertEquals('''
-		YangFile {
-		    cref Statement statements [
-		        0: Module {
+		Module {
+		    cref Statement substatements [
+		        0 : YangVersion {
+		            attr EString yangVersion '1.1'
+		        }
+		        1 : Namespace {
+		            attr EString uri 'urn:example:system'
+		        }
+		        2 : Prefix {
+		            attr EString prefix 'sys'
+		        }
+		        3 : Import {
 		            cref Statement substatements [
-		                0 : YangVersion {
-		                    attr EString yangVersion '1.1'
+		                0: Prefix {
+		                    attr EString prefix 'yang'
 		                }
-		                1 : Namespace {
-		                    attr EString uri 'urn:example:system'
+		                1: Reference {
+		                    attr EString reference 'RFC 6991: Common YANG Data Types'
 		                }
-		                2 : Prefix {
-		                    attr EString prefix 'sys'
-		                }
-		                3 : Import {
-		                    cref Statement substatements [
-		                        0: Prefix {
-		                            attr EString prefix 'yang'
-		                        }
-		                        1: Reference {
-		                            attr EString reference 'RFC 6991: Common YANG Data Types'
-		                        }
-		                    ]
-		                    ref AbstractModule module ref: AbstractModule@(unresolved proxy __synthetic0.yang#|0)
-		                }
-		                4 : Include {
-		                    ref AbstractModule module ref: AbstractModule@(unresolved proxy __synthetic0.yang#|1)
-		                }
-		                5 : Organization {
-		                    attr EString organization 'Example Inc.'
-		                }
-		                6 : Contact {
-		                    attr EString contact 'Joe L. User
+		            ]
+		            ref AbstractModule module ref: AbstractModule@(unresolved proxy __synthetic0.yang#|0)
+		        }
+		        4 : Include {
+		            ref AbstractModule module ref: AbstractModule@(unresolved proxy __synthetic0.yang#|1)
+		        }
+		        5 : Organization {
+		            attr EString organization 'Example Inc.'
+		        }
+		        6 : Contact {
+		            attr EString contact 'Joe L. User
 		
 		          Example Inc.
 		          42 Anywhere Drive
@@ -111,32 +109,30 @@ class YangParsingTest {
 		
 		          Phone: +1 800 555 0100
 		          EMail: joe@example.com'
-		                }
-		                7 : Description {
-		                    attr EString description 'The module for entities implementing the Example system.'
-		                }
-		                8 : Revision {
-		                    cref Statement substatements [
-		                        0: Description {
-		                            attr EString description 'Initial revision.'
-		                        }
-		                    ]
-		                    attr EString revision '2007-06-09'
-		                }
-		                9 : Unknown {
-		                    cref Statement substatements [
-		                        0: Unknown {
-		                            attr EString name 'rf3-4.5345we2'
-		                            ref Extension extension ref: Extension@(unresolved proxy __synthetic0.yang#|3)
-		                        }
-		                    ]
-		                    attr EString name 'rule'
-		                    ref Extension extension ref: Extension@(unresolved proxy __synthetic0.yang#|2)
+		        }
+		        7 : Description {
+		            attr EString description 'The module for entities implementing the Example system.'
+		        }
+		        8 : Revision {
+		            cref Statement substatements [
+		                0: Description {
+		                    attr EString description 'Initial revision.'
 		                }
 		            ]
-		            attr EString name 'example-system'
+		            attr EString revision '2007-06-09'
+		        }
+		        9 : Unknown {
+		            cref Statement substatements [
+		                0: Unknown {
+		                    ref Extension extension ref: Extension@(unresolved proxy __synthetic0.yang#|3)
+		                    attr EString name 'rf3-4.5345we2'
+		                }
+		            ]
+		            ref Extension extension ref: Extension@(unresolved proxy __synthetic0.yang#|2)
+		            attr EString name 'rule'
 		        }
 		    ]
+		    attr EString name 'example-system'
 		}'''.toString, EmfFormatter.objToStr(model))
 	}
 	
@@ -147,7 +143,7 @@ class YangParsingTest {
 		  type int32 {
 		    range 1;
 		  }
-		}'''.assertNoParserErrors;
+		}'''.wrapModule.assertNoParserErrors;
 	}
 
 	@Test
@@ -157,7 +153,7 @@ class YangParsingTest {
 		  type int32 {
 		    range '1';
 		  }
-		}'''.assertNoParserErrors;
+		}'''.wrapModule.assertNoParserErrors;
 	}
 
 	@Test
@@ -167,7 +163,7 @@ class YangParsingTest {
 		  type int32 {
 		    range "1";
 		  }
-		}'''.assertNoParserErrors;
+		}'''.wrapModule.assertNoParserErrors;
 	}
 	
 	@Test
@@ -177,7 +173,7 @@ class YangParsingTest {
 		  type int32 {
 		    range '1 | 2';
 		  }
-		}'''.assertNoParserErrors;
+		}'''.wrapModule.assertNoParserErrors;
 	}
 
 	@Test
@@ -187,7 +183,7 @@ class YangParsingTest {
 		  type int32 {
 		    range "1 | 2..4";
 		  }
-		}'''.assertNoParserErrors;
+		}'''.wrapModule.assertNoParserErrors;
 	}
 	
 	@Test
@@ -197,7 +193,7 @@ class YangParsingTest {
 		  type int32 {
 		    range '1 | 2..4';
 		  }
-		}'''.assertNoParserErrors;
+		}'''.wrapModule.assertNoParserErrors;
 	}
 	
 	@Test
@@ -207,7 +203,7 @@ class YangParsingTest {
 		  type int32 {
 		    range "1 | 2..4 | 5";
 		  }
-		}'''.assertNoParserErrors;
+		}'''.wrapModule.assertNoParserErrors;
 	}
 	
 	@Test
@@ -217,7 +213,7 @@ class YangParsingTest {
 		  type int32 {
 		    range "1 | 2..max | 5";
 		  }
-		}'''.assertNoParserErrors;
+		}'''.wrapModule.assertNoParserErrors;
 	}
 
 
@@ -228,7 +224,7 @@ class YangParsingTest {
 		  type int32 {
 		    range "1 | min..4 | 5";
 		  }
-		}'''.assertNoParserErrors;
+		}'''.wrapModule.assertNoParserErrors;
 	}
 	
 	@Test
@@ -238,7 +234,7 @@ class YangParsingTest {
 		  type int32 {
 		    range "1 | min..max | 5";
 		  }
-		}'''.assertNoParserErrors;
+		}'''.wrapModule.assertNoParserErrors;
 	}
 	
 	@Test
@@ -248,7 +244,7 @@ class YangParsingTest {
 		  type int32 {
 		    range '1 | min  ..  max | 5';
 		  }
-		}'''.assertNoParserErrors;
+		}'''.wrapModule.assertNoParserErrors;
 	}
 	
 	@Test
@@ -258,10 +254,14 @@ class YangParsingTest {
 		  type int32 {
 		    range '1 | 2 ..  3|4 ..  5      | 6 | 7..  max';
 		  }
-		}'''.assertNoParserErrors;
+		}'''.wrapModule.assertNoParserErrors;
 	}
 
-
+	private def wrapModule(CharSequence it) '''
+		module foo {
+			«it»
+		}
+	'''
 	private def assertNoParserErrors(CharSequence it) {
 		helper.assertNoErrors(parse, Diagnostic.SYNTAX_DIAGNOSTIC);
 	}
