@@ -26,9 +26,9 @@ import static extension org.eclipse.xtext.EcoreUtil2.getAllContentsOfType
  */
 @Singleton
 class YangValidator extends AbstractYangValidator {
-	
+
 	static val RANGE_BINARY_OPERATORS = #{'|', '..'};
-	
+
 	@Inject
 	extension YangExtensions;
 
@@ -75,7 +75,7 @@ class YangValidator extends AbstractYangValidator {
 			}
 		}
 	}
-	
+
 	@Check
 	def checkFractionDigitsExist(Type it) {
 		// https://tools.ietf.org/html/rfc7950#section-9.3.4
@@ -87,12 +87,12 @@ class YangValidator extends AbstractYangValidator {
 		if (decimalBuiltin) {
 			if (fractionDigitsExist) {
 				// Validate the fraction digits. It takes as an argument an integer between 1 and 18, inclusively.
-				val value = fractionDigits.range.parseIntSafe;
-				if (value === null || value.intValue < 1 || value.intValue > 18) {
+				val value = fractionDigitsAsInt;
+				if (value.intValue < 1 || value.intValue > 18) {
 					val message = '''The "fraction-digits" value must be an integer between 1 and 18, inclusively.''';
 					error(message, fractionDigits, FRACTION_DIGITS__RANGE, TYPE_ERROR);
 				}
-				
+
 			} else {
 				// Decimal types must have fraction-digits sub-statement.
 				val message = '''The "fraction-digits" statement must be present for "decimal64" types.''';
@@ -107,20 +107,13 @@ class YangValidator extends AbstractYangValidator {
 	}
 
 	private def boolean checkSyntax(Range it) {
-		val invalidOperations = getAllContentsOfType(BinaryOperation).filter[!RANGE_BINARY_OPERATORS.contains(operator)];
+		val invalidOperations = getAllContentsOfType(BinaryOperation).
+			filter[!RANGE_BINARY_OPERATORS.contains(operator)];
 		invalidOperations.forEach [
 			val message = '''Syntax error. Unexpected operator "«operator»".''';
 			error(message, it, BINARY_OPERATION__OPERATOR, SYNTAX_ERROR);
 		];
 		return invalidOperations.nullOrEmpty;
-	}
-	
-	private def parseIntSafe(String it) {
-		return try {
-			if (it === null) null else Integer.parseInt(it);
-		} catch (NumberFormatException e) {
-			null;
-		}
 	}
 
 }

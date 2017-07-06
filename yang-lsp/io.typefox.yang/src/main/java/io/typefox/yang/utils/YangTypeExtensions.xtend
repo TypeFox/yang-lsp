@@ -2,16 +2,18 @@ package io.typefox.yang.utils
 
 import com.google.common.base.Supplier
 import com.google.common.base.Suppliers
-import com.google.common.collect.ImmutableMap
 import com.google.common.collect.ImmutableSet
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import io.typefox.yang.services.YangGrammarAccess
 import io.typefox.yang.types.YangRange
+import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Range
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
+import java.math.BigDecimal
 import java.util.Collection
+import java.util.Collections
 import java.util.Map
 import java.util.Stack
 import org.eclipse.xtext.EcoreUtil2
@@ -51,19 +53,10 @@ class YangTypeExtensions {
 		].map[key.value -> value]).copyOf;
 	];
 
-	val Supplier<Map<String, YangRange>> decimalBuiltins = Suppliers.memoize [
+	val Supplier<Collection<String>> decimalBuiltins = Suppliers.memoize [
 		val it = grammarAccess.BUILTIN_TYPEAccess;
 		println("TODO: io.typefox.yang.utils.YangTypeExtensions.decimalBuiltinNames");
-		return newHashMap(#[
-			decimal64Keyword_3 -> BuiltinRanges.INT_64
-		].map[key.value -> value]).copyOf;
-	];
-
-	/**
-	 * Disjunction (OR) of the integer and decimal built-in types.
-	 */
-	val Supplier<Map<String, YangRange>> numberBuiltinNames = Suppliers.memoize [
-		return ImmutableMap.builder.putAll(integerBuiltins.get).putAll(decimalBuiltins.get).build;
+		return Collections.singleton(decimal64Keyword_3.value);
 	];
 
 	/**
@@ -91,7 +84,7 @@ class YangTypeExtensions {
 	 * Returns {@code true} if the type argument is a direct subtype of the built-in 64-bit decimal.
 	 */
 	def boolean isDecimalBuiltin(Type it) {
-		return decimalBuiltins.get.keySet.contains(typeRef.builtin);
+		return decimalBuiltins.get.contains(typeRef.builtin);
 	}
 
 	/**
@@ -198,7 +191,14 @@ class YangTypeExtensions {
 		val ranges = new Stack;
 		while (!types.isEmpty) {
 			val currentType = types.pop;
-			val range = numberBuiltinNames.get.get(currentType?.typeRef?.builtin);
+			val range = if (currentType.subtypeOfDecimal) {
+					val fractionDigits = currentType.fractionDigitsAsInt;
+					val lowerBound = BuiltinRanges.MIN_64_BASE.movePointLeft(fractionDigits).toString;
+					val upperBound = BuiltinRanges.MAX_64_BASE.movePointLeft(fractionDigits).toString;
+					YangRange.createBuiltin(lowerBound, upperBound);
+				} else {
+					integerBuiltins.get.get(currentType?.typeRef?.builtin);
+				}
 			if (range !== null) {
 				ranges.push(range);
 			}
@@ -210,14 +210,36 @@ class YangTypeExtensions {
 	}
 
 	/**
+	 * Returns with the fraction digit of the given type as an integer.
+	 * If the type is not a 64-bit decimal, but has a valid "fraction-digits" statement,
+	 * this method will parse the value and returns with the integer.
+	 * If the "fraction-digits" does not exist as a sub-statement on the type, or
+	 * it cannot be parsed, this method returns with {@code 0} (zero) instead. 
+	 */
+	def getFractionDigitsAsInt(Type it) {
+		val value = firstSubstatementsOfType(FractionDigits)?.range;
+		return try {
+			if(value === null) 0 else Integer.parseInt(value).intValue;
+		} catch (NumberFormatException e) {
+			0;
+		}
+	}
+
+	/**
 	 * Contains a couple of ranges for the YANG built-in types.
 	 */
 	static abstract class BuiltinRanges {
 
+		static val MIN_64_LITERAL = "-9223372036854775808";
+		static val MAX_64_LITERAL = "9223372036854775807";
+		
+		static val MIN_64_BASE = new BigDecimal(MIN_64_LITERAL);
+		static val MAX_64_BASE = new BigDecimal(MAX_64_LITERAL);
+
 		static val INT_8 = YangRange.createBuiltin("-128", "127");
 		static val INT_16 = YangRange.createBuiltin("-32768", "32767");
 		static val INT_32 = YangRange.createBuiltin("-2147483648", "2147483647");
-		static val INT_64 = YangRange.createBuiltin("-9223372036854775808", "9223372036854775807");
+		static val INT_64 = YangRange.createBuiltin(MIN_64_LITERAL, MAX_64_LITERAL);
 		static val UINT_8 = YangRange.createBuiltin("0", "255");
 		static val UINT_16 = YangRange.createBuiltin("0", "65535");
 		static val UINT_32 = YangRange.createBuiltin("0", "4294967295");

@@ -202,7 +202,16 @@ class YangRange {
 			val feature = if(op.right === object) BINARY_OPERATION__RIGHT else BINARY_OPERATION__RIGHT;
 			acceptError(message, op, feature, index, code);
 		} else if (object instanceof BinaryOperation) {
-			acceptError(message, object, null, index, code);
+			val feature = if (object.operator == '..') {
+					null;
+				} else if (object.right === astNode) {
+					BINARY_OPERATION__RIGHT
+				} else if (object.left === astNode) {
+					BINARY_OPERATION__LEFT
+				} else {
+					null;
+				}
+			acceptError(message, object, feature, index, code);
 		}
 	}
 

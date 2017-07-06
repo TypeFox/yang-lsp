@@ -239,7 +239,43 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Expression).head, TYPE_ERROR, '''-1''');
 	}
-	
+
+	@Test
+	def void checkRangeRestriction_02() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type decimal64 {
+			      range "-10 | 9";
+			      fraction-digits 18;
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Expression).head, TYPE_ERROR, '-10');
+	}
+
+	@Test
+	def void checkRangeRestriction_03() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type decimal64 {
+			      range "-10 | 9";
+			      fraction-digits 17;
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
+	}
+
 	@Test
 	def void checkrangeOrder_01() {
 		val it = load('''
@@ -256,7 +292,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Expression).head, TYPE_ERROR, '''1 .. 2''');
 	}
-	
+
 	@Test
 	def void checkrangeOrder_02() {
 		val it = load('''
@@ -308,7 +344,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Type).head, TYPE_ERROR, 'decimal64');
 	}
-	
+
 	@Test
 	def void checkFractionDigits_03() {
 		val it = load('''
@@ -326,7 +362,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, FractionDigits).head, TYPE_ERROR, 'bar');
 	}
-	
+
 	@Test
 	def void checkFractionDigits_04() {
 		val it = load('''
@@ -344,7 +380,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, FractionDigits).head, TYPE_ERROR, '19');
 	}
-	
+
 	@Test
 	def void checkFractionDigits_05() {
 		val it = load('''
