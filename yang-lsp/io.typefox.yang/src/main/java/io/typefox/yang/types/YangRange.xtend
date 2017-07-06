@@ -142,7 +142,21 @@ class YangRange {
 	 * 
 	 * See: https://tools.ietf.org/html/rfc7950#section-9.2.4 
 	 */
-	private def checkDisjointOrder(extension ValidationMessageAcceptorExt acceptor) {
+	private def checkDisjointOrder(ValidationMessageAcceptorExt acceptor) {
+		for (var i = 1; i < segments.size; i++) {
+			val previous = segments.get(i - 1).substitute(this);
+			val current = segments.get(i).substitute(this);
+			val message = if (current.lowerBound.isLessThanOrEqual(previous.upperBound)) {
+					'''Each range restriction must be disjoint.''';
+				} else if (current.upperBound.isLessThanOrEqual(previous.lowerBound)) {
+					'''Each range restriction must be in ascending order.''';
+				} else {
+					null
+				};
+			if (message !== null) {
+				acceptError(current, acceptor, message);
+			}
+		}
 		return !acceptor.hasError;
 	}
 
@@ -155,40 +169,40 @@ class YangRange {
 	 * See: https://tools.ietf.org/html/rfc7950#section-9.2.4 
 	 */
 	private def checkContains(YangRange other, ValidationMessageAcceptorExt acceptor) {
-		segments.map[substitute(this)].forEach [ currentSegment |
-			if (!other.segments.map[substitute(other)].exists[ otherSegment |
+		segments.map[substitute(this)].forEach [ current |
+			if (!other.segments.map[substitute(other)].exists [ parent |
 				// parent lower is less than or equals to the current lower
-				otherSegment.lowerBound.isLessThanOrEqual(currentSegment.lowerBound)
 				// and the current upper is less than the or equal to the parent upper
-				&& currentSegment.upperBound.isLessThanOrEqual(otherSegment.upperBound);
+				parent.lowerBound.isLessThanOrEqual(current.lowerBound) &&
+					current.upperBound.isLessThanOrEqual(parent.upperBound);
 			]) {
 				// Use the lower bound for both ranges and concrete values to log the error.
-				currentSegment.acceptError(acceptor);
+				val message = '''The «IF current.range»range«ELSE»explicit value«ENDIF» "«current»" is not valid for the base type.'''
+				current.acceptError(acceptor, message);
 			}
 		];
 		return !acceptor.hasError;
 	}
 
-	private def acceptError(Segment segment, extension ValidationMessageAcceptor acceptor) {
+	private def acceptError(Segment segment, extension ValidationMessageAcceptor acceptor, String message) {
 		val lowerBound = segment.lowerBound;
 		val astNode = lowerBound.node;
 		val code = TYPE_ERROR;
 		val index = ValidationMessageAcceptor.INSIGNIFICANT_INDEX;
-		val message = '''The «IF segment.range»range«ELSE»explicit value«ENDIF» "«segment»" is not valid for the base type.'''
 		val object = if (astNode.eContainer instanceof BinaryOperation) {
-			astNode.eContainer;
-		} else {
-			astNode;
-		}
+				astNode.eContainer;
+			} else {
+				astNode;
+			};
+
 		if (object instanceof Literal) {
-			acceptError(message, object, LITERAL__VALUE, index, code);			
+			acceptError(message, object, LITERAL__VALUE, index, code);
 		} else if (object instanceof Min || object instanceof Max) {
 			val op = object.eContainer as BinaryOperation;
-			val feature = if (op.right === object) BINARY_OPERATION__RIGHT else  BINARY_OPERATION__RIGHT;
+			val feature = if(op.right === object) BINARY_OPERATION__RIGHT else BINARY_OPERATION__RIGHT;
 			acceptError(message, op, feature, index, code);
 		} else if (object instanceof BinaryOperation) {
-			val feature = if (object.right === astNode) BINARY_OPERATION__RIGHT else  BINARY_OPERATION__RIGHT;
-			acceptError(message, object, feature, index, code);
+			acceptError(message, object, null, index, code);
 		}
 	}
 
@@ -243,13 +257,13 @@ class YangRange {
 			}
 			return this;
 		}
-		
+
 		private def isRange() {
 			return lowerBound.endpoint != upperBound.endpoint;
 		}
-		
+
 		override toString() {
-			return '''«lowerBound.endpoint»«IF range»..«upperBound.endpoint»«ENDIF»''';	
+			return '''«lowerBound.endpoint»«IF range»..«upperBound.endpoint»«ENDIF»''';
 		}
 
 	}

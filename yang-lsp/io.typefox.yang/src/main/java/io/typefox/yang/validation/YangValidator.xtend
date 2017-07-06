@@ -74,7 +74,6 @@ class YangValidator extends AbstractYangValidator {
 				yangRange.validate(this);
 			}
 		}
-		checkSyntax && yangRange.validate(this);
 	}
 	
 	@Check
