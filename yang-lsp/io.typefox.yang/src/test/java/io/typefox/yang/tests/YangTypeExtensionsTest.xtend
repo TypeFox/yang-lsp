@@ -119,7 +119,7 @@ class YangTypeExtensionsTest extends AbstractYangTest {
 			    }
 			  }
 			}
-		'''.load.root.firstSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).range.yangRange.toString.
+		'''.load.root.firstSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).refinement.yangRefinable.toString.
 			assertEquals('1..4');
 	}
 
@@ -133,7 +133,7 @@ class YangTypeExtensionsTest extends AbstractYangTest {
 			    }
 			  }
 			}
-		'''.load.root.firstSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).range.yangRange.toString.
+		'''.load.root.firstSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).refinement.yangRefinable.toString.
 			assertEquals('1 | 2 | 4..5 | 6');
 	}
 
@@ -157,7 +157,7 @@ class YangTypeExtensionsTest extends AbstractYangTest {
 			    }
 			  }
 			}
-		'''.load.root.lastSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).range.yangRange.toString.
+		'''.load.root.lastSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).refinement.yangRefinable.toString.
 			assertEquals('2..200')
 	}
 

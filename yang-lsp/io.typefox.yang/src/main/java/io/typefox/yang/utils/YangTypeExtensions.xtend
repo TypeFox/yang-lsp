@@ -6,14 +6,13 @@ import com.google.common.collect.ImmutableSet
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import io.typefox.yang.services.YangGrammarAccess
-import io.typefox.yang.types.YangRange
+import io.typefox.yang.types.YangRefinable
 import io.typefox.yang.yang.FractionDigits
-import io.typefox.yang.yang.Range
+import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import java.math.BigDecimal
 import java.util.Collection
-import java.util.Collections
 import java.util.Map
 import java.util.Stack
 import org.eclipse.xtext.EcoreUtil2
@@ -39,7 +38,7 @@ class YangTypeExtensions {
 		return ImmutableSet.copyOf(grammarAccess.BUILTIN_TYPEAccess.alternatives.elements.filter(Keyword).map[value]);
 	];
 
-	val Supplier<Map<String, YangRange>> integerBuiltins = Suppliers.memoize [
+	val Supplier<Map<String, YangRefinable>> integerBuiltins = Suppliers.memoize [
 		val it = grammarAccess.BUILTIN_TYPEAccess;
 		return newHashMap(#[
 			int8Keyword_8 -> BuiltinRanges.INT_8,
@@ -53,10 +52,12 @@ class YangTypeExtensions {
 		].map[key.value -> value]).copyOf;
 	];
 
-	val Supplier<Collection<String>> decimalBuiltins = Suppliers.memoize [
-		val it = grammarAccess.BUILTIN_TYPEAccess;
-		println("TODO: io.typefox.yang.utils.YangTypeExtensions.decimalBuiltinNames");
-		return Collections.singleton(decimal64Keyword_3.value);
+	val Supplier<String> decimalBuiltin = Suppliers.memoize [
+		return grammarAccess.BUILTIN_TYPEAccess.decimal64Keyword_3.value;
+	];
+
+	val Supplier<String> stringBuiltin = Suppliers.memoize [
+		return grammarAccess.BUILTIN_TYPEAccess.stringKeyword_13.value;
 	];
 
 	/**
@@ -84,28 +85,42 @@ class YangTypeExtensions {
 	 * Returns {@code true} if the type argument is a direct subtype of the built-in 64-bit decimal.
 	 */
 	def boolean isDecimalBuiltin(Type it) {
-		return decimalBuiltins.get.contains(typeRef.builtin);
+		return decimalBuiltin.get == typeRef.builtin;
+	}
+
+	/**
+	 * Returns {@code true} if the type argument is a direct subtype of the built-in string YANG type.
+	 */
+	def boolean isStringBuiltin(Type it) {
+		return stringBuiltin.get == typeRef.builtin;
 	}
 
 	/**
 	 * Sugar for {@code isSubtypeOfInteger(Type) || isSubtypeOfDecimal(Type)}.
 	 */
 	def boolean isSubTypeOfNumber(Type it) {
-		return isSubtypeOf[integerBuiltin || decimalBuiltin];
+		return isSubtypeOf[isIntegerBuiltin || isDecimalBuiltin];
+	}
+	
+	/**
+	 * Returns {@code true} if the argument is either a direct or a transitive subtype of the built-in string YANG type.
+	 */
+	def boolean isSubTypeOfString(Type it) {
+		return isSubtypeOf[isStringBuiltin];
 	}
 
 	/**
 	 * Returns {@code true} if the type argument is a subtype of any built-in integer types or derived from it.
 	 */
 	def boolean isSubtypeOfInteger(Type it) {
-		return isSubtypeOf[integerBuiltin];
+		return isSubtypeOf[isIntegerBuiltin];
 	}
 
 	/**
 	 * Returns {@code true} if the type argument is a subtype of the built-in 64-bit decimal type or derived from it.
 	 */
 	def boolean isSubtypeOfDecimal(Type it) {
-		return isSubtypeOf[decimalBuiltin];
+		return isSubtypeOf[isDecimalBuiltin];
 	}
 
 	private def boolean isSubtypeOf(Type it, (Type)=>boolean subtypePredicate) {
@@ -127,14 +142,14 @@ class YangTypeExtensions {
 	/**
 	 * Returns with the {@code type of t}
 	 */
-	def Type getType(Typedef it) {
+	def getType(Typedef it) {
 		return substatementsOfType(Type).head;
 	}
 
 	/**
 	 * Returns with the direct super type of type argument. If the argument is a built-in type, returns with the argument.
 	 */
-	def Type getSuperType(Type it) {
+	def getSuperType(Type it) {
 		if (builtin) {
 			return it;
 		}
@@ -142,33 +157,33 @@ class YangTypeExtensions {
 	}
 
 	/**
-	 * Returns with the container type of the range argument.
+	 * Returns with the container type of the refinement argument.
 	 */
-	def Type getType(Range it) {
+	def Type getType(Refinable it) {
 		return EcoreUtil2.getContainerOfType(it, Type);
 	}
 
 	/**
-	 * Returns with the contained (sub-statement) range for the type.
+	 * Returns with the contained (sub-statement) refinement for the type.
 	 */
-	def Range getRange(Type it) {
-		return firstSubstatementsOfType(Range);
+	def getRefinement(Type it) {
+		return firstSubstatementsOfType(Refinable);
 	}
 
 	/**
-	 * Returns with the range which the argument range restricts.
-	 * If the range does not have any restriction, returns with the built-in type range.
+	 * Returns with the refinement which the argument refinement restricts.
+	 * If the refinement does not have any restriction, returns with the built-in type refinement.
 	 */
-	def getSuperYangRange(Range range) {
-		return range.type.superType;
+	def getSuperYangRefinement(Refinable refinable) {
+		return refinable.type.superType;
 	}
 
 	/**
-	 * Transforms the AST range into a data model range and returns with it.  
-	 * Returns with {@code null} if the given range argument does not contained
+	 * Transforms the AST refinement into a data model refinement and returns with it.  
+	 * Returns with {@code null} if the given refinement argument does not contained
 	 * either in an integer or in a decimal type.
 	 */
-	def getYangRange(Range it) {
+	def getYangRefinable(Refinable it) {
 		val type = type;
 		if (!type.subTypeOfNumber) {
 			return null;
@@ -187,26 +202,26 @@ class YangTypeExtensions {
 			}
 		}
 
-		// Calculate the ranges from top to bottom. (Bottom ranges are built-in ranges.)
-		val ranges = new Stack;
+		// Calculate the refinements from top to bottom. (Bottom refinements are built-in refinements.)
+		val refinements = new Stack;
 		while (!types.isEmpty) {
 			val currentType = types.pop;
-			val range = if (currentType.subtypeOfDecimal) {
+			val refinement = if (currentType.subtypeOfDecimal) {
 					val fractionDigits = currentType.fractionDigitsAsInt;
 					val lowerBound = BuiltinRanges.MIN_64_BASE.movePointLeft(fractionDigits).toString;
 					val upperBound = BuiltinRanges.MAX_64_BASE.movePointLeft(fractionDigits).toString;
-					YangRange.createBuiltin(lowerBound, upperBound);
+					YangRefinable.createBuiltin(lowerBound, upperBound);
 				} else {
 					integerBuiltins.get.get(currentType?.typeRef?.builtin);
 				}
-			if (range !== null) {
-				ranges.push(range);
+			if (refinement !== null) {
+				refinements.push(refinement);
 			}
-			val parentRange = ranges.peek;
-			ranges.add(YangRange.create(currentType.range, parentRange));
+			val parentRange = refinements.peek;
+			refinements.add(YangRefinable.create(currentType.refinement, parentRange));
 		}
 
-		return ranges.pop;
+		return refinements.pop;
 	}
 
 	/**
@@ -232,18 +247,18 @@ class YangTypeExtensions {
 
 		static val MIN_64_LITERAL = "-9223372036854775808";
 		static val MAX_64_LITERAL = "9223372036854775807";
-		
+
 		static val MIN_64_BASE = new BigDecimal(MIN_64_LITERAL);
 		static val MAX_64_BASE = new BigDecimal(MAX_64_LITERAL);
 
-		static val INT_8 = YangRange.createBuiltin("-128", "127");
-		static val INT_16 = YangRange.createBuiltin("-32768", "32767");
-		static val INT_32 = YangRange.createBuiltin("-2147483648", "2147483647");
-		static val INT_64 = YangRange.createBuiltin(MIN_64_LITERAL, MAX_64_LITERAL);
-		static val UINT_8 = YangRange.createBuiltin("0", "255");
-		static val UINT_16 = YangRange.createBuiltin("0", "65535");
-		static val UINT_32 = YangRange.createBuiltin("0", "4294967295");
-		static val UINT_64 = YangRange.createBuiltin("0", "18446744073709551615");
+		static val INT_8 = YangRefinable.createBuiltin("-128", "127");
+		static val INT_16 = YangRefinable.createBuiltin("-32768", "32767");
+		static val INT_32 = YangRefinable.createBuiltin("-2147483648", "2147483647");
+		static val INT_64 = YangRefinable.createBuiltin(MIN_64_LITERAL, MAX_64_LITERAL);
+		static val UINT_8 = YangRefinable.createBuiltin("0", "255");
+		static val UINT_16 = YangRefinable.createBuiltin("0", "65535");
+		static val UINT_32 = YangRefinable.createBuiltin("0", "4294967295");
+		static val UINT_64 = YangRefinable.createBuiltin("0", "18446744073709551615");
 
 	}
 

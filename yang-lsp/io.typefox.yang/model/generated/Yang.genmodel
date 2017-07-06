@@ -160,15 +160,12 @@
     <genClasses ecoreClass="Yang.ecore#//When">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//When/condition"/>
     </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//Range">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Range/expression"/>
+    <genClasses ecoreClass="Yang.ecore#//Refinable">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Refinable/expression"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Expression"/>
     <genClasses ecoreClass="Yang.ecore#//FractionDigits">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//FractionDigits/range"/>
-    </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//Length">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Length/length"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Pattern">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Pattern/regexp"/>

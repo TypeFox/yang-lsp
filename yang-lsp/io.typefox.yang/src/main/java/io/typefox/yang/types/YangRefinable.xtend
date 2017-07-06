@@ -10,7 +10,7 @@ import io.typefox.yang.yang.BinaryOperation
 import io.typefox.yang.yang.Literal
 import io.typefox.yang.yang.Max
 import io.typefox.yang.yang.Min
-import io.typefox.yang.yang.Range
+import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.util.YangSwitch
 import java.math.BigDecimal
 import java.util.Comparator
@@ -27,11 +27,11 @@ import static io.typefox.yang.yang.YangPackage.Literals.*
 import static extension io.typefox.yang.utils.ValidationMessageAcceptorExt.wrappedAcceptor
 
 /**
- * Immutable representation of a <a href="https://tools.ietf.org/html/rfc7950#section-9.2.4">YANG range</a>.
+ * Immutable representation of a <a href="https://tools.ietf.org/html/rfc7950#section-9.2.4">YANG refinable</a>.
  * 
  * @author akos.kitta
  */
-class YangRange {
+class YangRefinable {
 
 	static val MIN = 'min';
 	static val MAX = 'max';
@@ -61,7 +61,7 @@ class YangRange {
 		}
 	];
 
-	val YangRange parentRange;
+	val YangRefinable parentRange;
 	val List<Segment> segments;
 	val Supplier<String> minSupplier;
 	val Supplier<String> maxSupplier;
@@ -69,19 +69,19 @@ class YangRange {
 	/**
 	 * Use {@link YangTypeExtensions#getYangRange(Range)} instead.
 	 */
-	static def create(Range range, YangRange parentRange) {
+	static def create(Refinable refinable, YangRefinable parentRange) {
 		Preconditions.checkNotNull(parentRange, 'parentRange');
-		return new YangRange(new RangeTransformer().apply(range), parentRange);
+		return new YangRefinable(new RangeTransformer().apply(refinable), parentRange);
 	}
 
 	/**
 	 * This should be used only for built-in type definition.
 	 */
 	static def createBuiltin(String lowerBound, String upperBound) {
-		return new YangRange(#[new Cut(lowerBound, null), new Cut('..', null), new Cut(upperBound, null)], null);
+		return new YangRefinable(#[new Cut(lowerBound, null), new Cut('..', null), new Cut(upperBound, null)], null);
 	}
 
-	private new(Iterable<Cut> segments, YangRange parentRange) {
+	private new(Iterable<Cut> segments, YangRefinable parentRange) {
 		val builder = ImmutableList.builder;
 		val itr = segments.toList.listIterator;
 		while (itr.hasNext) {
@@ -103,7 +103,7 @@ class YangRange {
 			val max = this.segments.last.upperBound;
 			return if (max.endpoint == MAX) {
 				checkState(this.parentRange !==
-					null, '''Cannot substitute '«MAX»' keyword when parent range is not specified.''');
+					null, '''Cannot substitute '«MAX»' keyword when parent refinement is not specified.''');
 				this.parentRange.max;
 			} else {
 				max.endpoint;
@@ -113,7 +113,7 @@ class YangRange {
 			val min = this.segments.head.lowerBound;
 			return if (min.endpoint == MIN) {
 				checkState(this.parentRange !==
-					null, '''Cannot substitute '«MIN»' keyword when parent range is not specified.''');
+					null, '''Cannot substitute '«MIN»' keyword when parent refinement is not specified.''');
 				this.parentRange.min;
 			} else {
 				min.endpoint;
@@ -122,7 +122,7 @@ class YangRange {
 	}
 
 	/**
-	 * Returns {@code true} if the range is valid, otherwise returns {@code false}.
+	 * Returns {@code true} if the refinement is valid, otherwise returns {@code false}.
 	 */
 	def validate(ValidationMessageAcceptor it) {
 		// There should be nothing to do for built-in types.
@@ -138,7 +138,7 @@ class YangRange {
 	}
 
 	/**
-	 * If multiple values or ranges are given, they all must be disjoint and must be in ascending order.
+	 * If multiple values or refinement are given, they all must be disjoint and must be in ascending order.
 	 * 
 	 * See: https://tools.ietf.org/html/rfc7950#section-9.2.4 
 	 */
@@ -168,7 +168,7 @@ class YangRange {
 	 * 
 	 * See: https://tools.ietf.org/html/rfc7950#section-9.2.4 
 	 */
-	private def checkContains(YangRange other, ValidationMessageAcceptorExt acceptor) {
+	private def checkContains(YangRefinable other, ValidationMessageAcceptorExt acceptor) {
 		segments.map[substitute(this)].forEach [ current |
 			if (!other.segments.map[substitute(other)].exists [ parent |
 				// parent lower is less than or equals to the current lower
@@ -176,7 +176,7 @@ class YangRange {
 				parent.lowerBound.isLessThanOrEqual(current.lowerBound) &&
 					current.upperBound.isLessThanOrEqual(parent.upperBound);
 			]) {
-				// Use the lower bound for both ranges and concrete values to log the error.
+				// Use the lower bound for both refinements and concrete values to log the error.
 				val message = '''The «IF current.range»range«ELSE»explicit value«ENDIF» "«current»" is not valid for the base type.'''
 				current.acceptError(acceptor, message);
 			}
@@ -243,7 +243,7 @@ class YangRange {
 			return !(compareTo(o) > 0);
 		}
 
-		private def Cut substitute(YangRange conatiner) {
+		private def Cut substitute(YangRefinable conatiner) {
 			return switch (endpoint) {
 				case MIN: new Cut(conatiner.min, node)
 				case MAX: new Cut(conatiner.max, node)
@@ -258,7 +258,7 @@ class YangRange {
 		val Cut lowerBound;
 		val Cut upperBound;
 
-		private def Segment substitute(YangRange conatiner) {
+		private def Segment substitute(YangRefinable conatiner) {
 			val sLoweBound = lowerBound.substitute(conatiner);
 			val sUpperBound = upperBound.substitute(conatiner);
 			if (lowerBound !== sLoweBound || upperBound !== sUpperBound) {
@@ -278,15 +278,15 @@ class YangRange {
 	}
 
 	/**
-	 * YANG range visitor that transforms the AST nodes into a list of range strings. 
+	 * YANG refinement visitor that transforms the AST nodes into a list of range strings. 
 	 */
-	private static class RangeTransformer extends YangSwitch<List<Pair<String, EObject>>> implements Function1<Range, Iterable<Cut>> {
+	private static class RangeTransformer extends YangSwitch<List<Pair<String, EObject>>> implements Function1<Refinable, Iterable<Cut>> {
 
-		override apply(Range it) {
+		override apply(Refinable it) {
 			return doSwitch.map[new Cut(key, value)];
 		}
 
-		override caseRange(Range it) {
+		override caseRefinable(Refinable it) {
 			return doSwitch(expression);
 		}
 

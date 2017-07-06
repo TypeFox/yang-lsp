@@ -299,7 +299,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "key"                    {yybegin(EXPRESSION); return Key; }
  "leaf"                   {yybegin(BLACK_BOX_STRING); return Leaf; }
  "leaf-list"              {yybegin(BLACK_BOX_STRING); return LeafList; }
- "length"                 {yybegin(BLACK_BOX_STRING); return Length; }
+ "length"                 {yybegin(RANGE_EXPRESSION); return Length; }
  "list"                   {yybegin(BLACK_BOX_STRING); return List; }
  "mandatory"              {yybegin(BLACK_BOX_STRING); return Mandatory; }
  "max-elements"           {yybegin(BLACK_BOX_STRING); return MaxElements; }

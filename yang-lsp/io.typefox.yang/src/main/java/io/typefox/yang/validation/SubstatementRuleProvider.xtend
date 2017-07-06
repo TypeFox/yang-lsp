@@ -129,8 +129,7 @@ class SubstatementRuleProvider {
 
 	static val TYPE_RULE = newRule()
 		.optional(FRACTION_DIGITS)
-		.optional(RANGE)
-		.optional(LENGTH)
+		.optional(REFINABLE)
 		.any(PATTERN)
 		.any(ENUM)
 		.any(BIT)
@@ -139,13 +138,10 @@ class SubstatementRuleProvider {
 		.any(BASE)
 		.any(TYPE); 
 
-	static val RANGE_RULE = newRule()
-		.optional(ERROR_MESSAGE)
-		.optional(ERROR_APP_TAG)
-		.optional(DESCRIPTION)
-		.optional(REFERENCE);
-
-	static val LENGTH_RULE = newRule()
+	/**
+	 * For both "range" and "length".
+	 */
+	static val REFINABLE_RULE = newRule()
 		.optional(ERROR_MESSAGE)
 		.optional(ERROR_APP_TAG)
 		.optional(DESCRIPTION)
@@ -406,8 +402,7 @@ class SubstatementRuleProvider {
 		.put(IDENTITY, IDENTITY_RULE)
 		.put(TYPEDEF, TYPEDEF_RULE)
 		.put(TYPE, TYPE_RULE)
-		.put(RANGE, RANGE_RULE)
-		.put(LENGTH, LENGTH_RULE)
+		.put(REFINABLE, REFINABLE_RULE)
 		.put(PATTERN, PATTERN_RULE)
 		.put(ENUM, ENUM_RULE)
 		.put(BIT, BIT_RULE)

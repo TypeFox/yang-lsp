@@ -388,7 +388,7 @@ When :
 ;
 
 // 9.2.4 
-Range:
+Range returns Refinable:
 	'range' expression=DisjointExpression StatementEnd
 ;
 
@@ -410,8 +410,8 @@ FractionDigits:
 ;
 
 // 9.4.4
-Length:
-	'length' length=StringValue StatementEnd
+Length returns Refinable:
+	'length' expression=DisjointExpression StatementEnd
 ;
 
 // 9.4.5

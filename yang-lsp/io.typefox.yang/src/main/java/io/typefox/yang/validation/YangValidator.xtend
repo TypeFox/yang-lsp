@@ -3,13 +3,14 @@
  */
 package io.typefox.yang.validation
 
+import com.google.common.collect.ImmutableSet
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.utils.YangTypeExtensions
 import io.typefox.yang.yang.BinaryOperation
 import io.typefox.yang.yang.FractionDigits
-import io.typefox.yang.yang.Range
+import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.YangVersion
@@ -27,7 +28,7 @@ import static extension org.eclipse.xtext.EcoreUtil2.getAllContentsOfType
 @Singleton
 class YangValidator extends AbstractYangValidator {
 
-	static val RANGE_BINARY_OPERATORS = #{'|', '..'};
+	static val RANGE_BINARY_OPERATORS = ImmutableSet.of('|', '..');
 
 	@Inject
 	extension YangExtensions;
@@ -58,20 +59,22 @@ class YangValidator extends AbstractYangValidator {
 	def void checkTypeRestriction(Type it) {
 		// https://tools.ietf.org/html/rfc7950#section-9.2.3
 		// https://tools.ietf.org/html/rfc7950#section-9.3.3
-		if (!subTypeOfNumber) {
-			getAllContentsOfType(Range).forEach [
+		// Same for string it just has another statement name.
+		// https://tools.ietf.org/html/rfc7950#section-9.4.3
+		if (!subTypeOfNumber && !subTypeOfString) {
+			getAllContentsOfType(Refinable).forEach [
 				val message = '''Only integer and decimal types can be restricted with the 'range' statement.''';
-				error(message, it, RANGE__EXPRESSION, SYNTAX_ERROR);
+				error(message, it, REFINABLE__EXPRESSION, SYNTAX_ERROR);
 			];
 		}
 	}
 
 	@Check
-	def checkRange(Range it) {
+	def checkRefinement(Refinable it) {
 		if (checkSyntax) {
-			val yangRange = yangRange;
-			if (yangRange !== null) {
-				yangRange.validate(this);
+			val yangRefinable = yangRefinable;
+			if (yangRefinable !== null) {
+				yangRefinable.validate(this);
 			}
 		}
 	}
@@ -105,8 +108,9 @@ class YangValidator extends AbstractYangValidator {
 			}
 		}
 	}
+	
 
-	private def boolean checkSyntax(Range it) {
+	private def boolean checkSyntax(Refinable it) {
 		val invalidOperations = getAllContentsOfType(BinaryOperation).
 			filter[!RANGE_BINARY_OPERATORS.contains(operator)];
 		invalidOperations.forEach [

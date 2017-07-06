@@ -7,7 +7,7 @@ import io.typefox.yang.yang.Expression
 import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Prefix
-import io.typefox.yang.yang.Range
+import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.xtext.EcoreUtil2
@@ -214,13 +214,13 @@ class YangValidatorTest extends AbstractYangTest {
 			  namespace "urn:yang:types";
 			  prefix "yang";
 			  typedef my-base-int32-type {
-			    type string {
+			    type bit {
 			      range "1 | 4";
 			    }
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Range).head, SYNTAX_ERROR, '''1 | 4''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Refinable).head, SYNTAX_ERROR, '''1 | 4''');
 	}
 
 	@Test
