@@ -11,6 +11,7 @@ import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
 
 import static io.typefox.yang.validation.IssueCodes.*
+import io.typefox.yang.yang.Expression
 
 /**
  * Validation test for the YANG language.
@@ -184,6 +185,23 @@ class YangValidatorTest extends AbstractYangTest {
 			}
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Range).head, SYNTAX_ERROR, '''1 | 4''');
+	}
+	
+	@Test
+	def void checkRange_01() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-int32-type {
+			    type uint8 {
+			      range -1;
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Expression).head, INVALID_TYPE_RESTRICTION, '''-1''');
 	}
 
 }

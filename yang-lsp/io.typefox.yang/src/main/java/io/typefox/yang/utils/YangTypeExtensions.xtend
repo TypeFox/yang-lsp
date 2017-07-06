@@ -172,6 +172,8 @@ class YangTypeExtensions {
 
 	/**
 	 * Transforms the AST range into a data model range and returns with it.  
+	 * Returns with {@code null} if the given range argument does not contained
+	 * either in an integer or in a decimal type.
 	 */
 	def getYangRange(Range it) {
 		val type = type;

@@ -33,6 +33,12 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 */
 	public static val SYNTAX_ERROR = 'SYNTAX_ERROR';
 	
+	/**
+	 * Issue code for invalid type restrictions.
+	 * https://tools.ietf.org/html/rfc7950#section-9.2.4
+	 */
+	public static val INVALID_TYPE_RESTRICTION = 'INVALID_TYPE_RESTRICTION'; 
+	
 	public static val UNKNOWN_REVISION = 'UNKNOWN_REVISION'
 	public static val DUPLICATE_NAME = 'DUPLICATE_NAME'
 	public static val MISSING_PREFIX = 'MISSING_PREFIX'
@@ -53,7 +59,8 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 		error(UNEXPECTED_SUBSTATEMENT),
 		error(SUBSTATEMENT_ORDERING),
 		error(INCORRECT_VERSION),
-		error(SYNTAX_ERROR)
+		error(SYNTAX_ERROR),
+		error(INVALID_TYPE_RESTRICTION)
 	}
 	
 	private static def Pair<String, PreferenceKey> error(String code) {

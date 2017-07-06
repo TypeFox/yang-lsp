@@ -58,12 +58,18 @@ class YangValidator extends AbstractYangValidator {
 	@Check
 	def void checkTypeRestriction(Type it) {
 		// https://tools.ietf.org/html/rfc7950#section-9.2.3
+		// https://tools.ietf.org/html/rfc7950#section-9.3.3
 		if (!subTypeOfNumber) {
 			getAllContentsOfType(Range).forEach [
-				error('''Only integer and decimal types can be restricted with the "range" statement.''', it,
+				error('''Only integer and decimal types can be restricted with the 'range' statement.''', it,
 					RANGE__EXPRESSION, SYNTAX_ERROR);
 			];
 		}
+	}
+	
+	@Check
+	def void checkRange(Range it) {
+		yangRange?.validate(this);
 	}
 
 }
