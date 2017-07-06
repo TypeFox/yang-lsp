@@ -172,7 +172,7 @@ class YangRange {
 	private def acceptError(Segment segment, extension ValidationMessageAcceptor acceptor) {
 		val lowerBound = segment.lowerBound;
 		val astNode = lowerBound.node;
-		val issueCode = INVALID_TYPE_RESTRICTION;
+		val code = TYPE_ERROR;
 		val index = ValidationMessageAcceptor.INSIGNIFICANT_INDEX;
 		val message = '''The «IF segment.range»range«ELSE»explicit value«ENDIF» "«segment»" is not valid for the base type.'''
 		val object = if (astNode.eContainer instanceof BinaryOperation) {
@@ -181,14 +181,14 @@ class YangRange {
 			astNode;
 		}
 		if (object instanceof Literal) {
-			acceptError(message, object, LITERAL__VALUE, index, issueCode);			
+			acceptError(message, object, LITERAL__VALUE, index, code);			
 		} else if (object instanceof Min || object instanceof Max) {
 			val op = object.eContainer as BinaryOperation;
 			val feature = if (op.right === object) BINARY_OPERATION__RIGHT else  BINARY_OPERATION__RIGHT;
-			acceptError(message, op, feature, index, issueCode);
+			acceptError(message, op, feature, index, code);
 		} else if (object instanceof BinaryOperation) {
 			val feature = if (object.right === astNode) BINARY_OPERATION__RIGHT else  BINARY_OPERATION__RIGHT;
-			acceptError(message, object, feature, index, issueCode);
+			acceptError(message, object, feature, index, code);
 		}
 	}
 

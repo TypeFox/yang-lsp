@@ -11,12 +11,12 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 * Issue code that are entangled with cardinality problems of container statement's sub-statements.
 	 */
 	public static val SUBSTATEMENT_CARDINALITY = 'SUBSTATEMENT_CARDINALITY';
-	
+
 	/**
 	 * Issue code indicating an invalid sub-statement inside its parent statement container.
 	 */
 	public static val UNEXPECTED_SUBSTATEMENT = 'UNEXPECTED_SUBSTATEMENT';
-	
+
 	/**
 	 * Issue code for cases when a sub-statement incorrectly precedes another sub-statement.
 	 */
@@ -26,19 +26,18 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 * Issues code that is used when a module has anything but {@code '1.1'} version.
 	 */
 	public static val INCORRECT_VERSION = 'INCORRECT_VERSION';
-	
+
 	/**
 	 * Represents a "fake" syntax error. Our grammar is relaxed and this kind of error code should
 	 * be reported to indicate if a construct does not comply the YANG grammar.
 	 */
 	public static val SYNTAX_ERROR = 'SYNTAX_ERROR';
-	
+
 	/**
-	 * Issue code for invalid type restrictions.
-	 * https://tools.ietf.org/html/rfc7950#section-9.2.4
+	 * Errors for types. Such as invalid type restriction, range error, fraction-digits issue. 
 	 */
-	public static val INVALID_TYPE_RESTRICTION = 'INVALID_TYPE_RESTRICTION'; 
-	
+	public static val TYPE_ERROR = 'TYPE_ERROR';
+
 	public static val UNKNOWN_REVISION = 'UNKNOWN_REVISION'
 	public static val DUPLICATE_NAME = 'DUPLICATE_NAME'
 	public static val MISSING_PREFIX = 'MISSING_PREFIX'
@@ -46,8 +45,8 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	public static val IMPORT_NOT_A_MODULE = 'IMPORT_NOT_A_MODULE'
 	public static val INCLUDE_NOT_A_SUB_MODULE = 'INCLUDE_NOT_A_SUB_MODULE'
 	public static val INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE = 'INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE'
-	
-	private static Map<String,PreferenceKey> codes = #{
+
+	private static Map<String, PreferenceKey> codes = #{
 		error(UNKNOWN_REVISION),
 		error(DUPLICATE_NAME),
 		error(MISSING_PREFIX),
@@ -60,19 +59,19 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 		error(SUBSTATEMENT_ORDERING),
 		error(INCORRECT_VERSION),
 		error(SYNTAX_ERROR),
-		error(INVALID_TYPE_RESTRICTION)
+		error(TYPE_ERROR)
 	}
-	
+
 	private static def Pair<String, PreferenceKey> error(String code) {
 		code -> new PreferenceKey(code, SeverityConverter.SEVERITY_ERROR)
 	}
-	
+
 	private static def Pair<String, PreferenceKey> warn(String code) {
 		code -> new PreferenceKey(code, SeverityConverter.SEVERITY_WARNING)
 	}
-	
+
 	override getConfigurableIssueCodes() {
 		codes
 	}
-	
+
 }

@@ -4,9 +4,11 @@ import io.typefox.yang.yang.BinaryOperation
 import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Description
 import io.typefox.yang.yang.Expression
+import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Range
+import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
@@ -169,7 +171,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, BinaryOperation).head, SYNTAX_ERROR, "+");
 	}
-	
+
 	@Test
 	def void checkRangeOperator_02() {
 		val it = load('''
@@ -186,7 +188,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertNoErrors;
 	}
-	
+
 	@Test
 	def void checkRangeOperator_03() {
 		val it = load('''
@@ -235,7 +237,96 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Expression).head, INVALID_TYPE_RESTRICTION, '''-1''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Expression).head, TYPE_ERROR, '''-1''');
+	}
+
+	@Test
+	def void checkFractionDigits_01() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type int32 {
+			      range "1 | 4";
+			      fraction-digits 2;
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Type).head, TYPE_ERROR, 'int32');
+	}
+
+	@Test
+	def void checkFractionDigits_02() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type decimal64 {
+			      range "1 | 4";
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Type).head, TYPE_ERROR, 'decimal64');
+	}
+	
+	@Test
+	def void checkFractionDigits_03() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type decimal64 {
+			      range "1 | 4";
+			      fraction-digits bar;
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, FractionDigits).head, TYPE_ERROR, 'bar');
+	}
+	
+	@Test
+	def void checkFractionDigits_04() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type decimal64 {
+			      range "1 | 4";
+			      fraction-digits 19;
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, FractionDigits).head, TYPE_ERROR, '19');
+	}
+	
+	@Test
+	def void checkFractionDigits_05() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type decimal64 {
+			      range "1 | 4";
+			      fraction-digits 2;
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
 	}
 
 }

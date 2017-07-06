@@ -5,8 +5,10 @@ package io.typefox.yang.validation
 
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.utils.YangTypeExtensions
 import io.typefox.yang.yang.BinaryOperation
+import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Range
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Type
@@ -26,6 +28,9 @@ import static extension org.eclipse.xtext.EcoreUtil2.getAllContentsOfType
 class YangValidator extends AbstractYangValidator {
 	
 	static val RANGE_BINARY_OPERATORS = #{'|', '..'};
+	
+	@Inject
+	extension YangExtensions;
 
 	@Inject
 	extension YangTypeExtensions;
@@ -71,6 +76,36 @@ class YangValidator extends AbstractYangValidator {
 		}
 		checkSyntax && yangRange.validate(this);
 	}
+	
+	@Check
+	def checkFractionDigitsExist(Type it) {
+		// https://tools.ietf.org/html/rfc7950#section-9.3.4
+		val fractionDigits = firstSubstatementsOfType(FractionDigits);
+		val fractionDigitsExist = fractionDigits !== null;
+		// Note, only the decimal type definition MUST have the `fraction-digits` statement.
+		// It is not mandatory for types that are derived from decimal built-ins. 
+		val decimalBuiltin = decimalBuiltin;
+		if (decimalBuiltin) {
+			if (fractionDigitsExist) {
+				// Validate the fraction digits. It takes as an argument an integer between 1 and 18, inclusively.
+				val value = fractionDigits.range.parseIntSafe;
+				if (value === null || value.intValue < 1 || value.intValue > 18) {
+					val message = '''The "fraction-digits" value must be an integer between 1 and 18, inclusively.''';
+					error(message, fractionDigits, FRACTION_DIGITS__RANGE, TYPE_ERROR);
+				}
+				
+			} else {
+				// Decimal types must have fraction-digits sub-statement.
+				val message = '''The "fraction-digits" statement must be present for "decimal64" types.''';
+				error(message, it, TYPE__TYPE_REF, TYPE_ERROR);
+			}
+		} else {
+			if (fractionDigitsExist) {
+				val message = '''Only decimal64 types can have a "fraction-digits" statement."''';
+				error(message, it, TYPE__TYPE_REF, TYPE_ERROR);
+			}
+		}
+	}
 
 	private def boolean checkSyntax(Range it) {
 		val invalidOperations = getAllContentsOfType(BinaryOperation).filter[!RANGE_BINARY_OPERATORS.contains(operator)];
@@ -79,6 +114,14 @@ class YangValidator extends AbstractYangValidator {
 			error(message, it, BINARY_OPERATION__OPERATOR, SYNTAX_ERROR);
 		];
 		return invalidOperations.nullOrEmpty;
+	}
+	
+	private def parseIntSafe(String it) {
+		return try {
+			if (it === null) null else Integer.parseInt(it);
+		} catch (NumberFormatException e) {
+			null;
+		}
 	}
 
 }
