@@ -6,6 +6,7 @@ dependencies {
 	compile "org.eclipse.elk:org.eclipse.elk.alg.layered:${versions.elk}"
 	compile "io.typefox.sprotty:diagram-server:${versions.sprotty}"
 	compile "io.typefox.sprotty:diagram-layout-engine:${versions.sprotty}"
+	compile "io.typefox.sprotty:xtext-diagram:${versions.sprotty}"
 	compile "com.google.inject:guice:4.1.0"
 	testCompile 'junit:junit:4.12'
 }

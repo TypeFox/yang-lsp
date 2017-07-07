@@ -14,6 +14,7 @@ import io.typefox.sprotty.api.SLabel
 import io.typefox.sprotty.api.SModelElement
 import io.typefox.sprotty.api.SModelRoot
 import io.typefox.sprotty.api.SNode
+import io.typefox.sprotty.server.xtext.IDiagramGenerator
 import io.typefox.yang.yang.Container
 import io.typefox.yang.yang.DataSchemaNode
 import io.typefox.yang.yang.Leaf
@@ -24,9 +25,17 @@ import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangFile
 import java.util.ArrayList
 import java.util.List
+import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.util.CancelIndicator
 
-class YangDiagramGenerator {
+class YangDiagramGenerator implements IDiagramGenerator {
+	
+	override generate(Resource resource, CancelIndicator cancelIndicator) {
+		val content = resource.contents.head
+		if (content instanceof YangFile) {
+			generateDiagram(content, cancelIndicator)
+		}
+	}
 
 	def boolean isClassMember(Statement statement) {
 //		val List<Class> types = #[Leaf, LeafList]

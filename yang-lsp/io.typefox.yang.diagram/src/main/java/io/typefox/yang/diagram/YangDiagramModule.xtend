@@ -6,26 +6,26 @@
  */
 package io.typefox.yang.diagram
 
-import com.google.inject.AbstractModule
-import io.typefox.sprotty.api.DefaultDiagramServer
-import io.typefox.sprotty.api.IDiagramSelectionListener
-import io.typefox.sprotty.api.IDiagramServer
-import io.typefox.sprotty.api.ILayoutEngine
-import io.typefox.sprotty.api.IModelUpdateListener
-import io.typefox.sprotty.api.IPopupModelFactory
 import io.typefox.sprotty.layout.ElkLayoutEngine
-import org.eclipse.xtext.ide.server.ILanguageServerExtension
+import io.typefox.sprotty.server.xtext.DefaultDiagramModule
+import io.typefox.sprotty.server.xtext.IDiagramGenerator
 
-class YangDiagramModule extends AbstractModule {
+class YangDiagramModule extends DefaultDiagramModule {
 	
-	override protected configure() {
-		bind(ILanguageServerExtension).to(DiagramLanguageServerImpl)
-		bind(IDiagramServer.Provider).to(DiagramLanguageServerImpl)
-		bind(IDiagramServer).to(DefaultDiagramServer)
-		bind(ILayoutEngine).to(ElkLayoutEngine)
-		bind(IPopupModelFactory).to(IPopupModelFactory.NullImpl)
-		bind(IModelUpdateListener).to(IModelUpdateListener.NullImpl)
-		bind(IDiagramSelectionListener).to(IDiagramSelectionListener.NullImpl)
+	override bindILanguageServerExtension() {
+		YangLanguageServerExtension
+	}
+	
+	override bindIDiagramServerProvider() {
+		YangLanguageServerExtension
+	}
+	
+	override bindILayoutEngine() {
+		ElkLayoutEngine
+	}
+	
+	def Class<? extends IDiagramGenerator> bindIDiagramGenerator() {
+		YangDiagramGenerator
 	}
 	
 }
