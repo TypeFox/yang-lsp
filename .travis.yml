@@ -21,3 +21,6 @@ before_script:
 
 script:
   - ./yang-lsp/gradlew -p yang-lsp build
+
+notifications:
+  slack: theia-dev:wZFIkC6bV4WUqsnT6YxzGoMq
