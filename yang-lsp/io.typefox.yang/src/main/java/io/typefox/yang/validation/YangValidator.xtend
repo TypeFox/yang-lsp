@@ -109,7 +109,7 @@ class YangValidator extends AbstractYangValidator {
 			}
 		} else {
 			if (fractionDigitsExist) {
-				val message = '''Only decimal64 types can have a "fraction-digits" statement."''';
+				val message = '''Only decimal64 types can have a "fraction-digits" statement.''';
 				error(message, it, TYPE__TYPE_REF, TYPE_ERROR);
 			}
 		}
@@ -117,16 +117,24 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def checkPattern(Pattern it) {
-		try {
-			// https://tools.ietf.org/html/rfc7950#section-9.4.5
-			java.util.regex.Pattern.compile(regexp.nullToEmpty);
-		} catch (PatternSyntaxException e) {
-			val message = if (regexp.nullOrEmpty) {
-					'Regular expression must be specified.'
-				} else {
-					'''Invalid regular expression pattern: "«regexp»".''';
-				}
-			error(message, it, PATTERN__REGEXP, TYPE_ERROR);
+		// https://tools.ietf.org/html/rfc7950#section-9.4.5
+		if (eContainer instanceof Type) {
+			val type = eContainer as Type;
+			if (type.subtypeOfString) {
+				try {
+					java.util.regex.Pattern.compile(regexp.nullToEmpty);
+				} catch (PatternSyntaxException e) {
+					val message = if (regexp.nullOrEmpty) {
+							'Regular expression must be specified.'
+						} else {
+							'''Invalid regular expression pattern: "«regexp»".''';
+						}
+					error(message, it, PATTERN__REGEXP, TYPE_ERROR);
+				}				
+			} else {
+				val message = '''Only string types can have a "pattern" statement.''';
+				error(message, type, TYPE__TYPE_REF, TYPE_ERROR);
+			}
 		}
 	}
 
