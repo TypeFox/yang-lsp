@@ -71,9 +71,11 @@ class YangDiagramGenerator {
 				// TODO instead of [M] there should be a model for rendering an element with another background color... 
 				moduleNodeLabel.text = '[M] ' + statement.name
 				moduleNode.children.add(moduleNodeLabel)
+				moduleNode.children.addAll(createChildElements(moduleNode, statement.substatements, (level + 1)))
 				
 				element.children.add(moduleNode)
-				
+				addChildren = false
+
 			} else if (isClassMember(statement)) { 
 				element = configSElement(new SLabel, parent.id + '-' + (statement as DataSchemaNode).name, 'text')
 				(element as SLabel).text = (statement as DataSchemaNode).name
@@ -86,10 +88,10 @@ class YangDiagramGenerator {
 				compartment.children.addAll(createChildElements(element, statement.substatements, (level + 1)))
 				addChildren = false
 				element.children.add(compartment)
-//				val SEdge compositionEdge = configSElement(new SEdge, parent.id + '2' + element.id + '-edge', 'composition')
-//				compositionEdge.sourceId = parent.id
-//				compositionEdge.targetId = element.id
-//				parent.children.add(compositionEdge)
+				val SEdge compositionEdge = configSElement(new SEdge, parent.id + '2' + element.id + '-edge', 'composition')
+				compositionEdge.sourceId = parent.id
+				compositionEdge.targetId = element.id
+				parent.children.add(compositionEdge)
 			}
 			if (element !== null) {
 				if (addChildren)
