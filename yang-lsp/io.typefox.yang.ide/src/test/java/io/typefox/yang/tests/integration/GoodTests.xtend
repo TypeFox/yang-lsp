@@ -26,16 +26,21 @@ class GoodTests {
 		}
 	
 		def Collection<Object[]> getUrisAndDiagnostics() {
+			val before = System.currentTimeMillis
 			initialize[
 				rootUri = new File("./test-data/good").absoluteFile.toURI.toString
 			]
-			return diagnostics.entrySet.map[ 
-				val result = <Object>newArrayOfSize(3)
-				result.set(0, it.key)
-				result.set(1, it.value)
-				result.set(2, URI.createURI(it.key).lastSegment)
-				return result
-			].toList
+			try {
+				return diagnostics.entrySet.map[ 
+					val result = <Object>newArrayOfSize(3)
+					result.set(0, it.key)
+					result.set(1, it.value)
+					result.set(2, URI.createURI(it.key).lastSegment)
+					return result
+				].toList
+			} finally {
+				println("Building took" + (System.currentTimeMillis - before) +" ms.")
+			}
 		}
 	}
 	

@@ -27,6 +27,7 @@ import static io.typefox.yang.yang.YangPackage.Literals.*
 
 import static extension com.google.common.base.Strings.nullToEmpty
 import static extension org.eclipse.xtext.EcoreUtil2.getAllContentsOfType
+import io.typefox.yang.utils.YangNameUtils
 
 /**
  * This class contains custom validation rules for the YANG language. 
@@ -41,7 +42,7 @@ class YangValidator extends AbstractYangValidator {
 
 	@Inject
 	extension YangTypeExtensions;
-
+	
 	@Inject
 	SubstatementRuleProvider substatementRuleProvider;
 
@@ -70,9 +71,11 @@ class YangValidator extends AbstractYangValidator {
 		val refinements = getAllContentsOfType(Refinable);
 		if (!refinements.nullOrEmpty) {
 			val expectedRefinementKind = refinementKind;
-			refinements.filter(expectedRefinementKind).forEach [
-				val message = '''Type cannot have '«expectedRefinementKind.simpleName.toFirstLower»' restriction statement.''';
-				error(message, it, REFINABLE__EXPRESSION, TYPE_ERROR);
+			refinements.forEach [
+				if (expectedRefinementKind===null || !(expectedRefinementKind.isAssignableFrom(it.class))) {					
+					val message = '''Type cannot have '«YangNameUtils.getYangName(it.class)»' restriction statement.''';
+					error(message, it, REFINABLE__EXPRESSION, TYPE_ERROR);
+				}
 			];
 		}
 	}
