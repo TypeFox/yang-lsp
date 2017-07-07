@@ -21,7 +21,5 @@ public class SLayoutNode extends SNode {
 
 	public void setLayout(String layout) {
 		this.layout = layout;
-	}
-	
-	
+	}	
 }
