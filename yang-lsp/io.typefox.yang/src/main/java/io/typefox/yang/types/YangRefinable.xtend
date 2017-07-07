@@ -43,7 +43,7 @@ class YangRefinable {
 		}
 
 		override toString() {
-			return "NOOP";
+			return 'NOOP';
 		}
 
 	};
@@ -86,7 +86,7 @@ class YangRefinable {
 	 */
 	static def create(Refinable refinable, YangRefinable parentRange) {
 		Preconditions.checkNotNull(parentRange, 'parentRange');
-		return new YangRefinable(new RangeTransformer().apply(refinable), parentRange);
+		return new YangRefinable(new RefinableTransformer().apply(refinable), parentRange);
 	}
 
 	/**
@@ -295,7 +295,7 @@ class YangRefinable {
 	/**
 	 * YANG refinement visitor that transforms the AST nodes into a list of range strings. 
 	 */
-	private static class RangeTransformer extends YangSwitch<List<Pair<String, EObject>>> implements Function1<Refinable, Iterable<Cut>> {
+	private static class RefinableTransformer extends YangSwitch<List<Pair<String, EObject>>> implements Function1<Refinable, Iterable<Cut>> {
 
 		override apply(Refinable it) {
 			return doSwitch.map[new Cut(key, value)];

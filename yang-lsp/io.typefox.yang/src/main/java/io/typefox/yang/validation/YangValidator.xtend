@@ -6,9 +6,11 @@ package io.typefox.yang.validation
 import com.google.common.collect.ImmutableSet
 import com.google.inject.Inject
 import com.google.inject.Singleton
+import io.typefox.yang.types.YangEnumeration
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.utils.YangTypeExtensions
 import io.typefox.yang.yang.BinaryOperation
+import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Modifier
 import io.typefox.yang.yang.Pattern
@@ -86,6 +88,21 @@ class YangValidator extends AbstractYangValidator {
 	}
 
 	@Check
+	def checkEnumeration(Type type) {
+		if (type.subtypeOfEnumeration) {
+			val yangEnumeration = type.yangEnumeration;
+			if (yangEnumeration !== null && yangEnumeration !== YangEnumeration.NOOP) {
+				yangEnumeration.validate(this);
+			}
+		} else {
+			type.getAllContentsOfType(Enum).forEach [
+				val message = '''Only enumeration types can have a "enum" statement.''';
+				error(message, type, TYPE__TYPE_REF, TYPE_ERROR);
+			];
+		}
+	}
+
+	@Check
 	def checkFractionDigitsExist(Type it) {
 		// https://tools.ietf.org/html/rfc7950#section-9.3.4
 		val fractionDigits = firstSubstatementsOfType(FractionDigits);
@@ -130,7 +147,7 @@ class YangValidator extends AbstractYangValidator {
 							'''Invalid regular expression pattern: "«regexp»".''';
 						}
 					error(message, it, PATTERN__REGEXP, TYPE_ERROR);
-				}				
+				}
 			} else {
 				val message = '''Only string types can have a "pattern" statement.''';
 				error(message, type, TYPE__TYPE_REF, TYPE_ERROR);

@@ -6,6 +6,7 @@ import com.google.common.collect.ImmutableSet
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import io.typefox.yang.services.YangGrammarAccess
+import io.typefox.yang.types.YangEnumeration
 import io.typefox.yang.types.YangRefinable
 import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Refinable
@@ -60,6 +61,10 @@ class YangTypeExtensions {
 		return grammarAccess.BUILTIN_TYPEAccess.stringKeyword_13.value;
 	];
 
+	val Supplier<String> enumerationBuiltin = Suppliers.memoize [
+		return grammarAccess.BUILTIN_TYPEAccess.enumerationKeyword_5.value;
+	];
+
 	/**
 	 * Returns {@code true} if the type of the type definition argument is a YANG built-in type.
 	 */
@@ -96,6 +101,13 @@ class YangTypeExtensions {
 	}
 
 	/**
+	 * Returns {@code true} if the type argument is a subtype of the built-in YANG enumeration type.
+	 */
+	def boolean isEnumerationBuiltin(Type it) {
+		return enumerationBuiltin.get == typeRef.builtin;
+	}
+
+	/**
 	 * Sugar for {@code isSubtypeOfInteger(Type) || isSubtypeOfDecimal(Type)}.
 	 */
 	def boolean isSubtypeOfNumber(Type it) {
@@ -121,6 +133,13 @@ class YangTypeExtensions {
 	 */
 	def boolean isSubtypeOfDecimal(Type it) {
 		return isSubtypeOf[isDecimalBuiltin];
+	}
+
+	/**
+	 * {@code true} if the argument is either a direct or transitive subtype of the YANG enumeration type, otherwise {@code false};
+	 */
+	def boolean isSubtypeOfEnumeration(Type it) {
+		return isSubtypeOf[isEnumerationBuiltin];
 	}
 
 	private def boolean isSubtypeOf(Type it, (Type)=>boolean subtypePredicate) {
@@ -206,17 +225,7 @@ class YangTypeExtensions {
 		}
 
 		// Calculate the type hierarchy from bottom to top. (Top element must be a built-in type.)
-		val types = new Stack;
-		types.push(type);
-		var superType = type.superType;
-		while (superType !== null) {
-			types.push(superType);
-			if (superType.builtin) {
-				superType = null;
-			} else {
-				superType = superType.superType;
-			}
-		}
+		val types = type.typeHierarchy;
 
 		// Calculate the refinements from top to bottom. (Bottom refinements are built-in refinements.)
 		val refinements = new Stack;
@@ -247,6 +256,42 @@ class YangTypeExtensions {
 		}
 
 		return refinements.pop;
+	}
+
+	/**
+	 * Transforms the enumeration type into a enumeration data object for further validation.
+	 * Returns with a NOOP enumeration, if the argument is not a type of enumeration or
+	 * is the built-in enumeration.
+	 */
+	def getYangEnumeration(Type it) {
+		var enumeration = YangEnumeration.NOOP;
+		if (!subtypeOfEnumeration) {
+			return enumeration;
+		}
+		
+		val types = typeHierarchy;
+		while (!types.isEmpty) {
+			val currentType = types.pop;
+			enumeration = YangEnumeration.create(currentType, enumeration);
+		}
+		return enumeration;
+	}
+
+	/**
+	 * Calculate the type hierarchy from bottom to top. Top element is a built-in type. Includes the argument if not {@code null}.
+	 */
+	private def getTypeHierarchy(Type it) {
+		val hierarchy = new Stack;
+		var superType = it;
+		while (superType !== null) {
+			hierarchy.push(superType);
+			if (superType.builtin) {
+				superType = null;
+			} else {
+				superType = superType.superType;
+			}
+		}
+		return hierarchy;
 	}
 
 	/**

@@ -3,9 +3,11 @@ package io.typefox.yang.tests
 import io.typefox.yang.yang.BinaryOperation
 import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Description
+import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.Expression
 import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Import
+import io.typefox.yang.yang.Modifier
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Type
@@ -14,7 +16,6 @@ import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
 
 import static io.typefox.yang.validation.IssueCodes.*
-import io.typefox.yang.yang.Modifier
 
 /**
  * Validation test for the YANG language.
@@ -276,7 +277,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertNoErrors;
 	}
-	
+
 	@Test
 	def void checkRangeRestriction_04() {
 		val it = load('''
@@ -293,7 +294,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Expression).head, TYPE_ERROR, '''-1''');
 	}
-	
+
 	@Test
 	def void checkLengthRestriction_01() {
 		val it = load('''
@@ -433,7 +434,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertNoErrors;
 	}
-	
+
 	@Test
 	def void checkModifier_01() {
 		val it = load('''
@@ -452,7 +453,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertNoErrors;
 	}
-	
+
 	@Test
 	def void checkModifier_02() {
 		val it = load('''
@@ -471,7 +472,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Modifier).head, TYPE_ERROR, 'blablabla');
 	}
-	
+
 	@Test
 	def void checkPattern_01() {
 		val it = load('''
@@ -488,7 +489,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertNoErrors;
 	}
-	
+
 	@Test
 	def void checkPattern_02() {
 		val it = load('''
@@ -509,7 +510,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertNoErrors;
 	}
-	
+
 	@Test
 	def void checkPattern_03() {
 		val it = load('''
@@ -525,6 +526,118 @@ class YangValidatorTest extends AbstractYangTest {
 			}
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Type).head, TYPE_ERROR, 'int32');
+	}
+
+	@Test
+	def void checkEnumStatements() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type int32 {
+			      enum blabla;
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Type).head, TYPE_ERROR, 'int32');
+	}
+
+	@Test
+	def void checkEnumerationUniqueness_01() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type enumeration {
+			      enum zero;
+			      enum one;
+			      enum seven {
+			        value 7;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
+	}
+
+	@Test
+	def void checkEnumerationUniqueness_02() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type enumeration {
+			      enum dupe;
+			      enum zero;
+			      enum one;
+			      enum seven {
+			        value 7;
+			      }
+			      enum dupe;
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, 'dupe');
+	}
+
+	@Test
+	def void checkEnumerationName_01() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type enumeration {
+			      enum "";
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, '''""''');
+	}
+
+	@Test
+	def void checkEnumerationName_02() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type enumeration {
+			      enum " 36";
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, '''" 36"''');
+	}
+
+	@Test
+	def void checkEnumerationName_03() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type enumeration {
+			      enum "36 ";
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, '''"36 "''');
 	}
 
 }
