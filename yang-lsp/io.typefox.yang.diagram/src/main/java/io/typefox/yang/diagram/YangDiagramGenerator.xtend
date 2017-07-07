@@ -10,6 +10,7 @@ import io.typefox.sprotty.api.Dimension
 import io.typefox.sprotty.api.Point
 import io.typefox.sprotty.api.SCompartment
 import io.typefox.sprotty.api.SEdge
+import io.typefox.sprotty.api.SGraph
 import io.typefox.sprotty.api.SLabel
 import io.typefox.sprotty.api.SModelElement
 import io.typefox.sprotty.api.SModelRoot
@@ -131,7 +132,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	}
 
 	def SModelRoot generateDiagram(YangFile file, CancelIndicator cancelIndicator) {
-		val diagram = new SModelRoot => [
+		val diagram = new SGraph => [
 			type = 'graph'
 			id = 'yang'
 		]

@@ -8,6 +8,7 @@ package io.typefox.yang.diagram
 
 import com.google.inject.Guice
 import com.google.inject.Inject
+import io.typefox.sprotty.layout.ElkLayoutEngine
 import io.typefox.sprotty.server.json.ActionTypeAdapter
 import io.typefox.yang.YangRuntimeModule
 import io.typefox.yang.ide.YangIdeModule
@@ -21,6 +22,7 @@ import java.util.concurrent.Executors
 import java.util.function.Function
 import org.apache.log4j.FileAppender
 import org.apache.log4j.Logger
+import org.eclipse.elk.alg.layered.options.LayeredOptions
 import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer
 import org.eclipse.lsp4j.jsonrpc.RemoteEndpoint
@@ -49,7 +51,10 @@ class YangServerLauncher extends ServerLauncher {
 			removeAllAppenders()
 			addAppender(new FileAppender(defaultAppender.layout, 'yang-server.log', false))
 		]
-		
+
+		// Initialize ELK
+		ElkLayoutEngine.initialize(new LayeredOptions)
+
 		// Do a manual setup that includes the Yang diagram module
 		new YangIdeSetup {
 			override createInjector() {
