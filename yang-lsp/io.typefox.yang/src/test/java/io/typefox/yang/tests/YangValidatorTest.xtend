@@ -14,6 +14,7 @@ import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
 
 import static io.typefox.yang.validation.IssueCodes.*
+import io.typefox.yang.yang.Modifier
 
 /**
  * Validation test for the YANG language.
@@ -426,6 +427,82 @@ class YangValidatorTest extends AbstractYangTest {
 			    type decimal64 {
 			      range "1 | 4";
 			      fraction-digits 2;
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
+	}
+	
+	@Test
+	def void checkModifier_01() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type string {
+			      pattern '[xX][mM][lL].*' {
+			        modifier invert-match;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
+	}
+	
+	@Test
+	def void checkModifier_02() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type string {
+			      pattern '[xX][mM][lL].*' {
+			        modifier blablabla;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Modifier).head, TYPE_ERROR, 'blablabla');
+	}
+	
+	@Test
+	def void checkPattern_01() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type string {
+			      pattern "[0-9a-fA-F]*";
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
+	}
+	
+	@Test
+	def void checkPattern_02() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type string {
+			      length "1..max";
+			      pattern '[a-zA-Z_][a-zA-Z0-9\-_.]*';
+			      pattern '[xX][mM][lL].*' {
+			        modifier invert-match;
+			      }
 			    }
 			  }
 			}

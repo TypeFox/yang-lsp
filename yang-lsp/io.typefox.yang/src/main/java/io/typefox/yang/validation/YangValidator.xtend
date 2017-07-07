@@ -10,16 +10,20 @@ import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.utils.YangTypeExtensions
 import io.typefox.yang.yang.BinaryOperation
 import io.typefox.yang.yang.FractionDigits
+import io.typefox.yang.yang.Modifier
+import io.typefox.yang.yang.Pattern
 import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.YangVersion
+import java.util.regex.PatternSyntaxException
 import org.eclipse.xtext.validation.Check
 
 import static io.typefox.yang.utils.YangExtensions.*
 import static io.typefox.yang.validation.IssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
+import static extension com.google.common.base.Strings.nullToEmpty
 import static extension org.eclipse.xtext.EcoreUtil2.getAllContentsOfType
 
 /**
@@ -108,6 +112,30 @@ class YangValidator extends AbstractYangValidator {
 				val message = '''Only decimal64 types can have a "fraction-digits" statement."''';
 				error(message, it, TYPE__TYPE_REF, TYPE_ERROR);
 			}
+		}
+	}
+
+	@Check
+	def checkPattern(Pattern it) {
+		try {
+			// https://tools.ietf.org/html/rfc7950#section-9.4.5
+			java.util.regex.Pattern.compile(regexp.nullToEmpty);
+		} catch (PatternSyntaxException e) {
+			val message = if (regexp.nullOrEmpty) {
+					'Regular expression must be specified.'
+				} else {
+					'''Invalid regular expression pattern: "«regexp»".''';
+				}
+			error(message, it, PATTERN__REGEXP, TYPE_ERROR);
+		}
+	}
+
+	@Check
+	def checkModifier(Modifier it) {
+		// https://tools.ietf.org/html/rfc7950#section-9.4.6
+		if (modifier != 'invert-match') {
+			val message = '''Modifier value must be "invert-match".''';
+			error(message, it, MODIFIER__MODIFIER, TYPE_ERROR);
 		}
 	}
 
