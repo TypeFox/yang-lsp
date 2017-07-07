@@ -69,7 +69,6 @@ OtherStatement :
 	| FractionDigits
 	| IfFeature
 	| Key
-	| Length
 	| Mandatory
 	| MaxElements
 	| MinElements
@@ -83,9 +82,9 @@ OtherStatement :
 	| Position
 	| Prefix
 	| Presence
-	| Range
 	| Reference
 	| Refine
+	| Refinable
 	| RequireInstance
 	| Revision
 	| RevisionDate
@@ -99,6 +98,10 @@ OtherStatement :
 	| When
 	| YangVersion
 	| YinElement
+;
+
+Refinable : 
+	Range | Length
 ;
 
 // 7.1	
@@ -386,8 +389,8 @@ When :
 ;
 
 // 9.2.4 
-Range returns Refinable:
-	kind='range' expression=RefinementExpression StatementEnd
+Range :
+	'range' expression=RefinementExpression StatementEnd
 ;
 
 RefinementExpression returns Expression:
@@ -408,8 +411,8 @@ FractionDigits:
 ;
 
 // 9.4.4
-Length returns Refinable:
-	kind='length' expression=RefinementExpression StatementEnd
+Length :
+	'length' expression=RefinementExpression StatementEnd
 ;
 
 // 9.4.5

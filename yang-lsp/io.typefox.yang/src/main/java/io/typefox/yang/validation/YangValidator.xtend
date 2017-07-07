@@ -70,8 +70,8 @@ class YangValidator extends AbstractYangValidator {
 		val refinements = getAllContentsOfType(Refinable);
 		if (!refinements.nullOrEmpty) {
 			val expectedRefinementKind = refinementKind;
-			refinements.filter[kind != expectedRefinementKind].forEach [
-				val message = '''Type cannot have '«kind»' restriction statement.''';
+			refinements.filter(expectedRefinementKind).forEach [
+				val message = '''Type cannot have '«expectedRefinementKind.simpleName.toFirstLower»' restriction statement.''';
 				error(message, it, REFINABLE__EXPRESSION, TYPE_ERROR);
 			];
 		}

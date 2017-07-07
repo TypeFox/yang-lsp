@@ -20,6 +20,8 @@ import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.Keyword
 
 import static extension com.google.common.collect.ImmutableMap.copyOf
+import io.typefox.yang.yang.Length
+import io.typefox.yang.yang.Range
 
 /**
  * Extensions for YANG <a href="https://tools.ietf.org/html/rfc7950#section-9.2">built-in types</a>.
@@ -185,8 +187,8 @@ class YangTypeExtensions {
 	 */
 	def getRefinementKind(Type it) {
 		return switch (it) {
-			case subtypeOfNumber: 'range'
-			case subtypeOfString: 'length'
+			case subtypeOfNumber: Range
+			case subtypeOfString: Length
 			default: null
 		};
 	}

@@ -16,6 +16,10 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="DataSchemaNode" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="OtherStatement" eSuperTypes="#//Statement"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Refinable" eSuperTypes="#//OtherStatement">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="expression" eType="#//Expression"
+        containment="true"/>
+  </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Module" eSuperTypes="#//AbstractModule"/>
   <eClassifiers xsi:type="ecore:EClass" name="YangVersion" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="yangVersion" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -160,15 +164,12 @@
   <eClassifiers xsi:type="ecore:EClass" name="When" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="condition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Refinable" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="kind" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="expression" eType="#//Expression"
-        containment="true"/>
-  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Range" eSuperTypes="#//Refinable"/>
   <eClassifiers xsi:type="ecore:EClass" name="Expression"/>
   <eClassifiers xsi:type="ecore:EClass" name="FractionDigits" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="range" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Length" eSuperTypes="#//Refinable"/>
   <eClassifiers xsi:type="ecore:EClass" name="Pattern" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="regexp" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
