@@ -155,6 +155,22 @@ class YangTypeExtensions {
 		}
 		return typeRef?.type?.type;
 	}
+	
+	/**
+	 * Returns with the refinement kind for the type argument based on its built-in super type.
+	 * <ul>
+	 * <li>{@code range} for the decimal and all integer types.</li>
+	 * <li>{@code length} for the string type.</li>
+	 * <li>{@code null} otherwise.</li>
+	 * <ul> 
+	 */
+	def getRefinementKind(Type it) {
+		return switch (it) {
+			case subTypeOfNumber: 'range'
+			case subTypeOfString: 'length'
+			default: null
+		};
+	}
 
 	/**
 	 * Returns with the container type of the refinement argument.

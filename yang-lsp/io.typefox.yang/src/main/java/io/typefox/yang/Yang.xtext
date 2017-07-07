@@ -389,7 +389,7 @@ When :
 
 // 9.2.4 
 Range returns Refinable:
-	'range' expression=RefinementExpression StatementEnd
+	kind='range' expression=RefinementExpression StatementEnd
 ;
 
 RefinementExpression returns Expression:
@@ -411,7 +411,7 @@ FractionDigits:
 
 // 9.4.4
 Length returns Refinable:
-	'length' expression=RefinementExpression StatementEnd
+	kind='length' expression=RefinementExpression StatementEnd
 ;
 
 // 9.4.5
