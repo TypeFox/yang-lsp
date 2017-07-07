@@ -389,18 +389,18 @@ When :
 
 // 9.2.4 
 Range returns Refinable:
-	'range' expression=DisjointExpression StatementEnd
+	kind='range' expression=RefinementExpression StatementEnd
 ;
 
-DisjointExpression returns Expression:
-	RangeExpression ({BinaryOperation.left=current} operator=OPERATOR right=RangeExpression)*
+RefinementExpression returns Expression:
+	RangeRefinementExpression ({BinaryOperation.left=current} operator=OPERATOR right=RangeRefinementExpression)*
 ;
 
-RangeExpression returns Expression:
-	RangeBoundaryExpression ({BinaryOperation.left=current} operator='..' right=RangeBoundaryExpression)?
+RangeRefinementExpression returns Expression:
+	ExplicitRefinementExpression ({BinaryOperation.left=current} operator='..' right=ExplicitRefinementExpression)?
 ;
 
-RangeBoundaryExpression returns Expression:
+ExplicitRefinementExpression returns Expression:
 	{Literal} value = NUMBER | {Min} 'min' | {Max} 'max'
 ;
 
@@ -411,7 +411,7 @@ FractionDigits:
 
 // 9.4.4
 Length returns Refinable:
-	'length' expression=DisjointExpression StatementEnd
+	kind='length' expression=RefinementExpression StatementEnd
 ;
 
 // 9.4.5

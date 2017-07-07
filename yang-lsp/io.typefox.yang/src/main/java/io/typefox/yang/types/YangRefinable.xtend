@@ -33,6 +33,21 @@ import static extension io.typefox.yang.utils.ValidationMessageAcceptorExt.wrapp
  */
 class YangRefinable {
 
+	/**
+	 * NOOP refinable. The validation does nothing on this instance.
+	 */
+	public static val NOOP = new YangRefinable(emptyList, null) {
+
+		override validate(ValidationMessageAcceptor it) {
+			return true;
+		}
+
+		override toString() {
+			return "NOOP";
+		}
+
+	};
+
 	static val MIN = 'min';
 	static val MAX = 'max';
 

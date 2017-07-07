@@ -161,6 +161,7 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//When/condition"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Refinable">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Refinable/kind"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Refinable/expression"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Expression"/>

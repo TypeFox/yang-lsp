@@ -61,10 +61,12 @@ class YangValidator extends AbstractYangValidator {
 		// https://tools.ietf.org/html/rfc7950#section-9.3.3
 		// Same for string it just has another statement name.
 		// https://tools.ietf.org/html/rfc7950#section-9.4.3
-		if (!subTypeOfNumber && !subTypeOfString) {
-			getAllContentsOfType(Refinable).forEach [
-				val message = '''Only integer and decimal types can be restricted with the 'range' statement.''';
-				error(message, it, REFINABLE__EXPRESSION, SYNTAX_ERROR);
+		val refinements = getAllContentsOfType(Refinable);
+		if (!refinements.nullOrEmpty) {
+			val expectedRefinementKind = refinementKind;
+			refinements.filter[kind != expectedRefinementKind].forEach [
+				val message = '''Type cannot have '«kind»' restriction statement.''';
+				error(message, it, REFINABLE__EXPRESSION, TYPE_ERROR);
 			];
 		}
 	}
@@ -108,7 +110,6 @@ class YangValidator extends AbstractYangValidator {
 			}
 		}
 	}
-	
 
 	private def boolean checkSyntax(Refinable it) {
 		val invalidOperations = getAllContentsOfType(BinaryOperation).

@@ -214,13 +214,13 @@ class YangValidatorTest extends AbstractYangTest {
 			  namespace "urn:yang:types";
 			  prefix "yang";
 			  typedef my-base-int32-type {
-			    type bit {
+			    type bits {
 			      range "1 | 4";
 			    }
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Refinable).head, SYNTAX_ERROR, '''1 | 4''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Refinable).head, TYPE_ERROR, '''1 | 4''');
 	}
 
 	@Test
@@ -275,9 +275,43 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertNoErrors;
 	}
+	
+	@Test
+	def void checkRangeRestriction_04() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-int32-type {
+			    type string {
+			      length -1;
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Expression).head, TYPE_ERROR, '''-1''');
+	}
+	
+	@Test
+	def void checkLengthRestriction_01() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type int32 {
+			      length "-10 | 9";
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Refinable).head, TYPE_ERROR, '''-10 | 9''');
+	}
 
 	@Test
-	def void checkrangeOrder_01() {
+	def void checkRangeOrder_01() {
 		val it = load('''
 			module foo {
 			  yang-version 1.1;
@@ -294,7 +328,7 @@ class YangValidatorTest extends AbstractYangTest {
 	}
 
 	@Test
-	def void checkrangeOrder_02() {
+	def void checkRangeOrder_02() {
 		val it = load('''
 			module foo {
 			  yang-version 1.1;

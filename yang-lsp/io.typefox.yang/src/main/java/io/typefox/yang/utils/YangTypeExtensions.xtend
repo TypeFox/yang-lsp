@@ -98,14 +98,14 @@ class YangTypeExtensions {
 	/**
 	 * Sugar for {@code isSubtypeOfInteger(Type) || isSubtypeOfDecimal(Type)}.
 	 */
-	def boolean isSubTypeOfNumber(Type it) {
+	def boolean isSubtypeOfNumber(Type it) {
 		return isSubtypeOf[isIntegerBuiltin || isDecimalBuiltin];
 	}
-	
+
 	/**
 	 * Returns {@code true} if the argument is either a direct or a transitive subtype of the built-in string YANG type.
 	 */
-	def boolean isSubTypeOfString(Type it) {
+	def boolean isSubtypeOfString(Type it) {
 		return isSubtypeOf[isStringBuiltin];
 	}
 
@@ -157,6 +157,22 @@ class YangTypeExtensions {
 	}
 
 	/**
+	 * Returns with the refinement kind for the type argument based on its built-in super type.
+	 * <ul>
+	 * <li>{@code range} for the decimal and all integer types.</li>
+	 * <li>{@code length} for the string type.</li>
+	 * <li>{@code null} otherwise.</li>
+	 * <ul> 
+	 */
+	def getRefinementKind(Type it) {
+		return switch (it) {
+			case subtypeOfNumber: 'range'
+			case subtypeOfString: 'length'
+			default: null
+		};
+	}
+
+	/**
 	 * Returns with the container type of the refinement argument.
 	 */
 	def Type getType(Refinable it) {
@@ -180,13 +196,13 @@ class YangTypeExtensions {
 
 	/**
 	 * Transforms the AST refinement into a data model refinement and returns with it.  
-	 * Returns with {@code null} if the given refinement argument does not contained
-	 * either in an integer or in a decimal type.
+	 * Returns with the {@link YangRefinable#NOOP NOOP} refinable if the given refinement 
+	 * argument does not contained either in an integer, a decimal or in a string type.
 	 */
 	def getYangRefinable(Refinable it) {
 		val type = type;
-		if (!type.subTypeOfNumber) {
-			return null;
+		if (!type.subtypeOfNumber && !type.subtypeOfString) {
+			return YangRefinable.NOOP;
 		}
 
 		// Calculate the type hierarchy from bottom to top. (Top element must be a built-in type.)
@@ -206,14 +222,23 @@ class YangTypeExtensions {
 		val refinements = new Stack;
 		while (!types.isEmpty) {
 			val currentType = types.pop;
-			val refinement = if (currentType.subtypeOfDecimal) {
+			val refinement = switch (currentType) {
+				case currentType.subtypeOfDecimal: {
 					val fractionDigits = currentType.fractionDigitsAsInt;
 					val lowerBound = BuiltinRanges.MIN_64_BASE.movePointLeft(fractionDigits).toString;
 					val upperBound = BuiltinRanges.MAX_64_BASE.movePointLeft(fractionDigits).toString;
 					YangRefinable.createBuiltin(lowerBound, upperBound);
-				} else {
+				}
+				case currentType.subtypeOfInteger: {
 					integerBuiltins.get.get(currentType?.typeRef?.builtin);
 				}
+				case currentType.subtypeOfString: {
+					integerBuiltins.get.get(grammarAccess.BUILTIN_TYPEAccess.uint64Keyword_17.value)
+				}
+				default: {
+					null
+				}
+			}
 			if (refinement !== null) {
 				refinements.push(refinement);
 			}
