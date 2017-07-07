@@ -92,7 +92,7 @@ OPERATOR= "and" | "or" | "mod" | "div" | "*" | "|" | "+" | "-" | "=" | "!=" | "<
 STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | {SL_COMMENT})*
 
 %s EXPRESSION, IN_EXPRESSION_STRING, IN_SQ_EXPRESSION_STRING
-%s RANGE_EXPRESSION, IN_RANGE_EXPRESSION_STRING, IN_SQ_RANGE_EXPRESSION_STRING
+%s REFINEMENT_EXPRESSION, IN_REFINEMENT_EXPRESSION_STRING, IN_SQ_REFINEMENT_EXPRESSION_STRING
 %s COLON_EXPECTED, ID_EXPECTED
 %s BLACK_BOX_STRING
 
@@ -229,11 +229,11 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	"'"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
 }
 
-<RANGE_EXPRESSION> {
+<REFINEMENT_EXPRESSION> {
 	{ML_COMMENT} { return RULE_ML_COMMENT; }
 	{SL_COMMENT} { return RULE_SL_COMMENT; }
-	\"          {yybegin(IN_RANGE_EXPRESSION_STRING); return RULE_HIDDEN;}
-	"'"         {yybegin(IN_SQ_RANGE_EXPRESSION_STRING); return RULE_HIDDEN;}
+	\"          {yybegin(IN_REFINEMENT_EXPRESSION_STRING); return RULE_HIDDEN;}
+	"'"         {yybegin(IN_SQ_REFINEMENT_EXPRESSION_STRING); return RULE_HIDDEN;}
 	{NUMBER}    { return RULE_NUMBER; }
 	{OPERATOR}  { return RULE_OPERATOR; }
 	"min"                   {return Min;}
@@ -241,7 +241,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	".."        { return FullStopFullStop; }
 }
 
-<IN_RANGE_EXPRESSION_STRING> {
+<IN_REFINEMENT_EXPRESSION_STRING> {
 	{SINGLE_QUOTED_STRING} { return RULE_STRING; }
 	{ESCAPED_DQ_STRING}    { return RULE_STRING; }
 	{NUMBER}    { return RULE_NUMBER; }
@@ -250,11 +250,11 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	"max"                   {return Max;}
 	".."        { return FullStopFullStop; }
 
-	\" {STRING_CONCAT} { yybegin(RANGE_EXPRESSION); return RULE_HIDDEN; }
+	\" {STRING_CONCAT} { yybegin(REFINEMENT_EXPRESSION); return RULE_HIDDEN; }
 	\"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
 }
 
-<IN_SQ_RANGE_EXPRESSION_STRING> {
+<IN_SQ_REFINEMENT_EXPRESSION_STRING> {
 	{DOUBLE_QUOTED_STRING}    { return RULE_STRING; }
 	{NUMBER}    { return RULE_NUMBER; }
 	{OPERATOR}  { return RULE_OPERATOR; }
@@ -262,7 +262,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	"max"                   {return Max;}
 	".."        { return FullStopFullStop; }
 
-	"'" {STRING_CONCAT} { yybegin(RANGE_EXPRESSION); return RULE_HIDDEN; }
+	"'" {STRING_CONCAT} { yybegin(REFINEMENT_EXPRESSION); return RULE_HIDDEN; }
 	"'"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
 }
 
@@ -299,7 +299,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "key"                    {yybegin(EXPRESSION); return Key; }
  "leaf"                   {yybegin(BLACK_BOX_STRING); return Leaf; }
  "leaf-list"              {yybegin(BLACK_BOX_STRING); return LeafList; }
- "length"                 {yybegin(RANGE_EXPRESSION); return Length; }
+ "length"                 {yybegin(REFINEMENT_EXPRESSION); return Length; }
  "list"                   {yybegin(BLACK_BOX_STRING); return List; }
  "mandatory"              {yybegin(BLACK_BOX_STRING); return Mandatory; }
  "max-elements"           {yybegin(BLACK_BOX_STRING); return MaxElements; }
@@ -317,7 +317,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "position"               {yybegin(BLACK_BOX_STRING); return Position; }
  "prefix"                 {yybegin(BLACK_BOX_STRING); return Prefix; }
  "presence"               {yybegin(BLACK_BOX_STRING); return Presence; }
- "range"                  {yybegin(RANGE_EXPRESSION); return Range; }
+ "range"                  {yybegin(REFINEMENT_EXPRESSION); return Range; }
  "reference"              {yybegin(BLACK_BOX_STRING); return Reference; }
  "refine"                 {yybegin(EXPRESSION); return Refine; }
  "require-instance"       {yybegin(BLACK_BOX_STRING); return RequireInstance; }
