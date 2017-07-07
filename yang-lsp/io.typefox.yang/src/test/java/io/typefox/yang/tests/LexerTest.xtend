@@ -287,6 +287,32 @@ class LexerTest {
 		l.assertNextToken(RULE_NUMBER, '4')
 	}
 	
+	@Test def void test_Comments() {
+		val l = lexer.get
+		l.charStream = new ANTLRStringStream('''
+			/*
+			    augment "/policy:policies/policy:policy-entry"
+			        + "/policy:classifier-entry"
+			        + "/policy:classifier-action-entry-cfg/"
+			        + "policy:action-cfg-params/action:marking/action:marking-cfg" {
+			            description "extend the marking dscp to add set from a tablemap";
+			            uses SET-VAL-TABLEMAP;
+			        }
+			*/
+		''')
+		l.assertNextToken(RULE_ML_COMMENT, '''
+			/*
+			    augment "/policy:policies/policy:policy-entry"
+			        + "/policy:classifier-entry"
+			        + "/policy:classifier-action-entry-cfg/"
+			        + "policy:action-cfg-params/action:marking/action:marking-cfg" {
+			            description "extend the marking dscp to add set from a tablemap";
+			            uses SET-VAL-TABLEMAP;
+			        }
+			*/''')
+		l.assertNextToken(RULE_WS, '\n')
+		l.assertNextToken(EOF,null)
+	}
 	
 	private def void assertNextToken(Lexer it, int id, String text) {
 		val t = nextToken
