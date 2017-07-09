@@ -3,13 +3,12 @@
  */
 package io.typefox.yang.validation
 
-import com.google.common.collect.ImmutableSet
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import io.typefox.yang.types.YangEnumeration
 import io.typefox.yang.utils.YangExtensions
+import io.typefox.yang.utils.YangNameUtils
 import io.typefox.yang.utils.YangTypeExtensions
-import io.typefox.yang.yang.BinaryOperation
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Modifier
@@ -27,15 +26,12 @@ import static io.typefox.yang.yang.YangPackage.Literals.*
 
 import static extension com.google.common.base.Strings.nullToEmpty
 import static extension org.eclipse.xtext.EcoreUtil2.getAllContentsOfType
-import io.typefox.yang.utils.YangNameUtils
 
 /**
  * This class contains custom validation rules for the YANG language. 
  */
 @Singleton
 class YangValidator extends AbstractYangValidator {
-
-	static val RANGE_BINARY_OPERATORS = ImmutableSet.of('|', '..');
 
 	@Inject
 	extension YangExtensions;
@@ -82,11 +78,9 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def checkRefinement(Refinable it) {
-		if (checkSyntax) {
-			val yangRefinable = yangRefinable;
-			if (yangRefinable !== null) {
-				yangRefinable.validate(this);
-			}
+		val yangRefinable = yangRefinable;
+		if (yangRefinable !== null) {
+			yangRefinable.validate(this);
 		}
 	}
 
@@ -165,16 +159,6 @@ class YangValidator extends AbstractYangValidator {
 			val message = '''Modifier value must be "invert-match".''';
 			error(message, it, MODIFIER__MODIFIER, TYPE_ERROR);
 		}
-	}
-
-	private def boolean checkSyntax(Refinable it) {
-		val invalidOperations = getAllContentsOfType(BinaryOperation).
-			filter[!RANGE_BINARY_OPERATORS.contains(operator)];
-		invalidOperations.forEach [
-			val message = '''Syntax error. Unexpected operator "«operator»".''';
-			error(message, it, BINARY_OPERATION__OPERATOR, SYNTAX_ERROR);
-		];
-		return invalidOperations.nullOrEmpty;
 	}
 
 }

@@ -350,7 +350,21 @@ Feature:
 
 // 7.20.2
 IfFeature:
-	'if-feature' condition=Expression StatementEnd
+	'if-feature' condition=IfFeatureOrExpression StatementEnd
+;
+
+IfFeatureOrExpression returns Expression:
+	IfFeatureAndExpression ({BinaryOperator.left=current} operator='or' right=IfFeatureAndExpression)*
+;
+
+IfFeatureAndExpression returns Expression:
+	IfFeatureExpression ({BinaryOperator.left=current} operator='and' right=IfFeatureExpression)*
+;
+
+IfFeatureExpression returns Expression:
+	{FeatureReference} feature=[Feature|QNAME] |
+	{UnaryOperation} operator='not' target=IfFeatureExpression |
+	'(' IfFeatureOrExpression ')'
 ;
 
 // 7.20.3
@@ -394,7 +408,7 @@ Range :
 ;
 
 RefinementExpression returns Expression:
-	RangeRefinementExpression ({BinaryOperation.left=current} operator=OPERATOR right=RangeRefinementExpression)*
+	RangeRefinementExpression ({BinaryOperation.left=current} operator='|' right=RangeRefinementExpression)*
 ;
 
 RangeRefinementExpression returns Expression:

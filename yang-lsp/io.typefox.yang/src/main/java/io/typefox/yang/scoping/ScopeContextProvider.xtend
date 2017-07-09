@@ -6,26 +6,30 @@ import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.yang.AbsoluteSchemaNodeIdentifier
 import io.typefox.yang.yang.AbstractImport
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Action
 import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Base
 import io.typefox.yang.yang.BelongsTo
 import io.typefox.yang.yang.Case
 import io.typefox.yang.yang.Choice
-import io.typefox.yang.yang.DataSchemaNode
 import io.typefox.yang.yang.Deviation
 import io.typefox.yang.yang.Extension
 import io.typefox.yang.yang.Feature
+import io.typefox.yang.yang.FeatureReference
 import io.typefox.yang.yang.Grouping
 import io.typefox.yang.yang.GroupingRef
 import io.typefox.yang.yang.IdentifierRef
 import io.typefox.yang.yang.Identity
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Include
+import io.typefox.yang.yang.Input
 import io.typefox.yang.yang.KeyReference
 import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.Output
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Refine
 import io.typefox.yang.yang.RevisionDate
+import io.typefox.yang.yang.Rpc
 import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.Statement
@@ -47,10 +51,6 @@ import org.eclipse.xtext.scoping.impl.SelectableBasedScope
 import org.eclipse.xtext.util.internal.EmfAdaptable
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
-import io.typefox.yang.yang.Input
-import io.typefox.yang.yang.Output
-import io.typefox.yang.yang.Rpc
-import io.typefox.yang.yang.Action
 
 /**
  * Links the imported modules and included submodules, as well as computing the IScopeContext for them. 
@@ -124,10 +124,7 @@ class ScopeContextProvider {
 		}
 	}
 	
-	protected dispatch def void computeScope(EObject module, QualifiedName nodePath, IScopeContext ctx) {
-	}
-	
-	protected dispatch def void computeScope(SchemaNode node, QualifiedName nodePath, IScopeContext ctx) {
+	protected dispatch def void computeScope(EObject node, QualifiedName nodePath, IScopeContext ctx) {
 		handleGeneric(node, nodePath, ctx)
 	}
 	
@@ -149,7 +146,7 @@ class ScopeContextProvider {
 				prefix
 			}
 			for (e : identifier.elements) {
-				pref = e.getQualifiedName(pref, context)
+				pref = e.internalGetQualifiedName(pref, context)
 				val p = pref
 				linker.link(e, YangPackage.Literals.IDENTIFIER_REF__NODE) [
 					val result = context.nodeScope.getSingleElement(p)
@@ -157,10 +154,6 @@ class ScopeContextProvider {
 				]
 			}
 		]
-	}
-	
-	protected dispatch def void computeScope(Statement node, QualifiedName nodePath, IScopeContext ctx) {
-		handleGeneric(node, nodePath, ctx)
 	}
 	
 	protected dispatch def void computeScope(TypeReference node, QualifiedName nodePath, IScopeContext ctx) {
@@ -201,6 +194,15 @@ class ScopeContextProvider {
 		ctx.runAfterDefinitionPhase [
 			linker.link(node, BASE__REFERENCE) [ name |
 				ctx.identityScope.getSingleElement(name)
+			]
+		]
+		handleGeneric(node, nodePath, ctx)
+	}
+	
+	protected dispatch def void computeScope(FeatureReference node, QualifiedName nodePath, IScopeContext ctx) {
+		ctx.runAfterDefinitionPhase [
+			linker.link(node, FEATURE_REFERENCE__FEATURE) [ name |
+				ctx.featureScope.getSingleElement(name)
 			]
 		]
 		handleGeneric(node, nodePath, ctx)
@@ -248,19 +250,18 @@ class ScopeContextProvider {
 		handleGeneric(node, nodePath, ctx)
 	}
 	
-	protected dispatch def void computeScope(DataSchemaNode module, QualifiedName nodePath, IScopeContext ctx) {
-		handleGeneric(module, nodePath, ctx)
-	}
-	
 	protected def void handleGeneric(EObject node, QualifiedName nodePath, IScopeContext ctx) {
 		if (node instanceof SchemaNode) {		
 			node.addToDefinitionScope(ctx)
 		}
-		val newPath = getQualifiedName(node, nodePath, ctx)
-		if (newPath != nodePath 
-			&& !(node instanceof Grouping)
-			&& !(node instanceof Augment)) {
-			node.addToNodeScope(newPath, ctx)
+		var newPath = nodePath
+		if (node instanceof Statement) {
+			newPath = getQualifiedName(node, nodePath, ctx)
+			if (newPath != nodePath 
+				&& !(node instanceof Grouping)
+				&& !(node instanceof Augment)) {
+				node.addToNodeScope(newPath, ctx)
+			}
 		}
 		val context = switch node {
 			Grouping : 
@@ -342,7 +343,7 @@ class ScopeContextProvider {
 		return candidate
 	}	
 	
-	private def dispatch QualifiedName getQualifiedName(EObject node, QualifiedName p, IScopeContext ctx) {
+	private def dispatch QualifiedName getQualifiedName(Statement node, QualifiedName p, IScopeContext ctx) {
 		return p
 	}
 	
@@ -399,22 +400,22 @@ class ScopeContextProvider {
 	}
 	
 	private def dispatch QualifiedName getQualifiedName(Augment node, QualifiedName p, IScopeContext ctx) {
-		return getQualifiedName(node.path, p, ctx)
+		return internalGetQualifiedName(node.path, p, ctx)
 	}
 	
-	private def dispatch QualifiedName getQualifiedName(SchemaNodeIdentifier identifier, QualifiedName p, IScopeContext ctx) {
+	private def dispatch QualifiedName internalGetQualifiedName(SchemaNodeIdentifier identifier, QualifiedName p, IScopeContext ctx) {
 		var prefix = if (identifier instanceof AbsoluteSchemaNodeIdentifier) {
 			QualifiedName.EMPTY
 		} else {
 			p
 		}
 		for (element : identifier.elements) {
-			prefix = element._getQualifiedName(prefix, ctx)
+			prefix = element.internalGetQualifiedName(prefix, ctx)
 		}
 		return prefix
 	}
 	
-	private def dispatch QualifiedName getQualifiedName(IdentifierRef ref, QualifiedName prefix, IScopeContext ctx) {
+	private def dispatch QualifiedName internalGetQualifiedName(IdentifierRef ref, QualifiedName prefix, IScopeContext ctx) {
 		val qn = linker.getLinkingName(ref, YangPackage.Literals.IDENTIFIER_REF__NODE)
 		if (qn !== null) {
 			var firstSeg = ctx.moduleName

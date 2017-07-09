@@ -158,23 +158,6 @@ class YangValidatorTest extends AbstractYangTest {
 	}
 
 	@Test
-	def void checkRangeOperator_01() {
-		val it = load('''
-			module foo {
-			  yang-version 1.1;
-			  namespace "urn:yang:types";
-			  prefix "yang";
-			  typedef my-base-int32-type {
-			    type int32 {
-			      range "1 + 4";
-			    }
-			  }
-			}
-		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, BinaryOperation).head, SYNTAX_ERROR, "+");
-	}
-
-	@Test
 	def void checkRangeOperator_02() {
 		val it = load('''
 			module foo {

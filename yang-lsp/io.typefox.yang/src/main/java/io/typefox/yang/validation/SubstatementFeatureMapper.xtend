@@ -21,7 +21,7 @@ class SubstatementFeatureMapper implements Function1<EClass, EStructuralFeature>
 	
 	new() {
 		mapping = #{
-			MODULE -> ABSTRACT_MODULE__NAME,
+			MODULE -> ABSTRACT_MODULE__NAME as EStructuralFeature,
 			YANG_VERSION -> YANG_VERSION__YANG_VERSION,
 			NAMESPACE -> NAMESPACE__URI,
 			PREFIX -> PREFIX__PREFIX,

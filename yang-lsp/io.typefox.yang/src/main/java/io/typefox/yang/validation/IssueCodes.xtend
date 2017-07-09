@@ -28,12 +28,6 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	public static val INCORRECT_VERSION = 'INCORRECT_VERSION';
 
 	/**
-	 * Represents a "fake" syntax error. Our grammar is relaxed and this kind of error code should
-	 * be reported to indicate if a construct does not comply the YANG grammar.
-	 */
-	public static val SYNTAX_ERROR = 'SYNTAX_ERROR';
-
-	/**
 	 * Errors for types. Such as invalid type restriction, range error, fraction-digits issue. 
 	 */
 	public static val TYPE_ERROR = 'TYPE_ERROR';
@@ -58,7 +52,6 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 		error(UNEXPECTED_SUBSTATEMENT),
 		error(SUBSTATEMENT_ORDERING),
 		error(INCORRECT_VERSION),
-		error(SYNTAX_ERROR),
 		error(TYPE_ERROR)
 	}
 

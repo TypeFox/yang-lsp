@@ -93,6 +93,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 
 %s EXPRESSION, IN_EXPRESSION_STRING, IN_SQ_EXPRESSION_STRING
 %s REFINEMENT_EXPRESSION, IN_REFINEMENT_EXPRESSION_STRING, IN_SQ_REFINEMENT_EXPRESSION_STRING
+%s IF_FEATURE_EXPRESSION, IN_IF_FEATURE_EXPRESSION_STRING, IN_SQ_IF_FEATURE_EXPRESSION_STRING
 %s COLON_EXPECTED, ID_EXPECTED
 %s BLACK_BOX_STRING
 
@@ -235,19 +236,17 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	\"          {yybegin(IN_REFINEMENT_EXPRESSION_STRING); return RULE_HIDDEN;}
 	"'"         {yybegin(IN_SQ_REFINEMENT_EXPRESSION_STRING); return RULE_HIDDEN;}
 	{NUMBER}    { return RULE_NUMBER; }
-	{OPERATOR}  { return RULE_OPERATOR; }
-	"min"                   {return Min;}
-	"max"                   {return Max;}
+	"|"  	    { return VerticalLine; }
+	"min"       { return Min;}
+	"max"       { return Max;}
 	".."        { return FullStopFullStop; }
 }
 
 <IN_REFINEMENT_EXPRESSION_STRING> {
-	{SINGLE_QUOTED_STRING} { return RULE_STRING; }
-	{ESCAPED_DQ_STRING}    { return RULE_STRING; }
 	{NUMBER}    { return RULE_NUMBER; }
-	{OPERATOR}  { return RULE_OPERATOR; }
-	"min"                   {return Min;}
-	"max"                   {return Max;}
+	"|"  	    { return VerticalLine; }
+	"min"       { return Min;}
+	"max"       { return Max;}
 	".."        { return FullStopFullStop; }
 
 	\" {STRING_CONCAT} { yybegin(REFINEMENT_EXPRESSION); return RULE_HIDDEN; }
@@ -255,14 +254,53 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 }
 
 <IN_SQ_REFINEMENT_EXPRESSION_STRING> {
-	{DOUBLE_QUOTED_STRING}    { return RULE_STRING; }
 	{NUMBER}    { return RULE_NUMBER; }
-	{OPERATOR}  { return RULE_OPERATOR; }
-	"min"                   {return Min;}
-	"max"                   {return Max;}
+	"|"  	    { return VerticalLine; }
+	"min"       { return Min;}
+	"max"       { return Max;}
 	".."        { return FullStopFullStop; }
 
 	"'" {STRING_CONCAT} { yybegin(REFINEMENT_EXPRESSION); return RULE_HIDDEN; }
+	"'"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
+}
+
+<IF_FEATURE_EXPRESSION> {
+	{ML_COMMENT} { return RULE_ML_COMMENT; }
+	{SL_COMMENT} { return RULE_SL_COMMENT; }
+	\"          {yybegin(IN_IF_FEATURE_EXPRESSION_STRING); return RULE_HIDDEN;}
+	"'"         {yybegin(IN_SQ_IF_FEATURE_EXPRESSION_STRING); return RULE_HIDDEN;}
+	":"        { return Colon; }
+	"or"  	   { return Or; }
+	"and"      { return And; }
+	"not"      { return Not; }
+	{ID}    	   { return RULE_ID; }
+	"("        { return LeftParenthesis; }
+	")"        { return RightParenthesis; }
+}
+
+<IN_IF_FEATURE_EXPRESSION_STRING> {
+	":"        { return Colon; }
+	"or"  	   { return Or; }
+	"and"      { return And; }
+	"not"      { return Not; }
+	{ID}    	   { return RULE_ID; }
+	"("        { return LeftParenthesis; }
+	")"        { return RightParenthesis; }
+
+	\" {STRING_CONCAT} { yybegin(IF_FEATURE_EXPRESSION); return RULE_HIDDEN; }
+	\"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
+}
+
+<IN_SQ_IF_FEATURE_EXPRESSION_STRING> {
+	":"        { return Colon; }
+	"or"  	   { return Or; }
+	"and"      { return And; }
+	"not"      { return Not; }
+	{ID}    	   { return RULE_ID; }
+	"("        { return LeftParenthesis; }
+	")"        { return RightParenthesis; }
+
+	"'" {STRING_CONCAT} { yybegin(IF_FEATURE_EXPRESSION); return RULE_HIDDEN; }
 	"'"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
 }
 
@@ -292,7 +330,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "fraction-digits"        {yybegin(BLACK_BOX_STRING); return FractionDigits; }
  "grouping"               {yybegin(BLACK_BOX_STRING); return Grouping; }
  "identity"               {yybegin(BLACK_BOX_STRING); return Identity; }
- "if-feature"             {yybegin(EXPRESSION); return IfFeature; }
+ "if-feature"             {yybegin(IF_FEATURE_EXPRESSION); return IfFeature; }
  "import"                 {yybegin(BLACK_BOX_STRING); return Import; }
  "include"                {yybegin(BLACK_BOX_STRING); return Include; }
  "input"                  {yybegin(BLACK_BOX_STRING); return Input; }
@@ -336,7 +374,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "yang-version"           {yybegin(BLACK_BOX_STRING); return YangVersion; }
  "yin-element"            {yybegin(BLACK_BOX_STRING); return YinElement; }
  
-{EXTENSION_NAME}          { yybegin(BLACK_BOX_STRING);  return RULE_EXTENSION_NAME; }
+	{EXTENSION_NAME}          { yybegin(BLACK_BOX_STRING);  return RULE_EXTENSION_NAME; }
 	
 	{ML_COMMENT} { return RULE_ML_COMMENT; }
 	{SL_COMMENT} { return RULE_SL_COMMENT; }
@@ -346,3 +384,4 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 \} { yybegin(YYINITIAL); return RightCurlyBracket; }
 {WS} { return RULE_WS; }
 . { return RULE_ANY_OTHER; }
+

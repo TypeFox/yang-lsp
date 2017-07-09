@@ -137,8 +137,9 @@
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Feature"/>
     <genClasses ecoreClass="Yang.ecore#//IfFeature">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//IfFeature/condition"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//IfFeature/condition"/>
     </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Expression"/>
     <genClasses ecoreClass="Yang.ecore#//Deviation">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Deviation/reference"/>
     </genClasses>
@@ -161,7 +162,6 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//When/condition"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Range"/>
-    <genClasses ecoreClass="Yang.ecore#//Expression"/>
     <genClasses ecoreClass="Yang.ecore#//FractionDigits">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//FractionDigits/range"/>
     </genClasses>
@@ -216,6 +216,18 @@
     <genClasses ecoreClass="Yang.ecore#//ThisLeafRef"/>
     <genClasses ecoreClass="Yang.ecore#//InstanceIdentifier">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//InstanceIdentifier/elements"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//BinaryOperator">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//BinaryOperator/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//BinaryOperator/operator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//BinaryOperator/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//FeatureReference">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//FeatureReference/feature"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//UnaryOperation">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//UnaryOperation/operator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//UnaryOperation/target"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//BinaryOperation">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//BinaryOperation/left"/>
