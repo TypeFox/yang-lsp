@@ -16,6 +16,7 @@ import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
 
 import static io.typefox.yang.validation.IssueCodes.*
+import io.typefox.yang.yang.Literal
 
 /**
  * Validation test for the YANG language.
@@ -293,6 +294,40 @@ class YangValidatorTest extends AbstractYangTest {
 			}
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Refinable).head, TYPE_ERROR, '''-10 | 9''');
+	}
+	
+	@Test
+	def void checkLengthRestriction_02() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type binary {
+			      length "255";
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
+	}
+	
+	@Test
+	def void checkLengthRestriction_03() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type binary {
+			      length -1;
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Literal).head, TYPE_ERROR, '''-1''');
 	}
 
 	@Test

@@ -9,6 +9,8 @@ import io.typefox.yang.services.YangGrammarAccess
 import io.typefox.yang.types.YangEnumeration
 import io.typefox.yang.types.YangRefinable
 import io.typefox.yang.yang.FractionDigits
+import io.typefox.yang.yang.Length
+import io.typefox.yang.yang.Range
 import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
@@ -20,8 +22,6 @@ import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.Keyword
 
 import static extension com.google.common.collect.ImmutableMap.copyOf
-import io.typefox.yang.yang.Length
-import io.typefox.yang.yang.Range
 
 /**
  * Extensions for YANG <a href="https://tools.ietf.org/html/rfc7950#section-9.2">built-in types</a>.
@@ -61,6 +61,10 @@ class YangTypeExtensions {
 
 	val Supplier<String> stringBuiltin = Suppliers.memoize [
 		return grammarAccess.BUILTIN_TYPEAccess.stringKeyword_13.value;
+	];
+
+	val Supplier<String> binaryBuiltin = Suppliers.memoize [
+		return grammarAccess.BUILTIN_TYPEAccess.binaryKeyword_0.value;
 	];
 
 	val Supplier<String> enumerationBuiltin = Suppliers.memoize [
@@ -103,6 +107,13 @@ class YangTypeExtensions {
 	}
 
 	/**
+	 * {@code true} if the argument is a direct subtype of the binary built-in YANG type.
+	 */
+	def boolean isBinaryBuiltin(Type it) {
+		return binaryBuiltin.get == typeRef.builtin;
+	}
+
+	/**
 	 * Returns {@code true} if the type argument is a subtype of the built-in YANG enumeration type.
 	 */
 	def boolean isEnumerationBuiltin(Type it) {
@@ -121,6 +132,13 @@ class YangTypeExtensions {
 	 */
 	def boolean isSubtypeOfString(Type it) {
 		return isSubtypeOf[isStringBuiltin];
+	}
+
+	/**
+	 * {@code true} if the argument is either a direct or derived subtype of the built-in binary type.
+	 */
+	def boolean isSubtypeOfBinary(Type it) {
+		return isSubtypeOf[isBinaryBuiltin];
 	}
 
 	/**
@@ -189,6 +207,7 @@ class YangTypeExtensions {
 		return switch (it) {
 			case subtypeOfNumber: Range
 			case subtypeOfString: Length
+			case subtypeOfBinary: Length
 			default: null
 		};
 	}
@@ -214,6 +233,19 @@ class YangTypeExtensions {
 	def getSuperYangRefinement(Refinable refinable) {
 		return refinable.type.superType;
 	}
+	
+	/**
+	 * {@code true} if the argument type is refinable. More formally, if any of the bellow conditions is {@code true}:
+	 * <p>
+	 * <ul>
+	 * <li>subtype of integer or decimal,</li>
+	 * <li>subtype of string or</li>
+	 * <li>subtype of binary.</li>
+	 * </ul>
+	 */
+	def isRefinable(Type it) {
+		return subtypeOfNumber || subtypeOfString || subtypeOfBinary; 
+	}
 
 	/**
 	 * Transforms the AST refinement into a data model refinement and returns with it.  
@@ -222,7 +254,7 @@ class YangTypeExtensions {
 	 */
 	def getYangRefinable(Refinable it) {
 		val type = type;
-		if (!type.subtypeOfNumber && !type.subtypeOfString) {
+		if (!type.refinable) {
 			return YangRefinable.NOOP;
 		}
 
@@ -244,7 +276,10 @@ class YangTypeExtensions {
 					integerBuiltins.get.get(currentType?.typeRef?.builtin);
 				}
 				case currentType.subtypeOfString: {
-					integerBuiltins.get.get(grammarAccess.BUILTIN_TYPEAccess.uint64Keyword_17.value)
+					integerBuiltins.get.get(grammarAccess.BUILTIN_TYPEAccess.uint64Keyword_17.value);
+				}
+				case currentType.subtypeOfBinary: {
+					integerBuiltins.get.get(grammarAccess.BUILTIN_TYPEAccess.uint64Keyword_17.value);
 				}
 				default: {
 					null
@@ -270,7 +305,7 @@ class YangTypeExtensions {
 		if (!subtypeOfEnumeration) {
 			return enumeration;
 		}
-		
+
 		val types = typeHierarchy;
 		while (!types.isEmpty) {
 			val currentType = types.pop;
