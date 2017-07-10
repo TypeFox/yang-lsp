@@ -622,7 +622,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, '''"36 "''');
 	}
-	
+
 	@Test
 	def void checkEnumerationValue_01() {
 		val it = load('''
@@ -641,7 +641,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Value).head, TYPE_ERROR, '''bb''');
 	}
-	
+
 	@Test
 	def void checkEnumerationValue_02() {
 		val it = load('''
@@ -660,7 +660,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Value).head, TYPE_ERROR, '''-2147483649''');
 	}
-	
+
 	@Test
 	def void checkEnumerationValue_03() {
 		val it = load('''
@@ -679,7 +679,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Value).head, TYPE_ERROR, '''2147483648''');
 	}
-	
+
 	@Test
 	def void checkEnumerationValue_04() {
 		val it = load('''
@@ -701,7 +701,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Value).head, TYPE_ERROR, '''10''');
 	}
-	
+
 	@Test
 	def void checkEnumerationValue_05() {
 		val it = load('''
@@ -720,6 +720,71 @@ class YangValidatorTest extends AbstractYangTest {
 			}
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, '''"b"''');
+	}
+
+	@Test
+	def void checkEnumerationValue_06() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-sub-type {
+			  	type my-base-enumeration-type {
+			  	  enum yellow {
+			  	    value 4; // illegal value change
+			  	  }
+			  	  enum red {
+			  	    value 3;
+			  	  }
+			  	}
+			  }
+			  typedef my-base-enumeration-type {
+			    type enumeration {
+			      enum white {
+			        value 1;
+			      }
+			      enum yellow {
+			        value 2;
+			      }
+			      enum red {
+			        value 3;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, '''yellow''');
+	}
+
+	@Test
+	def void checkEnumerationValue_07() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-sub-type {
+			  	type my-base-enumeration-type {
+			  	  enum black;
+			  	}
+			  }
+			  typedef my-base-enumeration-type {
+			    type enumeration {
+			      enum white {
+			        value 1;
+			      }
+			      enum yellow {
+			        value 2;
+			      }
+			      enum red {
+			        value 3;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, '''black''');
 	}
 
 }

@@ -139,7 +139,8 @@ class YangEnumeration {
 		val visitedValues = HashMultimap.create;
 		currentItems.forEach [ name, currentItem |
 			val parentItem = parentItems.get(name);
-			if (parentItem === null && parentEnumeration != NOOP) {
+			if ((parentItem === null && parentEnumeration !== NOOP) ||
+				(parentItem !== null && parentItem.value != currentItem.value)) {
 				val message = '''A new assigned name must not declared when restricting an existing enumeration.''';
 				acceptor.acceptError(message, currentItem.node, ENUM__NAME, INSIGNIFICANT_INDEX, TYPE_ERROR);
 			} else {
@@ -162,15 +163,15 @@ class YangEnumeration {
 						acceptor.acceptError(message, object, VALUE__VALUE, INSIGNIFICANT_INDEX, TYPE_ERROR);
 					}
 				} else if (maxValue >= Integer.MAX_VALUE) {
-					val message = '''Cannot automatically asign a value to enumeration. A concrete value has to be assigned instead.''';			
+					val message = '''Cannot automatically asign a value to enumeration. A concrete value has to be assigned instead.''';
 					acceptor.acceptError(message, currentItem.node, ENUM__NAME, INSIGNIFICANT_INDEX, TYPE_ERROR);
 				}
 			}
 		];
-		visitedValues.asMap.entrySet.forEach[
+		visitedValues.asMap.entrySet.forEach [
 			if (value.size > 1) {
-				value.forEach[
-					val message = '''The value must be unique within the enumeration type.''';			
+				value.forEach [
+					val message = '''The value must be unique within the enumeration type.''';
 					val object = node.substatements.filter(Value).head;
 					acceptor.acceptError(message, object, VALUE__VALUE, INSIGNIFICANT_INDEX, TYPE_ERROR);
 				];
@@ -184,7 +185,7 @@ class YangEnumeration {
 		val String name;
 		val String value;
 		val Statement node;
-		val String substitutedValue
+		val String substitutedValue;
 	}
 
 }

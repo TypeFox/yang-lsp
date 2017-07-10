@@ -82,9 +82,9 @@ class YangTypeExtensionsTest extends AbstractYangTest {
 			  }
 			
 			  typedef my-type1 {
-			  type my-base-int32-type {
-			    range "11..max";
-			  }
+			    type my-base-int32-type {
+			      range "11..max";
+			    }
 			  }
 			}
 		'''.load.root.lastSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).subtypeOfInteger.assertTrue;
@@ -101,9 +101,9 @@ class YangTypeExtensionsTest extends AbstractYangTest {
 			  }
 			
 			  typedef my-type1 {
-			  type my-base-int32-type {
-			    range "11..max";
-			  }
+			    type my-base-int32-type {
+			      range "11..max";
+			    }
 			  }
 			}
 		'''.load.root.lastSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).subtypeOfInteger.assertFalse;
