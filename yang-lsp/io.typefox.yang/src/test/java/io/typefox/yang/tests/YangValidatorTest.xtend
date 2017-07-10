@@ -822,4 +822,20 @@ class YangValidatorTest extends AbstractYangTest {
 		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, '''black''');
 	}
 
+	@Test
+	def void checkUnionType_01() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef bar {
+			    type union {
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Type).head, TYPE_ERROR, '''union''');
+	}
+
 }

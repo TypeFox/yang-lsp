@@ -37,7 +37,7 @@ class YangValidator extends AbstractYangValidator {
 
 	@Inject
 	extension YangTypeExtensions;
-	
+
 	@Inject
 	SubstatementRuleProvider substatementRuleProvider;
 
@@ -63,11 +63,11 @@ class YangValidator extends AbstractYangValidator {
 		// https://tools.ietf.org/html/rfc7950#section-9.3.3
 		// Same for string it just has another statement name.
 		// https://tools.ietf.org/html/rfc7950#section-9.4.3
-		val refinements = eContents.filter(Refinable);
+		val refinements = substatementsOfType(Refinable);
 		if (!refinements.nullOrEmpty) {
 			val expectedRefinementKind = refinementKind;
 			refinements.forEach [
-				if (expectedRefinementKind === null || !(expectedRefinementKind.isAssignableFrom(it.class))) {					
+				if (expectedRefinementKind === null || !(expectedRefinementKind.isAssignableFrom(it.class))) {
 					val message = '''Type cannot have '«YangNameUtils.getYangName(it.eClass)»' restriction statement.''';
 					error(message, it, REFINABLE__EXPRESSION, TYPE_ERROR);
 				}
@@ -84,6 +84,18 @@ class YangValidator extends AbstractYangValidator {
 	}
 
 	@Check
+	def checkUnionType(Type it) {
+		if (unionBuiltin) {
+			// At least one `type` sub-statement should be present for each `union` type.
+			// https://tools.ietf.org/html/rfc7950#section-9.12
+			if (substatementsOfType(Type).nullOrEmpty) {
+				val message = '''Type substatement must be present for each union type.''';
+				error(message, it, TYPE__TYPE_REF, TYPE_ERROR);
+			}
+		}
+	}
+
+	@Check
 	def checkEnumeration(Type type) {
 		if (type.subtypeOfEnumeration) {
 			val yangEnumeration = type.yangEnumeration;
@@ -91,7 +103,7 @@ class YangValidator extends AbstractYangValidator {
 				yangEnumeration.validate(this);
 			}
 		} else {
-			type.eContents.filter(Enum).forEach [
+			type.substatementsOfType(Enum).forEach [
 				val message = '''Only enumeration types can have a "enum" statement.''';
 				error(message, type, TYPE__TYPE_REF, TYPE_ERROR);
 			];

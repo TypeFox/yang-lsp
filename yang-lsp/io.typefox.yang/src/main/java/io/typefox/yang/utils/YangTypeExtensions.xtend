@@ -71,6 +71,10 @@ class YangTypeExtensions {
 		return grammarAccess.BUILTIN_TYPEAccess.enumerationKeyword_5.value;
 	];
 
+	val Supplier<String> unionBuiltin = Suppliers.memoize [
+		return grammarAccess.BUILTIN_TYPEAccess.unionKeyword_18.value;
+	];
+
 	/**
 	 * Returns {@code true} if the type of the type definition argument is a YANG built-in type.
 	 */
@@ -118,6 +122,13 @@ class YangTypeExtensions {
 	 */
 	def boolean isEnumerationBuiltin(Type it) {
 		return enumerationBuiltin.get == typeRef.builtin;
+	}
+
+	/**
+	 * {@code true} if the type is a direct subtype of the built-in union type, otherwise {@code false}.
+	 */
+	def boolean isUnionBuiltin(Type it) {
+		return unionBuiltin.get == typeRef.builtin;
 	}
 
 	/**
@@ -233,7 +244,7 @@ class YangTypeExtensions {
 	def getSuperYangRefinement(Refinable refinable) {
 		return refinable.type.superType;
 	}
-	
+
 	/**
 	 * {@code true} if the argument type is refinable. More formally, if any of the bellow conditions is {@code true}:
 	 * <p>
@@ -244,7 +255,7 @@ class YangTypeExtensions {
 	 * </ul>
 	 */
 	def isRefinable(Type it) {
-		return subtypeOfNumber || subtypeOfString || subtypeOfBinary; 
+		return subtypeOfNumber || subtypeOfString || subtypeOfBinary;
 	}
 
 	/**
