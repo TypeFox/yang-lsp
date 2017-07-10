@@ -15,6 +15,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import static org.junit.Assert.*
+import io.typefox.yang.yang.Path
 
 @RunWith(XtextRunner)
 @InjectWith(YangInjectorProvider)
@@ -28,6 +29,51 @@ class YangParsingTest {
 			foo:bar 43tg3g3;
 		'''.wrapModule.parse
 		helper.assertNoErrors(model, Diagnostic.SYNTAX_DIAGNOSTIC)
+	}
+	
+	@Test def void testXpath() {
+		val model = '''
+			path "/ll:x/ll:q[ll:a = current()/../a]/ll:b";
+		'''.wrapModule.parse
+		helper.assertNoErrors(model, Diagnostic.SYNTAX_DIAGNOSTIC)
+		assertEquals('''
+		XpathLocation {
+		    cref XpathExpression target XpathFilter {
+		        cref XpathExpression target XpathLocation {
+		            cref XpathExpression target AbsolutePath {
+		                cref XpathStep step XpathStep {
+		                    attr EString node 'll:x'
+		                }
+		            }
+		            cref XpathStep step XpathStep {
+		                attr EString node 'll:q'
+		            }
+		        }
+		        cref XpathExpression predicate XpathBinaryOperation {
+		            cref XpathExpression left RelativePath {
+		                cref XpathStep step XpathStep {
+		                    attr EString node 'll:a'
+		                }
+		            }
+		            attr EString operator '='
+		            cref XpathExpression right XpathLocation {
+		                cref XpathExpression target XpathLocation {
+		                    cref XpathExpression target XpathFunctionCall {
+		                        attr EString name 'current'
+		                    }
+		                    cref XpathStep step ParentRef {
+		                    }
+		                }
+		                cref XpathStep step XpathStep {
+		                    attr EString node 'a'
+		                }
+		            }
+		        }
+		    }
+		    cref XpathStep step XpathStep {
+		        attr EString node 'll:b'
+		    }
+		}'''.toString, EmfFormatter.objToStr((model.substatements.head as Path).reference))
 	}
 
 	@Test def void testParse() {

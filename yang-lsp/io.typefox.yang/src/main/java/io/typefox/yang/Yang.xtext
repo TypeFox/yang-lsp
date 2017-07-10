@@ -181,7 +181,7 @@ Container:
 
 // 7.5.3
 Must:
-	'must' constraint=Expression StatementEnd
+	'must' constraint=XpathExpression StatementEnd
 ;
 
 // 7.5.4.1 
@@ -399,7 +399,7 @@ Reference :
 	
 // 7.21.5
 When :
-	'when' condition=Expression StatementEnd
+	'when' condition=XpathExpression StatementEnd
 ;
 
 // 9.2.4 
@@ -461,7 +461,7 @@ Position:
 
 // 9.9.2
 Path:
-	'path' reference=Expression StatementEnd
+	'path' reference=XpathExpression StatementEnd
 ;
 
 // 9.9.3
@@ -494,23 +494,113 @@ IdentifierRef:
 	node=[SchemaNode|QNAME]
 ;
 
-PredicatedIdentifierRef:
-	IdentifierRef ({PredicatedIdentifierRef.ref=current} '[' predicate=Predicate ']')*
+/////////////////////////////////
+// Xpath 1.0
+/////////////////////////////////
+
+XpathExpression returns XpathExpression:  
+	XpathOrExpr
 ;
 
-Predicate:
-	left=(IdentifierRef|ThisLeafRef) '=' value=STRING
-	| value = NUMBER
+XpathOrExpr  returns XpathExpression:  
+	XpathAndExpr ({XpathBinaryOperation.left=current} operator='or' right=XpathAndExpr)*
 ;
 
-ThisLeafRef:
-	{ThisLeafRef} '.'
+XpathAndExpr  returns XpathExpression:  
+	XpathEqualityExpr ({XpathBinaryOperation.left=current} operator='and' right=XpathEqualityExpr)*
 ;
 
-InstanceIdentifier :
-	('/' elements+=PredicatedIdentifierRef)+
+XpathEqualityExpr returns XpathExpression:  
+	XpathRelationalExpr ({XpathBinaryOperation.left=current} operator=('='|'!=') right=XpathRelationalExpr)*
 ;
 
+XpathRelationalExpr returns XpathExpression : 
+	XpathAdditiveExpr ({XpathBinaryOperation.left=current} operator=('<'|'>'|'<='|'>=') right=XpathAdditiveExpr)*
+;
+
+XpathAdditiveExpr returns XpathExpression :  
+	XpathMultiplicativeExpr ({XpathBinaryOperation.left=current} operator=('+'|'-') right=XpathMultiplicativeExpr)*
+;
+
+XpathMultiplicativeExpr returns XpathExpression :  
+	XpathUnaryExpr ({XpathBinaryOperation.left=current} operator=('*'|'div'|'mod') right=XpathMultiplicativeExpr)?
+;
+
+XpathUnaryExpr returns XpathExpression :
+	{XpathUnaryOperation} operator='-' target=XpathUnionExpr
+	| XpathUnionExpr
+;
+
+XpathUnionExpr returns XpathExpression :  
+	 XpathPathExpr ({XpathBinaryOperation.left=current} operator='|' right=XpathUnionExpr)?
+;
+
+
+XpathPathExpr returns XpathExpression :  
+	 XpathFilterExpr ({XpathLocation.target=current} '/' ->(isAbbreviated?='/')? step=XpathStep ({XpathFilter.target = current} '[' predicate=XpathExpression ']')*)*
+;
+
+XpathFilterExpr returns XpathExpression : 
+	XpathPrimaryExpr ({XpathFilter.target = current} '[' predicate=XpathExpression ']')*
+;
+
+XpathPrimaryExpr returns XpathExpression :  
+	 {XpathVariableReference} '$' name=QNAME
+  |  '(' XpathExpression ')'
+  |  {XpathStringLiteral} value=STRING
+  |  {XpathNumberLiteral} value=NUMBER  
+  |  {XpathFunctionCall} name=QNAME '(' ( args+=XpathExpression ( ',' args+=XpathExpression )* )? ')'
+  |  {RelativePath} step=XpathStep
+  |  {AbsolutePath} '/' ->(isAbbreviated?='/')? ->step=XpathStep?
+;
+
+XpathStep returns XpathStep :
+	  {CurrentRef} '.'
+	| {ParentRef} '..'
+	| {AbbrevAttributeStep} '@' attributeName=ID  
+	| (axis=XpathAxisName '::')? node=XpathNodeTest
+;
+
+XpathNodeTest:  
+	 XpathNameTest
+  |  XpathNodeType '(' ')'
+  |  'processing-instruction' '(' STRING ')'
+;
+
+XpathNameTest:  
+	(ID ':')? ('*'|ID)
+;
+
+XpathNodeType:  
+     'comment'
+  |  'text'
+  |  'node'
+;
+  
+XpathAxisName:  
+     'ancestor'
+  |  'ancestor-or-self'
+  |  'attribute'
+  |  'child'
+  |  'descendant'
+  |  'descendant-or-self'
+  |  'following'
+  |  'following-sibling'
+  |  'namespace'
+  |  'parent'
+  |  'preceding'
+  |  'preceding-sibling'
+  |  'self'
+  ;
+
+
+/////////////////////////////////
+/////////////////////////////////
+/////////////////////////////////
+/////////////////////////////////
+/////////////////////////////////
+/////////////////////////////////
+/////////////////////////////////
 // Leafref path
 
 QNAME:
@@ -640,9 +730,6 @@ STATEMENT_KEYWORD :
 | 'yin-element'
 ;
 
-Expression :
-	(OPERATOR | BUILTIN_TYPE | ID | NUMBER | ':' |'('|')'|'['|']'|'.'|'..'|'/'|','| STRING)+
-;
 
 // lexer rules
 

@@ -33,10 +33,10 @@ class LexerTest {
 		l.assertNextToken(RULE_NUMBER,'23.4')
 		l.assertNextToken(Comma,',')
 		l.assertNextToken(RULE_NUMBER,'.5')
-		l.assertNextToken(RULE_OPERATOR,'+')
+		l.assertNextToken(PlusSign,'+')
 		l.assertNextToken(LeftParenthesis,'(')
 		l.assertNextToken(RULE_NUMBER,'.45')
-		l.assertNextToken(RULE_OPERATOR,'div')
+		l.assertNextToken(Div,'div')
 		l.assertNextToken(LeftParenthesis,'(')
 		l.assertNextToken(RULE_NUMBER,'23')
 		l.assertNextToken(RightParenthesis,')')
@@ -71,8 +71,6 @@ class LexerTest {
 		l.assertNextToken(Semicolon,';')
 	}
 	
-	
-	
 	@Test def void testBlackBoxDQString() {
 		val l = lexer.get
 		l.charStream = new ANTLRStringStream('''
@@ -101,7 +99,7 @@ class LexerTest {
 		l.assertNextToken(LeftSquareBracket,'[')
 		l.assertNextToken(RULE_ID,'x')
 		l.assertNextToken(RULE_WS,' ')
-		l.assertNextToken(RULE_OPERATOR,'=')
+		l.assertNextToken(EqualsSign,'=')
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(RULE_STRING,'"holla"')
 		l.assertNextToken(RightSquareBracket,']')
@@ -110,7 +108,7 @@ class LexerTest {
 	+ /* test */ 
 	")
 		l.assertNextToken(RULE_HIDDEN,"'")
-		l.assertNextToken(RULE_OPERATOR,'and')
+		l.assertNextToken(And,'and')
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(RULE_ID,'myFunction')
 		l.assertNextToken(LeftParenthesis,'(')
@@ -119,12 +117,12 @@ class LexerTest {
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(RULE_NUMBER,'.5')
 		l.assertNextToken(RULE_WS,' ')
-		l.assertNextToken(RULE_OPERATOR,'+')
+		l.assertNextToken(PlusSign,'+')
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(LeftParenthesis,'(')
 		l.assertNextToken(RULE_NUMBER,'.45')
 		l.assertNextToken(RULE_WS,' ')
-		l.assertNextToken(RULE_OPERATOR,'div')
+		l.assertNextToken(Div,'div')
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(RULE_NUMBER,'23')
 		l.assertNextToken(RightParenthesis,')')
@@ -149,7 +147,7 @@ class LexerTest {
 		l.assertNextToken(LeftSquareBracket,'[')
 		l.assertNextToken(RULE_ID,'x')
 		l.assertNextToken(RULE_WS,' ')
-		l.assertNextToken(RULE_OPERATOR,'=')
+		l.assertNextToken(EqualsSign,'=')
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(RULE_STRING,'\\\"holla\\\"')
 		l.assertNextToken(RightSquareBracket,']')
@@ -158,7 +156,7 @@ class LexerTest {
 	+ /* test */ 
 	')
 		l.assertNextToken(RULE_HIDDEN,'"')
-		l.assertNextToken(RULE_OPERATOR,'and')
+		l.assertNextToken(And,'and')
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(RULE_ID,'myFunction')
 		l.assertNextToken(LeftParenthesis,'(')
@@ -167,12 +165,12 @@ class LexerTest {
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(RULE_NUMBER,'.5')
 		l.assertNextToken(RULE_WS,' ')
-		l.assertNextToken(RULE_OPERATOR,'+')
+		l.assertNextToken(PlusSign,'+')
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(LeftParenthesis,'(')
 		l.assertNextToken(RULE_NUMBER,'.45')
 		l.assertNextToken(RULE_WS,' ')
-		l.assertNextToken(RULE_OPERATOR,'div')
+		l.assertNextToken(Div,'div')
 		l.assertNextToken(RULE_WS,' ')
 		l.assertNextToken(RULE_NUMBER,'23')
 		l.assertNextToken(RightParenthesis,')')

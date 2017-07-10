@@ -65,7 +65,8 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Container" eSuperTypes="#//DataSchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Must" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="constraint" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="constraint" eType="#//XpathExpression"
+        containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="ErrorMessage" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="message" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -164,7 +165,8 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="reference" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="When" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="condition" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="condition" eType="#//XpathExpression"
+        containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Range" eSuperTypes="#//Refinable"/>
   <eClassifiers xsi:type="ecore:EClass" name="FractionDigits" eSuperTypes="#//OtherStatement">
@@ -190,7 +192,8 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="position" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Path" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="reference" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="reference" eType="#//XpathExpression"
+        containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="RequireInstance" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="isRequireInstance" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
@@ -208,24 +211,13 @@
   <eClassifiers xsi:type="ecore:EClass" name="GroupingRef">
     <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//Grouping"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="IdentifierRef" eSuperTypes="#//PredicatedIdentifierRef">
+  <eClassifiers xsi:type="ecore:EClass" name="IdentifierRef">
     <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//SchemaNode"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="PredicatedIdentifierRef">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="ref" eType="#//PredicatedIdentifierRef"
-        containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EReference" name="predicate" eType="#//Predicate"
-        containment="true"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="Predicate">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="left" eType="ecore:EClass http://www.eclipse.org/emf/2002/Ecore#//EObject"
-        containment="true"/>
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="ThisLeafRef"/>
-  <eClassifiers xsi:type="ecore:EClass" name="InstanceIdentifier">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="elements" upperBound="-1"
-        eType="#//PredicatedIdentifierRef" containment="true"/>
+  <eClassifiers xsi:type="ecore:EClass" name="XpathExpression"/>
+  <eClassifiers xsi:type="ecore:EClass" name="XpathStep">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="axis" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="node" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="BinaryOperator" eSuperTypes="#//Expression">
     <eStructuralFeatures xsi:type="ecore:EReference" name="left" eType="#//Expression"
@@ -254,4 +246,57 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Min" eSuperTypes="#//Expression"/>
   <eClassifiers xsi:type="ecore:EClass" name="Max" eSuperTypes="#//Expression"/>
+  <eClassifiers xsi:type="ecore:EClass" name="XpathBinaryOperation" eSuperTypes="#//XpathExpression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="left" eType="#//XpathExpression"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="operator" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="right" eType="#//XpathExpression"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="XpathUnaryOperation" eSuperTypes="#//XpathExpression">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="operator" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//XpathExpression"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="XpathLocation" eSuperTypes="#//XpathExpression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//XpathExpression"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isAbbreviated" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="step" eType="#//XpathStep"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="XpathFilter" eSuperTypes="#//XpathExpression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//XpathExpression"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="predicate" eType="#//XpathExpression"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="XpathVariableReference" eSuperTypes="#//XpathExpression">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="XpathStringLiteral" eSuperTypes="#//XpathExpression">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="XpathNumberLiteral" eSuperTypes="#//XpathExpression">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="value" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="XpathFunctionCall" eSuperTypes="#//XpathExpression">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="args" upperBound="-1" eType="#//XpathExpression"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="RelativePath" eSuperTypes="#//XpathExpression">
+    <eStructuralFeatures xsi:type="ecore:EReference" name="step" eType="#//XpathStep"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="AbsolutePath" eSuperTypes="#//XpathExpression">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isAbbreviated" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="step" eType="#//XpathStep"
+        containment="true"/>
+  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="CurrentRef" eSuperTypes="#//XpathStep"/>
+  <eClassifiers xsi:type="ecore:EClass" name="ParentRef" eSuperTypes="#//XpathStep"/>
+  <eClassifiers xsi:type="ecore:EClass" name="AbbrevAttributeStep" eSuperTypes="#//XpathStep">
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="attributeName" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+  </eClassifiers>
 </ecore:EPackage>

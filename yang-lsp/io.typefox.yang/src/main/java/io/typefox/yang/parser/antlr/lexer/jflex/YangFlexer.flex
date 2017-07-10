@@ -92,6 +92,7 @@ OPERATOR= "and" | "or" | "mod" | "div" | "*" | "|" | "+" | "-" | "=" | "!=" | "<
 STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | {SL_COMMENT})*
 
 %s EXPRESSION, IN_EXPRESSION_STRING, IN_SQ_EXPRESSION_STRING
+%s XPATH_EXPRESSION, IN_XPATH_EXPRESSION_STRING, IN_SQ_XPATH_EXPRESSION_STRING
 %s REFINEMENT_EXPRESSION, IN_REFINEMENT_EXPRESSION_STRING, IN_SQ_REFINEMENT_EXPRESSION_STRING
 %s IF_FEATURE_EXPRESSION, IN_IF_FEATURE_EXPRESSION_STRING, IN_SQ_IF_FEATURE_EXPRESSION_STRING
 %s COLON_EXPECTED, ID_EXPECTED
@@ -229,7 +230,174 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	"'" {STRING_CONCAT} { yybegin(EXPRESSION); return RULE_HIDDEN; }
 	"'"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
 }
+<XPATH_EXPRESSION> {
+	{ML_COMMENT} { return RULE_ML_COMMENT; }
+	{SL_COMMENT} { return RULE_SL_COMMENT; }
+	\"          {yybegin(IN_XPATH_EXPRESSION_STRING); return RULE_HIDDEN;}
+	"'"         {yybegin(IN_SQ_XPATH_EXPRESSION_STRING); return RULE_HIDDEN;}
+	"comment"							{return Comment;}
+	"text"								{return Text;}
+	"processing-instruction"				{return ProcessingInstruction;}
+	"node"								{return Node;}
+	
+	"ancestor"							{return Ancestor;}
+	"ancestor-or-self"					{return AncestorOrSelf;}
+	"attribute"							{return Attribute;}
+	"child"								{return Child;}
+	"descendant"							{return Descendant;}
+	"descendant-or-self"					{return DescendantOrSelf;}
+	"following"							{return Following;}
+	"following-sibling"					{return FollowingSibling;}
+	"namespace"							{return Namespace;}
+	"parent"								{return Parent;}
+	"preceding"							{return Preceding;}
+	"preceding-sibling"					{return PrecedingSibling;}
+	"self"								{return Self;}
+	
+	"or" 								{return Or;}
+	"and"								{return And;}
+	"div"								{return Div;}
+	"mod"								{return Mod;}
+	
+	{ID}									{ return RULE_ID; }
+	{NUMBER}								{ return RULE_NUMBER; }
+	
+	"="         { return EqualsSign; }
+	"!="	        { return ExclamationMarkEqualsSign; }
+	"<"         { return LessThanSign; }
+	">"         { return GreaterThanSign; }
+	"<="	        { return LessThanSignEqualsSign; }
+	">="        { return GreaterThanSignEqualsSign; }
+	"+"         { return PlusSign; }
+	"-"         { return HyphenMinus; }
+	"*"         { return Asterisk; }
+	"$"         { return DollarSign; }
+	"|"         { return VerticalLine; }
+	"@"         { return CommercialAt; }
+	
+	":"         { return Colon; }
+	"("         { return LeftParenthesis; }
+	")"         { return RightParenthesis; }
+	"["         { return LeftSquareBracket; }
+	"]"         { return RightSquareBracket; }
+	"."         { return FullStop; }
+	".."        { return FullStopFullStop; }
+	"/"         { return Solidus; }
+	","         { return Comma; }
+}
 
+<IN_XPATH_EXPRESSION_STRING> {
+	{SINGLE_QUOTED_STRING} { return RULE_STRING; }
+	{ESCAPED_DQ_STRING}    { return RULE_STRING; }
+	"comment"							{return Comment;}
+	"text"								{return Text;}
+	"processing-instruction"				{return ProcessingInstruction;}
+	"node"								{return Node;}
+	
+	"ancestor"							{return Ancestor;}
+	"ancestor-or-self"					{return AncestorOrSelf;}
+	"attribute"							{return Attribute;}
+	"child"								{return Child;}
+	"descendant"							{return Descendant;}
+	"descendant-or-self"					{return DescendantOrSelf;}
+	"following"							{return Following;}
+	"following-sibling"					{return FollowingSibling;}
+	"namespace"							{return Namespace;}
+	"parent"								{return Parent;}
+	"preceding"							{return Preceding;}
+	"preceding-sibling"					{return PrecedingSibling;}
+	"self"								{return Self;}
+	
+	"or" 								{return Or;}
+	"and"								{return And;}
+	"div"								{return Div;}
+	"mod"								{return Mod;}
+	
+	{ID}									{ return RULE_ID; }
+	{NUMBER}								{ return RULE_NUMBER; }
+	
+	"="         { return EqualsSign; }
+	"!="	        { return ExclamationMarkEqualsSign; }
+	"<"         { return LessThanSign; }
+	">"         { return GreaterThanSign; }
+	"<="	        { return LessThanSignEqualsSign; }
+	">="        { return GreaterThanSignEqualsSign; }
+	"+"         { return PlusSign; }
+	"-"         { return HyphenMinus; }
+	"*"         { return Asterisk; }
+	"$"         { return DollarSign; }
+	"|"         { return VerticalLine; }
+	"@"         { return CommercialAt; }
+	
+	":"         { return Colon; }
+	"("         { return LeftParenthesis; }
+	")"         { return RightParenthesis; }
+	"["         { return LeftSquareBracket; }
+	"]"         { return RightSquareBracket; }
+	"."         { return FullStop; }
+	".."        { return FullStopFullStop; }
+	"/"         { return Solidus; }
+	","         { return Comma; }
+
+	\" {STRING_CONCAT} { yybegin(XPATH_EXPRESSION); return RULE_HIDDEN; }
+	\"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
+}
+
+<IN_SQ_XPATH_EXPRESSION_STRING> {
+	{DOUBLE_QUOTED_STRING}    { return RULE_STRING; }
+	"comment"							{return Comment;}
+	"text"								{return Text;}
+	"processing-instruction"				{return ProcessingInstruction;}
+	"node"								{return Node;}
+	
+	"ancestor"							{return Ancestor;}
+	"ancestor-or-self"					{return AncestorOrSelf;}
+	"attribute"							{return Attribute;}
+	"child"								{return Child;}
+	"descendant"							{return Descendant;}
+	"descendant-or-self"					{return DescendantOrSelf;}
+	"following"							{return Following;}
+	"following-sibling"					{return FollowingSibling;}
+	"namespace"							{return Namespace;}
+	"parent"								{return Parent;}
+	"preceding"							{return Preceding;}
+	"preceding-sibling"					{return PrecedingSibling;}
+	"self"								{return Self;}
+	
+	"or" 								{return Or;}
+	"and"								{return And;}
+	"div"								{return Div;}
+	"mod"								{return Mod;}
+	
+	{ID}									{ return RULE_ID; }
+	{NUMBER}								{ return RULE_NUMBER; }
+	
+	"="         { return EqualsSign; }
+	"!="	        { return ExclamationMarkEqualsSign; }
+	"<"         { return LessThanSign; }
+	">"         { return GreaterThanSign; }
+	"<="	        { return LessThanSignEqualsSign; }
+	">="        { return GreaterThanSignEqualsSign; }
+	"+"         { return PlusSign; }
+	"-"         { return HyphenMinus; }
+	"*"         { return Asterisk; }
+	"$"         { return DollarSign; }
+	"|"         { return VerticalLine; }
+	"@"         { return CommercialAt; }
+	
+	":"         { return Colon; }
+	"("         { return LeftParenthesis; }
+	")"         { return RightParenthesis; }
+	"["         { return LeftSquareBracket; }
+	"]"         { return RightSquareBracket; }
+	"."         { return FullStop; }
+	".."        { return FullStopFullStop; }
+	"/"         { return Solidus; }
+	","         { return Comma; }
+
+	"'" {STRING_CONCAT} { yybegin(XPATH_EXPRESSION); return RULE_HIDDEN; }
+	"'"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
+}
 <REFINEMENT_EXPRESSION> {
 	{ML_COMMENT} { return RULE_ML_COMMENT; }
 	{SL_COMMENT} { return RULE_SL_COMMENT; }
@@ -263,7 +431,6 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	"'" {STRING_CONCAT} { yybegin(REFINEMENT_EXPRESSION); return RULE_HIDDEN; }
 	"'"                 { yybegin(YYINITIAL); return RULE_HIDDEN; }
 }
-
 <IF_FEATURE_EXPRESSION> {
 	{ML_COMMENT} { return RULE_ML_COMMENT; }
 	{SL_COMMENT} { return RULE_SL_COMMENT; }
@@ -344,13 +511,13 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "min-elements"           {yybegin(BLACK_BOX_STRING); return MinElements; }
  "modifier"               {yybegin(BLACK_BOX_STRING); return Modifier; }
  "module"                 {yybegin(BLACK_BOX_STRING); return Module; }
- "must"                   {yybegin(EXPRESSION); return Must; }
+ "must"                   {yybegin(XPATH_EXPRESSION); return Must; }
  "namespace"              {yybegin(BLACK_BOX_STRING); return Namespace; }
  "notification"           {yybegin(BLACK_BOX_STRING); return Notification; }
  "ordered-by"             {yybegin(BLACK_BOX_STRING); return OrderedBy; }
  "organization"           {yybegin(BLACK_BOX_STRING); return Organization; }
  "output"                 {yybegin(BLACK_BOX_STRING); return Output; }
- "path"                   {yybegin(EXPRESSION); return Path; }
+ "path"                   {yybegin(XPATH_EXPRESSION); return Path; }
  "pattern"                {yybegin(BLACK_BOX_STRING); return Pattern; }
  "position"               {yybegin(BLACK_BOX_STRING); return Position; }
  "prefix"                 {yybegin(BLACK_BOX_STRING); return Prefix; }
@@ -370,7 +537,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
  "units"                  {yybegin(BLACK_BOX_STRING); return Units; }
  "uses"                   {yybegin(EXPRESSION); return Uses; }
  "value"                  {yybegin(BLACK_BOX_STRING); return Value; }
- "when"                   {yybegin(EXPRESSION); return When; }
+ "when"                   {yybegin(XPATH_EXPRESSION); return When; }
  "yang-version"           {yybegin(BLACK_BOX_STRING); return YangVersion; }
  "yin-element"            {yybegin(BLACK_BOX_STRING); return YinElement; }
  

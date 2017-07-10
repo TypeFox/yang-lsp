@@ -19,6 +19,7 @@ class FlexGenerator {
 		boolean canContainString
 	} 
 	
+	
 	val predefinedRules = '''
 		WS=[\ \n\r\t]+
 		
@@ -77,6 +78,58 @@ class FlexGenerator {
 		","         { return Comma; }
 	''', true)
 	
+	val XpathExpressionMode = new ExpressionMode('XPATH_EXPRESSION','''
+		"comment"							{return Comment;}
+		"text"								{return Text;}
+		"processing-instruction"				{return ProcessingInstruction;}
+		"node"								{return Node;}
+		
+		"ancestor"							{return Ancestor;}
+		"ancestor-or-self"					{return AncestorOrSelf;}
+		"attribute"							{return Attribute;}
+		"child"								{return Child;}
+		"descendant"							{return Descendant;}
+		"descendant-or-self"					{return DescendantOrSelf;}
+		"following"							{return Following;}
+		"following-sibling"					{return FollowingSibling;}
+		"namespace"							{return Namespace;}
+		"parent"								{return Parent;}
+		"preceding"							{return Preceding;}
+		"preceding-sibling"					{return PrecedingSibling;}
+		"self"								{return Self;}
+		
+		"or" 								{return Or;}
+		"and"								{return And;}
+		"div"								{return Div;}
+		"mod"								{return Mod;}
+
+		{ID}									{ return RULE_ID; }
+		{NUMBER}								{ return RULE_NUMBER; }
+		
+		"="         { return EqualsSign; }
+		"!="	        { return ExclamationMarkEqualsSign; }
+		"<"         { return LessThanSign; }
+		">"         { return GreaterThanSign; }
+		"<="	        { return LessThanSignEqualsSign; }
+		">="        { return GreaterThanSignEqualsSign; }
+		"+"         { return PlusSign; }
+		"-"         { return HyphenMinus; }
+		"*"         { return Asterisk; }
+		"$"         { return DollarSign; }
+		"|"         { return VerticalLine; }
+		"@"         { return CommercialAt; }
+		
+		":"         { return Colon; }
+		"("         { return LeftParenthesis; }
+		")"         { return RightParenthesis; }
+		"["         { return LeftSquareBracket; }
+		"]"         { return RightSquareBracket; }
+		"."         { return FullStop; }
+		".."        { return FullStopFullStop; }
+		"/"         { return Solidus; }
+		","         { return Comma; }
+	''', true)
+	
 	val RefinementMode = new ExpressionMode('REFINEMENT_EXPRESSION','''
 		{NUMBER}    { return RULE_NUMBER; }
 		"|"  	    { return VerticalLine; }
@@ -95,6 +148,7 @@ class FlexGenerator {
 		")"        { return RightParenthesis; }
 	''', false)
 	
+	val allModes = #[GenericExpressionMode, XpathExpressionMode, RefinementMode, IfFeatureMode]
 	
 	val statements = '''
 		"action"                  {yybegin(BLACK_BOX_STRING); return Action; }
@@ -136,13 +190,13 @@ class FlexGenerator {
 		 "min-elements"           {yybegin(BLACK_BOX_STRING); return MinElements; }
 		 "modifier"               {yybegin(BLACK_BOX_STRING); return Modifier; }
 		 "module"                 {yybegin(BLACK_BOX_STRING); return Module; }
-		 "must"                   {yybegin(«GenericExpressionMode.name»); return Must; }
+		 "must"                   {yybegin(«XpathExpressionMode.name»); return Must; }
 		 "namespace"              {yybegin(BLACK_BOX_STRING); return Namespace; }
 		 "notification"           {yybegin(BLACK_BOX_STRING); return Notification; }
 		 "ordered-by"             {yybegin(BLACK_BOX_STRING); return OrderedBy; }
 		 "organization"           {yybegin(BLACK_BOX_STRING); return Organization; }
 		 "output"                 {yybegin(BLACK_BOX_STRING); return Output; }
-		 "path"                   {yybegin(«GenericExpressionMode.name»); return Path; }
+		 "path"                   {yybegin(«XpathExpressionMode.name»); return Path; }
 		 "pattern"                {yybegin(BLACK_BOX_STRING); return Pattern; }
 		 "position"               {yybegin(BLACK_BOX_STRING); return Position; }
 		 "prefix"                 {yybegin(BLACK_BOX_STRING); return Prefix; }
@@ -162,7 +216,7 @@ class FlexGenerator {
 		 "units"                  {yybegin(BLACK_BOX_STRING); return Units; }
 		 "uses"                   {yybegin(«GenericExpressionMode.name»); return Uses; }
 		 "value"                  {yybegin(BLACK_BOX_STRING); return Value; }
-		 "when"                   {yybegin(«GenericExpressionMode.name»); return When; }
+		 "when"                   {yybegin(«XpathExpressionMode.name»); return When; }
 		 "yang-version"           {yybegin(BLACK_BOX_STRING); return YangVersion; }
 		 "yin-element"            {yybegin(BLACK_BOX_STRING); return YinElement; }
 	'''
@@ -274,7 +328,7 @@ class FlexGenerator {
 		
 		«predefinedRules»
 		
-		«FOR m : #[GenericExpressionMode, RefinementMode, IfFeatureMode]»
+		«FOR m : allModes»
 			%s «m.name», IN_«m.name»_STRING, IN_SQ_«m.name»_STRING
 		«ENDFOR»
 		%s COLON_EXPECTED, ID_EXPECTED
@@ -292,11 +346,9 @@ class FlexGenerator {
 			{SL_COMMENT} { return RULE_SL_COMMENT; }
 		}
 		
-		«generateExpressionMode(GenericExpressionMode)»
-		
-		«generateExpressionMode(RefinementMode)»
-		
-		«generateExpressionMode(IfFeatureMode)»
+		«FOR mode : allModes»
+			«generateExpressionMode(mode)»
+		«ENDFOR»
 		
 		<YYINITIAL> {
 		«statements»
