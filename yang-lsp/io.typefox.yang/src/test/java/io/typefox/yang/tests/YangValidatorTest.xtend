@@ -701,5 +701,25 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Value).head, TYPE_ERROR, '''10''');
 	}
+	
+	@Test
+	def void checkEnumerationValue_05() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type enumeration {
+			      enum "a" {
+			        value 2147483647;
+			      }
+			      enum "b";
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, '''"b"''');
+	}
 
 }

@@ -161,6 +161,9 @@ class YangEnumeration {
 						val object = currentItem.node.substatements.filter(Value).head;
 						acceptor.acceptError(message, object, VALUE__VALUE, INSIGNIFICANT_INDEX, TYPE_ERROR);
 					}
+				} else if (maxValue >= Integer.MAX_VALUE) {
+					val message = '''Cannot automatically asign a value to enumeration. A concrete value has to be assigned instead.''';			
+					acceptor.acceptError(message, currentItem.node, ENUM__NAME, INSIGNIFICANT_INDEX, TYPE_ERROR);
 				}
 			}
 		];
