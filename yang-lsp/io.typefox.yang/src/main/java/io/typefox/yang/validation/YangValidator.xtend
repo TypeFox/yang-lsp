@@ -25,7 +25,6 @@ import static io.typefox.yang.validation.IssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 import static extension com.google.common.base.Strings.nullToEmpty
-import static extension org.eclipse.xtext.EcoreUtil2.getAllContentsOfType
 
 /**
  * This class contains custom validation rules for the YANG language. 
@@ -60,16 +59,18 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def void checkTypeRestriction(Type it) {
+		val t = it;
+		println(t);
 		// https://tools.ietf.org/html/rfc7950#section-9.2.3
 		// https://tools.ietf.org/html/rfc7950#section-9.3.3
 		// Same for string it just has another statement name.
 		// https://tools.ietf.org/html/rfc7950#section-9.4.3
-		val refinements = getAllContentsOfType(Refinable);
+		val refinements = eContents.filter(Refinable);
 		if (!refinements.nullOrEmpty) {
 			val expectedRefinementKind = refinementKind;
 			refinements.forEach [
-				if (expectedRefinementKind===null || !(expectedRefinementKind.isAssignableFrom(it.class))) {					
-					val message = '''Type cannot have '«YangNameUtils.getYangName(it.class)»' restriction statement.''';
+				if (expectedRefinementKind === null || !(expectedRefinementKind.isAssignableFrom(it.class))) {					
+					val message = '''Type cannot have '«YangNameUtils.getYangName(it.eClass)»' restriction statement.''';
 					error(message, it, REFINABLE__EXPRESSION, TYPE_ERROR);
 				}
 			];
@@ -92,7 +93,7 @@ class YangValidator extends AbstractYangValidator {
 				yangEnumeration.validate(this);
 			}
 		} else {
-			type.getAllContentsOfType(Enum).forEach [
+			type.eContents.filter(Enum).forEach [
 				val message = '''Only enumeration types can have a "enum" statement.''';
 				error(message, type, TYPE__TYPE_REF, TYPE_ERROR);
 			];

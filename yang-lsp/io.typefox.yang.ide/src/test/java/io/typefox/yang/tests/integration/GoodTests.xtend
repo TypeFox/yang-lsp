@@ -56,10 +56,6 @@ class GoodTests {
 	val protected String simpleName // only used in value of @Parameters
 	
 	@Test def void checkDiagnostics() {
-		if (this.simpleName == 'yt2.yang') {
-			// ignored
-			return;
-		}
 		val issues = diagnostics.sortBy[range.start.line].sortBy[range.start.character].toList
 		val inserts = newArrayList()
 		val lines = Files.readAllLines(new File(URI.createURI(uri).toFileString).toPath)
