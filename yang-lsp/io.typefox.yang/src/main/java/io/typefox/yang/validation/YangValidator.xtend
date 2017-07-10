@@ -59,8 +59,6 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def void checkTypeRestriction(Type it) {
-		val t = it;
-		println(t);
 		// https://tools.ietf.org/html/rfc7950#section-9.2.3
 		// https://tools.ietf.org/html/rfc7950#section-9.3.3
 		// Same for string it just has another statement name.
