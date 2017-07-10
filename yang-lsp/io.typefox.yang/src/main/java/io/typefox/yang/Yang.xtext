@@ -557,8 +557,8 @@ XpathPrimaryExpr returns XpathExpression :
 XpathStep returns XpathStep :
 	  {CurrentRef} '.'
 	| {ParentRef} '..'
-	| {AbbrevAttributeStep} '@' attributeName=ID  
-	| (axis=XpathAxisName '::')? node=XpathNodeTest
+	| {AbbrevAttributeStep} '@' attributeName=(XpathIDOrKw|'*')  
+	| (axis=XpathAxisName ':' ':')? node=XpathNodeTest
 ;
 
 XpathNodeTest:  
@@ -568,7 +568,7 @@ XpathNodeTest:
 ;
 
 XpathNameTest:  
-	(ID ':')? ('*'|ID)
+	(ID ':')? ('*'|XpathIDOrKw)
 ;
 
 XpathNodeType:  
@@ -591,8 +591,11 @@ XpathAxisName:
   |  'preceding'
   |  'preceding-sibling'
   |  'self'
-  ;
+;
 
+XpathIDOrKw :
+	ID | 'div' | 'and'| 'or' | 'mod' | XpathAxisName | XpathNodeType
+;
 
 /////////////////////////////////
 /////////////////////////////////

@@ -85,7 +85,8 @@ SINGLE_QUOTED_STRING= "'" [^']* "'"?
 DOUBLE_QUOTED_STRING= \" ([^\\\"]|\\.)* \"?
 ESCAPED_DQ_STRING= \\\" [^\\\"]* \\\"?
 
-NUMBER= ("+"|"-")?[0-9]+ ("." [0-9]+)? | "." [0-9]+ 
+NUMBER= ("+"|"-")? {U_NUMBER}
+U_NUMBER= [0-9]+ ("." [0-9]+)? | "." [0-9]+
 
 OPERATOR= "and" | "or" | "mod" | "div" | "*" | "|" | "+" | "-" | "=" | "!=" | "<" | "<=" | ">" | ">="
 
@@ -260,7 +261,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	"mod"								{return Mod;}
 	
 	{ID}									{ return RULE_ID; }
-	{NUMBER}								{ return RULE_NUMBER; }
+	{U_NUMBER}								{ return RULE_NUMBER; }
 	
 	"="         { return EqualsSign; }
 	"!="	        { return ExclamationMarkEqualsSign; }
@@ -314,7 +315,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	"mod"								{return Mod;}
 	
 	{ID}									{ return RULE_ID; }
-	{NUMBER}								{ return RULE_NUMBER; }
+	{U_NUMBER}								{ return RULE_NUMBER; }
 	
 	"="         { return EqualsSign; }
 	"!="	        { return ExclamationMarkEqualsSign; }
@@ -370,7 +371,7 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	"mod"								{return Mod;}
 	
 	{ID}									{ return RULE_ID; }
-	{NUMBER}								{ return RULE_NUMBER; }
+	{U_NUMBER}								{ return RULE_NUMBER; }
 	
 	"="         { return EqualsSign; }
 	"!="	        { return ExclamationMarkEqualsSign; }

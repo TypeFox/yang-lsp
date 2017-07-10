@@ -50,6 +50,7 @@ class IntegrationTest {
 		lexer.charStream = new ANTLRFileStream(file.absolutePath)
 		var t = lexer.nextToken
 		val buffer = new StringBuffer
+		val tokens = newArrayList
 		while (t.type !== JFlexBasedInternalYangLexer.EOF) {
 			if (t.type === JFlexBasedInternalYangLexer.RULE_ANY_OTHER) {
 				Assert.fail('''
@@ -61,8 +62,8 @@ class IntegrationTest {
 			}
 			try {
 				buffer.append(t.text)
+				tokens.add(t) 
 				t = lexer.nextToken
-				
 			} catch (Error e) {
 			}
 		}

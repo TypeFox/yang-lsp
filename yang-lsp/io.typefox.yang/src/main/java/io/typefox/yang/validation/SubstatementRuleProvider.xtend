@@ -230,6 +230,7 @@ class SubstatementRuleProvider {
 
 	static val LIST_RULE = newRule()
 		.optional(WHEN)
+		.any(IF_FEATURE)
 		.any(MUST)
 		.optional(KEY)
 		.any(UNIQUE)

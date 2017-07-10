@@ -75,6 +75,13 @@ class YangParsingTest {
 		    }
 		}'''.toString, EmfFormatter.objToStr((model.substatements.head as Path).reference))
 	}
+	
+	@Test def void testXpath_02() {
+		val m  = '''
+			must "child::para[position()=last()-1]";
+		'''.wrapModule.parse
+		helper.assertNoErrors(m, Diagnostic.SYNTAX_DIAGNOSTIC)
+	}
 
 	@Test def void testParse() {
 		val model = '''

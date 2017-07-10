@@ -312,10 +312,25 @@ class LexerTest {
 		l.assertNextToken(EOF,null)
 	}
 	
+	@Test def void testString() {
+		val l = lexer.get
+		l.charStream = new ANTLRStringStream('''
+			description "User variable type; only 'global' variables can \\
+					be saved in the yangcli uservars file.";
+		''')
+		l.assertNextToken(Description, 'description')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(RULE_STRING, null)
+		l.assertNextToken(Semicolon, ';')
+		l.assertNextToken(RULE_WS, null)
+		l.assertNextToken(EOF, null)
+	}
+	
 	private def void assertNextToken(Lexer it, int id, String text) {
 		val t = nextToken
 		assertEquals(id, t.type)
-		assertEquals(text, t.text)
+		if (text !== null)
+			assertEquals(text, t.text)
 	}
 	
 }
