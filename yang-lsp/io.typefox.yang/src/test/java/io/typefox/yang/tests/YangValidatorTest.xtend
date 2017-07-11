@@ -1,12 +1,15 @@
 package io.typefox.yang.tests
 
+import io.typefox.yang.yang.Bit
 import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Description
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.Expression
 import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Import
+import io.typefox.yang.yang.Literal
 import io.typefox.yang.yang.Modifier
+import io.typefox.yang.yang.Position
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Type
@@ -16,7 +19,6 @@ import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
 
 import static io.typefox.yang.validation.IssueCodes.*
-import io.typefox.yang.yang.Literal
 
 /**
  * Validation test for the YANG language.
@@ -295,7 +297,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Refinable).head, TYPE_ERROR, '''-10 | 9''');
 	}
-	
+
 	@Test
 	def void checkLengthRestriction_02() {
 		val it = load('''
@@ -312,7 +314,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertNoErrors;
 	}
-	
+
 	@Test
 	def void checkLengthRestriction_03() {
 		val it = load('''
@@ -836,6 +838,188 @@ class YangValidatorTest extends AbstractYangTest {
 			}
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Type).head, TYPE_ERROR, '''union''');
+	}
+
+	@Test
+	def void checkUnionType_02() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef bar {
+			    type union {
+			      type string {
+			        pattern "[0-9a-fA-F]*";
+			      }
+			      type enumeration {
+			        enum default-filter;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
+	}
+
+	@Test
+	def void checkBitsType_01() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef bar {
+			    type bits {
+			    	  bit disable-nagle {
+			    	    position 0;
+			      }
+			      bit auto-sense-speed {
+			        position 1;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
+	}
+
+	@Test
+	def void checkBitsType_02() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef bar {
+			    type bits {
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Type).head, TYPE_ERROR, '''bits''');
+	}
+
+	@Test
+	def void checkBitsType_03() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef bar {
+			    type bits {
+			    	  bit dupe {
+			    	    position 0;
+			      }
+			      bit dupe {
+			        position 1;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, TYPE_ERROR, '''dupe''');
+	}
+
+	@Test
+	def void checkBitsPosition_01() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef bar {
+			    type bits {
+			    	  bit a {
+			    	    position 3;
+			      }
+			      bit b {
+			        position 3;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''3''');
+	}
+	
+	@Test
+	def void checkBitsPosition_02() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef bar {
+			    type bits {
+			    	  bit a {
+			    	    position invalid;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''invalid''');
+	}
+	
+	@Test
+	def void checkBitsPosition_03() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef bar {
+			    type bits {
+			    	  bit a {
+			    	    position -1;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''-1''');
+	}
+	
+	@Test
+	def void checkBitsPosition_04() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef bar {
+			    type bits {
+			    	  bit a {
+			    	    position 4294967296;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''4294967296''');
+	}
+	
+	@Test
+	def void checkBitsPosition_05() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef bar {
+			    type bits {
+			    	  bit canAssign;
+			    	  bit a {
+			    	    position 4294967295;
+			      }
+			      bit cannotAssign;
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, TYPE_ERROR, '''cannotAssign''');
 	}
 
 }

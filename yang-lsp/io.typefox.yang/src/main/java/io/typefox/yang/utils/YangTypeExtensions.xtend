@@ -75,6 +75,10 @@ class YangTypeExtensions {
 		return grammarAccess.BUILTIN_TYPEAccess.unionKeyword_18.value;
 	];
 
+	val Supplier<String> bitsBuiltin = Suppliers.memoize [
+		return grammarAccess.BUILTIN_TYPEAccess.bitsKeyword_1.value;
+	];
+
 	/**
 	 * Returns {@code true} if the type of the type definition argument is a YANG built-in type.
 	 */
@@ -132,6 +136,13 @@ class YangTypeExtensions {
 	}
 
 	/**
+	 * Returns {@code true} if the argument is a directly derived from the bits YANG type, otherwise {@code false}.
+	 */
+	def boolean isBitsBuiltin(Type it) {
+		return bitsBuiltin.get == typeRef.builtin;
+	}
+
+	/**
 	 * Sugar for {@code isSubtypeOfInteger(Type) || isSubtypeOfDecimal(Type)}.
 	 */
 	def boolean isSubtypeOfNumber(Type it) {
@@ -171,6 +182,13 @@ class YangTypeExtensions {
 	 */
 	def boolean isSubtypeOfEnumeration(Type it) {
 		return isSubtypeOf[isEnumerationBuiltin];
+	}
+
+	/**
+	 * {@code true} if the argument is either a direct or transitive subtype of the YANG enumeration type, otherwise {@code false};
+	 */
+	def boolean isSubtypeOfBits(Type it) {
+		return isSubtypeOf[isBitsBuiltin];
 	}
 
 	private def boolean isSubtypeOf(Type it, (Type)=>boolean subtypePredicate) {
