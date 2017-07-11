@@ -29,7 +29,7 @@ import static extension com.google.common.collect.ImmutableMap.copyOf
  * @author akos.kitta
  */
 @Singleton
-class YangTypeExtensions {
+class YangTypesExtensions {
 
 	@Inject
 	extension YangExtensions;
@@ -96,49 +96,49 @@ class YangTypeExtensions {
 	/**
 	 * Returns {@code true} if the type argument is a direct subtype of the built-in integer.
 	 */
-	def boolean isIntegerBuiltin(Type it) {
+	def boolean isInteger(Type it) {
 		return integerBuiltins.get.keySet.contains(typeRef.builtin);
 	}
 
 	/**
 	 * Returns {@code true} if the type argument is a direct subtype of the built-in 64-bit decimal.
 	 */
-	def boolean isDecimalBuiltin(Type it) {
+	def boolean isDecimal(Type it) {
 		return decimalBuiltin.get == typeRef.builtin;
 	}
 
 	/**
 	 * Returns {@code true} if the type argument is a direct subtype of the built-in string YANG type.
 	 */
-	def boolean isStringBuiltin(Type it) {
+	def boolean isString(Type it) {
 		return stringBuiltin.get == typeRef.builtin;
 	}
 
 	/**
 	 * {@code true} if the argument is a direct subtype of the binary built-in YANG type.
 	 */
-	def boolean isBinaryBuiltin(Type it) {
+	def boolean isBinary(Type it) {
 		return binaryBuiltin.get == typeRef.builtin;
 	}
 
 	/**
 	 * Returns {@code true} if the type argument is a subtype of the built-in YANG enumeration type.
 	 */
-	def boolean isEnumerationBuiltin(Type it) {
+	def boolean isEnumeration(Type it) {
 		return enumerationBuiltin.get == typeRef.builtin;
 	}
 
 	/**
 	 * {@code true} if the type is a direct subtype of the built-in union type, otherwise {@code false}.
 	 */
-	def boolean isUnionBuiltin(Type it) {
+	def boolean isUnion(Type it) {
 		return unionBuiltin.get == typeRef.builtin;
 	}
 
 	/**
 	 * Returns {@code true} if the argument is a directly derived from the bits YANG type, otherwise {@code false}.
 	 */
-	def boolean isBitsBuiltin(Type it) {
+	def boolean isBits(Type it) {
 		return bitsBuiltin.get == typeRef.builtin;
 	}
 
@@ -146,49 +146,49 @@ class YangTypeExtensions {
 	 * Sugar for {@code isSubtypeOfInteger(Type) || isSubtypeOfDecimal(Type)}.
 	 */
 	def boolean isSubtypeOfNumber(Type it) {
-		return isSubtypeOf[isIntegerBuiltin || isDecimalBuiltin];
+		return isSubtypeOf[isInteger || isDecimal];
 	}
 
 	/**
 	 * Returns {@code true} if the argument is either a direct or a transitive subtype of the built-in string YANG type.
 	 */
 	def boolean isSubtypeOfString(Type it) {
-		return isSubtypeOf[isStringBuiltin];
+		return isSubtypeOf[isString];
 	}
 
 	/**
 	 * {@code true} if the argument is either a direct or derived subtype of the built-in binary type.
 	 */
 	def boolean isSubtypeOfBinary(Type it) {
-		return isSubtypeOf[isBinaryBuiltin];
+		return isSubtypeOf[isBinary];
 	}
 
 	/**
 	 * Returns {@code true} if the type argument is a subtype of any built-in integer types or derived from it.
 	 */
 	def boolean isSubtypeOfInteger(Type it) {
-		return isSubtypeOf[isIntegerBuiltin];
+		return isSubtypeOf[isInteger];
 	}
 
 	/**
 	 * Returns {@code true} if the type argument is a subtype of the built-in 64-bit decimal type or derived from it.
 	 */
 	def boolean isSubtypeOfDecimal(Type it) {
-		return isSubtypeOf[isDecimalBuiltin];
+		return isSubtypeOf[isDecimal];
 	}
 
 	/**
 	 * {@code true} if the argument is either a direct or transitive subtype of the YANG enumeration type, otherwise {@code false};
 	 */
 	def boolean isSubtypeOfEnumeration(Type it) {
-		return isSubtypeOf[isEnumerationBuiltin];
+		return isSubtypeOf[isEnumeration];
 	}
 
 	/**
 	 * {@code true} if the argument is either a direct or transitive subtype of the YANG enumeration type, otherwise {@code false};
 	 */
 	def boolean isSubtypeOfBits(Type it) {
-		return isSubtypeOf[isBitsBuiltin];
+		return isSubtypeOf[isBits];
 	}
 
 	private def boolean isSubtypeOf(Type it, (Type)=>boolean subtypePredicate) {

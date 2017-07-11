@@ -4,7 +4,6 @@ import com.google.common.collect.HashMultimap
 import com.google.common.collect.ImmutableList
 import com.google.common.primitives.Ints
 import io.typefox.yang.utils.ValidationMessageAcceptorExt
-import io.typefox.yang.utils.YangTypeExtensions
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Type
@@ -21,6 +20,7 @@ import static io.typefox.yang.yang.YangPackage.Literals.*
 import static org.eclipse.xtext.validation.ValidationMessageAcceptor.INSIGNIFICANT_INDEX
 
 import static extension io.typefox.yang.utils.ValidationMessageAcceptorExt.wrappedAcceptor
+import io.typefox.yang.utils.YangTypesExtensions
 
 /**
  * Representation of a YANG <a href="https://tools.ietf.org/html/rfc7950#section-9.6">enumeration</a> built-in type.
@@ -49,7 +49,7 @@ class YangEnumeration {
 	 */
 	static def create(Type it, YangEnumeration parentEnumeration) {
 		checkArgument(eResource instanceof XtextResource, '''Unexpected EResource: «eResource»''');
-		if (!(eResource as XtextResource).resourceServiceProvider.get(YangTypeExtensions).isSubtypeOfEnumeration(it)) {
+		if (!(eResource as XtextResource).resourceServiceProvider.get(YangTypesExtensions).isSubtypeOfEnumeration(it)) {
 			throw new IllegalArgumentException('''Type argument is not a subtype of the YANG enumeration type: «it»''');
 		}
 		val items = substatements.filter(Enum).map [

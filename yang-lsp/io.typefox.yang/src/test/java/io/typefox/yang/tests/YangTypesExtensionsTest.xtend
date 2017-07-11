@@ -1,7 +1,7 @@
 package io.typefox.yang.tests
 
 import com.google.inject.Inject
-import io.typefox.yang.utils.YangTypeExtensions
+import io.typefox.yang.utils.YangTypesExtensions
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import org.junit.Assert
@@ -14,10 +14,10 @@ import static extension org.junit.Assert.*
  * 
  * @author akos.kitta
  */
-class YangTypeExtensionsTest extends AbstractYangTest {
+class YangTypesExtensionsTest extends AbstractYangTest {
 
 	@Inject
-	extension YangTypeExtensions;
+	extension YangTypesExtensions;
 
 	@Test
 	def void checkBuiltin_True() {
@@ -119,8 +119,8 @@ class YangTypeExtensionsTest extends AbstractYangTest {
 			    }
 			  }
 			}
-		'''.load.root.firstSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).refinement.yangRefinable.toString.
-			assertEquals('1..4');
+		'''.load.root.firstSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).refinement.yangRefinable.
+			toString.assertEquals('1..4');
 	}
 
 	@Test
@@ -133,8 +133,8 @@ class YangTypeExtensionsTest extends AbstractYangTest {
 			    }
 			  }
 			}
-		'''.load.root.firstSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).refinement.yangRefinable.toString.
-			assertEquals('1 | 2 | 4..5 | 6');
+		'''.load.root.firstSubstatementsOfType(Typedef).firstSubstatementsOfType(Type).refinement.yangRefinable.
+			toString.assertEquals('1 | 2 | 4..5 | 6');
 	}
 
 	@Test

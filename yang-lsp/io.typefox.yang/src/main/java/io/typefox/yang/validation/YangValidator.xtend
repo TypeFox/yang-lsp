@@ -9,7 +9,7 @@ import com.google.inject.Singleton
 import io.typefox.yang.types.YangEnumeration
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.utils.YangNameUtils
-import io.typefox.yang.utils.YangTypeExtensions
+import io.typefox.yang.utils.YangTypesExtensions
 import io.typefox.yang.yang.Bit
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.FractionDigits
@@ -40,7 +40,7 @@ class YangValidator extends AbstractYangValidator {
 	extension YangExtensions;
 
 	@Inject
-	extension YangTypeExtensions;
+	extension YangTypesExtensions;
 
 	@Inject
 	SubstatementRuleProvider substatementRuleProvider;
@@ -89,7 +89,7 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def checkUnionType(Type it) {
-		if (unionBuiltin) {
+		if (union) {
 			// At least one `type` sub-statement should be present for each `union` type.
 			// https://tools.ietf.org/html/rfc7950#section-9.12
 			if (substatementsOfType(Type).nullOrEmpty) {
@@ -172,7 +172,7 @@ class YangValidator extends AbstractYangValidator {
 				// must either have the same value as in the base type or not be
 				// present, in which case the value is the same as in the base type.
 				// No need to validate the direct subtype of bits as no restrictions are applied on them.
-				if (!bitsBuiltin) {
+				if (!isBits) {
 					val currentType = it;
 					val allBitNames = HashMultimap.<String, Bit>create;
 					typeHierarchy.filter[it !== currentType].forEach [
@@ -223,7 +223,7 @@ class YangValidator extends AbstractYangValidator {
 		val fractionDigitsExist = fractionDigits !== null;
 		// Note, only the decimal type definition MUST have the `fraction-digits` statement.
 		// It is not mandatory for types that are derived from decimal built-ins. 
-		val decimalBuiltin = decimalBuiltin;
+		val decimalBuiltin = decimal;
 		if (decimalBuiltin) {
 			if (fractionDigitsExist) {
 				// Validate the fraction digits. It takes as an argument an integer between 1 and 18, inclusively.
