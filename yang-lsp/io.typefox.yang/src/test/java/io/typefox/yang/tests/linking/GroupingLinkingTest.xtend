@@ -29,4 +29,27 @@ class GroupingLinkingTest extends AbstractYangTest {
 		''')
 		assertNoErrors(m.root)
 	}
+	
+	@Test def void testNestedUse_02() {
+		val m = load('''
+			module foo {
+				namespace "foo:bar";
+				prefix foo;
+				
+				uses A;
+				
+				grouping A {
+					list mylist {
+						uses B;
+					}
+					grouping B {
+						leaf myLeaf {
+							type string;
+						}
+					}
+				}
+			}
+		''')
+		assertNoErrors(m.root)
+	}
 }

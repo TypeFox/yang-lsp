@@ -157,7 +157,7 @@ class ScopeContextProvider {
 	}
 	
 	protected dispatch def void computeScope(TypeReference node, QualifiedName nodePath, IScopeContext ctx) {
-		ctx.runAfterDefinitionPhase [
+		ctx.onResolveDefinitions [
 			linker.link(node, TYPE_REFERENCE__TYPE) [ name |
 				if (name.segmentCount == 2 && name.firstSegment == ctx.localPrefix) {
 					return ctx.typeScope.getSingleElement(name.skipFirst(1))
@@ -170,7 +170,7 @@ class ScopeContextProvider {
 	
 	protected dispatch def void computeScope(Uses node, QualifiedName nodePath, IScopeContext ctx) {
 		handleGeneric(node, nodePath, ctx)
-		ctx.runAfterDefinitionPhase [
+		ctx.onComputeNodeScope [
 			val inliningCtx = new GroupingInliningScopeContext(ctx)
 			for (child : node.grouping.node.substatements) {
 				handleGeneric(child, nodePath, inliningCtx)
@@ -179,7 +179,7 @@ class ScopeContextProvider {
 	}
 	
 	protected dispatch def void computeScope(GroupingRef node, QualifiedName nodePath, IScopeContext ctx) {
-		ctx.runAfterDefinitionPhase [
+		ctx.onResolveDefinitions [
 			linker.link(node, GROUPING_REF__NODE) [ name |
 				if (name.segmentCount == 2 && name.firstSegment == ctx.localPrefix) {
 					return ctx.groupingScope.getSingleElement(name.skipFirst(1))
@@ -191,7 +191,7 @@ class ScopeContextProvider {
 	}
 	
 	protected dispatch def void computeScope(Base node, QualifiedName nodePath, IScopeContext ctx) {
-		ctx.runAfterDefinitionPhase [
+		ctx.onResolveDefinitions [
 			linker.link(node, BASE__REFERENCE) [ name |
 				ctx.identityScope.getSingleElement(name)
 			]
@@ -200,7 +200,7 @@ class ScopeContextProvider {
 	}
 	
 	protected dispatch def void computeScope(FeatureReference node, QualifiedName nodePath, IScopeContext ctx) {
-		ctx.runAfterDefinitionPhase [
+		ctx.onResolveDefinitions [
 			linker.link(node, FEATURE_REFERENCE__FEATURE) [ name |
 				ctx.featureScope.getSingleElement(name)
 			]
@@ -209,7 +209,7 @@ class ScopeContextProvider {
 	}
 	
 	protected dispatch def void computeScope(Unknown node, QualifiedName nodePath, IScopeContext ctx) {
-		ctx.runAfterDefinitionPhase [
+		ctx.onResolveDefinitions [
 			linker.link(node, UNKNOWN__EXTENSION) [ name |
 				ctx.extensionScope.getSingleElement(name)
 			]
@@ -277,8 +277,7 @@ class ScopeContextProvider {
 	}
 	
 	private def void addToNodeScope(EObject node, QualifiedName name, IScopeContext ctx) {
-		ctx.runAfterDefinitionPhase 
-		[
+		ctx.onComputeNodeScope [
 			if (!ctx.nodeScope.tryAddLocal(name, node)) {
 				validator.addIssue(node, SCHEMA_NODE__NAME, '''A schema node with the name '«name»' already exists.''', IssueCodes.DUPLICATE_NAME)
 			}

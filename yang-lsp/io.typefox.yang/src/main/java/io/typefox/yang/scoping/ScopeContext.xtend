@@ -37,7 +37,8 @@ interface IScopeContext {
 	def MapScope getExtensionScope()
 	def MapScope getNodeScope()
 	
-	def void runAfterDefinitionPhase(Runnable callback)
+	def void onResolveDefinitions(Runnable callback)
+	def void onComputeNodeScope(Runnable callback)
 	def void runAfterAll(Runnable callback)
 	
 	def void resolveDefinitionPhase()
@@ -50,6 +51,11 @@ interface IScopeContext {
 @Data class GroupingInliningScopeContext implements IScopeContext {
 	@Delegate IScopeContext original
 	
+	override onResolveDefinitions(Runnable runnable) {
+		// do nothing
+	}
+	
+	override MapScope getGroupingScope() { new MapScope }
 	override MapScope getTypeScope() { new MapScope }
 	override MapScope getIdentityScope() { new MapScope }
 	override MapScope getFeatureScope() { new MapScope }
@@ -100,7 +106,8 @@ class ScopeContext implements IScopeContext {
 	@Accessors(PUBLIC_GETTER) MapScope extensionScope = new MapScope(new LazyScope[computeParentDefinitionScope[getExtensionScope]])
 	MapScope nodeScope
 	
-	List<Runnable> afterDefinitionPhase = newArrayList
+	List<Runnable> resolveDefinitions = newArrayList
+	List<Runnable> computeNodeScope = newArrayList
 	List<Runnable> afterAll = newArrayList
 							  
 	@Accessors(PUBLIC_GETTER) Map<String, IScopeContext> importedModules = newHashMap
@@ -124,14 +131,18 @@ class ScopeContext implements IScopeContext {
 	}
 	
 	override void resolveDefinitionPhase() {
-		if (afterDefinitionPhase === null) {
+		if (resolveDefinitions === null) {
 			return;
 		}
-		val copy = afterDefinitionPhase
-		afterDefinitionPhase = null
+		val copy = resolveDefinitions
+		resolveDefinitions = null
+		copy.forEach[run]
+				
+		val copy2 = computeNodeScope
+		computeNodeScope = null
 		// assign the node scope
 		this.nodeScope = new MapScope(computeParentNodeScope)
-		copy.forEach[run]
+		copy2.forEach[run]
 	}
 	
 	override void resolveAll() {
@@ -183,14 +194,25 @@ class ScopeContext implements IScopeContext {
 		return new CompositeScope(result)
 	}
 	
-	override void runAfterDefinitionPhase(Runnable run) {
-		if (this.afterDefinitionPhase === null) {
+	override void onResolveDefinitions(Runnable run) {
+		if (this.resolveDefinitions === null) {
+			if (this.computeNodeScope === null) {
+				throw new IllegalStateException("Cannot add to phase, since the next phase has already been executed. Ignoring the callback")
+			}
+			run.run
+		} else {	
+			this.resolveDefinitions.add(run)
+		}
+	}
+	
+	override void onComputeNodeScope(Runnable run) {
+		if (this.computeNodeScope === null) {
 			if (this.afterAll === null) {
 				throw new IllegalStateException("Cannot add to phase, since the next phase has already been executed. Ignoring the callback")
 			}
 			run.run
 		} else {		
-			this.afterDefinitionPhase.add(run)
+			this.computeNodeScope.add(run)
 		}
 	}
 	
