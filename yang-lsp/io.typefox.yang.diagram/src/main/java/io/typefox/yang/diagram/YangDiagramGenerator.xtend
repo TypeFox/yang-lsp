@@ -18,6 +18,7 @@ import io.typefox.sprotty.server.xtext.IDiagramGenerator
 import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.Action
 import io.typefox.yang.yang.Anyxml
+import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Case
 import io.typefox.yang.yang.Choice
 import io.typefox.yang.yang.Config
@@ -25,6 +26,7 @@ import io.typefox.yang.yang.Container
 import io.typefox.yang.yang.Description
 import io.typefox.yang.yang.Grouping
 import io.typefox.yang.yang.IfFeature
+import io.typefox.yang.yang.Key
 import io.typefox.yang.yang.Leaf
 import io.typefox.yang.yang.LeafList
 import io.typefox.yang.yang.Module
@@ -44,13 +46,20 @@ import io.typefox.yang.yang.impl.GroupingImpl
 import io.typefox.yang.yang.impl.ListImpl
 import io.typefox.yang.yang.impl.ModuleImpl
 import java.util.ArrayList
+import java.util.HashMap
 import java.util.List
+import java.util.Map
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.util.CancelIndicator
-import io.typefox.yang.yang.Augment
-import io.typefox.yang.yang.Key
+import io.typefox.yang.yang.Import
 
 class YangDiagramGenerator implements IDiagramGenerator {
+
+	// Map -> [{Statement-name: [{statement:model-element}...]}...]
+	val Map<String, Map<Statement, SModelElement>> elementIndex = new HashMap
+	val Map<Statement, ()=>void> postProcesses = new HashMap
+
+	var SGraph diagramRoot
 
 	override generate(Resource resource, CancelIndicator cancelIndicator) {
 		val content = resource.contents.head
@@ -60,15 +69,18 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	}
 
 	def SModelRoot generateDiagram(AbstractModule module, CancelIndicator cancelIndicator) {
-		val diagram = new SGraph => [
+		diagramRoot = new SGraph => [
 			type = 'graph'
 			id = 'yang'
+			children = new ArrayList<SModelElement>
 		]
 
-		val rootChildren = createChildElements(diagram, diagram, #[module])
-		if (rootChildren.length > 0)
-			diagram.children = rootChildren
-		return diagram
+		val rootChildren = createChildElements(diagramRoot, diagramRoot, #[module])
+		if (rootChildren.length > 0) {
+			diagramRoot.children.addAll(rootChildren)
+			postProcessing()
+		}
+		return diagramRoot
 	}
 
 	/**
@@ -84,26 +96,21 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			num++
 			var SModelElement element = null
 			element = generateElement(statement, viewParentElement, modelParentElement)
-			if (element !== null)
+			if (element !== null) {
+				val statementClassName = statement.class.simpleName
+				if (elementIndex.get(statementClassName) === null)
+					elementIndex.put(statementClassName, new HashMap)
+				elementIndex.get(statementClassName).put(statement, element)
 				rootChildren.add(element)
+			}
 		}
 		return rootChildren
 	}
 
 	protected def dispatch SModelElement generateElement(Module moduleStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		// Module
-		val moduleElement = configSElement(SNode, moduleStmt.name, 'module')
-
-		// Module label
 		val prefix = moduleStmt.substatements.filter(Prefix).head
-		val SLabel moduleLabel = configSElement(SLabel, moduleElement.id + '-label', 'heading')
-		moduleLabel.position = new Point => [
-			x = 5
-			y = 5
-		]
-		moduleLabel.text = prefix.prefix + ':' + moduleStmt.name
-		moduleElement.children.add(moduleLabel)
+		val moduleElement = createModule(moduleStmt.name, prefix.prefix)
 
 		// Module note
 		val SNode moduleNotes = configSElement(SNode, moduleElement.id + '-note', 'note')
@@ -127,22 +134,26 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def dispatch SModelElement generateElement(Container containerStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		return generateClassElement(containerStmt, viewParentElement, modelParentElement)
+		return createClassElement(containerStmt, viewParentElement, modelParentElement)
 	}
 
 	protected def dispatch SModelElement generateElement(io.typefox.yang.yang.List listStmt,
 		SModelElement viewParentElement, SModelElement modelParentElement) {
-		return generateClassElement(listStmt, viewParentElement, modelParentElement)
+		return createClassElement(listStmt, viewParentElement, modelParentElement)
 	}
 
 	protected def dispatch SModelElement generateElement(Key keyStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		// TODO
+		postProcesses.put(keyStmt, [
+// TODO: iterate over keyStmt.references, get the leaf statements, get the related leaf elements and extend the text
+		])
+
+		null
 	}
 
 	protected def dispatch SModelElement generateElement(Grouping groupingStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		return generateClassElement(groupingStmt, viewParentElement, modelParentElement)
+		createClassElement(groupingStmt, viewParentElement, modelParentElement)
 	}
 
 	protected def dispatch SModelElement generateElement(Augment augmentStmt, SModelElement viewParentElement,
@@ -162,18 +173,34 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def dispatch SModelElement generateElement(Uses usesStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
+
+		postProcesses.put(usesStmt, [
+			val groupings = elementIndex.get('GroupingImpl')
+			val groupingElement = if(groupings !== null) groupings.get(usesStmt.grouping.node)
+			// is there a grouping element in this module? If not it is usage relates to an external module grouping
+			if (groupingElement !== null)
+				modelParentElement.children.add(createEdge(viewParentElement, groupingElement, 'uses'))
+		])
+
 		if (modelParentElement instanceof SCompartment) {
-			val SLabel memberElement = configSElement(SLabel, viewParentElement.id + '-uses-' + usesStmt.grouping.node.name, 'text')
+			val SLabel memberElement = configSElement(SLabel,
+				viewParentElement.id + '-uses-' + usesStmt.grouping.node.name, 'text')
 			memberElement.text = 'uses ' + usesStmt.grouping.node.name
 			return memberElement
-		} 
-//		else if (modelParentElement instanceof SNode) {
-//			val SEdge compositionEdge = configSElement(SEdge,
-//					viewParentElement.id + '2' + containerElement.id + '-edge', 'uses')
-//				compositionEdge.sourceId = viewParentElement.id
-//				compositionEdge.targetId = containerElement.id
-//				modelParentElement.children.add(compositionEdge)
-//		}
+		}
+	}
+
+	protected def dispatch SModelElement generateElement(Import importStmt, SModelElement viewParentElement,
+		SModelElement modelParentElement) {
+		val prefix = importStmt.substatements.filter(Prefix).head
+		val module = createModule(importStmt.module.name, prefix.prefix)
+		diagramRoot.children.add(module)
+
+		postProcesses.put(importStmt, [
+			modelParentElement.children.add(createEdge(module, viewParentElement, 'import'))
+		])
+
+		return null
 	}
 
 	protected def dispatch SModelElement generateElement(Description descriptionStmt, SModelElement viewParentElement,
@@ -213,12 +240,12 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def dispatch SModelElement generateElement(Leaf leafStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		generateClassMemberElement(leafStmt, viewParentElement, modelParentElement)
+		createClassMemberElement(leafStmt, viewParentElement, modelParentElement)
 	}
 
 	protected def dispatch SModelElement generateElement(LeafList leafListStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		generateClassMemberElement(leafListStmt, viewParentElement, modelParentElement)
+		createClassMemberElement(leafListStmt, viewParentElement, modelParentElement)
 	}
 
 	protected def dispatch SModelElement generateElement(Action actionStmt, SModelElement viewParentElement,
@@ -254,7 +281,22 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		]
 	}
 
-	protected def SModelElement generateClassMemberElement(SchemaNode statement, SModelElement viewParentElement,
+	protected def SNode createModule(String name, String prefix) {
+		// Module
+		val moduleElement = configSElement(SNode, name, 'module')
+
+		// Module label
+		val SLabel moduleLabel = configSElement(SLabel, moduleElement.id + '-label', 'heading')
+		moduleLabel.position = new Point => [
+			x = 5
+			y = 5
+		]
+		moduleLabel.text = prefix + ':' + name
+		moduleElement.children.add(moduleLabel)
+		return moduleElement
+	}
+
+	protected def SModelElement createClassMemberElement(SchemaNode statement, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
 		if (modelParentElement instanceof SCompartment) {
 			val SLabel memberElement = configSElement(SLabel, viewParentElement.id + '-' + statement.name, 'text')
@@ -265,41 +307,43 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		}
 	}
 
-	protected def SModelElement generateClassElement(SchemaNode statement, SModelElement viewParentElement,
+	protected def SModelElement createClassElement(SchemaNode statement, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
 		if (modelParentElement instanceof SNode) {
-			val containerElement = configSElement(SNode, viewParentElement.id + '-' + statement.name, 'class')
-			containerElement.layout = 'vbox'
+			val classElement = configSElement(SNode, viewParentElement.id + '-' + statement.name, 'class')
+			classElement.layout = 'vbox'
 
-			val containerLabel = configSElement(SLabel, containerElement.id + '-label', 'heading')
-			containerLabel.text = '[' + findTag(statement) + '] ' + statement.name
-			containerElement.children.add(containerLabel)
+			val classLabel = configSElement(SLabel, classElement.id + '-label', 'heading')
+			classLabel.text = '[' + findTag(statement) + '] ' + statement.name
+			classElement.children.add(classLabel)
 
-			val compartment = configSElement(SCompartment, containerElement.id + '-compartment', 'comp')
+			// add class members to compartment element
+			val compartment = configSElement(SCompartment, classElement.id + '-compartment', 'comp')
 			compartment.layout = 'vbox'
-			compartment.children.addAll(createChildElements(viewParentElement, compartment, statement.substatements))
-			containerElement.children.add(compartment)
+			compartment.children.addAll(createChildElements(classElement, compartment, statement.substatements))
+			classElement.children.add(compartment)
 
+			// add composition elements 
 			modelParentElement.children.addAll(
-				createChildElements(containerElement, modelParentElement, statement.substatements))
+				createChildElements(classElement, modelParentElement, statement.substatements))
 
 			if (!(statement instanceof Grouping)) {
 				val SEdge compositionEdge = configSElement(SEdge,
-					viewParentElement.id + '2' + containerElement.id + '-edge', 'composition')
+					viewParentElement.id + '2' + classElement.id + '-edge', 'composition')
 				compositionEdge.sourceId = viewParentElement.id
-				compositionEdge.targetId = containerElement.id
+				compositionEdge.targetId = classElement.id
 				modelParentElement.children.add(compositionEdge)
 			}
 
-			return containerElement
+			return classElement
 		}
 	}
 
-	protected def String findEdgeType(Statement statement) {
-		switch statement {
-			GroupingImpl: 'uses'
-			default: 'composition'
-		}
+	protected def SEdge createEdge(SModelElement fromElement, SModelElement toElement, String edgeType) {
+		val SEdge edge = configSElement(SEdge, fromElement.id + '2' + toElement.id + '-edge', edgeType)
+		edge.sourceId = fromElement.id
+		edge.targetId = toElement.id
+		return edge
 	}
 
 	protected def String findTag(Statement statement) {
@@ -320,6 +364,12 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			SEdge: 'edge'
 			default: 'dontknow'
 		}
+	}
+
+	protected def void postProcessing() {
+		postProcesses.forEach [ statement, process |
+			process.apply
+		]
 	}
 
 }
