@@ -344,9 +344,10 @@ class YangTypeExtensions {
 	}
 
 	/**
-	 * Calculate the type hierarchy from bottom to top. Top element is a built-in type. Includes the argument if not {@code null}.
+	 * Calculate the type hierarchy from bottom to top and returns with a mutable stack.
+	 * The top-most element is a built-in type. Includes the argument if not {@code null}.
 	 */
-	private def getTypeHierarchy(Type it) {
+	def getTypeHierarchy(Type it) {
 		val hierarchy = new Stack;
 		var superType = it;
 		while (superType !== null) {

@@ -1021,5 +1021,110 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, TYPE_ERROR, '''cannotAssign''');
 	}
+	
+	@Test
+	def void checkBitsPosition_06() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef mybits-subtype {
+			    type mybits-type {
+			      bit disable-nagle {
+			        position 0;
+			      }
+			      bit auto-sense-speed {
+			        position 1;
+			      }
+			    }
+			  }
+			  typedef mybits-type {
+			    type bits {
+			      bit disable-nagle {
+			        position 0;
+			      }
+			      bit auto-sense-speed {
+			        position 1;
+			      }
+			      bit ten-mb-only {
+			        position 2;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
+	}
+	
+	@Test
+	def void checkBitsPosition_07() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef mybits-subtype {
+			    type mybits-type {
+			      bit disable-nagle {
+			        position 3;
+			      }
+			      bit auto-sense-speed {
+			        position 1;
+			      }
+			    }
+			  }
+			  typedef mybits-type {
+			    type bits {
+			      bit disable-nagle {
+			        position 0;
+			      }
+			      bit auto-sense-speed {
+			        position 1;
+			      }
+			      bit ten-mb-only {
+			        position 2;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''3''');
+	}
+	
+	@Test
+	def void checkBitsPosition_08() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef mybits-subtype {
+			    type mybits-type {
+			      bit invalid {
+			        position 3;
+			      }
+			      bit auto-sense-speed {
+			        position 1;
+			      }
+			    }
+			  }
+			  typedef mybits-type {
+			    type bits {
+			      bit disable-nagle {
+			        position 0;
+			      }
+			      bit auto-sense-speed {
+			        position 1;
+			      }
+			      bit ten-mb-only {
+			        position 2;
+			      }
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, TYPE_ERROR, '''invalid''');
+	}
 
 }

@@ -101,11 +101,11 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def checkBitsType(Type it) {
-		if (bitsBuiltin) {
+		if (subtypeOfBits) {
 			// The "bit" statement, which is a sub-statement to the "type" statement, must be present if the type is "bits".
 			// https://tools.ietf.org/html/rfc7950#section-9.7.4
 			val bits = substatementsOfType(Bit);
-			if (bits.nullOrEmpty) {
+			if (bits.nullOrEmpty && builtin) {
 				val message = '''Bits type must have at least one "bit" statement.''';
 				error(message, it, TYPE__TYPE_REF, TYPE_ERROR);
 			} else {
@@ -135,12 +135,11 @@ class YangValidator extends AbstractYangValidator {
 						];
 					}
 				];
-				
-				
+
 				val maxPosition = newArrayList(0L);
 				// Assigned values must be between 0 and 4294967295.
 				// https://tools.ietf.org/html/rfc7950#section-9.7.4.2
-				bits.forEach[
+				bits.forEach [
 					val position = firstSubstatementsOfType(Position);
 					val positionValue = position?.position;
 					if (positionValue !== null) {
@@ -168,7 +167,36 @@ class YangValidator extends AbstractYangValidator {
 						}
 					}
 				];
-				
+
+				// When an existing bits type is restricted, the "position" statement
+				// must either have the same value as in the base type or not be
+				// present, in which case the value is the same as in the base type.
+				// No need to validate the direct subtype of bits as no restrictions are applied on them.
+				if (!bitsBuiltin) {
+					val currentType = it;
+					val allBitNames = HashMultimap.<String, Bit>create;
+					typeHierarchy.filter[it !== currentType].forEach [
+						substatementsOfType(Bit).forEach [
+							allBitNames.put(name, it);
+						];
+					];
+
+					bits.forEach [
+						val message = '''A new assigned name must not declared when restricting an existing bits type.''';
+						val bitWithSameNames = allBitNames.get(name);
+						if (bitWithSameNames.nullOrEmpty) {
+							error(message, it, BIT__NAME, TYPE_ERROR);
+						} else {
+							val position = firstSubstatementsOfType(Position);
+							val positionValue = position?.position;
+							val parentPositions = bitWithSameNames.map[firstSubstatementsOfType(Position)].filterNull.
+								map[it.position];
+							if (positionValue !== null && !parentPositions.exists[positionValue == it]) {
+								error(message, position, POSITION__POSITION, TYPE_ERROR);
+							}
+						}
+					];
+				}
 			}
 		}
 	}
