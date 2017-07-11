@@ -50,7 +50,6 @@ interface IScopeContext {
 @Data class GroupingInliningScopeContext implements IScopeContext {
 	@Delegate IScopeContext original
 	
-	override MapScope getGroupingScope() { new MapScope }
 	override MapScope getTypeScope() { new MapScope }
 	override MapScope getIdentityScope() { new MapScope }
 	override MapScope getFeatureScope() { new MapScope }
