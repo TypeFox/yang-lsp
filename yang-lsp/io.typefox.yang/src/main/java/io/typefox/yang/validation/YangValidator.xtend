@@ -3,28 +3,28 @@
  */
 package io.typefox.yang.validation
 
-import com.google.common.collect.HashMultimap
+import com.google.common.collect.Range
 import com.google.inject.Inject
 import com.google.inject.Singleton
-import io.typefox.yang.types.YangEnumeration
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.utils.YangNameUtils
 import io.typefox.yang.utils.YangTypesExtensions
 import io.typefox.yang.yang.Base
-import io.typefox.yang.yang.Bit
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Modifier
 import io.typefox.yang.yang.Pattern
-import io.typefox.yang.yang.Position
 import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.YangVersion
+import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.ParseException
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression
+import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.validation.Check
 
+import static com.google.common.base.CharMatcher.*
 import static io.typefox.yang.utils.YangExtensions.*
 import static io.typefox.yang.validation.IssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
@@ -42,6 +42,9 @@ class YangValidator extends AbstractYangValidator {
 
 	@Inject
 	extension YangTypesExtensions;
+
+	@Inject
+	extension YangEnumerableValidator;
 
 	@Inject
 	SubstatementRuleProvider substatementRuleProvider;
@@ -99,7 +102,7 @@ class YangValidator extends AbstractYangValidator {
 			}
 		}
 	}
-	
+
 	@Check
 	def checkIdentityrefType(Type it) {
 		if (identityref) {
@@ -113,119 +116,41 @@ class YangValidator extends AbstractYangValidator {
 		}
 	}
 
+	@Data
+	private static class EnumerableValidationContext {
+		val String name;
+		val EClass enumerableClass;
+		val EClass orderedClass;
+		val Range<Integer> substatementCardinality;
+		val Range<Long> ordinalRange;
+	}
+
 	@Check
-	def checkBitsType(Type it) {
-		if (subtypeOfBits) {
-			// The "bit" statement, which is a sub-statement to the "type" statement, must be present if the type is "bits".
-			// https://tools.ietf.org/html/rfc7950#section-9.7.4
-			val bits = substatementsOfType(Bit);
-			if (bits.nullOrEmpty && builtin) {
-				val message = '''Bits type must have at least one "bit" statement.''';
-				error(message, it, TYPE__TYPE_REF, TYPE_ERROR);
-			} else {
-				// All assigned names in a bits type must be unique.
-				// https://tools.ietf.org/html/rfc7950#section-9.7.4
-				val nameNodeMapping = HashMultimap.create;
-				bits.forEach[nameNodeMapping.put(name, it)];
-				nameNodeMapping.asMap.forEach [ name, statementsWithSameName |
-					if (statementsWithSameName.size > 1) {
-						statementsWithSameName.forEach [
-							val message = '''All assigned names in a bits type must be unique.''';
-							error(message, it, BIT__NAME, TYPE_ERROR);
-						];
-					}
-				];
-				// All assigned positions in a bits type must be unique
-				// https://tools.ietf.org/html/rfc7950#section-9.7.4.2
-				val positionNodeMapping = HashMultimap.create;
-				val allPositions = bits.map[firstSubstatementsOfType(Position)];
-				val assignedPositions = allPositions.filterNull;
-				assignedPositions.forEach[positionNodeMapping.put(position, it)];
-				positionNodeMapping.asMap.forEach [ position, statementsWithSamePosition |
-					if (statementsWithSamePosition.size > 1) {
-						statementsWithSamePosition.forEach [
-							val message = '''All assigned positions in a bits type must be unique.''';
-							error(message, it, POSITION__POSITION, TYPE_ERROR);
-						];
-					}
-				];
-
-				val maxPosition = newArrayList(0L);
-				// Assigned values must be between 0 and 4294967295.
-				// https://tools.ietf.org/html/rfc7950#section-9.7.4.2
-				bits.forEach [
-					val position = firstSubstatementsOfType(Position);
-					val positionValue = position?.position;
-					if (positionValue !== null) {
-						try {
-							val value = Long.parseLong(positionValue);
-							if (value < 0L || value > 4294967295L) {
-								throw new NumberFormatException;
-							}
-							if (value > maxPosition.head.longValue) {
-								maxPosition.set(0, value);
-							}
-						} catch (NumberFormatException e) {
-							val message = 'Assigned positions must be an unsigned integer between 0 and 4294967295.';
-							error(message, position, POSITION__POSITION, TYPE_ERROR);
-						}
-					} else {
-						// If the current highest bit position value is equal to 4294967295,
-						// then a position value must be specified for "bit" sub-statements
-						// following the one with the current highest position value.
-						if (maxPosition.head.longValue >= 4294967295L) {
-							val message = '''Cannot automatically asign a value to position. An explicit position has to be assigned instead.''';
-							error(message, it, BIT__NAME, TYPE_ERROR);
-						} else {
-							maxPosition.set(0, maxPosition.head.longValue + 1L);
-						}
-					}
-				];
-
-				// When an existing bits type is restricted, the "position" statement
-				// must either have the same value as in the base type or not be
-				// present, in which case the value is the same as in the base type.
-				// No need to validate the direct subtype of bits as no restrictions are applied on them.
-				if (!isBits) {
-					val currentType = it;
-					val allBitNames = HashMultimap.<String, Bit>create;
-					typeHierarchy.filter[it !== currentType].forEach [
-						substatementsOfType(Bit).forEach [
-							allBitNames.put(name, it);
-						];
-					];
-
-					bits.forEach [
-						val message = '''A new assigned name must not declared when restricting an existing bits type.''';
-						val bitWithSameNames = allBitNames.get(name);
-						if (bitWithSameNames.nullOrEmpty) {
-							error(message, it, BIT__NAME, TYPE_ERROR);
-						} else {
-							val position = firstSubstatementsOfType(Position);
-							val positionValue = position?.position;
-							val parentPositions = bitWithSameNames.map[firstSubstatementsOfType(Position)].filterNull.
-								map[it.position];
-							if (positionValue !== null && !parentPositions.exists[positionValue == it]) {
-								error(message, position, POSITION__POSITION, TYPE_ERROR);
-							}
-						}
-					];
-				}
-			}
-		}
+	def checkEnumerables(Type it) {
+		validateEnumerable(this);
 	}
 
 	@Check
 	def checkEnumeration(Type type) {
-		if (type.subtypeOfEnumeration) {
-			val yangEnumeration = type.yangEnumeration;
-			if (yangEnumeration !== null && yangEnumeration !== YangEnumeration.NOOP) {
-				yangEnumeration.validate(this);
-			}
-		} else {
-			type.substatementsOfType(Enum).forEach [
+		val enums = type.substatementsOfType(Enum);
+		if (!type.subtypeOfEnumeration) {
+			enums.forEach [
 				val message = '''Only enumeration types can have a "enum" statement.''';
 				error(message, type, TYPE__TYPE_REF, TYPE_ERROR);
+			];
+		} else {
+			enums.forEach [
+				val message = if (name.length === 0) {
+						'''The name must not be zero-length.'''
+					} else if (name != WHITESPACE.or(BREAKING_WHITESPACE).trimFrom(name)) {
+						'''The name must not have any leading or trailing whitespace characters.'''
+					} else {
+						null;
+					}
+				if (message !== null) {
+					error(message, it, ENUMERABLE__NAME, TYPE_ERROR);
+				}
+
 			];
 		}
 	}

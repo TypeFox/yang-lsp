@@ -6,8 +6,6 @@ import com.google.common.collect.ImmutableSet
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import io.typefox.yang.services.YangGrammarAccess
-import io.typefox.yang.types.YangEnumeration
-import io.typefox.yang.types.YangRefinable
 import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Length
 import io.typefox.yang.yang.Range
@@ -78,7 +76,7 @@ class YangTypesExtensions {
 	val Supplier<String> bitsBuiltin = Suppliers.memoize [
 		return grammarAccess.BUILTIN_TYPEAccess.bitsKeyword_1.value;
 	];
-	
+
 	val Supplier<String> identityrefBuiltin = Suppliers.memoize [
 		return grammarAccess.BUILTIN_TYPEAccess.identityrefKeyword_6.value;
 	];
@@ -145,7 +143,7 @@ class YangTypesExtensions {
 	def boolean isBits(Type it) {
 		return bitsBuiltin.get == typeRef.builtin;
 	}
-	
+
 	/**
 	 * {@code true if the type is an identity reference built-in type, otherwise {@code false}.
 	 */
@@ -333,25 +331,6 @@ class YangTypesExtensions {
 		}
 
 		return refinements.pop;
-	}
-
-	/**
-	 * Transforms the enumeration type into a enumeration data object for further validation.
-	 * Returns with a NOOP enumeration, if the argument is not a type of enumeration or
-	 * is the built-in enumeration.
-	 */
-	def getYangEnumeration(Type it) {
-		var enumeration = YangEnumeration.NOOP;
-		if (!subtypeOfEnumeration) {
-			return enumeration;
-		}
-
-		val types = typeHierarchy;
-		while (!types.isEmpty) {
-			val currentType = types.pop;
-			enumeration = YangEnumeration.create(currentType, enumeration);
-		}
-		return enumeration;
 	}
 
 	/**

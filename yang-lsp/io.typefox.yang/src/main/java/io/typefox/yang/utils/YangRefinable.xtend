@@ -1,10 +1,9 @@
-package io.typefox.yang.types
+package io.typefox.yang.utils
 
 import com.google.common.base.Preconditions
 import com.google.common.base.Supplier
 import com.google.common.base.Suppliers
 import com.google.common.collect.ImmutableList
-import io.typefox.yang.utils.ValidationMessageAcceptorExt
 import io.typefox.yang.yang.BinaryOperation
 import io.typefox.yang.yang.Literal
 import io.typefox.yang.yang.Max

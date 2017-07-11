@@ -56,12 +56,11 @@ OtherStatement :
 	| Augment
 	| Base
 	| BelongsTo
-	| Bit
 	| Config
 	| Contact
 	| Default
 	| Description
-	| Enum
+	| Enumerable
 	| ErrorAppTag
 	| ErrorMessage
 	| Deviation
@@ -75,11 +74,11 @@ OtherStatement :
 	| Modifier
 	| Must
 	| Namespace
+	| Ordered
 	| OrderedBy
 	| Organization
 	| Path
 	| Pattern
-	| Position
 	| Prefix
 	| Presence
 	| Reference
@@ -94,10 +93,17 @@ OtherStatement :
 	| Units
 	| Unknown
 	| Uses
-	| Value
 	| When
 	| YangVersion
 	| YinElement
+;
+
+Enumerable:
+	Enum | Bit
+;
+
+Ordered:
+	Position | Value
 ;
 
 Refinable : 
@@ -446,7 +452,7 @@ Enum:
 
 // 9.6.4.2
 Value:
-	'value' value=StringValue StatementEnd
+	'value' ordinal=StringValue StatementEnd
 ;
 
 // 9.7.4
@@ -456,7 +462,7 @@ Bit:
 
 // 9.7.4.2
 Position:
-	'position' position=StringValue StatementEnd
+	'position' ordinal=StringValue StatementEnd
 ;
 
 // 9.9.2

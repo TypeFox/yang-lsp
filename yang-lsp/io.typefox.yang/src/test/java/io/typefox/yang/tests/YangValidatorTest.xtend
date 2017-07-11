@@ -1089,7 +1089,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''3''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, TYPE_ERROR, '''disable-nagle''');
 	}
 
 	@Test

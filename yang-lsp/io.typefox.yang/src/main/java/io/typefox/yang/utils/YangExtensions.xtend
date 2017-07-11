@@ -55,21 +55,21 @@ class YangExtensions {
 	/**
 	 * Returns with all sub-statements of a given type for the statement argument.
 	 */
-	def <S extends Statement> substatementsOfType(Statement it, Class<S> clazz) {
+	def <S extends Statement> substatementsOfType(Statement it, Class<? extends S> clazz) {
 		return substatements.filter(clazz);
 	}
 	
 	/**
 	 * Returns with the first sub-statement of a given type for the statement argument or {@code null}.
 	 */
-	def <S extends Statement> firstSubstatementsOfType(Statement it, Class<S> clazz) {
+	def <S extends Statement> firstSubstatementsOfType(Statement it, Class<? extends S> clazz) {
 		return substatementsOfType(clazz).head;
 	}
 	
 	/**
 	 * Returns with the last sub-statement of a given type for the statement argument or {@code null}.
 	 */
-	def <S extends Statement> lastSubstatementsOfType(Statement it, Class<S> clazz) {
+	def <S extends Statement> lastSubstatementsOfType(Statement it, Class<? extends S> clazz) {
 		return substatementsOfType(clazz).last;
 	}
 

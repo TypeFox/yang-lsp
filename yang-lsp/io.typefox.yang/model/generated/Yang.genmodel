@@ -20,6 +20,12 @@
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//DataSchemaNode"/>
     <genClasses ecoreClass="Yang.ecore#//OtherStatement"/>
+    <genClasses ecoreClass="Yang.ecore#//Enumerable">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Enumerable/name"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Ordered">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Ordered/ordinal"/>
+    </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Refinable">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Refinable/expression"/>
     </genClasses>
@@ -172,18 +178,10 @@
     <genClasses ecoreClass="Yang.ecore#//Modifier">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Modifier/modifier"/>
     </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//Enum">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Enum/name"/>
-    </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//Value">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Value/value"/>
-    </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//Bit">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Bit/name"/>
-    </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//Position">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Position/position"/>
-    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Enum"/>
+    <genClasses ecoreClass="Yang.ecore#//Value"/>
+    <genClasses ecoreClass="Yang.ecore#//Bit"/>
+    <genClasses ecoreClass="Yang.ecore#//Position"/>
     <genClasses ecoreClass="Yang.ecore#//Path">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Path/reference"/>
     </genClasses>
