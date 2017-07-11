@@ -10,6 +10,7 @@ import io.typefox.yang.types.YangEnumeration
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.utils.YangNameUtils
 import io.typefox.yang.utils.YangTypesExtensions
+import io.typefox.yang.yang.Base
 import io.typefox.yang.yang.Bit
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.FractionDigits
@@ -98,6 +99,19 @@ class YangValidator extends AbstractYangValidator {
 			}
 		}
 	}
+	
+	@Check
+	def checkIdentityrefType(Type it) {
+		if (identityref) {
+			// The "base" statement, which is a sub-statement to the "type" statement, 
+			// must be present at least once if the type is "identityref".
+			// https://tools.ietf.org/html/rfc7950#section-9.10.2
+			if (substatementsOfType(Base).nullOrEmpty) {
+				val message = '''The "base" statement must be present at least once for all "identityref" types''';
+				error(message, it, TYPE__TYPE_REF, TYPE_ERROR);
+			}
+		}
+	}
 
 	@Check
 	def checkBitsType(Type it) {
@@ -163,7 +177,7 @@ class YangValidator extends AbstractYangValidator {
 							val message = '''Cannot automatically asign a value to position. An explicit position has to be assigned instead.''';
 							error(message, it, BIT__NAME, TYPE_ERROR);
 						} else {
-							maxPosition.set(0, maxPosition.head.longValue + 1);
+							maxPosition.set(0, maxPosition.head.longValue + 1L);
 						}
 					}
 				];

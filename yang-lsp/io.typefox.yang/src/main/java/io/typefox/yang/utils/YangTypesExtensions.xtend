@@ -78,6 +78,10 @@ class YangTypesExtensions {
 	val Supplier<String> bitsBuiltin = Suppliers.memoize [
 		return grammarAccess.BUILTIN_TYPEAccess.bitsKeyword_1.value;
 	];
+	
+	val Supplier<String> identityrefBuiltin = Suppliers.memoize [
+		return grammarAccess.BUILTIN_TYPEAccess.identityrefKeyword_6.value;
+	];
 
 	/**
 	 * Returns {@code true} if the type of the type definition argument is a YANG built-in type.
@@ -140,6 +144,13 @@ class YangTypesExtensions {
 	 */
 	def boolean isBits(Type it) {
 		return bitsBuiltin.get == typeRef.builtin;
+	}
+	
+	/**
+	 * {@code true if the type is an identity reference built-in type, otherwise {@code false}.
+	 */
+	def boolean isIdentityref(Type it) {
+		return identityrefBuiltin.get == typeRef.builtin;
 	}
 
 	/**

@@ -943,7 +943,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''3''');
 	}
-	
+
 	@Test
 	def void checkBitsPosition_02() {
 		val it = load('''
@@ -962,7 +962,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''invalid''');
 	}
-	
+
 	@Test
 	def void checkBitsPosition_03() {
 		val it = load('''
@@ -981,7 +981,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''-1''');
 	}
-	
+
 	@Test
 	def void checkBitsPosition_04() {
 		val it = load('''
@@ -1000,7 +1000,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''4294967296''');
 	}
-	
+
 	@Test
 	def void checkBitsPosition_05() {
 		val it = load('''
@@ -1021,7 +1021,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, TYPE_ERROR, '''cannotAssign''');
 	}
-	
+
 	@Test
 	def void checkBitsPosition_06() {
 		val it = load('''
@@ -1056,7 +1056,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertNoErrors;
 	}
-	
+
 	@Test
 	def void checkBitsPosition_07() {
 		val it = load('''
@@ -1091,7 +1091,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''3''');
 	}
-	
+
 	@Test
 	def void checkBitsPosition_08() {
 		val it = load('''
@@ -1126,5 +1126,43 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, TYPE_ERROR, '''invalid''');
 	}
+
+	@Test
+	def void checkIdentityRef_01() {
+		val it = load('''
+			module example-my-crypto {
+			       yang-version 1.1;
+			       namespace "urn:example:my-crypto";
+			       prefix mc;
+			       identity eth-if-speed {
+			         description 
+			           "Representing the configured or negotiated speed of an Ethernet interface.  Definitions are only required for PHYs that can run at different speeds (e.g. BASE-T).";
+			       }
+			       leaf crypto {
+			         type identityref {
+			           base "eth-if-speed";
+			         }
+			       }
+			     }
+		''');
+		assertNoErrors;
+	}
+
+	@Test
+	def void checkIdentityRef_02() {
+		val it = load('''
+			module example-my-crypto {
+			       yang-version 1.1;
+			       namespace "urn:example:my-crypto";
+			       prefix mc;
+			       leaf crypto {
+			         type identityref {
+			         }
+			       }
+			     }
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Type).head, TYPE_ERROR, '''identityref''');
+	}
+
 
 }
