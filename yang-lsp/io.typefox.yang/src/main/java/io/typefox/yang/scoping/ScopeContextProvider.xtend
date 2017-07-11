@@ -68,6 +68,24 @@ class ScopeContextProvider {
 		IScopeContext scopeContext
 	}
 	
+	def IScopeContext findScopeContext(EObject node) {
+		val module = EcoreUtil2.getContainerOfType(node, AbstractModule)
+		if (module === null) {
+			throw new IllegalStateException("Object "+node+" not contained in a module.")
+		}
+		// trigger computation
+		var result = getScopeContext(module)
+		var current = node
+		do {
+			val candidate = Adapter.findInEmfObject(current)
+			if (candidate !== null) {
+				return candidate.scopeContext
+			}
+			current = current.eContainer
+		} while (current !== null)
+		return result
+	}
+	
 	def IScopeContext getScopeContext(AbstractModule module) {
 		val existing = Adapter.findInEmfObject(module)
 		if (existing !== null) {
@@ -172,10 +190,37 @@ class ScopeContextProvider {
 		handleGeneric(node, nodePath, ctx)
 		ctx.onComputeNodeScope [
 			val inliningCtx = new GroupingInliningScopeContext(ctx)
-			for (child : node.grouping.node.substatements) {
-				handleGeneric(child, nodePath, inliningCtx)
+			if (node.grouping !== null) {
+				for (child : node.grouping.node.substatements) {
+					inlineGrouping(child, nodePath, inliningCtx)
+				}
 			}
 		]
+	}
+	
+	private def dispatch void inlineGrouping(Statement statement, QualifiedName name, GroupingInliningScopeContext context) {
+	}
+	private def dispatch void inlineGrouping(Grouping statement, QualifiedName name, GroupingInliningScopeContext context) {
+	}
+	private def dispatch void inlineGrouping(Typedef statement, QualifiedName name, GroupingInliningScopeContext context) {
+	}
+	private def dispatch void inlineGrouping(Uses statement, QualifiedName name, GroupingInliningScopeContext context) {
+		if (statement.grouping !== null) {
+			for (subStmnt : statement.grouping.node.substatements) {
+				inlineGrouping(subStmnt, name, context)
+			}
+		}
+	}
+	
+	private def dispatch void inlineGrouping(SchemaNode statement, QualifiedName name, GroupingInliningScopeContext context) {
+		val newPath = getQualifiedName(statement, name, context)
+		if (newPath != name 
+			&& !(statement instanceof Augment)) {
+			statement.addToNodeScope(newPath, context)
+		}
+		for (subStmnt : statement.substatements) {
+			inlineGrouping(subStmnt, newPath, context)
+		}
 	}
 	
 	protected dispatch def void computeScope(GroupingRef node, QualifiedName nodePath, IScopeContext ctx) {
@@ -266,8 +311,11 @@ class ScopeContextProvider {
 		val context = switch node {
 			Grouping : 
 				new LocalNodeScopeContext(ctx)
-			SchemaNode : 
-				new LocalScopeContext(ctx)
+			SchemaNode : {
+				val scope = Adapter.findInEmfObject(node)?.scopeContext ?: new LocalScopeContext(ctx)
+				new Adapter(scope).attachToEmfObject(node)
+				scope
+			}
 			default : 
 				ctx
 		}
@@ -277,7 +325,8 @@ class ScopeContextProvider {
 	}
 	
 	private def void addToNodeScope(EObject node, QualifiedName name, IScopeContext ctx) {
-		ctx.onComputeNodeScope [
+		ctx.onComputeNodeScope 
+		[
 			if (!ctx.nodeScope.tryAddLocal(name, node)) {
 				validator.addIssue(node, SCHEMA_NODE__NAME, '''A schema node with the name '«name»' already exists.''', IssueCodes.DUPLICATE_NAME)
 			}
@@ -340,7 +389,7 @@ class ScopeContextProvider {
 			return candidate.substatements.filter(BelongsTo).head.module
 		}
 		return candidate
-	}	
+	}
 	
 	private def dispatch QualifiedName getQualifiedName(Statement node, QualifiedName p, IScopeContext ctx) {
 		return p

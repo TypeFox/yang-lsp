@@ -91,7 +91,7 @@ class LocalNodeScopeContext extends LocalScopeContext {
 			parent.nodeScope // initialize
 		}
 		return nodeScope
-	}	
+	}
 }
 
 @Log

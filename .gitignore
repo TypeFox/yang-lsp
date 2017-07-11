@@ -2,6 +2,8 @@
 /build/
 .DS_Store
 
+test-data
+
 # Ignore Gradle GUI config
 gradle-app.setting
 

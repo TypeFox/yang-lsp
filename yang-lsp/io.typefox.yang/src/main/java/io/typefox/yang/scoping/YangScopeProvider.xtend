@@ -4,7 +4,6 @@
 package io.typefox.yang.scoping
 
 import com.google.inject.Inject
-import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.YangPackage
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
@@ -19,14 +18,14 @@ class YangScopeProvider implements IScopeProvider {
 
 	override getScope(EObject context, EReference reference) {
 		val ctx = findScopeInAdapters(context, reference)
-		switch reference.eClass {
+		switch reference.EReferenceType {
 			case YangPackage.Literals.ABSTRACT_MODULE : {
 				return ctx.moduleScope
 			}
 			case YangPackage.Literals.GROUPING : {
 				return ctx.groupingScope
 			}
-			case YangPackage.Literals.TYPE : {
+			case YangPackage.Literals.TYPEDEF : {
 				return ctx.typeScope
 			}
 			case YangPackage.Literals.FEATURE : {
@@ -45,8 +44,7 @@ class YangScopeProvider implements IScopeProvider {
 	}
 	
 	protected def IScopeContext findScopeInAdapters(EObject object, EReference reference) {
-		val m = object.eResource.contents.head as AbstractModule
-		return provider.getScopeContext(m)
+		return provider.findScopeContext(object)
 	}
 	
 }

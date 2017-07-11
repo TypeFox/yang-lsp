@@ -52,4 +52,30 @@ class GroupingLinkingTest extends AbstractYangTest {
 		''')
 		assertNoErrors(m.root)
 	}
+	
+	@Test def void testNestedUse_03() {
+		val m = load('''
+			module yt5 {
+			
+			    namespace "urn:ietf:params:xml:ns:yang:yt5";
+			    prefix "yt5";
+			
+				uses AA;
+				grouping AA {
+				    container b {
+				        uses AAA;
+				        grouping AAA {
+				        		uses AAAA;
+				        }
+				    }
+				
+				    grouping AAAA {
+				        container bbbb {
+				        }
+				    }
+				}
+			}
+		''')
+		assertNoErrors(m.root)
+	}
 }

@@ -3,9 +3,16 @@
  */
 package io.typefox.yang.ide
 
+import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider
+import io.typefox.yang.ide.completion.YangCompletionProvider
 
 /**
  * Use this class to register ide components.
  */
 class YangIdeModule extends AbstractYangIdeModule {
+	
+	def Class<? extends IdeContentProposalProvider> bindIdeContentProposalProvider() {
+		return YangCompletionProvider
+	}
+	
 }

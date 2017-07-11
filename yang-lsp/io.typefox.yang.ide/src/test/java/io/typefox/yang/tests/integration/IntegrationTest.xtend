@@ -23,7 +23,7 @@ class IntegrationTest {
 	@Parameters(name= "{0}")
 	static def Collection<Object[]> getFiles() {
 		val params = newArrayList
-		scanRecursively(new File("./test-data")) [
+		scanRecursively(new File("./src/test/resources")) [
 			val arr = <Object>newArrayOfSize(1)
 			arr.set(0, it)
 			params.add(arr)

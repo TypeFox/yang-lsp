@@ -30,7 +30,7 @@ class GoodTests {
 		def Collection<Object[]> getUrisAndDiagnostics() {
 			val before = System.currentTimeMillis
 			initialize[
-				rootUri = new File("./test-data").absoluteFile.toURI.toString
+				rootUri = new File("./src/test/resources").absoluteFile.toURI.toString
 			]
 			try {
 				return diagnostics.entrySet.map[ 
