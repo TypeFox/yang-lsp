@@ -22,6 +22,7 @@ import static io.typefox.yang.validation.IssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 import static extension io.typefox.yang.utils.YangNameUtils.getYangName
+import static extension org.eclipse.xtext.util.Strings.*
 
 /**
  * Validator for YANG enumeration and bits types.
@@ -45,12 +46,14 @@ class YangEnumerableValidator {
 		val it = context.astNode;
 		val minValid = context.ordinalRange.lowerEndpoint.longValue;
 		val maxValid = context.ordinalRange.upperEndpoint.longValue;
+		val enumerableName = context.enumerableClass.yangName;
+		val orderedName = context.enumerableClass.yangName;
 
 		// The "bit" statement, which is a sub-statement to the "type" statement, must be present if the type is "bits".
 		// https://tools.ietf.org/html/rfc7950#section-9.7.4
 		val enumerables = substatementsOfType(context.enumerableClass);
-		if (enumerables.nullOrEmpty && builtin) {
-			val message = '''Bits type must have at least one "bit" statement.''';
+		if (!context.substatementCardinality.contains(enumerables.size) && builtin) {
+			val message = '''«context.name.toFirstUpper» type must have at least one "«enumerableName»" statement.''';
 			acceptor.error(message, it, TYPE__TYPE_REF, TYPE_ERROR);
 		} else {
 			// All assigned names in a bits type must be unique.
@@ -60,7 +63,7 @@ class YangEnumerableValidator {
 			nameNodeMapping.asMap.forEach [ name, statementsWithSameName |
 				if (statementsWithSameName.size > 1) {
 					statementsWithSameName.forEach [
-						val message = '''All assigned names in a bits type must be unique.''';
+						val message = '''All assigned names in a «enumerableName» type must be unique.''';
 						acceptor.error(message, it, ENUMERABLE__NAME, TYPE_ERROR);
 					];
 				}
@@ -74,7 +77,7 @@ class YangEnumerableValidator {
 			ordinalsNodeMapping.asMap.forEach [ ordinal, statementsWithSameOrdinal |
 				if (statementsWithSameOrdinal.size > 1) {
 					statementsWithSameOrdinal.forEach [
-						val message = '''All assigned positions in a bits type must be unique.''';
+						val message = '''All assigned «orderedName»s in a «context.name» type must be unique.''';
 						acceptor.error(message, it, ORDERED__ORDINAL, TYPE_ERROR);
 					];
 				}
@@ -96,7 +99,7 @@ class YangEnumerableValidator {
 							maxOrdinal.set(0, value);
 						}
 					} catch (NumberFormatException e) {
-						val message = '''Assigned positions must be an unsigned integer between «minValid» and «maxValid».''';
+						val message = '''Assigned «orderedName»s must be an integer between «minValid» and «maxValid».''';
 						acceptor.error(message, ordered, ORDERED__ORDINAL, TYPE_ERROR);
 					}
 				} else {
@@ -104,7 +107,7 @@ class YangEnumerableValidator {
 					// then a position value must be specified for "bit" sub-statements
 					// following the one with the current highest position value.
 					if (maxOrdinal.head.longValue >= maxValid) {
-						val message = '''Cannot automatically asign a value to position. An explicit position has to be assigned instead.''';
+						val message = '''Cannot automatically asign a value to «orderedName». An explicit «orderedName» has to be assigned instead.''';
 						acceptor.error(message, it, ENUMERABLE__NAME, TYPE_ERROR);
 					} else {
 						maxOrdinal.set(0, maxOrdinal.head.longValue + 1L);
@@ -126,7 +129,7 @@ class YangEnumerableValidator {
 				];
 
 				enumerables.forEach [
-					val message = '''A new assigned name must not declared when restricting an existing bits type.''';
+					val message = '''A new assigned name must not declared when restricting an existing «context.name» type.''';
 					val enumerablesWithSameNames = allEnumerablesNames.get(name);
 					if (enumerablesWithSameNames.nullOrEmpty) {
 						acceptor.error(message, it, ENUMERABLE__NAME, TYPE_ERROR);
@@ -152,12 +155,12 @@ class YangEnumerableValidator {
 			case subtypeOfEnumeration: {
 				val cardinalityRange = Range.closed(0, Integer.MAX_VALUE);
 				val ordinalRange = Range.closed(-2147483648L, 2147483647L);
-				new Context(it, yangName, Enum, Value, cardinalityRange, ordinalRange);
+				new Context(it, 'enumeration', Enum, Value, cardinalityRange, ordinalRange);
 			}
 			case subtypeOfBits: {
 				val cardinalityRange = Range.closed(1, Integer.MAX_VALUE);
 				val ordinalRange = Range.closed(0L, 4294967295L);
-				new Context(it, yangName, Bit, Position, cardinalityRange, ordinalRange);
+				new Context(it, 'bits', Bit, Position, cardinalityRange, ordinalRange);
 			}
 			default:
 				null
