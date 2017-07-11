@@ -28,10 +28,10 @@ module when_bug {
         type string;
       }
 
-      leaf type {
-        type ianaift:iana-if-type;
-        mandatory true;
-      }
+//      leaf type {
+//        type ianaift:iana-if-type;
+//        mandatory true;
+//      }
     } // list interface
   } // container when_bug
 

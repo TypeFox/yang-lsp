@@ -332,16 +332,23 @@ class FlexGenerator {
 		«FOR m : allModes»
 			%s «m.name», IN_«m.name»_STRING, IN_SQ_«m.name»_STRING
 		«ENDFOR»
-		%s COLON_EXPECTED, ID_EXPECTED
-		%s BLACK_BOX_STRING
+		%s BLACK_BOX_STRING, BLACK_BOX_STRING_CONCAT
 		
 		%%
 		
 		<BLACK_BOX_STRING> {
 			{STRING} { return RULE_STRING; }	
+			{SINGLE_QUOTED_STRING} { yybegin(BLACK_BOX_STRING_CONCAT); return RULE_STRING; }
+			{DOUBLE_QUOTED_STRING} { yybegin(BLACK_BOX_STRING_CONCAT); return RULE_STRING; }
+			
+			{ML_COMMENT} { return RULE_ML_COMMENT; }
+			{SL_COMMENT} { return RULE_SL_COMMENT; }
+		}
+		
+		<BLACK_BOX_STRING_CONCAT> {
+			"+" { return RULE_HIDDEN;}
 			{SINGLE_QUOTED_STRING} { return RULE_STRING; }
 			{DOUBLE_QUOTED_STRING} { return RULE_STRING; }
-			"+" { return RULE_HIDDEN;}
 			
 			{ML_COMMENT} { return RULE_ML_COMMENT; }
 			{SL_COMMENT} { return RULE_SL_COMMENT; }

@@ -28,10 +28,10 @@ module augment_interface {
         type string;
       }
 
-      leaf type {
-        type ianaift:iana-if-type;
-        mandatory true;
-      }
+//      leaf type {
+//        type ianaift:iana-if-type;
+//        mandatory true;
+//      }
     } // list interface
   } // container augment_interface
 }

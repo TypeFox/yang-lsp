@@ -285,6 +285,36 @@ class LexerTest {
 		l.assertNextToken(RULE_NUMBER, '4')
 	}
 	
+	@Test def void test_singleQuotedString() {
+		val l = lexer.get;
+		l.charStream = new ANTLRStringStream('''
+			pattern '((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}'
+			  + '((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|'
+			  + '(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.){3}'
+			  + '(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))'
+			  + '(%[\p{N}\p{L}]+)?';
+		''')
+		l.assertNextToken(Pattern, 'pattern')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(RULE_STRING, "'((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}'")
+		l.assertNextToken(RULE_WS, System.lineSeparator + '  ')
+		l.assertNextToken(RULE_HIDDEN, '+')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(RULE_STRING, "'((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|'")
+		l.assertNextToken(RULE_WS, System.lineSeparator + '  ')
+		l.assertNextToken(RULE_HIDDEN, '+')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(RULE_STRING, "'(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\\.){3}'")
+		l.assertNextToken(RULE_WS, System.lineSeparator + '  ')
+		l.assertNextToken(RULE_HIDDEN, '+')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(RULE_STRING, "'(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))'")
+		l.assertNextToken(RULE_WS, System.lineSeparator + '  ')
+		l.assertNextToken(RULE_HIDDEN, '+')
+		l.assertNextToken(RULE_WS, ' ')
+		l.assertNextToken(RULE_STRING, "'(%[\\p{N}\\p{L}]+)?'")
+	}
+	
 	@Test def void test_Comments() {
 		val l = lexer.get
 		l.charStream = new ANTLRStringStream('''

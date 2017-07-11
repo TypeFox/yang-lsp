@@ -38,7 +38,7 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 					val seg = n.text 					
 					if (seg.length>=2) {
 						val first = seg.charAt(0)
-						if (quotes.contains(first) && string.charAt(seg.length-1) === first) {
+						if (quotes.contains(first) && seg.charAt(seg.length-1) === first) {
 							result.append(seg.substring(1, seg.length-1))
 						} else {
 							result.append(seg)

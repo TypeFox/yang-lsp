@@ -17,7 +17,8 @@ import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.YangVersion
-import java.util.regex.PatternSyntaxException
+import org.eclipse.emf.ecore.xml.type.internal.RegEx.ParseException
+import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression
 import org.eclipse.xtext.validation.Check
 
 import static io.typefox.yang.utils.YangExtensions.*
@@ -147,8 +148,8 @@ class YangValidator extends AbstractYangValidator {
 			val type = eContainer as Type;
 			if (type.subtypeOfString) {
 				try {
-					java.util.regex.Pattern.compile(regexp.nullToEmpty);
-				} catch (PatternSyntaxException e) {
+					new RegularExpression(regexp.nullToEmpty, 'X');
+				} catch (ParseException e) {
 					val message = if (regexp.nullOrEmpty) {
 							'Regular expression must be specified.'
 						} else {
