@@ -11,7 +11,7 @@ import static extension java.lang.reflect.Modifier.*
 
 /**
  * Test to verify that all issues codes are available from the {@link IssueCodes#getConfigurableIssueCodes() 
- * configurable issue codes}.
+ * configurable issue codes}, in other words; no dangling issue codes exist.
  * 
  * @author akos.kitta
  */
@@ -26,19 +26,16 @@ class IssueCodesTest extends AbstractYangTest {
 	@Test
 	def void checkCodes() {
 		val copy = Maps.newHashMap(configurableIssueCodes);
-		val issueCodes = IssueCodes.declaredFields.filter [
-			modifiers.static && modifiers.public && type === String
-		].map[
+		IssueCodes.declaredFields.filter[modifiers.static && modifiers.public && type === String].map [
 			get(null) as String
-		];
-		issueCodes.forEach[
+		].forEach [
 			val value = copy.remove(it);
 			if (value === null) {
 				val message = '''Issue code '«it»' was not registerted among the configurable codes although it is declared as a code.''';
 				collector.addError(new IllegalStateException(message));
 			}
 		];
-		copy.keySet.forEach[
+		copy.keySet.forEach [
 			val message = '''Issue code '«it»' was registerted among the configurable codes although it is not declared as a code.''';
 			collector.addError(new IllegalStateException(message));
 		];

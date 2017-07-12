@@ -13,6 +13,8 @@ import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.Base
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.FractionDigits
+import io.typefox.yang.yang.Import
+import io.typefox.yang.yang.Include
 import io.typefox.yang.yang.Modifier
 import io.typefox.yang.yang.Pattern
 import io.typefox.yang.yang.Refinable
@@ -59,8 +61,27 @@ class YangValidator extends AbstractYangValidator {
 	@Check
 	def void checkVersion(YangVersion it) {
 		if (yangVersion != YANG_1 && yangVersion != YANG_1_1) {
-			val message = '''The version must be either '«YANG_1»' or '«YANG_1_1»'.''';
+			val message = '''The version must be either "«YANG_1»" or "YANG_1_1»".''';
 			error(message, it, YANG_VERSION__YANG_VERSION, INCORRECT_VERSION);
+		}
+	}
+
+	@Check
+	def void checkVersionConsistency(AbstractModule it) {
+		// https://tools.ietf.org/html/rfc7950#section-12
+		// A YANG version 1.1 module must not include a YANG version 1 submodule, and a YANG version 1 module must not include a YANG version 1.1 submodule.
+		val moduleVersion = yangVersion;
+		substatementsOfType(Include).map[module].filterNull.filter[eResource !== null && !eIsProxy].filter[yangVersion != moduleVersion].forEach [
+			val message = '''Cannot include a version «yangVersion» submodule in a version «moduleVersion» module.''';
+			error(message, it, ABSTRACT_IMPORT__MODULE, BAD_INCLUDE_YANG_VERSION);
+		];
+
+		// A YANG version 1 module or submodule must not import a YANG version 1.1 module by revision.	
+		if (moduleVersion == YANG_1) {
+			substatementsOfType(Import).map[module].filterNull.filter[eResource !== null && !eIsProxy].filter[yangVersion != moduleVersion].forEach [
+				val message = '''Cannot import a version «yangVersion» submodule in a version «moduleVersion» module.''';
+				error(message, it, ABSTRACT_IMPORT__MODULE, BAD_IMPORT_YANG_VERSION);
+			];
 		}
 	}
 
@@ -80,7 +101,7 @@ class YangValidator extends AbstractYangValidator {
 			val expectedRefinementKind = refinementKind;
 			refinements.forEach [
 				if (expectedRefinementKind === null || !(expectedRefinementKind.isAssignableFrom(it.class))) {
-					val message = '''Type cannot have '«YangNameUtils.getYangName(it.eClass)»' restriction statement.''';
+					val message = '''Type cannot have "«YangNameUtils.getYangName(it.eClass)»" restriction statement.''';
 					error(message, it, REFINABLE__EXPRESSION, TYPE_ERROR);
 				}
 			];

@@ -60,6 +60,17 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 * For instance; the name contains any invalid characters, or equals to any YANG built-in type name.
 	 */
 	public static val BAD_TYPE_NAME = 'BAD_TYPE_NAME'.error;
+	
+	/**
+	 * Issues code when there is an inconsistency between a module's version and the version of the included modules.
+	 */
+	public static val BAD_INCLUDE_YANG_VERSION = 'BAD_INCLUDE_YANG_VERSION'.error;
+
+	/**
+	 * Issues code when there is an inconsistency between a module's version and the version of the included modules.
+	 */
+	public static val BAD_IMPORT_YANG_VERSION = 'BAD_IMPORT_YANG_VERSION'.error;
+
 
 	private static val Map<String, PreferenceKey> CODES = BUILDER.build;
 
