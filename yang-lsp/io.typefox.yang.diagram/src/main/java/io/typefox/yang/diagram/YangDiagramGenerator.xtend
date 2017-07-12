@@ -52,6 +52,7 @@ import java.util.Map
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.util.CancelIndicator
 import io.typefox.yang.yang.Import
+import org.eclipse.emf.ecore.EObject
 
 class YangDiagramGenerator implements IDiagramGenerator {
 
@@ -272,6 +273,11 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		SModelElement modelParentElement) {
 		// TODO
 	}
+	
+	protected def dispatch SModelElement generateElement(EObject node, SModelElement viewParentElement,
+		SModelElement modelParentElement) {
+		// TODO
+	}
 
 	protected def <E extends SModelElement> E configSElement(Class<E> elementClass, String idStr, String typeStr) {
 		elementClass.constructor.newInstance => [
@@ -367,7 +373,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	}
 
 	protected def void postProcessing() {
-		postProcesses.forEach [ statement, process |
+		new HashMap(postProcesses).forEach [ statement, process |
 			process.apply
 		]
 	}

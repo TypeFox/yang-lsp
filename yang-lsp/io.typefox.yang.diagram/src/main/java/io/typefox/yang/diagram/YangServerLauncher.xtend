@@ -106,7 +106,7 @@ class YangServerLauncher extends ServerLauncher {
 	 * Copied from {@link org.eclipse.lsp4j.jsonrpc.Launcher} to customize the JSON handler.
 	 * https://github.com/eclipse/lsp4j/issues/105
 	 */
-	def <T> Launcher<T> createIoLauncher(Object localService, Class<T> remoteInterface, InputStream in, OutputStream out, ExecutorService executorService, Function<MessageConsumer, MessageConsumer> wrapper) {
+	def static <T> Launcher<T> createIoLauncher(Object localService, Class<T> remoteInterface, InputStream in, OutputStream out, ExecutorService executorService, Function<MessageConsumer, MessageConsumer> wrapper) {
 		val supportedMethods = new LinkedHashMap<String, JsonRpcMethod>
 		supportedMethods.putAll(ServiceEndpoints.getSupportedMethods(remoteInterface))
 		
