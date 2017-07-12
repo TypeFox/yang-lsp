@@ -172,10 +172,10 @@ class ScopeContext implements IScopeContext {
 		var result = newArrayList()
 		if (this.localPrefix !== null) {				
 			val prefix = QualifiedName.create(this.localPrefix)
-			result.add(new PrefixingScope(fun.apply(this), prefix))
+			result.add(new PrefixingScope(fun.apply(this).localOnly, prefix))
 		}
 		for (subModule : moduleBelongingSubModules) {
-			val scope = fun.apply(subModule).getLocalOnly()
+			val scope = fun.apply(subModule).localOnly
 			result.add(scope)
 			if (this.localPrefix !== null) {				
 				val prefix = QualifiedName.create(this.localPrefix)
@@ -183,11 +183,11 @@ class ScopeContext implements IScopeContext {
 			}
 		}
 		for (imported : this.importedModules.entrySet) {
-			val scope = fun.apply(imported.value).getLocalOnly()
+			val scope = fun.apply(imported.value).localOnly
 			val prefix = QualifiedName.create(imported.key)
 			result.add(new PrefixingScope(scope, prefix))
 			for (submodule : imported.value.moduleBelongingSubModules) {
-				val subScope = fun.apply(submodule).getLocalOnly()
+				val subScope = fun.apply(submodule).localOnly
 				result.add(new PrefixingScope(subScope, prefix))
 			}
 		}
