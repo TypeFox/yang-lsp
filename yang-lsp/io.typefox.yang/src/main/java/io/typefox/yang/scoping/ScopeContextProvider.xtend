@@ -190,7 +190,7 @@ class ScopeContextProvider {
 		handleGeneric(node, nodePath, ctx)
 		ctx.onComputeNodeScope [
 			val inliningCtx = new GroupingInliningScopeContext(ctx)
-			if (node.grouping !== null) {
+			if (node.grouping?.node !== null) {
 				for (child : node.grouping.node.substatements) {
 					inlineGrouping(child, nodePath, inliningCtx)
 				}
