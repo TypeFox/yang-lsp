@@ -7,6 +7,8 @@ import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider
 import io.typefox.yang.ide.completion.YangCompletionProvider
 import io.typefox.yang.ide.contentassist.antlr.lexer.InternalYangLexer
 import io.typefox.yang.ide.contentassist.antlr.lexer.jflex.JFlexBasedInternalYangLexer
+import org.eclipse.xtext.ide.server.symbol.DocumentSymbolService
+import io.typefox.yang.ide.symbols.YangDocumentSymbolService
 
 /**
  * Use this class to register ide components.
@@ -21,4 +23,7 @@ class YangIdeModule extends AbstractYangIdeModule {
 		return JFlexBasedInternalYangLexer;
 	}
 	
+	def Class<? extends DocumentSymbolService> bindDocumentSymbolService() {
+		return YangDocumentSymbolService;
+	}
 }
