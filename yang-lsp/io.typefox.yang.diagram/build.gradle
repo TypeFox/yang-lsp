@@ -12,6 +12,9 @@ dependencies {
 	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
 }
 
+sourceSets.test.compileClasspath += project(':io.typefox.yang').sourceSets.test.output
+sourceSets.test.runtimeClasspath += project(':io.typefox.yang').sourceSets.test.output
+
 mainClassName = 'io.typefox.yang.diagram.YangServerLauncher'
 applicationName = 'yang-language-server'
 applicationDefaultJvmArgs = ['-agentlib:jdwp=transport=dt_socket,address=localhost:8787,server=y,suspend=n,quiet=y']
