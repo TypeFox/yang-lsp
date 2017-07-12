@@ -12,14 +12,15 @@ import io.typefox.yang.yang.Modifier
 import io.typefox.yang.yang.Position
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Refinable
+import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.Type
+import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.Value
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
 
 import static io.typefox.yang.validation.IssueCodes.*
-import io.typefox.yang.yang.Revision
 
 /**
  * Validation test for the YANG language.
@@ -1231,6 +1232,37 @@ class YangValidatorTest extends AbstractYangTest {
 			}
 		''');
 		assertWarning(EcoreUtil2.getAllContentsOfType(root, Revision).head, REVISION_ORDER, '2017-01-12');
+	}
+
+	@Test	
+	def void checkTypedef_01() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			  }
+			}
+		''');
+		assertError(root.firstSubstatementsOfType(Typedef), SUBSTATEMENT_CARDINALITY, 'my-base-type');
+	}
+	
+	@Test	
+	def void checkTypedef_02() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef string {
+			    type int32 {
+			      range "1 .. 4";
+			    }
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Typedef).head, BAD_TYPE_NAME, 'string');
 	}
 
 }

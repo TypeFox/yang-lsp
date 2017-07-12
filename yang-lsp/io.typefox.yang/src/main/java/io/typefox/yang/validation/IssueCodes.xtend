@@ -54,6 +54,12 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 * Issue code that applies on a revision if that is not in a reverse chronological order.
 	 */
 	public static val REVISION_ORDER = 'REVISION_ORDER'.warn;
+	
+	/**
+	 * Issue code when the name of a type does not conform with the existing constraints.
+	 * For instance; the name contains any invalid characters, or equals to any YANG built-in type name.
+	 */
+	public static val BAD_TYPE_NAME = 'BAD_TYPE_NAME'.error;
 
 	private static val Map<String, PreferenceKey> CODES = BUILDER.build;
 

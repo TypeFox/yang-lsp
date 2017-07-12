@@ -19,6 +19,7 @@ import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Type
+import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.ParseException
@@ -242,6 +243,17 @@ class YangValidator extends AbstractYangValidator {
 				val message = '''The revision statement is not given in reverse chronological order.''';
 				warning(message, current, REVISION__REVISION, REVISION_ORDER);
 			}
+		}
+	}
+
+	@Check
+	def checkTypedef(Typedef it) {
+		// The [1..*] type cardinality is checked by other rules.
+		// Also, the type name uniqueness is checked in the scoping. 
+		// https://tools.ietf.org/html/rfc7950#section-7.3
+		if (name.builtinName) {
+			val message = '''Illegal type name "«name»".''';
+			error(message, it, SCHEMA_NODE__NAME, BAD_TYPE_NAME);
 		}
 	}
 

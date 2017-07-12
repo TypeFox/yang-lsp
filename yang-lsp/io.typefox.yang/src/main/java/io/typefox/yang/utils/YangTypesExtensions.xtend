@@ -80,6 +80,13 @@ class YangTypesExtensions {
 	val Supplier<String> identityrefBuiltin = Suppliers.memoize [
 		return grammarAccess.BUILTIN_TYPEAccess.identityrefKeyword_6.value;
 	];
+	
+	/**
+	 * Returns {@code true} if the argument equals with any of the built-in YANG type names, otherwise {@code false}.
+	 */
+	def boolean isBuiltinName(String it) {
+		return builtinNames.get.contains(it);
+	}
 
 	/**
 	 * Returns {@code true} if the type of the type definition argument is a YANG built-in type.
