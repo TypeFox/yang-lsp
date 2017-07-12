@@ -10,6 +10,7 @@ import org.eclipse.xtext.linking.lazy.LazyURIEncoder
 import org.eclipse.xtext.naming.IQualifiedNameConverter
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.IEObjectDescription
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 
 class Linker {
 
@@ -32,12 +33,17 @@ class Linker {
 
 	def QualifiedName getLinkingName(EObject element, EReference reference) {
 		val proxy = element.eGet(reference, false) as InternalEObject
-		if (proxy !== null && proxy.eIsProxy) {
-			val uri = proxy.eProxyURI
-			if (uri.trimFragment == element.eResource.getURI &&
-				lazyURIEncoder.isCrossLinkFragment(element.eResource, uri.fragment)) {
-				val node = lazyURIEncoder.getNode(element, uri.fragment)
-				val symbol = linkingHelper.getCrossRefNodeAsString(node, true)
+		if (proxy !== null) {
+			if (proxy.eIsProxy) {
+				val uri = proxy.eProxyURI
+				if (uri.trimFragment == element.eResource.getURI &&
+					lazyURIEncoder.isCrossLinkFragment(element.eResource, uri.fragment)) {
+					val node = lazyURIEncoder.getNode(element, uri.fragment)
+					val symbol = linkingHelper.getCrossRefNodeAsString(node, true)
+					return qualifiedNameConverter.toQualifiedName(symbol)
+				}
+			} else {
+				val symbol = NodeModelUtils.findNodesForFeature(element, reference).map[leafNodes.filter[!isHidden].map[getText].join("")].join("")
 				return qualifiedNameConverter.toQualifiedName(symbol)
 			}
 		}

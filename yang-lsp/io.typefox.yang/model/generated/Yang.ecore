@@ -107,7 +107,7 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="DescendantSchemaNodeIdentifierReferences">
     <eStructuralFeatures xsi:type="ecore:EReference" name="references" upperBound="-1"
-        eType="#//DescendantSchemaNodeIdentifier" containment="true"/>
+        eType="#//SchemaNodeIdentifier" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Unique" eSuperTypes="#//OtherStatement #//DescendantSchemaNodeIdentifierReferences"/>
   <eClassifiers xsi:type="ecore:EClass" name="Choice" eSuperTypes="#//DataSchemaNode"/>
@@ -120,7 +120,7 @@
         containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Refine" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//DescendantSchemaNodeIdentifier"
+    <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//SchemaNodeIdentifier"
         containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Rpc" eSuperTypes="#//SchemaNode"/>
@@ -201,16 +201,13 @@
     <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="SchemaNodeIdentifier">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="elements" upperBound="-1"
-        eType="#//IdentifierRef" containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="target" eType="#//SchemaNodeIdentifier"
+        containment="true"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="schemaNode" eType="#//SchemaNode"/>
+    <eStructuralFeatures xsi:type="ecore:EAttribute" name="isAbsolute" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EBoolean"/>
   </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="AbsoluteSchemaNodeIdentifier" eSuperTypes="#//SchemaNodeIdentifier"/>
-  <eClassifiers xsi:type="ecore:EClass" name="DescendantSchemaNodeIdentifier" eSuperTypes="#//SchemaNodeIdentifier"/>
   <eClassifiers xsi:type="ecore:EClass" name="GroupingRef">
     <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//Grouping"/>
-  </eClassifiers>
-  <eClassifiers xsi:type="ecore:EClass" name="IdentifierRef">
-    <eStructuralFeatures xsi:type="ecore:EReference" name="node" eType="#//SchemaNode"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="XpathExpression"/>
   <eClassifiers xsi:type="ecore:EClass" name="XpathStep">
