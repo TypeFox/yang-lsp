@@ -9,12 +9,14 @@ import com.google.inject.Singleton
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.utils.YangNameUtils
 import io.typefox.yang.utils.YangTypesExtensions
+import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.Base
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Modifier
 import io.typefox.yang.yang.Pattern
 import io.typefox.yang.yang.Refinable
+import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.YangVersion
@@ -30,6 +32,7 @@ import static io.typefox.yang.validation.IssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 import static extension com.google.common.base.Strings.nullToEmpty
+import static extension io.typefox.yang.utils.YangDateUtils.*
 
 /**
  * This class contains custom validation rules for the YANG language. 
@@ -214,6 +217,31 @@ class YangValidator extends AbstractYangValidator {
 		if (modifier != 'invert-match') {
 			val message = '''Modifier value must be "invert-match".''';
 			error(message, it, MODIFIER__MODIFIER, TYPE_ERROR);
+		}
+	}
+
+	@Check
+	def checkRevisionFormat(Revision it) {
+		if (revision !== null) {
+			try {
+				revisionDateFormat.parse(revision);
+			} catch (java.text.ParseException e) {
+				val message = '''The revision date string should be in the following format: "YYYY-MM-DD".''';
+				warning(message, it, REVISION__REVISION, INVALID_REVISION_FORMAT);
+			}
+		}
+	}
+
+	@Check
+	def checkRevisionOrder(AbstractModule it) {
+		val revisions = substatementsOfType(Revision).toList;
+		for (index : 1 ..< revisions.size) {
+			val previous = revisions.get(index - 1);
+			val current = revisions.get(index);
+			if (current.isGreaterThan(previous)) {
+				val message = '''The revision statement is not given in reverse chronological order.''';
+				warning(message, current, REVISION__REVISION, REVISION_ORDER);
+			}
 		}
 	}
 

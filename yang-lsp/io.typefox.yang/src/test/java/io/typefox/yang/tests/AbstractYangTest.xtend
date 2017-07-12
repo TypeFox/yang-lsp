@@ -31,58 +31,66 @@ abstract class AbstractYangTest {
 	@Inject protected IResourceDescription.Manager mnr
 	@Inject protected ValidationTestHelper validator
 	@Inject extension protected YangExtensions
-	
+
 	XtextResourceSet resourceSet
-	
+
 	@Before def void setup() {
 		resourceSet = resourceSetProvider.get
 	}
-	
+
 	protected def assertError(EObject obj, String code) {
 		validator.assertError(obj, obj.eClass, code)
 	}
-	
+
 	protected def assertError(EObject obj, String code, String searchTerm, String... messageParts) {
 		val parsedText = (obj.eResource as XtextResource).parseResult?.rootNode?.text;
 		val offset = parsedText.indexOf(searchTerm);
 		Preconditions.checkArgument(offset >= 0, '''The '«searchTerm»' is not conatined in '«parsedText»'.''');
 		validator.assertError(obj, obj.eClass, code, offset, searchTerm.length, messageParts);
 	}
-	
+
 	protected def assertWarning(EObject obj, String code) {
 		validator.assertWarning(obj, obj.eClass, code)
 	}
-	
+
 	protected def assertWarning(EObject obj, String code, String searchTerm, String... messageParts) {
 		val parsedText = (obj.eResource as XtextResource).parseResult?.rootNode?.text;
 		val offset = parsedText.indexOf(searchTerm);
 		Preconditions.checkArgument(offset >= 0, '''The '«searchTerm»' is not conatined in '«parsedText»'.''');
 		validator.assertWarning(obj, obj.eClass, code, offset, searchTerm.length, messageParts);
 	}
-	
+
 	protected def assertNoErrors(Resource resource) {
 		validator.assertNoErrors(resource)
 	}
-	
+
 	protected def assertNoErrors(EObject eObject) {
 		validator.assertNoErrors(eObject)
 	}
-	
+
+	protected def assertNoIssues(Resource resource) {
+		validator.assertNoIssues(resource)
+	}
+
+	protected def assertNoIssues(EObject eObject) {
+		validator.assertNoIssues(eObject)
+	}
+
 	protected def Resource load(CharSequence contents) {
-		val uri = URI.createURI("synthetic:///__synthetic"+resourceSet.resources.size+".yang")
+		val uri = URI.createURI("synthetic:///__synthetic" + resourceSet.resources.size + ".yang")
 		val resource = resourceHelper.resource(contents.toString, uri, resourceSet)
 		resource.load(emptyMap)
 		Assert.assertTrue(resource.errors.join('\n')[message], resource.errors.empty)
 		return resource
 	}
-	
+
 	protected def AbstractModule root(Resource r) {
 		fullyResolve
 		return r.contents.head as AbstractModule
 	}
-	
+
 	var isFullyResolved = false
-	
+
 	private def void fullyResolve() {
 		if (isFullyResolved)
 			return;
@@ -92,7 +100,7 @@ abstract class AbstractYangTest {
 			this.validator.validate(it)
 		]
 	}
-	
+
 	private def void installIndex() {
 		val index = new ResourceDescriptionsData(Collections.emptyList)
 		val resources = new ArrayList(resourceSet.resources)

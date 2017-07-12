@@ -19,6 +19,7 @@ import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
 
 import static io.typefox.yang.validation.IssueCodes.*
+import io.typefox.yang.yang.Revision
 
 /**
  * Validation test for the YANG language.
@@ -1131,19 +1132,19 @@ class YangValidatorTest extends AbstractYangTest {
 	def void checkIdentityRef_01() {
 		val it = load('''
 			module example-my-crypto {
-			       yang-version 1.1;
-			       namespace "urn:example:my-crypto";
-			       prefix mc;
-			       identity eth-if-speed {
-			         description 
-			           "Representing the configured or negotiated speed of an Ethernet interface.  Definitions are only required for PHYs that can run at different speeds (e.g. BASE-T).";
-			       }
-			       leaf crypto {
-			         type identityref {
-			           base "eth-if-speed";
-			         }
-			       }
-			     }
+			  yang-version 1.1;
+			  namespace "urn:example:my-crypto";
+			  prefix mc;
+			  identity eth-if-speed {
+			  description 
+			    "Representing the configured or negotiated speed of an Ethernet interface.  Definitions are only required for PHYs that can run at different speeds (e.g. BASE-T).";
+			  }
+			  leaf crypto {
+			    type identityref {
+			      base "eth-if-speed";
+			    }
+			  }
+			}
 		''');
 		assertNoErrors;
 	}
@@ -1152,17 +1153,84 @@ class YangValidatorTest extends AbstractYangTest {
 	def void checkIdentityRef_02() {
 		val it = load('''
 			module example-my-crypto {
-			       yang-version 1.1;
-			       namespace "urn:example:my-crypto";
-			       prefix mc;
-			       leaf crypto {
-			         type identityref {
-			         }
-			       }
-			     }
+			  yang-version 1.1;
+			  namespace "urn:example:my-crypto";
+			  prefix mc;
+			  leaf crypto {
+			    type identityref {
+			    }
+			  }
+			}
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Type).head, TYPE_ERROR, '''identityref''');
 	}
 
+	@Test
+	def void checkRevisionFormat_01() {
+		val it = load('''
+			module example-my-crypto {
+			  yang-version 1.1;
+			  namespace "urn:example:my-crypto";
+			  prefix mc;
+			  revision 2017-01-10 {
+			    description
+			      "Updated to address CFC1 Review Comments.";
+			    reference
+			      "EVC Ethernet Services Definitions YANG Modules (MEF XX), TBD";
+			  }
+			}
+		''');
+		assertNoIssues;
+	}
+	
+	@Test
+	def void checkRevisionFormat_02() {
+		val it = load('''
+			module example-my-crypto {
+			  yang-version 1.1;
+			  namespace "urn:example:my-crypto";
+			  prefix mc;
+			  revision 10-01-2017 {
+			    description
+			      "Updated to address CFC1 Review Comments.";
+			    reference
+			      "EVC Ethernet Services Definitions YANG Modules (MEF XX), TBD";
+			  }
+			}
+		''');
+		assertWarning(EcoreUtil2.getAllContentsOfType(root, Revision).head, INVALID_REVISION_FORMAT, '10-01-2017');
+	}
+	
+	@Test
+	def void checkRevisionOrder_01() {
+		val it = load('''
+			module example-my-crypto {
+			  yang-version 1.1;
+			  namespace "urn:example:my-crypto";
+			  prefix mc;
+			  revision 2017-01-12;
+			  revision 2017-01-12;
+			  revision 2017-01-11;
+			  revision 2017-01-10;
+			}
+		''');
+		assertNoIssues;
+	}
+	
+	@Test
+	def void checkRevisionOrder_02() {
+		val it = load('''
+			module example-my-crypto {
+			  yang-version 1.1;
+			  namespace "urn:example:my-crypto";
+			  prefix mc;
+			  revision 2017-01-11;
+			  revision 2017-01-12;
+			  revision 2017-01-10;
+			  revision 2017-01-10;
+			}
+		''');
+		assertWarning(EcoreUtil2.getAllContentsOfType(root, Revision).head, REVISION_ORDER, '2017-01-12');
+	}
 
 }
