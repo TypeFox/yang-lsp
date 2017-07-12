@@ -3,7 +3,6 @@ package io.typefox.yang.scoping
 import com.google.inject.Inject
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.validation.IssueCodes
-import io.typefox.yang.yang.AbsoluteSchemaNodeIdentifier
 import io.typefox.yang.yang.AbstractImport
 import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.Action
@@ -18,7 +17,6 @@ import io.typefox.yang.yang.Feature
 import io.typefox.yang.yang.FeatureReference
 import io.typefox.yang.yang.Grouping
 import io.typefox.yang.yang.GroupingRef
-import io.typefox.yang.yang.IdentifierRef
 import io.typefox.yang.yang.Identity
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Include
@@ -152,26 +150,28 @@ class ScopeContextProvider {
 	}
 	
 	protected dispatch def void computeScope(Augment node, QualifiedName nodePath, IScopeContext ctx) {
-		node.path.doLinkNodeLater(nodePath, ctx)
+		if (node.path !== null) {
+			node.path.doLinkNodeLater(nodePath, ctx)
+		}
 		handleGeneric(node, nodePath, ctx)
 	}
 	
 	private def doLinkNodeLater(SchemaNodeIdentifier identifier, QualifiedName prefix, IScopeContext context) {
 		context.runAfterAll [
-			var pref = if (identifier instanceof AbsoluteSchemaNodeIdentifier) {
-				QualifiedName.EMPTY
-			} else {
-				prefix
-			}
-			for (e : identifier.elements) {
-				pref = e.internalGetQualifiedName(pref, context)
-				val p = pref
-				linker.link(e, YangPackage.Literals.IDENTIFIER_REF__NODE) [
-					val result = context.nodeScope.getSingleElement(p)
-					return result
-				]
-			}
+			internalLinkNode(identifier, prefix, context)
 		]
+	}
+	
+	private def QualifiedName internalLinkNode(SchemaNodeIdentifier identifier, QualifiedName prefix, IScopeContext context) {
+		if (identifier.target !== null) {
+			internalLinkNode(identifier.target, prefix, context) 
+		}
+		val pref = identifier.internalGetQualifiedName(prefix, context)
+		linker.link(identifier, YangPackage.Literals.SCHEMA_NODE_IDENTIFIER__SCHEMA_NODE) [
+			val result = context.nodeScope.getSingleElement(pref)
+			return result
+		]
+		return pref
 	}
 	
 	protected dispatch def void computeScope(TypeReference node, QualifiedName nodePath, IScopeContext ctx) {
@@ -448,23 +448,21 @@ class ScopeContextProvider {
 	}
 	
 	private def dispatch QualifiedName getQualifiedName(Augment node, QualifiedName p, IScopeContext ctx) {
+		if (node.path === null) {
+			return p
+		}
 		return internalGetQualifiedName(node.path, p, ctx)
 	}
 	
-	private def dispatch QualifiedName internalGetQualifiedName(SchemaNodeIdentifier identifier, QualifiedName p, IScopeContext ctx) {
-		var prefix = if (identifier instanceof AbsoluteSchemaNodeIdentifier) {
+	private def QualifiedName internalGetQualifiedName(SchemaNodeIdentifier identifier, QualifiedName p, IScopeContext ctx) {
+		var prefix = if (identifier.target !== null) {
+			internalGetQualifiedName(identifier.target, p, ctx)			
+		} else if (identifier.isIsAbsolute) {
 			QualifiedName.EMPTY
 		} else {
 			p
 		}
-		for (element : identifier.elements) {
-			prefix = element.internalGetQualifiedName(prefix, ctx)
-		}
-		return prefix
-	}
-	
-	private def dispatch QualifiedName internalGetQualifiedName(IdentifierRef ref, QualifiedName prefix, IScopeContext ctx) {
-		val qn = linker.getLinkingName(ref, YangPackage.Literals.IDENTIFIER_REF__NODE)
+		val qn = linker.getLinkingName(identifier, YangPackage.Literals.SCHEMA_NODE_IDENTIFIER__SCHEMA_NODE)
 		if (qn !== null) {
 			var firstSeg = ctx.moduleName
 			if (qn.segmentCount === 2) {
@@ -475,5 +473,6 @@ class ScopeContextProvider {
 		}
 		return prefix
 	}
+	
 }
 															

@@ -290,7 +290,7 @@ Uses:
 
 // 7.13.2
 Refine:
-	'refine' node=DescendantSchemaNodeIdentifier StatementEnd
+	'refine' node=SchemaNodeIdentifier StatementEnd
 ;
 
 // 7.14
@@ -479,26 +479,26 @@ Unknown:
 	extension=[Extension|EXTENSION_NAME] name=StringValue? StatementEnd 
 ;
 
-SchemaNodeIdentifier:
-	AbsoluteSchemaNodeIdentifier |
-	DescendantSchemaNodeIdentifier 
+DescendantSchemaNodeIdentifier returns SchemaNodeIdentifier:
+	DescendantRootSchemaNodeIdentifier ({SchemaNodeIdentifier.target=current} '/' schemaNode=[SchemaNode|QNAME])*
 ;
 
-AbsoluteSchemaNodeIdentifier:
-	('/' elements+=IdentifierRef)+
+DescendantRootSchemaNodeIdentifier returns SchemaNodeIdentifier:
+	schemaNode=[SchemaNode|QNAME]
 ;
 
-DescendantSchemaNodeIdentifier:
-	elements+=IdentifierRef ('/' elements+=IdentifierRef)*
+SchemaNodeIdentifier returns SchemaNodeIdentifier:
+	RootSchemaNodeIdentifier ({SchemaNodeIdentifier.target=current} '/' schemaNode=[SchemaNode|QNAME])*
+;
+
+RootSchemaNodeIdentifier returns SchemaNodeIdentifier:
+	isAbsolute?='/'? schemaNode=[SchemaNode|QNAME]
 ;
 
 GroupingRef:
 	node=[Grouping|QNAME]
 ;
 
-IdentifierRef:
-	node=[SchemaNode|QNAME]
-;
 
 /////////////////////////////////
 // Xpath 1.0
