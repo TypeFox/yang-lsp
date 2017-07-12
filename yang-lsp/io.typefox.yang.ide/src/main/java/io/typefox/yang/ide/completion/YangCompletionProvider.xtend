@@ -80,7 +80,9 @@ class YangCompletionProvider extends IdeContentProposalProvider {
 				if (i % 2 === 0) { // module prefix
 					val modulePrefix = suffix.getSegment(i)
 					if (modulePrefix != scopeCtx.moduleName) {
-						name.append(suffix.getSegment(i)).append(":")
+						val moduleName = suffix.getSegment(i)
+						val importPrefix = scopeCtx.importedModules.entrySet.findFirst[value.moduleName == moduleName].key
+						name.append(importPrefix).append(":")
 					}
 				} else {
 					name.append(suffix.getSegment(i))

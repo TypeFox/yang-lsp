@@ -10,7 +10,7 @@ class SchemaPathCompletionTest extends AbstractLanguageServerTest {
 	}
 	
 	@Test
-	def void testTypeCompletion_01() {
+	def void testNodeCompletion_01() {
 		testCompletion [
 		    model = '''
 			    	module foo {
@@ -30,7 +30,7 @@ class SchemaPathCompletionTest extends AbstractLanguageServerTest {
 	}
 	
 	@Test
-	def void testTypeCompletion_02() {
+	def void testNodeCompletion_02() {
 		testCompletion [
 		    model = '''
 			    	module foo {
@@ -51,7 +51,7 @@ class SchemaPathCompletionTest extends AbstractLanguageServerTest {
 	}
 	
 	@Test
-	def void testTypeCompletion_03() {
+	def void testNodeCompletion_03() {
 		testCompletion [
 		    model = '''
 			    	module foo {
@@ -77,6 +77,42 @@ class SchemaPathCompletionTest extends AbstractLanguageServerTest {
 				x/foo -> x/foo [[14, 14] .. [14, 14]]
 				x/foo/y -> x/foo/y [[14, 14] .. [14, 14]]
 				/ -> / [[14, 13] .. [14, 14]]
+			'''
+		]
+	}
+	
+	@Test
+	def void testNodeCompletion_04() {
+		testCompletion [
+			filesInScope = #{
+				'other.yang' -> '''
+				module other {
+					container bla {}
+				}
+				'''
+			}
+		    model = '''
+			    	module foo {
+			    		prefix f;
+			    		import other {
+			    			prefix o;
+			    		}
+			    		augment "/o:bla" {
+			    			container foo {
+			    				leaf y {
+			    					type string;
+			    				}
+			    			}
+			    		}
+			    		augment 
+			    	}'''
+			line = 12
+			column = 9
+			expectedCompletionItems = '''
+				o:bla -> o:bla [[12, 9] .. [12, 9]]
+				o:bla/foo -> o:bla/foo [[12, 9] .. [12, 9]]
+				o:bla/foo/y -> o:bla/foo/y [[12, 9] .. [12, 9]]
+				/ -> / [[12, 9] .. [12, 9]]
 			'''
 		]
 	}
