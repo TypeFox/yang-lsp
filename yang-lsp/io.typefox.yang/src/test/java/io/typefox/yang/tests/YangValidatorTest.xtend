@@ -608,7 +608,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, 'dupe');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, DUPLICATE_ENUMERABLE_NAME, 'dupe');
 	}
 
 	@Test
@@ -678,7 +678,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Value).head, TYPE_ERROR, '''bb''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Value).head, ORDINAL_VALUE, '''bb''');
 	}
 
 	@Test
@@ -697,7 +697,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Value).head, TYPE_ERROR, '''-2147483649''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Value).head, ORDINAL_VALUE, '''-2147483649''');
 	}
 
 	@Test
@@ -716,7 +716,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Value).head, TYPE_ERROR, '''2147483648''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Value).head, ORDINAL_VALUE, '''2147483648''');
 	}
 
 	@Test
@@ -738,7 +738,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Value).head, TYPE_ERROR, '''10''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Value).head, DUPLICATE_ENUMERABLE_VALUE, '''10''');
 	}
 
 	@Test
@@ -758,7 +758,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, '''"b"''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, ORDINAL_VALUE, '''"b"''');
 	}
 
 	@Test
@@ -793,7 +793,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, '''yellow''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, ENUMERABLE_RESTRICTION_VALUE, '''yellow''');
 	}
 
 	@Test
@@ -823,7 +823,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, TYPE_ERROR, '''black''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Enum).head, ENUMERABLE_RESTRICTION_NAME, '''black''');
 	}
 
 	@Test
@@ -921,7 +921,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, TYPE_ERROR, '''dupe''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, DUPLICATE_ENUMERABLE_NAME, '''dupe''');
 	}
 
 	@Test
@@ -943,7 +943,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''3''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, DUPLICATE_ENUMERABLE_VALUE, '''3''');
 	}
 
 	@Test
@@ -962,7 +962,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''invalid''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, ORDINAL_VALUE, '''invalid''');
 	}
 
 	@Test
@@ -981,7 +981,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''-1''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, ORDINAL_VALUE, '''-1''');
 	}
 
 	@Test
@@ -1000,7 +1000,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, TYPE_ERROR, '''4294967296''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Position).head, ORDINAL_VALUE, '''4294967296''');
 	}
 
 	@Test
@@ -1021,7 +1021,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, TYPE_ERROR, '''cannotAssign''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, ORDINAL_VALUE, '''cannotAssign''');
 	}
 
 	@Test
@@ -1091,7 +1091,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, TYPE_ERROR, '''disable-nagle''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, ENUMERABLE_RESTRICTION_VALUE, '''disable-nagle''');
 	}
 
 	@Test
@@ -1126,7 +1126,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, TYPE_ERROR, '''invalid''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Bit).head, ENUMERABLE_RESTRICTION_NAME, '''invalid''');
 	}
 
 	@Test

@@ -71,6 +71,30 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 */
 	public static val BAD_IMPORT_YANG_VERSION = 'BAD_IMPORT_YANG_VERSION'.error;
 
+	/**
+	 * Issue code indicating that all assigned names in an enumerable must be unique.
+	 */
+	public static val DUPLICATE_ENUMERABLE_NAME = 'DUPLICATE_ENUMERABLE_NAME'.error;
+	
+	/**
+	 * Issue code indicating that all assigned values in an enumerable must be unique.
+	 */
+	public static val DUPLICATE_ENUMERABLE_VALUE = 'DUPLICATE_ENUMERABLE_VALUE'.error;
+	
+	/**
+	 * Issue code indicating that an enumerable introduces a new name that is not declared among the parent restriction.
+	 */
+	public static val ENUMERABLE_RESTRICTION_NAME = 'ENUMERABLE_RESTRICTION_NAME'.error;
+	
+	/**
+	 * Issue code indicating that an enumerable introduces a new value that is not declared among the parent restriction.
+	 */
+	public static val ENUMERABLE_RESTRICTION_VALUE = 'ENUMERABLE_RESTRICTION_VALUE'.error;
+	
+	/**
+	 * Issue code when an ordinal value exceeds its limits.
+	 */
+	public static val ORDINAL_VALUE = 'ORDINAL_VALUE'.error; 
 
 	private static val Map<String, PreferenceKey> CODES = BUILDER.build;
 

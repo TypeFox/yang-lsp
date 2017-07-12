@@ -63,8 +63,8 @@ class YangEnumerableValidator {
 			nameNodeMapping.asMap.forEach [ name, statementsWithSameName |
 				if (statementsWithSameName.size > 1) {
 					statementsWithSameName.forEach [
-						val message = '''All assigned names in a «enumerableName» type must be unique.''';
-						acceptor.error(message, it, ENUMERABLE__NAME, TYPE_ERROR);
+						val message = '''The «orderedName» name has already been used for the «context.name».''';
+						acceptor.error(message, it, ENUMERABLE__NAME, DUPLICATE_ENUMERABLE_NAME);
 					];
 				}
 			];
@@ -77,8 +77,8 @@ class YangEnumerableValidator {
 			ordinalsNodeMapping.asMap.forEach [ ordinal, statementsWithSameOrdinal |
 				if (statementsWithSameOrdinal.size > 1) {
 					statementsWithSameOrdinal.forEach [
-						val message = '''All assigned «orderedName»s in a «context.name» type must be unique.''';
-						acceptor.error(message, it, ORDERED__ORDINAL, TYPE_ERROR);
+						val message = '''The integer value «orderedName»s has already been used for the «context.name».''';
+						acceptor.error(message, it, ORDERED__ORDINAL, DUPLICATE_ENUMERABLE_VALUE);
 					];
 				}
 			];
@@ -99,8 +99,8 @@ class YangEnumerableValidator {
 							maxOrdinal.set(0, value);
 						}
 					} catch (NumberFormatException e) {
-						val message = '''Assigned «orderedName»s must be an integer between «minValid» and «maxValid».''';
-						acceptor.error(message, ordered, ORDERED__ORDINAL, TYPE_ERROR);
+						val message = '''The «enumerableName» value is not an integer between «minValid» and «maxValid».''';
+						acceptor.error(message, ordered, ORDERED__ORDINAL, ORDINAL_VALUE);
 					}
 				} else {
 					// If the current highest bit position value is equal to 4294967295,
@@ -108,7 +108,7 @@ class YangEnumerableValidator {
 					// following the one with the current highest position value.
 					if (maxOrdinal.head.longValue >= maxValid) {
 						val message = '''Cannot automatically asign a value to «orderedName». An explicit «orderedName» has to be assigned instead.''';
-						acceptor.error(message, it, ENUMERABLE__NAME, TYPE_ERROR);
+						acceptor.error(message, it, ENUMERABLE__NAME, ORDINAL_VALUE);
 					} else {
 						maxOrdinal.set(0, maxOrdinal.head.longValue + 1L);
 					}
@@ -132,7 +132,7 @@ class YangEnumerableValidator {
 					val message = '''A new assigned name must not declared when restricting an existing «context.name» type.''';
 					val enumerablesWithSameNames = allEnumerablesNames.get(name);
 					if (enumerablesWithSameNames.nullOrEmpty) {
-						acceptor.error(message, it, ENUMERABLE__NAME, TYPE_ERROR);
+						acceptor.error(message, it, ENUMERABLE__NAME, ENUMERABLE_RESTRICTION_NAME);
 					} else {
 						val ordered = firstSubstatementsOfType(context.orderedClass);
 						val ordinal = ordered?.ordinal;
@@ -141,7 +141,7 @@ class YangEnumerableValidator {
 						].filterNull.map[it.ordinal];
 
 						if (ordinal !== null && !parentOrdinals.exists[ordinal == it]) {
-							acceptor.error(message, it, ENUMERABLE__NAME, TYPE_ERROR);
+							acceptor.error(message, it, ENUMERABLE__NAME, ENUMERABLE_RESTRICTION_VALUE);
 						}
 					}
 				];
