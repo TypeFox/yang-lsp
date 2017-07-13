@@ -3,7 +3,6 @@
  */
 package io.typefox.yang.validation
 
-import com.google.common.collect.Range
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import io.typefox.yang.utils.YangExtensions
@@ -15,7 +14,12 @@ import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Include
+import io.typefox.yang.yang.Key
+import io.typefox.yang.yang.Mandatory
+import io.typefox.yang.yang.MaxElements
+import io.typefox.yang.yang.MinElements
 import io.typefox.yang.yang.Modifier
+import io.typefox.yang.yang.OrderedBy
 import io.typefox.yang.yang.Pattern
 import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Revision
@@ -23,10 +27,8 @@ import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.YangVersion
-import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.ParseException
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression
-import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.validation.Check
 
 import static com.google.common.base.CharMatcher.*
@@ -35,6 +37,7 @@ import static io.typefox.yang.validation.IssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 import static extension com.google.common.base.Strings.nullToEmpty
+import static extension io.typefox.yang.utils.IterableExtensions2.toMultimap
 import static extension io.typefox.yang.utils.YangDateUtils.*
 
 /**
@@ -71,14 +74,18 @@ class YangValidator extends AbstractYangValidator {
 		// https://tools.ietf.org/html/rfc7950#section-12
 		// A YANG version 1.1 module must not include a YANG version 1 submodule, and a YANG version 1 module must not include a YANG version 1.1 submodule.
 		val moduleVersion = yangVersion;
-		substatementsOfType(Include).map[module].filterNull.filter[eResource !== null && !eIsProxy].filter[yangVersion != moduleVersion].forEach [
+		substatementsOfType(Include).map[module].filterNull.filter[eResource !== null && !eIsProxy].filter [
+			yangVersion != moduleVersion
+		].forEach [
 			val message = '''Cannot include a version «yangVersion» submodule in a version «moduleVersion» module.''';
 			error(message, it, ABSTRACT_IMPORT__MODULE, BAD_INCLUDE_YANG_VERSION);
 		];
 
 		// A YANG version 1 module or submodule must not import a YANG version 1.1 module by revision.	
 		if (moduleVersion == YANG_1) {
-			substatementsOfType(Import).map[module].filterNull.filter[eResource !== null && !eIsProxy].filter[yangVersion != moduleVersion].forEach [
+			substatementsOfType(Import).map[module].filterNull.filter[eResource !== null && !eIsProxy].filter [
+				yangVersion != moduleVersion
+			].forEach [
 				val message = '''Cannot import a version «yangVersion» submodule in a version «moduleVersion» module.''';
 				error(message, it, ABSTRACT_IMPORT__MODULE, BAD_IMPORT_YANG_VERSION);
 			];
@@ -141,15 +148,6 @@ class YangValidator extends AbstractYangValidator {
 		}
 	}
 
-	@Data
-	private static class EnumerableValidationContext {
-		val String name;
-		val EClass enumerableClass;
-		val EClass orderedClass;
-		val Range<Integer> substatementCardinality;
-		val Range<Long> ordinalRange;
-	}
-
 	@Check
 	def checkEnumerables(Type it) {
 		validateEnumerable(this);
@@ -175,7 +173,6 @@ class YangValidator extends AbstractYangValidator {
 				if (message !== null) {
 					error(message, it, ENUMERABLE__NAME, TYPE_ERROR);
 				}
-
 			];
 		}
 	}
@@ -275,6 +272,76 @@ class YangValidator extends AbstractYangValidator {
 		if (name.builtinName) {
 			val message = '''Illegal type name "«name»".''';
 			error(message, it, SCHEMA_NODE__NAME, BAD_TYPE_NAME);
+		}
+	}
+
+	@Check
+	def checkMandatoryValue(Mandatory it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.6.5
+		// The value can be either `true` or `false`. If missing, then `false` by default.
+		if (isMandatory !== null) {
+			val validValues = #{"true", "false"};
+			if (!validValues.contains(isMandatory)) {
+				val message = '''The argument of the "mandatory" statement must be either "true" or "false".''';
+				error(message, it, MANDATORY__IS_MANDATORY, TYPE_ERROR);
+			}
+		}
+	}
+
+	@Check
+	def checkMinElements(MinElements it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.7.5
+		val expectedElements = minElements.parseIntSafe;
+		if (expectedElements === null || expectedElements.intValue < 0) {
+			val message = '''The value of the "min-elements" must be a non-negative integer.''';
+			error(message, it, MIN_ELEMENTS__MIN_ELEMENTS, TYPE_ERROR);
+		}
+	}
+
+	@Check
+	def chechMaxElements(MaxElements it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.7.6
+		if (maxElements != 'unbounded') {
+			val expectedElements = maxElements.parseIntSafe;
+			if (expectedElements === null || expectedElements.intValue < 1) {
+				val message = '''The value of the "max-elements" must be a positive integer or the string "unbounded".''';
+				error(message, it, MIN_ELEMENTS__MIN_ELEMENTS, TYPE_ERROR);
+			}
+		}
+	}
+
+	@Check
+	def checkOrderedBy(OrderedBy it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.7.7
+		if (orderedBy !== null) {
+			val validValues = #{"system", "user"};
+			if (!validValues.contains(orderedBy)) {
+				val message = '''The argument of the "ordered-by" statement must be either "system" or "user".''';
+				error(message, it, ORDERED_BY__ORDERED_BY, TYPE_ERROR);
+			}
+		}
+	}
+
+	@Check
+	def checkKey(Key key) {
+		// https://tools.ietf.org/html/rfc7950#section-7.8.2	
+		// A leaf identifier must not appear more than once in the key.
+		key.references.filter[!node?.name.nullOrEmpty].toMultimap[node.name].asMap.forEach [ name, nodesWithSameName |
+			if (nodesWithSameName.size > 1) {
+				nodesWithSameName.forEach [
+					val message = '''The leaf identifier "«name»" must not appear more than once in a key.''';
+					val index = key.references.indexOf(it);
+					error(message, key, KEY__REFERENCES, index, KEY_DUPLICATE_LEAF_NAME);
+				];
+			}
+		];
+	}
+
+	private def getParseIntSafe(String it) {
+		return try {
+			if(nullOrEmpty) null else Integer.parseInt(it);
+		} catch (NumberFormatException e) {
+			null;
 		}
 	}
 

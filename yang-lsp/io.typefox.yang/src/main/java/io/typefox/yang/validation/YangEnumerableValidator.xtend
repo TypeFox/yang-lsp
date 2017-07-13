@@ -1,6 +1,5 @@
 package io.typefox.yang.validation
 
-import com.google.common.collect.HashMultimap
 import com.google.common.collect.Range
 import com.google.inject.Inject
 import com.google.inject.Singleton
@@ -21,6 +20,7 @@ import org.eclipse.xtext.validation.ValidationMessageAcceptor
 import static io.typefox.yang.validation.IssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
+import static extension io.typefox.yang.utils.IterableExtensions2.toMultimap
 import static extension io.typefox.yang.utils.YangNameUtils.getYangName
 import static extension org.eclipse.xtext.util.Strings.*
 
@@ -58,9 +58,7 @@ class YangEnumerableValidator {
 		} else {
 			// All assigned names in a bits type must be unique.
 			// https://tools.ietf.org/html/rfc7950#section-9.7.4
-			val nameNodeMapping = HashMultimap.create;
-			enumerables.forEach[nameNodeMapping.put(name, it)];
-			nameNodeMapping.asMap.forEach [ name, statementsWithSameName |
+			enumerables.toMultimap[name].asMap.forEach [ name, statementsWithSameName |
 				if (statementsWithSameName.size > 1) {
 					statementsWithSameName.forEach [
 						val message = '''The «orderedName» name has already been used for the «context.name».''';
@@ -70,11 +68,8 @@ class YangEnumerableValidator {
 			];
 			// All assigned positions in a bits type must be unique
 			// https://tools.ietf.org/html/rfc7950#section-9.7.4.2
-			val ordinalsNodeMapping = HashMultimap.<String, Ordered>create;
 			val allOrdinals = enumerables.map[firstSubstatementsOfType(context.orderedClass)];
-			val assignedOrdinals = allOrdinals.filterNull;
-			assignedOrdinals.forEach[ordinalsNodeMapping.put(ordinal, it)];
-			ordinalsNodeMapping.asMap.forEach [ ordinal, statementsWithSameOrdinal |
+			allOrdinals.filterNull.toMultimap[ordinal].asMap.forEach [ ordinal, statementsWithSameOrdinal |
 				if (statementsWithSameOrdinal.size > 1) {
 					statementsWithSameOrdinal.forEach [
 						val message = '''The integer value «orderedName»s has already been used for the «context.name».''';
@@ -121,12 +116,9 @@ class YangEnumerableValidator {
 			// No need to validate the direct subtype of bits as no restrictions are applied on them.
 			if (!builtin) {
 				val currentType = it;
-				val allEnumerablesNames = HashMultimap.<String, Enumerable>create;
-				typeHierarchy.filter[it !== currentType].forEach [
-					substatementsOfType(context.enumerableClass).forEach [
-						allEnumerablesNames.put(name, it);
-					];
-				];
+				val allEnumerablesNames = typeHierarchy.filter[it !== currentType].map [
+					substatementsOfType(context.enumerableClass)
+				].flatten.toMultimap[name];
 
 				enumerables.forEach [
 					val message = '''A new assigned name must not declared when restricting an existing «context.name» type.''';

@@ -9,7 +9,7 @@ import org.eclipse.xtext.validation.SeverityConverter
 
 @Singleton
 class IssueCodes extends ConfigurableIssueCodesProvider {
-	
+
 	private static val BUILDER = ImmutableMap.<String, PreferenceKey>builder;
 
 	/**
@@ -33,7 +33,7 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	public static val INCORRECT_VERSION = 'INCORRECT_VERSION'.error;
 
 	/**
-	 * Errors for types. Such as invalid type restriction, range error, fraction-digits issue. 
+	 * Errors for types. Such as invalid type restriction, range error, fraction-digits issue.
 	 */
 	public static val TYPE_ERROR = 'TYPE_ERROR'.error;
 
@@ -44,23 +44,23 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	public static val IMPORT_NOT_A_MODULE = 'IMPORT_NOT_A_MODULE'.error;
 	public static val INCLUDE_NOT_A_SUB_MODULE = 'INCLUDE_NOT_A_SUB_MODULE'.error;
 	public static val INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE = 'INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE'.error;
-	
+
 	/**
 	 * Issue code when the revision date does not conform the "YYYY-MM-DD" format.
 	 */
 	public static val INVALID_REVISION_FORMAT = 'INVALID_REVISION_FORMAT'.warn;
-	
+
 	/**
 	 * Issue code that applies on a revision if that is not in a reverse chronological order.
 	 */
 	public static val REVISION_ORDER = 'REVISION_ORDER'.warn;
-	
+
 	/**
 	 * Issue code when the name of a type does not conform with the existing constraints.
 	 * For instance; the name contains any invalid characters, or equals to any YANG built-in type name.
 	 */
 	public static val BAD_TYPE_NAME = 'BAD_TYPE_NAME'.error;
-	
+
 	/**
 	 * Issues code when there is an inconsistency between a module's version and the version of the included modules.
 	 */
@@ -75,38 +75,43 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 * Issue code indicating that all assigned names in an enumerable must be unique.
 	 */
 	public static val DUPLICATE_ENUMERABLE_NAME = 'DUPLICATE_ENUMERABLE_NAME'.error;
-	
+
 	/**
 	 * Issue code indicating that all assigned values in an enumerable must be unique.
 	 */
 	public static val DUPLICATE_ENUMERABLE_VALUE = 'DUPLICATE_ENUMERABLE_VALUE'.error;
-	
+
 	/**
 	 * Issue code indicating that an enumerable introduces a new name that is not declared among the parent restriction.
 	 */
 	public static val ENUMERABLE_RESTRICTION_NAME = 'ENUMERABLE_RESTRICTION_NAME'.error;
-	
+
 	/**
 	 * Issue code indicating that an enumerable introduces a new value that is not declared among the parent restriction.
 	 */
 	public static val ENUMERABLE_RESTRICTION_VALUE = 'ENUMERABLE_RESTRICTION_VALUE'.error;
 	
 	/**
+	 * Issues code for indicating a duplicate leaf node name in a key. 
+	 */
+	public static val KEY_DUPLICATE_LEAF_NAME = 'KEY_DUPLICATE_LEAF_NAME'.error;
+
+	/**
 	 * Issue code when an ordinal value exceeds its limits.
 	 */
-	public static val ORDINAL_VALUE = 'ORDINAL_VALUE'.error; 
+	public static val ORDINAL_VALUE = 'ORDINAL_VALUE'.error;
 
 	private static val Map<String, PreferenceKey> CODES = BUILDER.build;
 
 	override getConfigurableIssueCodes() {
 		return CODES;
 	}
-	
+
 	private static def error(String code) {
 		BUILDER.put(code, new PreferenceKey(code, SeverityConverter.SEVERITY_ERROR));
 		return code;
 	}
-	
+
 	private static def warn(String code) {
 		BUILDER.put(code, new PreferenceKey(code, SeverityConverter.SEVERITY_WARNING));
 		return code;

@@ -21,6 +21,7 @@ import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
 
 import static io.typefox.yang.validation.IssueCodes.*
+import io.typefox.yang.yang.Key
 
 /**
  * Validation test for the YANG language.
@@ -1263,6 +1264,60 @@ class YangValidatorTest extends AbstractYangTest {
 			}
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Typedef).head, BAD_TYPE_NAME, 'string');
+	}
+	
+	@Test
+	def void checkKey_01() {
+		val it = load('''
+		module deref {
+		  yang-version 1.1;
+		  namespace urn:deref;
+		  prefix d;
+		  list a {
+		    key "ka1 ka2";
+		    leaf ka1 { type string; }
+		    leaf ka2 { type string; }
+		    list b {
+		      key kb;
+		      leaf kb { type string; }
+		      list c {
+		        key kc;
+		        leaf kc { type string; }
+		      }
+		      leaf lb { type string; }
+		    }
+		    leaf la { type string; }
+		  }
+		}
+		''')
+		assertNoErrors;
+	}
+	
+	@Test
+	def void checkKey_02() {
+		val it = load('''
+		module deref {
+		  yang-version 1.1;
+		  namespace urn:deref;
+		  prefix d;
+		  list a {
+		    key "ka1 ka2 ka1";
+		    leaf ka1 { type string; }
+		    leaf ka2 { type string; }
+		    list b {
+		      key kb;
+		      leaf kb { type string; }
+		      list c {
+		        key kc;
+		        leaf kc { type string; }
+		      }
+		      leaf lb { type string; }
+		    }
+		    leaf la { type string; }
+		  }
+		}
+		''')
+		assertError(EcoreUtil2.getAllContentsOfType(root, Key).head, KEY_DUPLICATE_LEAF_NAME, 'ka1');
 	}
 
 }
