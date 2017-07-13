@@ -1,13 +1,9 @@
 package io.typefox.yang.tests.completion
 
-import org.eclipse.xtext.testing.AbstractLanguageServerTest
+import io.typefox.yang.tests.AbstractYangLSPTest
 import org.junit.Test
 
-class YangCompletionTest extends AbstractLanguageServerTest {
-	
-	new() {
-		super("yang")
-	}
+class YangCompletionTest extends AbstractYangLSPTest {
 	
 	@Test
 	def void testTypeCompletion_01() {
