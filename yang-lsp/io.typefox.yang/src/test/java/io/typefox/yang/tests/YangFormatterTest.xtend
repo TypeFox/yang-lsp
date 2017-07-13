@@ -21,4 +21,25 @@ class YangFormatterTest extends AbstractYangTest {
 			'''
 		]
 	}
+
+    @Test
+    def void testFormatting_02_multiline_string_replacement() {
+        assertFormatted[
+            expectation = '''
+                module mytestid {
+                    description
+                        "35-columns------------------------ 35-columns------------------------
+                         15-columns---- 35-columns------------------------
+                         35-columns------------------------ 15-columns---- 15-columns----
+                         35-columns------------------------
+                        ";
+                }
+            '''
+            toBeFormatted = '''
+                module mytestid {
+                    description "35-columns------------------------ 35-columns------------------------ 15-columns---- 35-columns------------------------ 35-columns------------------------ 15-columns---- 15-columns---- 35-columns------------------------";
+                }
+            '''
+        ]
+    }
 }
