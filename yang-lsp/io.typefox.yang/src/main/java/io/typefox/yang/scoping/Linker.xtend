@@ -41,6 +41,9 @@ class Linker {
 					val node = lazyURIEncoder.getNode(element, uri.fragment)
 					val symbol = linkingHelper.getCrossRefNodeAsString(node, true)
 					return qualifiedNameConverter.toQualifiedName(symbol)
+				} else {
+					// regular proxy let's resolve here
+					element.eGet(reference, true)
 				}
 			} else {
 				val symbol = NodeModelUtils.findNodesForFeature(element, reference).map[leafNodes.filter[!isHidden].map[getText].join("")].join("")
