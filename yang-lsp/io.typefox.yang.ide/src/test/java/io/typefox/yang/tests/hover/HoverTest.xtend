@@ -9,9 +9,9 @@ class HoverTest extends AbstractYangLSPTest {
 		testHover[
 			model = '''
 				module foo {
-					description "Hello
+					description "   Hello
 					             This is super.
-					             
+					                test
 					             Bla blubb"
 				}
 			'''
@@ -19,9 +19,31 @@ class HoverTest extends AbstractYangLSPTest {
 			column = 8
 			expectedHover = '''
 				[[0, 7] .. [0, 10]]
-				Hello
+				   Hello
 				This is super.
-				
+				   test
+				Bla blubb
+			'''
+		]
+	}
+	
+	@Test def void testHover_02() {
+		testHover[
+			model = '''
+				module foo {
+					description "   Hello
+					        This is super.
+					                test
+					             Bla blubb"
+				}
+			'''
+			line = 0
+			column = 8
+			expectedHover = '''
+				[[0, 7] .. [0, 10]]
+				   Hello
+				This is super.
+				   test
 				Bla blubb
 			'''
 		]
