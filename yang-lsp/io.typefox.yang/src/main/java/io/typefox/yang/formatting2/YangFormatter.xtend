@@ -93,9 +93,10 @@ class MultilineStringReplacer implements ITextReplacer {
         val sb = new StringBuilder(currentIndentation).append('"')
         var lineLength = 0
         var first = true
+        var singleline = true
         for (s : splitted) {
-            lineLength += s.length
-            if (lineLength > 72) {
+            if ((lineLength += s.length) > 72) {
+                singleline = false
                 sb.append("\n").append(indentation).append(" ")
                 lineLength = s.length
             } else {
@@ -104,9 +105,12 @@ class MultilineStringReplacer implements ITextReplacer {
                 }
             }
             first = false
-            sb.append(s)
+            sb.append(s.replace("\n", "\n" + currentIndentation + " " ))
         }
-        sb.append("\n").append(indentation).append('"')
+        if (!singleline) {
+            sb.append("\n").append(indentation)
+        }
+        sb.append('"')
         context.addReplacement(segment.replaceWith(sb.toString))
         return context
     }

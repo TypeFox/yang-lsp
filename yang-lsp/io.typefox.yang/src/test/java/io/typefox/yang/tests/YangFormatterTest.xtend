@@ -48,7 +48,47 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting_03() {
+    def void testFormatting_03_singleline_description() {
+        assertFormatted[
+            expectation = '''
+                module mytestid {
+                
+                    description
+                        "35-columns------------------------ 15-columns----";
+                }
+            '''
+            toBeFormatted = '''
+                module mytestid {
+                    description        "35-columns------------------------ 15-columns----";
+                }
+            '''
+        ]
+    }
+    
+    @Test
+    def void testFormatting_04_additional_newlines_description() {
+        assertFormatted[
+            expectation = '''
+                module mytestid {
+                
+                    description
+                        "35-columns------------------------
+                         
+                         15-columns----";
+                }
+            '''
+            toBeFormatted = '''
+                module mytestid {
+                    description        "35-columns------------------------
+                    
+                    15-columns----";
+                }
+            '''
+        ]
+    }
+    
+    @Test
+    def void testFormatting_05() {
         assertFormatted[
             expectation = '''
                 module mytestid {
