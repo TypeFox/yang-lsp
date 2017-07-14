@@ -20,7 +20,7 @@ before_script:
   - mvn -f ./xtext-jflex/jflex-fragment/pom.xml clean install
 
 script:
-  - ./yang-lsp/gradlew -p yang-lsp build
+  - ./yang-lsp/gradlew -p yang-lsp build --refresh-dependencies
 
 notifications:
   slack: theia-dev:wZFIkC6bV4WUqsnT6YxzGoMq

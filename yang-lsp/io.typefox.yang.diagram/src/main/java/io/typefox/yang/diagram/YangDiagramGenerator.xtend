@@ -26,6 +26,7 @@ import io.typefox.yang.yang.Container
 import io.typefox.yang.yang.Description
 import io.typefox.yang.yang.Grouping
 import io.typefox.yang.yang.IfFeature
+import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Key
 import io.typefox.yang.yang.Leaf
 import io.typefox.yang.yang.LeafList
@@ -49,12 +50,14 @@ import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
 import java.util.Map
+import org.apache.log4j.Logger
+import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.util.CancelIndicator
-import io.typefox.yang.yang.Import
-import org.eclipse.emf.ecore.EObject
 
 class YangDiagramGenerator implements IDiagramGenerator {
+	
+	static val LOG = Logger.getLogger(YangDiagramGenerator)
 
 	// Map -> [{Statement-name: [{statement:model-element}...]}...]
 	val Map<String, Map<Statement, SModelElement>> elementIndex = new HashMap
@@ -62,9 +65,10 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	var SGraph diagramRoot
 
-	override generate(Resource resource, CancelIndicator cancelIndicator) {
+	override generate(Resource resource, Map<String, String> options, CancelIndicator cancelIndicator) {
 		val content = resource.contents.head
 		if (content instanceof AbstractModule) {
+			LOG.info("Generating diagram for input: '" + resource.URI.lastSegment + "'")
 			generateDiagram(content, cancelIndicator)
 		}
 	}
