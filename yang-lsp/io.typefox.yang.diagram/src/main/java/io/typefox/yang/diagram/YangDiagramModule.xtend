@@ -27,4 +27,8 @@ class YangDiagramModule extends DefaultDiagramModule {
 		YangDiagramGenerator
 	}
 	
+	override bindIPopupModelFactory() {
+		YangPopupModelFactory
+	}
+	
 }
