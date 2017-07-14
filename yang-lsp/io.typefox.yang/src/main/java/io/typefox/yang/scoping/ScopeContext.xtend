@@ -244,7 +244,11 @@ class ScopeContext implements IScopeContext {
 		 * @return true, if the element could be added
 		 */
 		def boolean tryAddLocal(QualifiedName name, EObject element) {
-			val existingLocal = this.elements.put(name, new EObjectDescription(name, element, emptyMap))
+			tryAddLocal(name, element, emptyMap)
+		}
+		
+		def boolean tryAddLocal(QualifiedName name, EObject element, Map<String,String> userData) {
+			val existingLocal = this.elements.put(name, new EObjectDescription(name, element, userData))
 			if (existingLocal !== null) {
 				// put it back if it was existing locally
 				this.elements.put(name, existingLocal)

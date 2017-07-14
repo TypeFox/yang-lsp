@@ -2,11 +2,10 @@ package io.typefox.yang.documentation
 
 import io.typefox.yang.yang.Description
 import io.typefox.yang.yang.Statement
+import io.typefox.yang.yang.YangPackage
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.documentation.IEObjectDocumentationProvider
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
-import io.typefox.yang.yang.YangPackage
-import com.google.common.base.Strings
 import org.eclipse.xtext.util.internal.Log
 
 @Log

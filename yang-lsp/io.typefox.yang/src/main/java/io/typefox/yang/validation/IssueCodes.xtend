@@ -101,6 +101,11 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 */
 	public static val ORDINAL_VALUE = 'ORDINAL_VALUE'.error;
 
+	/**
+	 * Issue code when a config=true is a child of a config=false (see https://tools.ietf.org/html/rfc7950#section-7.21.1)
+	 */
+	public static val INVALID_CONFIG = 'INVALID_CONFIG'.error;
+
 	private static val Map<String, PreferenceKey> CODES = BUILDER.build;
 
 	override getConfigurableIssueCodes() {

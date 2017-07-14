@@ -11,6 +11,7 @@ import io.typefox.yang.yang.Base
 import io.typefox.yang.yang.BelongsTo
 import io.typefox.yang.yang.Case
 import io.typefox.yang.yang.Choice
+import io.typefox.yang.yang.Config
 import io.typefox.yang.yang.Deviation
 import io.typefox.yang.yang.Extension
 import io.typefox.yang.yang.Feature
@@ -97,7 +98,7 @@ class ScopeContextProvider {
 		)
 		new Adapter(result).attachToEmfObject(module)
 		
-		handleGeneric(module, QualifiedName.EMPTY, result)
+		handleGeneric(module, QualifiedName.EMPTY, result, true)
 		return result
 	}
 	
@@ -140,20 +141,20 @@ class ScopeContextProvider {
 		}
 	}
 	
-	protected dispatch def void computeScope(EObject node, QualifiedName nodePath, IScopeContext ctx) {
-		handleGeneric(node, nodePath, ctx)
+	protected dispatch def void computeScope(EObject node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
+		handleGeneric(node, nodePath, ctx, isConfig)
 	}
 	
-	protected dispatch def void computeScope(Refine node, QualifiedName nodePath, IScopeContext ctx) {
+	protected dispatch def void computeScope(Refine node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		node.node.doLinkNodeLater(nodePath, ctx)
-		handleGeneric(node, nodePath, ctx)
+		handleGeneric(node, nodePath, ctx, isConfig)
 	}
 	
-	protected dispatch def void computeScope(Augment node, QualifiedName nodePath, IScopeContext ctx) {
+	protected dispatch def void computeScope(Augment node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		if (node.path !== null) {
 			node.path.doLinkNodeLater(nodePath, ctx)
 		}
-		handleGeneric(node, nodePath, ctx)
+		handleGeneric(node, nodePath, ctx, isConfig)
 	}
 	
 	private def doLinkNodeLater(SchemaNodeIdentifier identifier, QualifiedName prefix, IScopeContext context) {
@@ -174,7 +175,7 @@ class ScopeContextProvider {
 		return pref
 	}
 	
-	protected dispatch def void computeScope(TypeReference node, QualifiedName nodePath, IScopeContext ctx) {
+	protected dispatch def void computeScope(TypeReference node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		ctx.onResolveDefinitions [
 			linker.link(node, TYPE_REFERENCE__TYPE) [ name |
 				if (name.segmentCount == 2 && name.firstSegment == ctx.localPrefix) {
@@ -183,47 +184,67 @@ class ScopeContextProvider {
 				return ctx.typeScope.getSingleElement(name)
 			]
 		]
-		handleGeneric(node, nodePath, ctx)
+		handleGeneric(node, nodePath, ctx, isConfig)
 	}
 	
-	protected dispatch def void computeScope(Uses node, QualifiedName nodePath, IScopeContext ctx) {
-		handleGeneric(node, nodePath, ctx)
+	protected dispatch def void computeScope(Uses node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
+		handleGeneric(node, nodePath, ctx, isConfig)
 		ctx.onComputeNodeScope [
 			val inliningCtx = new GroupingInliningScopeContext(ctx)
 			if (node.grouping?.node !== null) {
 				for (child : node.grouping.node.substatements) {
-					inlineGrouping(child, nodePath, inliningCtx)
+					inlineGrouping(child, nodePath, inliningCtx, isConfig)
 				}
 			}
 		]
 	}
 	
-	private def dispatch void inlineGrouping(Statement statement, QualifiedName name, GroupingInliningScopeContext context) {
+	private def boolean handleConfig(Statement statement, boolean isConfig) {
+		// start fresh on grouping
+		if (statement instanceof Grouping) {
+			return true;
+		}
+		val configStmnt = statement.substatements.filter(Config).head
+		if (configStmnt === null) {
+			return isConfig
+		}
+		
+		if (configStmnt.isConfig.trim.toLowerCase == 'true') {
+			if (!isConfig) {
+				validator.addIssue(configStmnt, YangPackage.Literals.CONFIG__IS_CONFIG, "Cannot add configuration data as a child of non-config data.", IssueCodes.INVALID_CONFIG)
+			}	
+			return true;	
+		} 
+		return false;
 	}
-	private def dispatch void inlineGrouping(Grouping statement, QualifiedName name, GroupingInliningScopeContext context) {
+	
+	private def dispatch void inlineGrouping(Statement statement, QualifiedName name, GroupingInliningScopeContext context, boolean isConfig) {
 	}
-	private def dispatch void inlineGrouping(Typedef statement, QualifiedName name, GroupingInliningScopeContext context) {
+	private def dispatch void inlineGrouping(Grouping statement, QualifiedName name, GroupingInliningScopeContext context, boolean isConfig) {
 	}
-	private def dispatch void inlineGrouping(Uses statement, QualifiedName name, GroupingInliningScopeContext context) {
+	private def dispatch void inlineGrouping(Typedef statement, QualifiedName name, GroupingInliningScopeContext context, boolean isConfig) {
+	}
+	private def dispatch void inlineGrouping(Uses statement, QualifiedName name, GroupingInliningScopeContext context, boolean isConfig) {
 		if (statement.grouping !== null) {
 			for (subStmnt : statement.grouping.node.substatements) {
-				inlineGrouping(subStmnt, name, context)
+				inlineGrouping(subStmnt, name, context, isConfig)
 			}
 		}
 	}
 	
-	private def dispatch void inlineGrouping(SchemaNode statement, QualifiedName name, GroupingInliningScopeContext context) {
+	private def dispatch void inlineGrouping(SchemaNode statement, QualifiedName name, GroupingInliningScopeContext context, boolean isConfig) {
 		val newPath = getQualifiedName(statement, name, context)
+		var newIsConfig = handleConfig(statement, isConfig) 
 		if (newPath != name 
 			&& !(statement instanceof Augment)) {
-			statement.addToNodeScope(newPath, context)
+			statement.addToNodeScope(newPath, context, newIsConfig)
 		}
 		for (subStmnt : statement.substatements) {
-			inlineGrouping(subStmnt, newPath, context)
+			inlineGrouping(subStmnt, newPath, context, newIsConfig)
 		}
 	}
 	
-	protected dispatch def void computeScope(GroupingRef node, QualifiedName nodePath, IScopeContext ctx) {
+	protected dispatch def void computeScope(GroupingRef node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		ctx.onResolveDefinitions [
 			linker.link(node, GROUPING_REF__NODE) [ name |
 				if (name.segmentCount == 2 && name.firstSegment == ctx.localPrefix) {
@@ -232,37 +253,37 @@ class ScopeContextProvider {
 				return ctx.groupingScope.getSingleElement(name)
 			]
 		]
-		handleGeneric(node, nodePath, ctx)
+		handleGeneric(node, nodePath, ctx, isConfig)
 	}
 	
-	protected dispatch def void computeScope(Base node, QualifiedName nodePath, IScopeContext ctx) {
+	protected dispatch def void computeScope(Base node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		ctx.onResolveDefinitions [
 			linker.link(node, BASE__REFERENCE) [ name |
 				ctx.identityScope.getSingleElement(name)
 			]
 		]
-		handleGeneric(node, nodePath, ctx)
+		handleGeneric(node, nodePath, ctx, isConfig)
 	}
 	
-	protected dispatch def void computeScope(FeatureReference node, QualifiedName nodePath, IScopeContext ctx) {
+	protected dispatch def void computeScope(FeatureReference node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		ctx.onResolveDefinitions [
 			linker.link(node, FEATURE_REFERENCE__FEATURE) [ name |
 				ctx.featureScope.getSingleElement(name)
 			]
 		]
-		handleGeneric(node, nodePath, ctx)
+		handleGeneric(node, nodePath, ctx, isConfig)
 	}
 	
-	protected dispatch def void computeScope(Unknown node, QualifiedName nodePath, IScopeContext ctx) {
+	protected dispatch def void computeScope(Unknown node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		ctx.onResolveDefinitions [
 			linker.link(node, UNKNOWN__EXTENSION) [ name |
 				ctx.extensionScope.getSingleElement(name)
 			]
 		]
-		handleGeneric(node, nodePath, ctx)
+		handleGeneric(node, nodePath, ctx, isConfig)
 	}
 	
-	protected dispatch def void computeScope(KeyReference node, QualifiedName nodePath, IScopeContext ctx) {
+	protected dispatch def void computeScope(KeyReference node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		ctx.runAfterAll [
 			linker.link(node, KEY_REFERENCE__NODE) [ syntaxName |
 				val result = ctx.nodeScope.allElements.filter[ candidate |
@@ -277,35 +298,40 @@ class ScopeContextProvider {
 					}
 					return true
 				].head
+				if (result.userDataKeys.contains(NO_CONFIG_USER_DATA) === isConfig) {
+					validator.addIssue(node, YangPackage.Literals.KEY_REFERENCE__NODE, "The list's keys must have the same `config` value as the list itself.", IssueCodes.INVALID_CONFIG)
+				}
 				return result
 			]
 		]
-		handleGeneric(node, nodePath, ctx)
+		handleGeneric(node, nodePath, ctx, isConfig)
 	}
 	
-	protected dispatch def void computeScope(Unique node, QualifiedName nodePath, IScopeContext ctx) {
+	protected dispatch def void computeScope(Unique node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		for (identifier : node.references) {
 			this.doLinkNodeLater(identifier, nodePath, ctx)
 		}
-		handleGeneric(node, nodePath, ctx)
+		handleGeneric(node, nodePath, ctx, isConfig)
 	}
 	
-	protected dispatch def void computeScope(Deviation node, QualifiedName nodePath, IScopeContext ctx) {
+	protected dispatch def void computeScope(Deviation node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		this.doLinkNodeLater(node.reference, nodePath, ctx)
-		handleGeneric(node, nodePath, ctx)
+		handleGeneric(node, nodePath, ctx, isConfig)
 	}
 	
-	protected def void handleGeneric(EObject node, QualifiedName nodePath, IScopeContext ctx) {
+	protected def void handleGeneric(EObject node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
+		var newIsConfig = isConfig
 		if (node instanceof SchemaNode) {		
 			node.addToDefinitionScope(ctx)
 		}
 		var newPath = nodePath
 		if (node instanceof Statement) {
+			newIsConfig = this.handleConfig(node, isConfig)
 			newPath = getQualifiedName(node, nodePath, ctx)
 			if (newPath != nodePath 
 				&& !(node instanceof Grouping)
 				&& !(node instanceof Augment)) {
-				node.addToNodeScope(newPath, ctx)
+				node.addToNodeScope(newPath, ctx, newIsConfig)
 			}
 		}
 		val context = switch node {
@@ -320,20 +346,23 @@ class ScopeContextProvider {
 				ctx
 		}
 		for (child : node.eContents) {
-			computeScope(child, newPath, context)
+			computeScope(child, newPath, context, newIsConfig)
 		}
 	}
 	
-	private def void addToNodeScope(EObject node, QualifiedName name, IScopeContext ctx) {
+	private static val NO_CONFIG_USER_DATA = 'NO_CONFIG'
+	
+	private def void addToNodeScope(EObject node, QualifiedName name, IScopeContext ctx, boolean isConfig) {
 		ctx.onComputeNodeScope 
 		[
-			if (!ctx.nodeScope.tryAddLocal(name, node)) {
+			val options = if (isConfig) emptyMap else #{NO_CONFIG_USER_DATA -> 't'}
+			if (!ctx.nodeScope.tryAddLocal(name, node, options)) {
 				validator.addIssue(node, SCHEMA_NODE__NAME, '''A schema node with the name '«name»' already exists.''', IssueCodes.DUPLICATE_NAME)
 			}
 		]
 	}
 	
-	protected dispatch def void computeScope(AbstractImport element, QualifiedName currentPrefix, IScopeContext ctx) {
+	protected dispatch def void computeScope(AbstractImport element, QualifiedName currentPrefix, IScopeContext ctx, boolean isConfig) {
 		val importedModule = linker.<AbstractModule>link(element, ABSTRACT_IMPORT__MODULE) [ name |
 			val rev = element.substatements.filter(RevisionDate).head
 			val candidates = ctx.moduleScope.getElements(name)
@@ -428,7 +457,7 @@ class ScopeContextProvider {
 		// data nodes directly contained in choices get an implicit case (see RFC7950 7.9.2)
 		if (node.eContainer instanceof Choice && !(node instanceof Case)) {
 			prefix = p.append(ctx.moduleName).append(node.name)
-			node.addToNodeScope(prefix, ctx)
+			node.addToNodeScope(prefix, ctx, true)
 		}
 		val result = prefix.append(ctx.moduleName).append(node.name)
 		// add implicit input / output if they do not exist (see RFC 7950 7.14)
@@ -436,12 +465,12 @@ class ScopeContextProvider {
 			val input = node.substatements.filter(Input).head
 			if (input === null) {
 				val inputName = result.append(ctx.moduleName).append('input')
-				node.addToNodeScope(inputName, ctx)
+				node.addToNodeScope(inputName, ctx, true)
 			}
 			val output = node.substatements.filter(Output).head
 			if (output === null) {
 				val outputName = result.append(ctx.moduleName).append('output')
-				node.addToNodeScope(outputName, ctx)
+				node.addToNodeScope(outputName, ctx, true)
 			}
 		}
 		return result
