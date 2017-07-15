@@ -6,12 +6,10 @@
  */
 package io.typefox.yang.diagram
 
-import com.google.inject.Singleton
 import io.typefox.sprotty.api.IDiagramServer
 import io.typefox.sprotty.server.xtext.DiagramLanguageServerExtension
 import io.typefox.sprotty.server.xtext.LanguageAwareDiagramServer
 
-@Singleton
 class YangLanguageServerExtension extends DiagramLanguageServerExtension {
 	
 	override protected initializeDiagramServer(IDiagramServer server) {
