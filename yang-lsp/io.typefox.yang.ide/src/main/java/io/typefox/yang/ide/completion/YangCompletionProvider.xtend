@@ -1,15 +1,23 @@
 package io.typefox.yang.ide.completion
 
 import com.google.inject.Inject
+import io.typefox.yang.scoping.IScopeContext
+import io.typefox.yang.scoping.ScopeContext.MapScope
 import io.typefox.yang.scoping.ScopeContextProvider
+import io.typefox.yang.validation.SubstatementRuleProvider
+import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.SchemaNodeIdentifier
+import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangPackage
 import java.util.Collection
 import org.eclipse.emf.ecore.EClass
+import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.util.EcoreUtil
+import org.eclipse.xtext.AbstractElement
 import org.eclipse.xtext.CrossReference
 import org.eclipse.xtext.GrammarUtil
 import org.eclipse.xtext.Keyword
+import org.eclipse.xtext.ParserRule
 import org.eclipse.xtext.RuleCall
 import org.eclipse.xtext.ide.editor.contentassist.ContentAssistContext
 import org.eclipse.xtext.ide.editor.contentassist.IIdeContentProposalAcceptor
@@ -18,15 +26,19 @@ import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.xtext.CurrentTypeFinder
-import org.eclipse.emf.ecore.EObject
-import io.typefox.yang.scoping.ScopeContext.MapScope
-import io.typefox.yang.scoping.IScopeContext
-import io.typefox.yang.yang.SchemaNode
+
+import static io.typefox.yang.yang.YangPackage.Literals.*
+
+import static extension io.typefox.yang.utils.YangNameUtils.*
+import static extension org.eclipse.xtext.EcoreUtil2.*
 
 class YangCompletionProvider extends IdeContentProposalProvider {
-	
+
+	static val IGNORED_KEYWORDS = #{'/', '{', ';', '}'}
+
 	@Inject extension CurrentTypeFinder
 	@Inject ScopeContextProvider scopeContextProvider
+	@Inject SubstatementRuleProvider ruleProvider
 
 	override protected _createProposals(RuleCall ruleCall, ContentAssistContext context,
 		IIdeContentProposalAcceptor acceptor) {
@@ -89,8 +101,9 @@ class YangCompletionProvider extends IdeContentProposalProvider {
 			computeSchemaNodePathProposals(QualifiedName.EMPTY, nodeScope, scopeCtx, context, acceptor)
 		}
 	}
-	
-	private def void computeSchemaNodePathProposals(QualifiedName prefix, MapScope nodeScope, IScopeContext scopeCtx, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
+
+	private def void computeSchemaNodePathProposals(QualifiedName prefix, MapScope nodeScope, IScopeContext scopeCtx,
+		ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
 		for (e : nodeScope.allElements.filter[name.startsWith(prefix)]) {
 			val suffix = e.name.skipFirst(prefix.segmentCount)
 			var name = new StringBuilder()
@@ -99,7 +112,8 @@ class YangCompletionProvider extends IdeContentProposalProvider {
 					val modulePrefix = suffix.getSegment(i)
 					if (modulePrefix != scopeCtx.moduleName) {
 						val moduleName = suffix.getSegment(i)
-						val importPrefix = scopeCtx.importedModules.entrySet.findFirst[value.moduleName == moduleName].key
+						val importPrefix = scopeCtx.importedModules.entrySet.findFirst[value.moduleName == moduleName].
+							key
 						name.append(importPrefix).append(":")
 					}
 				} else {
@@ -111,10 +125,10 @@ class YangCompletionProvider extends IdeContentProposalProvider {
 			}
 			if (name.length > 0) {
 				val proposalName = if (prefix.segmentCount === 0) {
-					"/"+name.toString
-				} else {
-					name.toString
-				}
+						"/" + name.toString
+					} else {
+						name.toString
+					}
 				val entry = this.proposalCreator.createProposal(proposalName, context) [
 					// TODO description, etc.
 				]
@@ -122,11 +136,29 @@ class YangCompletionProvider extends IdeContentProposalProvider {
 			}
 		}
 	}
-	
-	static val ignoredKW = #{'/','{',';','}'}
-	
+
 	override protected filterKeyword(Keyword keyword, ContentAssistContext context) {
-		super.filterKeyword(keyword, context) && !ignoredKW.contains(keyword.value)
+		if (keyword.statement) {
+			val substatementRule = ruleProvider.get(context?.currentModel?.eClass);
+			if (substatementRule !== null) {
+				val container = context.currentModel as Statement;
+				val index = if (context.previousModel === container) {
+						0
+					} else {
+						container.substatements.indexOf(context.previousModel);
+					}
+				if (index >= 0) {
+					val clazz = keyword.value.EClassForName;
+					return clazz !== null && substatementRule.canInsert(container, clazz, index);
+				}
+			}
+		}
+		return super.filterKeyword(keyword, context) && !IGNORED_KEYWORDS.contains(keyword.value);
+	}
+
+	private def isStatement(AbstractElement it) {
+		val classifier = getContainerOfType(ParserRule)?.type?.classifier;
+		return classifier instanceof EClass && STATEMENT.isSuperTypeOf(classifier as EClass);
 	}
 
 	override createProposals(Collection<ContentAssistContext> contexts, IIdeContentProposalAcceptor acceptor) {

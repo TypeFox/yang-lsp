@@ -1,8 +1,12 @@
 package io.typefox.yang.utils
 
 import com.google.common.base.Preconditions
+import com.google.common.cache.CacheBuilder
+import io.typefox.yang.yang.BelongsTo
 import io.typefox.yang.yang.Statement
+import io.typefox.yang.yang.YangPackage
 import org.eclipse.emf.ecore.EClass
+import org.eclipse.xtend.lib.annotations.Data
 
 import static com.google.common.base.CaseFormat.*
 
@@ -15,6 +19,15 @@ import static com.google.common.base.CaseFormat.*
  * @author akos.kitta
  */
 abstract class YangNameUtils {
+
+	static val NAME_TO_ECLASS_CACHE = CacheBuilder.newBuilder.<String, EClassWrapper>build([
+		val simpleName = LOWER_HYPHEN.converterTo(UPPER_CAMEL).convert(it);
+		val classifier = YangPackage.eINSTANCE.getEClassifier(simpleName);
+		if (classifier instanceof EClass) {
+			return new EClassWrapper(classifier);
+		}
+		return EClassWrapper.MISSING;
+	]);
 
 	/**
 	 * Returns with the human readable statement of the YANG statement. 
@@ -40,7 +53,32 @@ abstract class YangNameUtils {
 		return UPPER_CAMEL.converterTo(LOWER_HYPHEN).convert(clazz.simpleName).toFirstLower;
 	}
 
+	/**
+	 * Returns with the EClass for the YANG name or {@code null} if the EClass cannot be resolved.
+	 * <p>
+	 * For instance returns with {@link BelongsTo} for {@code belongs-to}.
+	 */
+	static def EClass getEClassForName(String yangName) {
+		return if(yangName.nullOrEmpty) null else NAME_TO_ECLASS_CACHE.getUnchecked(yangName).orNull;
+	}
+
 	private new() {
+	}
+
+	/**
+	 * Wraps an EClass because the loading cache must not return with {@code null}.
+	 */
+	@Data
+	static final class EClassWrapper {
+
+		static val MISSING = new EClassWrapper(null);
+
+		val EClass clazz;
+
+		def private orNull() {
+			return if(clazz === null || this === MISSING) null else clazz;
+		}
+
 	}
 
 }
