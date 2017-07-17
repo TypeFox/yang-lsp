@@ -70,7 +70,7 @@ class YangValidatorTest extends AbstractYangTest {
 	}
 
 	@Test
-	def void checkSubstatement_Order() {
+	def void checkSubstatement_Order_01() {
 		val it = load('''
 			module example-system {
 			  namespace "urn:example:system";
@@ -80,6 +80,29 @@ class YangValidatorTest extends AbstractYangTest {
 			}
 		''');
 		assertError(root.firstSubstatementsOfType(Prefix), SUBSTATEMENT_ORDERING, 'prefix');
+	}
+	
+	@Test
+	def void checkSubstatement_Order_02() {
+		load('''
+			module d {
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			}
+			''');
+		val it = load('''
+			module example-system {
+			  namespace "urn:example:system";
+			  yang-version 1.1;
+			  prefix "asd";
+			  organization "organização güi";
+			  contact "àéïç¢ô";
+			  import d {
+			    prefix "test";
+			  }
+			}
+		''');
+		assertError(root.firstSubstatementsOfType(Import), SUBSTATEMENT_ORDERING, 'import', '''Substatement 'import' must be declared before 'organization'.''');
 	}
 
 	@Test

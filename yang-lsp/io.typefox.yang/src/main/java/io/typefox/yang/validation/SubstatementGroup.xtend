@@ -233,6 +233,7 @@ class SubstatementGroup {
 		}
 
 		var i = index - 1; // -1 since we do not have to compare the statement argument with itself.
+		var mostSevereErrorMessage = null as String; // This is for collecting the most sever error from the current position to zero index.
 		while (i >= 0) {
 			val precedingStatement = substatements.get(i);
 			val precedingConstraint = constraintMapping.get(precedingStatement.eClass);
@@ -242,12 +243,16 @@ class SubstatementGroup {
 				val ordinal = orderedConstraint.get(constraint);
 				val precedingOrdinal = orderedConstraint.get(precedingConstraint);
 				if (precedingOrdinal.isGreater(ordinal)) {
-					val message = '''Substatement '«clazz.yangName»' must be declared before '«precedingStatement.yangName»'.''';
-					acceptor.acceptError(message, statement, range.offset, range.length, SUBSTATEMENT_ORDERING);
-					return;
+					mostSevereErrorMessage = precedingStatement.yangName;
 				}
 			}
 			i--;
+		}
+
+		// GH-23 (https://github.com/yang-tools/yang-lsp/issues/23)
+		if (mostSevereErrorMessage !== null) {
+			val message = '''Substatement '«clazz.yangName»' must be declared before '«mostSevereErrorMessage»'.''';
+			acceptor.acceptError(message, statement, range.offset, range.length, SUBSTATEMENT_ORDERING);
 		}
 
 	}
