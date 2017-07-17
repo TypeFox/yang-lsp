@@ -8,9 +8,11 @@ import io.typefox.yang.yang.YangPackage
 import java.util.Map
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EObject
-import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.xtend.lib.annotations.Data
+import org.eclipse.xtext.Keyword
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.resource.XtextResource
+import org.eclipse.xtext.util.TextRegion
 import org.eclipse.xtext.validation.ValidationMessageAcceptor
 
 import static io.typefox.yang.validation.IssueCodes.*
@@ -78,6 +80,11 @@ class SubstatementGroup {
 		}
 		return this;
 	}
+	
+	private def TextRegion getKeywordRange(Statement stmnt) {
+		val node = NodeModelUtils.getNode(stmnt).leafNodes.findFirst[grammarElement instanceof Keyword]
+		return new TextRegion(node.offset, node.length)
+	}
 
 	def with(SubstatementGroup ruleGroup) {
 		constraintMapping.putAll(ruleGroup.constraintMapping);
@@ -98,8 +105,7 @@ class SubstatementGroup {
 		return this;
 	}
 
-	def void checkSubstatements(Statement substatementContainer, ValidationMessageAcceptor acceptor,
-		(EClass)=>EStructuralFeature featureMapper) {
+	def void checkSubstatements(Statement substatementContainer, ValidationMessageAcceptor acceptor) {
 
 		val substatements = substatementContainer.substatements;
 		val substatementTypes = substatements.toMap([eClass]);
@@ -107,16 +113,15 @@ class SubstatementGroup {
 			!substatementTypes.containsKey(it);
 		].forEach [
 			val message = '''Missing mandatory substatement: '«yangName»'.''';
-			val feature = featureMapper.apply(substatementContainer.eClass);
-			acceptor.acceptError(message, substatementContainer, feature, SUBSTATEMENT_CARDINALITY);
+			val range = getKeywordRange(substatementContainer);
+			acceptor.acceptError(message, substatementContainer, range.offset, range.length, SUBSTATEMENT_CARDINALITY);
 		];
 		substatements.forEach [ statement, index |
-			checkStatementInContext(statement, substatementContainer, acceptor, featureMapper);
+			checkStatementInContext(statement, substatementContainer, acceptor);
 		];
 	}
 
-	private def void checkStatementInContext(Statement statement, Statement substatementContainer,
-		ValidationMessageAcceptor acceptor, (EClass)=>EStructuralFeature featureMapper) {
+	private def void checkStatementInContext(Statement statement, Statement substatementContainer, ValidationMessageAcceptor acceptor) {
 
 		val substatements = substatementContainer.substatements;
 		val clazz = statement.eClass
@@ -125,13 +130,13 @@ class SubstatementGroup {
 			return;
 		}
 		val constraint = constraintMapping.get(clazz);
-		val feature = featureMapper.apply(clazz);
+		val range = getKeywordRange(statement);
 		val version11 = statement.isVersion11;
 
 		// Unexpected statement.
 		if (constraint === null) {
 			val message = '''Unexpected substatement: '«clazz.yangName»'.''';
-			acceptor.acceptError(message, statement, feature, UNEXPECTED_SUBSTATEMENT);
+			acceptor.acceptError(message, statement, range.offset, range.length, UNEXPECTED_SUBSTATEMENT);
 			return;
 		}
 
@@ -140,14 +145,14 @@ class SubstatementGroup {
 		val elementCount = substatements.filter(clazz.instanceClass).size;
 		if (!cardinality.contains(elementCount)) {
 			val message = '''Expected '«clazz.yangName»' with «cardinality» cardinality. Got «elementCount» instead.''';
-			acceptor.acceptError(message, statement, feature, SUBSTATEMENT_CARDINALITY);
+			acceptor.acceptError(message, statement, range.offset, range.length, SUBSTATEMENT_CARDINALITY);
 			return;
 		}
 		
 		// YANG version aware cardinality issue.
 		if (constraint.version11 && !version11) {
 			val message = '''Statment '«clazz.yangName»' requires explicit YANG version «YangExtensions.YANG_1_1».''';
-			acceptor.acceptError(message, statement, feature, SUBSTATEMENT_CARDINALITY);
+			acceptor.acceptError(message, statement, range.offset, range.length, SUBSTATEMENT_CARDINALITY);
 			return;
 		}
 
@@ -169,7 +174,7 @@ class SubstatementGroup {
 				val precedingOrdinal = orderedConstraint.get(precedingConstraint);
 				if (precedingOrdinal.isGreater(ordinal)) {
 					val message = '''Substatement '«clazz.yangName»' must be declared before '«precedingStatement.yangName»'.''';
-					acceptor.acceptError(message, statement, feature, SUBSTATEMENT_ORDERING);
+					acceptor.acceptError(message, statement, range.offset, range.length, SUBSTATEMENT_ORDERING);
 					return;
 				}
 			}
@@ -205,12 +210,6 @@ class SubstatementGroup {
 			return YangExtensions.YANG_1_1 == version;
 		}
 		return false;
-	}
-
-	private def acceptError(ValidationMessageAcceptor it, String message, EObject object, EStructuralFeature feature,
-		String code) {
-
-		acceptError(message, object, feature, -1, code);
 	}
 
 	@Data

@@ -123,8 +123,10 @@ class YangCompletionProvider extends IdeContentProposalProvider {
 		}
 	}
 	
+	static val ignoredKW = #{'/','{',';','}'}
+	
 	override protected filterKeyword(Keyword keyword, ContentAssistContext context) {
-		super.filterKeyword(keyword, context) && keyword.value != '/'
+		super.filterKeyword(keyword, context) && !ignoredKW.contains(keyword.value)
 	}
 
 	override createProposals(Collection<ContentAssistContext> contexts, IIdeContentProposalAcceptor acceptor) {

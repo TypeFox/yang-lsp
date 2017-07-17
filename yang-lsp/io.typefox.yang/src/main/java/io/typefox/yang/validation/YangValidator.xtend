@@ -58,9 +58,6 @@ class YangValidator extends AbstractYangValidator {
 	@Inject
 	SubstatementRuleProvider substatementRuleProvider;
 
-	@Inject
-	SubstatementFeatureMapper featureMapper;
-
 	@Check
 	def void checkVersion(YangVersion it) {
 		if (yangVersion != YANG_1 && yangVersion != YANG_1_1) {
@@ -94,7 +91,7 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def void checkSubstatements(Statement it) {
-		substatementRuleProvider.get(eClass)?.checkSubstatements(it, this, featureMapper);
+		substatementRuleProvider.get(eClass)?.checkSubstatements(it, this);
 	}
 
 	@Check

@@ -52,7 +52,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  namespace "urn:example:system";
 			}
 		''');
-		assertError(root, SUBSTATEMENT_CARDINALITY, "example-system");
+		assertError(root, SUBSTATEMENT_CARDINALITY);
 	}
 
 	@Test
@@ -79,7 +79,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  prefix "asd";
 			}
 		''');
-		assertError(root.firstSubstatementsOfType(Prefix), SUBSTATEMENT_ORDERING, '''"asd"''');
+		assertError(root.firstSubstatementsOfType(Prefix), SUBSTATEMENT_ORDERING, 'prefix');
 	}
 
 	@Test
@@ -1248,7 +1248,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(root.firstSubstatementsOfType(Typedef), SUBSTATEMENT_CARDINALITY, 'my-base-type');
+		assertError(root.firstSubstatementsOfType(Typedef), SUBSTATEMENT_CARDINALITY);
 	}
 	
 	@Test	
