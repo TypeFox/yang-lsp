@@ -18,6 +18,10 @@ import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.xtext.CurrentTypeFinder
+import org.eclipse.emf.ecore.EObject
+import io.typefox.yang.scoping.ScopeContext.MapScope
+import io.typefox.yang.scoping.IScopeContext
+import io.typefox.yang.yang.SchemaNode
 
 class YangCompletionProvider extends IdeContentProposalProvider {
 	
@@ -52,16 +56,22 @@ class YangCompletionProvider extends IdeContentProposalProvider {
 		}
 	}
 
-	private def QualifiedName computeNodeSchemaPrefix(ContentAssistContext context, IScope nodeScope) {
-		if (context.currentModel instanceof SchemaNodeIdentifier) {
-			val identifier =  context.currentModel as SchemaNodeIdentifier
-			if (identifier.target === null || identifier.target.schemaNode.eIsProxy) {
+	private def QualifiedName computeNodeSchemaPrefix(EObject object, IScope nodeScope) {
+		if (object instanceof SchemaNodeIdentifier) {
+			if (object.target === null || object.target.schemaNode.eIsProxy) {
 				return QualifiedName.EMPTY;
 			}
-			val desc = nodeScope.getSingleElement(identifier.target.schemaNode)
+			val desc = nodeScope.getSingleElement(object.target.schemaNode)
 			if (desc !== null) {
 				return desc.name
 			}
+		} else if (object instanceof SchemaNode) {
+			val desc = nodeScope.getSingleElement(object)
+			if (desc !== null) {
+				return desc.name
+			}
+		} else if (object.eContainer !== null) {
+			return computeNodeSchemaPrefix(object.eContainer, nodeScope)
 		}
 		return QualifiedName.EMPTY
 	}
@@ -71,8 +81,16 @@ class YangCompletionProvider extends IdeContentProposalProvider {
 
 		val scopeCtx = scopeContextProvider.findScopeContext(context.currentModel)
 		val nodeScope = scopeCtx.nodeScope
-		val prefix = computeNodeSchemaPrefix(context, nodeScope)
-
+		val prefix = computeNodeSchemaPrefix(context.currentModel, nodeScope)
+		val isInPath = context.currentModel instanceof SchemaNodeIdentifier
+		computeSchemaNodePathProposals(prefix, nodeScope, scopeCtx, context, acceptor)
+		if (!isInPath && prefix.segmentCount > 0) {
+			// add absolute proposals
+			computeSchemaNodePathProposals(QualifiedName.EMPTY, nodeScope, scopeCtx, context, acceptor)
+		}
+	}
+	
+	private def void computeSchemaNodePathProposals(QualifiedName prefix, MapScope nodeScope, IScopeContext scopeCtx, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
 		for (e : nodeScope.allElements.filter[name.startsWith(prefix)]) {
 			val suffix = e.name.skipFirst(prefix.segmentCount)
 			var name = new StringBuilder()
@@ -92,12 +110,21 @@ class YangCompletionProvider extends IdeContentProposalProvider {
 				}
 			}
 			if (name.length > 0) {
-				val entry = this.proposalCreator.createProposal(name.toString, context) [
+				val proposalName = if (prefix.segmentCount === 0) {
+					"/"+name.toString
+				} else {
+					name.toString
+				}
+				val entry = this.proposalCreator.createProposal(proposalName, context) [
 					// TODO description, etc.
 				]
 				acceptor.accept(entry, this.proposalPriorities.getCrossRefPriority(e, entry))
 			}
 		}
+	}
+	
+	override protected filterKeyword(Keyword keyword, ContentAssistContext context) {
+		super.filterKeyword(keyword, context) && keyword.value != '/'
 	}
 
 	override createProposals(Collection<ContentAssistContext> contexts, IIdeContentProposalAcceptor acceptor) {
