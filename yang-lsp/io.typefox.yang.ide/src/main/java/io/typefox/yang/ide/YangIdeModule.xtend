@@ -3,12 +3,20 @@
  */
 package io.typefox.yang.ide
 
-import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider
+import io.typefox.yang.ide.codelens.CodeLensService
 import io.typefox.yang.ide.completion.YangCompletionProvider
 import io.typefox.yang.ide.contentassist.antlr.lexer.InternalYangLexer
 import io.typefox.yang.ide.contentassist.antlr.lexer.jflex.JFlexBasedInternalYangLexer
-import org.eclipse.xtext.ide.server.symbol.DocumentSymbolService
 import io.typefox.yang.ide.symbols.YangDocumentSymbolService
+import java.util.List
+import org.eclipse.lsp4j.CodeLens
+import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider
+import org.eclipse.xtext.ide.server.Document
+import org.eclipse.xtext.ide.server.codelens.ICodeLensResolver
+import org.eclipse.xtext.ide.server.codelens.ICodeLensService
+import org.eclipse.xtext.ide.server.symbol.DocumentSymbolService
+import org.eclipse.xtext.resource.XtextResource
+import org.eclipse.xtext.util.CancelIndicator
 
 /**
  * Use this class to register ide components.
@@ -25,5 +33,25 @@ class YangIdeModule extends AbstractYangIdeModule {
 	
 	def Class<? extends DocumentSymbolService> bindDocumentSymbolService() {
 		return YangDocumentSymbolService;
+	}
+	
+	def Class<? extends ICodeLensService> bindICodeLensService() {
+		return CodeLensService
+	}
+	
+	def Class<? extends ICodeLensResolver> bindICodeLensResolver() {
+		return NoOpCodeLensResolver
+	}
+	
+	static class NoOpCodeLensResolver implements ICodeLensResolver {
+		
+		override resolveCodeLens(Document document, XtextResource resource, CodeLens codeLens, CancelIndicator indicator) {
+			//HACKY fix for https://github.com/TypeFox/monaco-languageclient/pull/6
+			if (codeLens?.command?.arguments?.head instanceof List<?>) {
+				codeLens.command.arguments = codeLens.command.arguments.head as List<Object>
+			}
+			return codeLens
+		}
+		
 	}
 }
