@@ -1,5 +1,6 @@
 package io.typefox.yang.tests
 
+import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Bit
 import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Description
@@ -7,6 +8,9 @@ import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.Expression
 import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Import
+import io.typefox.yang.yang.Key
+import io.typefox.yang.yang.KeyReference
+import io.typefox.yang.yang.Leaf
 import io.typefox.yang.yang.Literal
 import io.typefox.yang.yang.Modifier
 import io.typefox.yang.yang.Position
@@ -21,9 +25,6 @@ import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
 
 import static io.typefox.yang.validation.IssueCodes.*
-import io.typefox.yang.yang.Key
-import io.typefox.yang.yang.KeyReference
-import io.typefox.yang.yang.Leaf
 
 /**
  * Validation test for the YANG language.
@@ -1291,7 +1292,7 @@ class YangValidatorTest extends AbstractYangTest {
 		    leaf la { type string; }
 		  }
 		}
-		''')
+		''');
 		assertNoErrors;
 	}
 	
@@ -1318,7 +1319,7 @@ class YangValidatorTest extends AbstractYangTest {
 		    leaf la { type string; }
 		  }
 		}
-		''')
+		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Key).head, KEY_DUPLICATE_LEAF_NAME, 'ka1');
 	}
 	
@@ -1335,7 +1336,7 @@ class YangValidatorTest extends AbstractYangTest {
 		    leaf la { type string; }
 		  }
 		}
-		''')
+		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, KeyReference).head, INVALID_CONFIG, 'ka1');
 	}
 	
@@ -1347,17 +1348,17 @@ class YangValidatorTest extends AbstractYangTest {
 		  namespace urn:deref;
 		  prefix d;
 		  container a {
-		  	config false;
-		  	choice c {
-		  		case a {
-		  			leaf myLeaf {
-		  				config true;
-		  			}
-		  		}
+		    config false;
+		    choice c {
+		      case a {
+		        leaf myLeaf {
+		          config true;
+		        }
+		      }
 		    }
 		  }
 		}
-		''')
+		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Leaf).head.substatements.head, INVALID_CONFIG);
 	}
 	
@@ -1369,19 +1370,71 @@ class YangValidatorTest extends AbstractYangTest {
 		  namespace urn:deref;
 		  prefix d;
 		  container a {
-		  	config true;
-		  	choice c {
-		  		case a {
-		  			leaf myLeaf {
-		  				type string;
-		  				config false;
-		  			}
-		  		}
+		    config true;
+		    choice c {
+		      case a {
+		        leaf myLeaf {
+		          type string;
+		          config false;
+		        }
+		      }
 		    }
 		  }
 		}
-		''')
+		''');
 		assertNoErrors(root);
+	}
+
+	@Test
+	def void checkAugmentContent_01() {
+		val it = load('''
+		module amodule {
+		  namespace "urn:test:amodule";
+		  prefix "amodule";
+		  grouping g {
+		    leaf l { type string; }
+		  }
+		  rpc run {
+		    input { uses g; }
+		    output { 
+		      uses g {
+		        augment l {
+		          leaf xxx {
+		            type string;
+		          }
+		        }
+		      }
+		    }
+		  }
+		}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Augment).last, INVALID_AUGMENTATION);
+	}
+	
+	@Test
+	def void checkAugmentContent_02() {
+		val it = load('''
+		module amodule {
+		  namespace "urn:test:amodule";
+		  prefix "amodule";
+		  grouping g {
+		    leaf l { type string; }
+		  }
+		  rpc run {
+		    input { uses g; }
+		    output { 
+		      uses g {
+		        augment l {
+		          leaf xxx {
+		            type string;
+		          }
+		        }
+		      }
+		    }
+		  }
+		}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Augment).last, INVALID_AUGMENTATION);
 	}
 
 }

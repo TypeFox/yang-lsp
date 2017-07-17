@@ -3,12 +3,16 @@
  */
 package io.typefox.yang.validation
 
+import com.google.common.collect.ImmutableList
+import com.google.common.collect.LinkedHashMultimap
+import com.google.common.collect.Multimap
 import com.google.inject.Inject
 import com.google.inject.Singleton
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.utils.YangNameUtils
 import io.typefox.yang.utils.YangTypesExtensions
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Base
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.FractionDigits
@@ -23,12 +27,17 @@ import io.typefox.yang.yang.OrderedBy
 import io.typefox.yang.yang.Pattern
 import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Revision
+import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.YangVersion
+import java.util.Collection
+import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.ParseException
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression
+import org.eclipse.xtext.naming.IQualifiedNameProvider
+import org.eclipse.xtext.scoping.IScopeProvider
 import org.eclipse.xtext.validation.Check
 
 import static com.google.common.base.CharMatcher.*
@@ -37,8 +46,9 @@ import static io.typefox.yang.validation.IssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 import static extension com.google.common.base.Strings.nullToEmpty
-import static extension io.typefox.yang.utils.IterableExtensions2.toMultimap
+import static extension io.typefox.yang.utils.IterableExtensions2.*
 import static extension io.typefox.yang.utils.YangDateUtils.*
+import static extension io.typefox.yang.utils.YangNameUtils.*
 
 /**
  * This class contains custom validation rules for the YANG language. 
@@ -56,7 +66,33 @@ class YangValidator extends AbstractYangValidator {
 	extension YangEnumerableValidator;
 
 	@Inject
+	IQualifiedNameProvider qualifiedNameProvider;
+
+	@Inject
+	IScopeProvider scopeProvider;
+
+	@Inject
 	SubstatementRuleProvider substatementRuleProvider;
+
+	val Multimap<EClass, EClass> validAugmentStatements;
+	val Collection<EClass> validShorthandStatements;
+
+	new() {
+		super();
+		// https://tools.ietf.org/html/rfc7950#section-7.17
+		// The following map contain the valid sub-statements based on the type of the augmented node.
+		validAugmentStatements = LinkedHashMultimap.create;
+		#[CONTAINER, LIST, CASE, INPUT, OUTPUT, NOTIFICATION].forEach [
+			validAugmentStatements.putAll(it, #[CONTAINER, LEAF, LIST, LEAF_LIST, USES, CHOICE]);
+			if (it === CONTAINER || it === LIST) {
+				validAugmentStatements.putAll(it, #[ACTION, NOTIFICATION])
+			}
+		];
+		validAugmentStatements.put(CHOICE, CASE);
+		// https://tools.ietf.org/html/rfc7950#section-7.9.2
+		// Shorthand "case" statement. 
+		validShorthandStatements = ImmutableList.copyOf(#[ANYDATA, ANYXML, CHOICE, CONTAINER, LEAF, LIST, LEAF_LIST]);
+	}
 
 	@Check
 	def void checkVersion(YangVersion it) {
@@ -332,6 +368,63 @@ class YangValidator extends AbstractYangValidator {
 				];
 			}
 		];
+	}
+
+	@Check
+	def checkAugment(Augment it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.17
+		// https://github.com/yang-tools/yang-lsp/issues/25
+		//
+		// (1) The target node MUST be either a container, list, choice, case, input,
+		// output, or notification node.
+		// (2) If the target node is a container, list, case, input, output, or
+		// notification node, the "container", "leaf", "list", "leaf-list",
+		// "uses", and "choice" statements can be used within the "augment" statement.
+		// (3) If the target node is a container or list node, the "action" and
+		// "notification" statements can be used within the "augment" statement.
+		// (4) If the target node is a choice node, the "case" statement or a
+		// shorthand "case" statement (see Section 7.9.2) can be used within the "augment" statement.
+		val target = path?.schemaNode;
+		if (target !== null) {
+			val validSubstatements = validAugmentStatements.get(target.eClass);
+			if (validSubstatements.nullOrEmpty) {
+				val EClass[] inputOrOutput = newArrayOfSize(2);
+				// Implicit `input` and `output` is added to all "rpc" and "action" statements. (See: RFC 7950 7.14)
+				// ScopeContextProvider.getQualifiedName(SchemaNode, QualifiedName, IScopeContext)
+				if (target.eClass === RPC || target.eClass === ACTION) {
+					val fqn = qualifiedNameProvider.getFullyQualifiedName(target);
+					if (fqn !== null) {
+						val scope = scopeProvider.getScope(target, STATEMENT__SUBSTATEMENTS);
+						inputOrOutput.set(0, scope.getElements(fqn.append(target.mainModule.name).append('input')).head?.EClass);
+						inputOrOutput.set(1, scope.getElements(fqn.append(target.mainModule.name).append('output')).head?.EClass);
+					}
+				}
+				if (inputOrOutput.head === null && inputOrOutput.last === null) {
+					val validTypes = validAugmentStatements.keySet.map[yangName].toPrettyString('or');
+					val message = '''The augment's target node must be either a «validTypes» node.''';
+					error(message, it, AUGMENT__PATH, INVALID_AUGMENTATION);
+				}
+			} else {
+				// As a shorthand, the "case" statement can be omitted if the branch contains a single "anydata", "anyxml", 
+				// "choice", "container", "leaf", "list", or "leaf-list" statement.
+				val schemaNodes = substatements.filter(SchemaNode);
+				if (target.eClass === CHOICE && schemaNodes.size === 1) {
+					if (!validShorthandStatements.contains(schemaNodes.head.eClass) &&
+						schemaNodes.head.eClass !== CASE) {
+						val message = '''If the target node is a "choice" node, the "case" statement or a shorthand "case" statement can be used within the "augment" statement.''';
+						error(message, schemaNodes.head, SCHEMA_NODE__NAME, INVALID_AUGMENTATION);
+					}
+				} else {
+					schemaNodes.forEach [
+						if (!validSubstatements.contains(eClass)) {
+							val validTypes = validSubstatements.map[yangName].toPrettyString('or');
+							val message = '''If the target node is a "«target.eClass.yangName»" node, a «validTypes» statements can be used within the "augment" statement.''';
+							error(message, it, SCHEMA_NODE__NAME, INVALID_AUGMENTATION);
+						}
+					];
+				}
+			}
+		}
 	}
 
 	private def getParseIntSafe(String it) {
