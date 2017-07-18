@@ -14,7 +14,7 @@ import io.typefox.yang.yang.YangVersion
 class YangPopupModelFactory implements IPopupModelFactory {
 
 	override createPopupModel(SModelElement element, RequestPopupModelAction request, IDiagramServer server) {
-		if (element instanceof YangNode) {
+		if (element instanceof YangPopupNode) {
 			val statement = element.source
 			createPopup(statement, element)
 		}

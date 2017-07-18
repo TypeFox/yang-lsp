@@ -19,6 +19,8 @@ import java.nio.channels.Channels
 import java.util.concurrent.Executors
 import java.util.function.Consumer
 import org.eclipse.elk.alg.layered.options.LayeredMetaDataProvider
+import org.eclipse.elk.core.util.persistence.ElkGraphResourceFactory
+import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.eclipse.lsp4j.services.LanguageClient
 import org.eclipse.xtext.ide.server.LanguageServerImpl
@@ -31,6 +33,7 @@ class RunSocketServer {
 	def static void main(String[] args) throws Exception {
 		// Initialize ELK
 		ElkLayoutEngine.initialize(new LayeredMetaDataProvider)
+		Resource.Factory.Registry.INSTANCE.extensionToFactoryMap.put('elkg', new ElkGraphResourceFactory)
 		
 		// Do a manual setup that includes the Yang diagram module
 		new YangIdeSetup {
