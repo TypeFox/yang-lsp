@@ -43,7 +43,8 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	public static val MISSING_REVISION = 'MISSING_REVISION'.warn;
 	public static val IMPORT_NOT_A_MODULE = 'IMPORT_NOT_A_MODULE'.error;
 	public static val INCLUDE_NOT_A_SUB_MODULE = 'INCLUDE_NOT_A_SUB_MODULE'.error;
-	public static val INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE = 'INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE'.error;
+	public static val INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE = 'INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE'.
+		error
 
 	/**
 	 * Issue code when the revision date does not conform the "YYYY-MM-DD" format.
@@ -90,7 +91,7 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 * Issue code indicating that an enumerable introduces a new value that is not declared among the parent restriction.
 	 */
 	public static val ENUMERABLE_RESTRICTION_VALUE = 'ENUMERABLE_RESTRICTION_VALUE'.error;
-	
+
 	/**
 	 * Issues code for indicating a duplicate leaf node name in a key. 
 	 */
@@ -105,6 +106,11 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 * Issue code when a config=true is a child of a config=false (see https://tools.ietf.org/html/rfc7950#section-7.21.1)
 	 */
 	public static val INVALID_CONFIG = 'INVALID_CONFIG'.error;
+
+	/**
+	 * Issue code when an augmented node declares invalid sub-statements. For instance when an augmented leaf node has leaf nodes.
+	 */
+	public static val INVALID_AUGMENTATION = 'INVALID_AUGMENTATION'.error;
 
 	private static val Map<String, PreferenceKey> CODES = BUILDER.build;
 
