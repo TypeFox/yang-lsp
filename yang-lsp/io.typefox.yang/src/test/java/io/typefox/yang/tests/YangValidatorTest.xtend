@@ -1410,31 +1410,5 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Augment).last, INVALID_AUGMENTATION);
 	}
-	
-	@Test
-	def void checkAugmentContent_02() {
-		val it = load('''
-		module amodule {
-		  namespace "urn:test:amodule";
-		  prefix "amodule";
-		  grouping g {
-		    leaf l { type string; }
-		  }
-		  rpc run {
-		    input { uses g; }
-		    output { 
-		      uses g {
-		        augment l {
-		          leaf xxx {
-		            type string;
-		          }
-		        }
-		      }
-		    }
-		  }
-		}
-		''');
-		assertError(EcoreUtil2.getAllContentsOfType(root, Augment).last, INVALID_AUGMENTATION);
-	}
 
 }
