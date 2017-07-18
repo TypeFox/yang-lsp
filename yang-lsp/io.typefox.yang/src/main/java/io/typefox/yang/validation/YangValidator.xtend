@@ -28,6 +28,7 @@ import io.typefox.yang.yang.Pattern
 import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.SchemaNode
+import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
@@ -37,6 +38,7 @@ import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.ParseException
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression
 import org.eclipse.xtext.naming.IQualifiedNameProvider
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.scoping.IScopeProvider
 import org.eclipse.xtext.validation.Check
 
@@ -391,13 +393,15 @@ class YangValidator extends AbstractYangValidator {
 				// Implicit `input` and `output` is added to all "rpc" and "action" statements. (See: RFC 7950 7.14)
 				// ScopeContextProvider.getQualifiedName(SchemaNode, QualifiedName, IScopeContext)
 				if (target.eClass === RPC || target.eClass === ACTION) {
-					val fqn = qualifiedNameProvider.getFullyQualifiedName(target);
-					if (fqn !== null) {
-						val scope = scopeProvider.getScope(target, STATEMENT__SUBSTATEMENTS);
-						val inputFqn = fqn.append(target.mainModule.name).append('input');
-						val outputFqn = fqn.append(target.mainModule.name).append('output');
-						if (scope.getSingleElement(inputFqn) !== null || scope.getSingleElement(outputFqn) !== null) {
-							return;
+					val lastSegment = path.lastPathSegment;
+					if (lastSegment == 'input' || lastSegment == 'output') {
+						val fqn = qualifiedNameProvider.getFullyQualifiedName(target);
+						if (fqn !== null) {
+							val scope = scopeProvider.getScope(target, STATEMENT__SUBSTATEMENTS);
+							val inputOrOutputFqn = fqn.append(target.mainModule.name).append(lastSegment);
+							if (scope.getSingleElement(inputOrOutputFqn) !== null) {
+								return;
+							}
 						}
 					}
 				}
@@ -425,6 +429,23 @@ class YangValidator extends AbstractYangValidator {
 				}
 			}
 		}
+	}
+	
+	/**
+	 * Returns with the text of the last non-hidden leaf node of the argument, or {@code null}.
+	 */
+	private def getLastPathSegment(SchemaNodeIdentifier it) {
+		val node = NodeModelUtils.findActualNodeFor(it);
+		if (node !== null) {
+			val itr = node.leafNodes.toList.reverse.iterator;
+			while (itr.hasNext) {
+				val leafNode = itr.next;
+				if (!leafNode.hidden) {
+					return leafNode.text;
+				}
+			}
+		}
+		return null;
 	}
 
 	private def getParseIntSafe(String it) {
