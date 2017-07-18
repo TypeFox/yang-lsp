@@ -388,22 +388,22 @@ class YangValidator extends AbstractYangValidator {
 		if (target !== null) {
 			val validSubstatements = validAugmentStatements.get(target.eClass);
 			if (validSubstatements.nullOrEmpty) {
-				val EClass[] inputOrOutput = newArrayOfSize(2);
 				// Implicit `input` and `output` is added to all "rpc" and "action" statements. (See: RFC 7950 7.14)
 				// ScopeContextProvider.getQualifiedName(SchemaNode, QualifiedName, IScopeContext)
 				if (target.eClass === RPC || target.eClass === ACTION) {
 					val fqn = qualifiedNameProvider.getFullyQualifiedName(target);
 					if (fqn !== null) {
 						val scope = scopeProvider.getScope(target, STATEMENT__SUBSTATEMENTS);
-						inputOrOutput.set(0, scope.getElements(fqn.append(target.mainModule.name).append('input')).head?.EClass);
-						inputOrOutput.set(1, scope.getElements(fqn.append(target.mainModule.name).append('output')).head?.EClass);
+						val inputFqn = fqn.append(target.mainModule.name).append('input');
+						val outputFqn = fqn.append(target.mainModule.name).append('output');
+						if (scope.getSingleElement(inputFqn) !== null || scope.getSingleElement(outputFqn) !== null) {
+							return;
+						}
 					}
 				}
-				if (inputOrOutput.head === null && inputOrOutput.last === null) {
-					val validTypes = validAugmentStatements.keySet.map[yangName].toPrettyString('or');
-					val message = '''The augment's target node must be either a «validTypes» node.''';
-					error(message, it, AUGMENT__PATH, INVALID_AUGMENTATION);
-				}
+				val validTypes = validAugmentStatements.keySet.map[yangName].toPrettyString('or');
+				val message = '''The augment's target node must be either a «validTypes» node.''';
+				error(message, it, AUGMENT__PATH, INVALID_AUGMENTATION);
 			} else {
 				// As a shorthand, the "case" statement can be omitted if the branch contains a single "anydata", "anyxml", 
 				// "choice", "container", "leaf", "list", or "leaf-list" statement.
