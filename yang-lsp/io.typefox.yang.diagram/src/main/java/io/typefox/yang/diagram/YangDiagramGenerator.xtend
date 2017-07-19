@@ -230,37 +230,12 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def dispatch SModelElement generateElement(Choice choiceStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		if (modelParentElement instanceof SNode) {
-			val classElement = configSElement(SNode, viewParentElement.id + '-' + choiceStmt.name + '-choice', 'choice')
-			classElement.layout = 'vbox'
-			
-			val heading = configSElement(SLabel, classElement.id + '-label', 'heading')
-			heading.text = choiceStmt.name
-			classElement.children.add(heading)
-
-			// add class members to compartment element
-			val compartment = configSElement(SCompartment, classElement.id + '-compartment', 'comp')
-			compartment.layout = 'vbox'
-			compartment.children.addAll(createChildElements(classElement, compartment, choiceStmt.substatements))
-			classElement.children.add(compartment)
-
-			// add composition elements 
-			modelParentElement.children.addAll(
-				createChildElements(classElement, modelParentElement, choiceStmt.substatements))
-
-				val SEdge compositionEdge = configSElement(SEdge,
-					viewParentElement.id + '2' + classElement.id + '-edge', DASHED_EDGE_TYPE)
-				compositionEdge.sourceId = viewParentElement.id
-				compositionEdge.targetId = classElement.id
-				modelParentElement.children.add(compositionEdge)
-
-			return classElement
-		}
+		createTypedElementWithEdge(modelParentElement, viewParentElement, choiceStmt, 'choice', DASHED_EDGE_TYPE)
 	}
 
 	protected def dispatch SModelElement generateElement(Case caseStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		createClassElement(caseStmt, viewParentElement, modelParentElement, DASHED_EDGE_TYPE, findClass(caseStmt))
+		createTypedElementWithEdge(modelParentElement, viewParentElement, caseStmt, 'case', DASHED_EDGE_TYPE)
 	}
 
 	protected def dispatch SModelElement generateElement(Uses usesStmt, SModelElement viewParentElement,
@@ -274,7 +249,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			postProcesses.add([
 				val groupings = structuredElementIndex.get('GroupingImpl')
 				val groupingElement = if(groupings !== null) groupings.get(usesStmt.grouping.node)
-				// is there a grouping element in this module? If not it is usage relates to an external module grouping
+				// is there a grouping element in this module? If not its usage relates to an external module grouping
 				if (groupingElement !== null)
 					modelParentElement.children.add(createEdge(viewParentElement, groupingElement, USES_EDGE_TYPE))
 			])
@@ -323,9 +298,10 @@ class YangDiagramGenerator implements IDiagramGenerator {
 //		moduleNotes.source = moduleStmt
 //		moduleElement.children.add(moduleNotes)
 		// Module node
-		val moduleNode = configSElement(YangNodeClassified, moduleElement.id + '-node', 'class')
+		val moduleNode = configSElement(YangNode, moduleElement.id + '-node', 'class')
 		moduleNode.layout = 'vbox'
 		moduleNode.cssClass = 'moduleNode'
+		moduleNode.source = moduleStmt
 
 		// Module node label
 		val SLabel moduleNodeLabel = configSElement(SLabel, moduleNode.id + '-label', 'heading')
@@ -385,11 +361,13 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	protected def SModelElement createClassElement(Statement statement, String label, String id,
 		SModelElement viewParentElement, SModelElement modelParentElement, String edgeType, String cssClass) {
 		if (modelParentElement instanceof SNode) {
-			val classElement = configSElement(YangNodeClassified, id, 'class')
+			val classElement = configSElement(YangNode, id, 'class')
 			classElement.layout = 'vbox'
 			classElement.cssClass = cssClass
+			classElement.source = statement
 			
 			val classHeader = configSElement(YangHeaderNode, classElement.id + '-header', 'classHeader')
+			classHeader.layout = 'vbox'
 			classHeader.tag = findTag(statement)
 			classHeader.label = label
 			classElement.children.add(classHeader)
@@ -412,6 +390,38 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				modelParentElement.children.add(compositionEdge)
 			}
 
+			return classElement
+		}
+	}
+	
+	protected def SNode createTypedElementWithEdge(SModelElement modelParentElement, SModelElement viewParentElement, SchemaNode caseStmt, String type, String edgeType) {
+		if (modelParentElement instanceof SNode) {
+			val classElement = configSElement(SNode, viewParentElement.id + '-' + caseStmt.name + '-case', type)
+			classElement.layout = 'vbox'
+			
+			val headingContainer = configSElement(SCompartment, classElement.id + '-heading', 'comp')
+			headingContainer.layout = 'vbox'
+			
+			val heading = configSElement(SLabel, headingContainer.id + '-label', 'heading')
+			heading.text = caseStmt.name
+			headingContainer.children.add(heading)
+			classElement.children.add(headingContainer)
+		
+			// add class members to compartment element
+			val compartment = configSElement(SCompartment, classElement.id + '-compartment', 'comp')
+			compartment.layout = 'vbox'
+			compartment.children.addAll(createChildElements(classElement, compartment, caseStmt.substatements))
+			classElement.children.add(compartment)
+		
+			modelParentElement.children.addAll(
+				createChildElements(classElement, modelParentElement, caseStmt.substatements))
+		
+				val SEdge compositionEdge = configSElement(SEdge,
+					viewParentElement.id + '2' + classElement.id + '-edge', edgeType)
+				compositionEdge.sourceId = viewParentElement.id
+				compositionEdge.targetId = classElement.id
+				modelParentElement.children.add(compositionEdge)
+		
 			return classElement
 		}
 	}
