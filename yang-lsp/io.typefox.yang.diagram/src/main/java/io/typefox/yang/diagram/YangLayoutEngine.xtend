@@ -27,9 +27,9 @@ class YangLayoutEngine extends ElkLayoutEngine {
 	override layout(SModelRoot root) {
 		if (root instanceof SGraph) {
 			val configurator = new SprottyLayoutConfigurator
-//			configurator.configureByType('graph')
-//				.setProperty(CoreOptions.HIERARCHY_HANDLING, HierarchyHandling.INCLUDE_CHILDREN)
-//				.setProperty(CoreOptions.DIRECTION, Direction.DOWN)
+			configurator.configureByType('graph')
+				.setProperty(CoreOptions.DIRECTION, Direction.DOWN)
+				.setProperty(LayeredOptions.SPACING_NODE_NODE_BETWEEN_LAYERS, 50.0)
 			configurator.configureByType('node:module')
 				.setProperty(CoreOptions.DIRECTION, Direction.DOWN)
 				.setProperty(CoreOptions.SPACING_NODE_NODE, 100.0)
