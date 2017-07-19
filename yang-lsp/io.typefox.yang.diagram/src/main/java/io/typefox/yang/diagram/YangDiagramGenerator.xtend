@@ -265,7 +265,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		diagramRoot.children.add(module)
 
 		postProcesses.add([
-			modelParentElement.children.add(createEdge(module, modelParentElement, IMPORT_EDGE_TYPE))
+			diagramRoot.children.add(createEdge(module, modelParentElement, IMPORT_EDGE_TYPE))
 		])
 
 		return null
@@ -293,8 +293,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	}
 
 	protected def SNode initModule(SNode moduleElement, String tag, String name, Statement moduleStmt) {
-//		TODO add note element and implement YangPopupModelFactory.createPopup
-//      val moduleNotes = configSElement(YangNode, moduleElement.id + '-note', 'note')
+//		val moduleNotes = configSElement(YangNode, moduleElement.id + '-note', 'note')
 //		moduleNotes.source = moduleStmt
 //		moduleElement.children.add(moduleNotes)
 		// Module node
@@ -303,10 +302,12 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		moduleNode.cssClass = 'moduleNode'
 		moduleNode.source = moduleStmt
 
-		// Module node label
-		val SLabel moduleNodeLabel = configSElement(SLabel, moduleNode.id + '-label', 'heading')
-		moduleNodeLabel.text = '[' + tag + ']' + name
-		moduleNode.children.add(moduleNodeLabel)
+//FIXME duplicate code
+		val classHeader = configSElement(YangHeaderNode, moduleNode.id + '-header', 'classHeader')
+			classHeader.layout = 'vbox'
+			classHeader.tag = findTag(moduleStmt)
+			classHeader.label = name
+			moduleNode.children.add(classHeader)
 
 		moduleElement.children.add(moduleNode)
 		moduleElement.children.addAll(createChildElements(moduleNode, moduleElement, moduleStmt.substatements))
