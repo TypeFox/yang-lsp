@@ -18,6 +18,7 @@ import java.nio.channels.AsynchronousServerSocketChannel
 import java.nio.channels.Channels
 import java.util.concurrent.Executors
 import java.util.function.Consumer
+import org.apache.log4j.Logger
 import org.eclipse.elk.alg.layered.options.LayeredMetaDataProvider
 import org.eclipse.elk.core.util.persistence.ElkGraphResourceFactory
 import org.eclipse.emf.ecore.resource.Resource
@@ -29,6 +30,8 @@ import org.eclipse.xtext.resource.IResourceServiceProvider
 import org.eclipse.xtext.util.Modules2
 
 class RunSocketServer {
+	
+	static val LOG = Logger.getLogger(RunSocketServer)
 
 	def static void main(String[] args) throws Exception {
 		// Initialize ELK
@@ -49,17 +52,17 @@ class RunSocketServer {
 		val threadPool = Executors.newCachedThreadPool()
 		
 		while (true) {
-			var languageServer = injector.getInstance(LanguageServerImpl)
 			val socketChannel = serverSocket.accept.get
 			val in = Channels.newInputStream(socketChannel)
 			val out = Channels.newOutputStream(socketChannel)
 			val Consumer<GsonBuilder> configureGson = [ gsonBuilder |
 				ActionTypeAdapter.configureGson(gsonBuilder)
 			]
+			val languageServer = injector.getInstance(LanguageServerImpl)
 			val launcher = Launcher.createIoLauncher(languageServer, LanguageClient, in, out, threadPool, [it], configureGson)
 			languageServer.connect(launcher.remoteProxy)
 			launcher.startListening
-			println("Started Language server.")
+			LOG.info("Started language server for client " + socketChannel.remoteAddress)
 		}
 	}
 }
