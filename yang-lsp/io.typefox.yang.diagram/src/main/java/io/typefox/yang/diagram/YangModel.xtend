@@ -11,7 +11,7 @@ class YangNodeClassified extends SNode {
 }
 
 @Accessors
-class YangPopupNode extends YangNodeClassified {
+class YangNode extends YangNodeClassified {
 	transient Statement source
 }
 
