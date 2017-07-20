@@ -67,8 +67,6 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	static val USES_EDGE_TYPE = 'uses'
 	static val AUGMENTS_EDGE_TYPE = 'augments'
 
-	// Map -> [{Statement-name: [{statement:model-element}...]}...]
-	var Map<String, Map<Statement, SModelElement>> structuredElementIndex
 	var Map<Statement, SModelElement> elementIndex
 	var List<()=>void> postProcesses
 
@@ -83,7 +81,6 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	}
 
 	def SModelRoot generateDiagram(AbstractModule module, CancelIndicator cancelIndicator) {
-		structuredElementIndex = new HashMap
 		elementIndex = new HashMap
 		postProcesses = new ArrayList
 		diagramRoot = new SGraph => [
@@ -108,16 +105,10 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	protected def List<SModelElement> createChildElements(SModelElement viewParentElement,
 		SModelElement modelParentElement, List<Statement> statements) {
 		val rootChildren = new ArrayList()
-		var int num = 0
 		for (statement : statements) {
-			num++
 			var SModelElement element = null
 			element = generateElement(statement, viewParentElement, modelParentElement)
 			if (element !== null) {
-				val statementClassName = statement.class.simpleName
-				if (structuredElementIndex.get(statementClassName) === null)
-					structuredElementIndex.put(statementClassName, new HashMap)
-				structuredElementIndex.get(statementClassName).put(statement, element)
 				elementIndex.put(statement, element)
 				rootChildren.add(element)
 			}
@@ -156,8 +147,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			val keyReferences = keyStmt.references
 			postProcesses.add([
 				(keyReferences).forEach [ keyReference |
-					val leaf = structuredElementIndex.get('LeafImpl')
-					val leafElement = leaf.get(keyReference.node) as SLabel
+					val leafElement = elementIndex.get(keyReference.node) as SLabel
 					val label = leafElement.text
 					leafElement.text = 'KEY: ' + label
 				]
@@ -187,7 +177,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				val identityElement = createClassElement(identityStmt, viewParentElement, modelParentElement, null,
 					findClass(identityStmt))
 				modelParentElement.children.add(identityElement)
-				val baseIdentityElement = structuredElementIndex.get('IdentityImpl').get(base.reference)
+				val baseIdentityElement = elementIndex.get(base.reference)
 				modelParentElement.children.add(createEdge(baseIdentityElement, identityElement, STRAIGHT_EDGE_TYPE))
 			])
 			return null
@@ -202,9 +192,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		val targetNode = schemaNodeIdentifier.schemaNode
 		val augmentElementId = viewParentElement.id + '-' + targetNode.name + '-augmentation'
 		var SModelElement augmentElement = null
-		val augmentMap = structuredElementIndex.get('AugmentImpl')
-		var sameAugmentTarget = if (augmentMap !== null)
-				augmentMap.values.findFirst [ element |
+		var sameAugmentTarget = elementIndex.values.findFirst [ element |
 					element.id == augmentElementId
 				]
 
@@ -219,9 +207,11 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				modelParentElement, COMPOSITION_EDGE_TYPE, findClass(augmentStmt))
 
 			postProcesses.add([
-				if (elementIndex.get(targetNode) !== null)
+				val targetElement = elementIndex.get(targetNode)
+				if (targetElement !== null) {
 					modelParentElement.children.add(
-						createEdge(elementIndex.get(augmentStmt), elementIndex.get(targetNode), AUGMENTS_EDGE_TYPE))
+						createEdge(elementIndex.get(augmentStmt), targetElement, AUGMENTS_EDGE_TYPE))
+				}
 			])
 		}
 
@@ -247,8 +237,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			return memberElement
 		} else {
 			postProcesses.add([
-				val groupings = structuredElementIndex.get('GroupingImpl')
-				val groupingElement = if(groupings !== null) groupings.get(usesStmt.grouping.node)
+				val groupingElement = elementIndex.get(usesStmt.grouping.node)
 				// is there a grouping element in this module? If not its usage relates to an external module grouping
 				if (groupingElement !== null)
 					modelParentElement.children.add(createEdge(viewParentElement, groupingElement, USES_EDGE_TYPE))
@@ -304,10 +293,10 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 //FIXME duplicate code
 		val classHeader = configSElement(YangHeaderNode, moduleNode.id + '-header', 'classHeader')
-			classHeader.layout = 'vbox'
-			classHeader.tag = findTag(moduleStmt)
-			classHeader.label = name
-			moduleNode.children.add(classHeader)
+		classHeader.layout = 'vbox'
+		classHeader.tag = findTag(moduleStmt)
+		classHeader.label = name
+		moduleNode.children.add(classHeader)
 
 		moduleElement.children.add(moduleNode)
 		moduleElement.children.addAll(createChildElements(moduleNode, moduleElement, moduleStmt.substatements))
@@ -366,7 +355,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			classElement.layout = 'vbox'
 			classElement.cssClass = cssClass
 			classElement.source = statement
-			
+
 			val classHeader = configSElement(YangHeaderNode, classElement.id + '-header', 'classHeader')
 			classHeader.layout = 'vbox'
 			classHeader.tag = findTag(statement)
@@ -394,35 +383,36 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			return classElement
 		}
 	}
-	
-	protected def SNode createTypedElementWithEdge(SModelElement modelParentElement, SModelElement viewParentElement, SchemaNode caseStmt, String type, String edgeType) {
+
+	protected def SNode createTypedElementWithEdge(SModelElement modelParentElement, SModelElement viewParentElement,
+		SchemaNode caseStmt, String type, String edgeType) {
 		if (modelParentElement instanceof SNode) {
 			val classElement = configSElement(SNode, viewParentElement.id + '-' + caseStmt.name + '-case', type)
 			classElement.layout = 'vbox'
-			
+
 			val headingContainer = configSElement(SCompartment, classElement.id + '-heading', 'comp')
 			headingContainer.layout = 'vbox'
-			
+
 			val heading = configSElement(SLabel, headingContainer.id + '-label', 'heading')
 			heading.text = caseStmt.name
 			headingContainer.children.add(heading)
 			classElement.children.add(headingContainer)
-		
+
 			// add class members to compartment element
 			val compartment = configSElement(SCompartment, classElement.id + '-compartment', 'comp')
 			compartment.layout = 'vbox'
 			compartment.children.addAll(createChildElements(classElement, compartment, caseStmt.substatements))
 			classElement.children.add(compartment)
-		
+
 			modelParentElement.children.addAll(
 				createChildElements(classElement, modelParentElement, caseStmt.substatements))
-		
-				val SEdge compositionEdge = configSElement(SEdge,
-					viewParentElement.id + '2' + classElement.id + '-edge', edgeType)
-				compositionEdge.sourceId = viewParentElement.id
-				compositionEdge.targetId = classElement.id
-				modelParentElement.children.add(compositionEdge)
-		
+
+			val SEdge compositionEdge = configSElement(SEdge, viewParentElement.id + '2' + classElement.id + '-edge',
+				edgeType)
+			compositionEdge.sourceId = viewParentElement.id
+			compositionEdge.targetId = classElement.id
+			modelParentElement.children.add(compositionEdge)
+
 			return classElement
 		}
 	}
