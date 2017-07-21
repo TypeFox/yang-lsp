@@ -7,7 +7,6 @@
 package io.typefox.yang.diagram
 
 import io.typefox.sprotty.api.LayoutOptions
-import io.typefox.sprotty.api.Point
 import io.typefox.sprotty.api.SCompartment
 import io.typefox.sprotty.api.SEdge
 import io.typefox.sprotty.api.SGraph
@@ -136,17 +135,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	protected def dispatch SModelElement generateElement(Submodule submoduleStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
 		val moduleElement = createModule(submoduleStmt.name)
-		val content = new SNode => [
-			layout = 'free'
-			layoutOptions = new LayoutOptions [
-				paddingLeft = 0.0
-				paddingRight = 0.0
-				paddingTop = 0.0
-				paddingBottom = 0.0
-			]
-		]
-		moduleElement.children.add(content)
-		initModule(content, findClass(submoduleStmt), submoduleStmt.name, submoduleStmt)
+		initModule(moduleElement, findClass(submoduleStmt), submoduleStmt.name, submoduleStmt)
 	}
 
 	protected def dispatch SModelElement generateElement(Container containerStmt, SModelElement viewParentElement,
@@ -244,10 +233,10 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		if (choiceNode !== null) {
 			choiceNode.layoutOptions = new LayoutOptions [
 				HAlign = 'center'
-				paddingLeft = 8.0
-				paddingRight = 8.0
-				paddingTop = 8.0
-				paddingBottom = 8.0				
+				paddingLeft = 0.0
+				paddingRight = 0.0
+				paddingTop = 0.0
+				paddingBottom = 0.0				
 				paddingFactor = 2.0
 			]
 			return choiceNode			
