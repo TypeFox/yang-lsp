@@ -230,7 +230,16 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def dispatch SModelElement generateElement(Choice choiceStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		createTypedElementWithEdge(modelParentElement, viewParentElement, choiceStmt, 'choice', DASHED_EDGE_TYPE)
+		val choiceNode = createTypedElementWithEdge(modelParentElement, viewParentElement, choiceStmt, 'choice', DASHED_EDGE_TYPE)
+		if (choiceNode !== null) {
+			choiceNode.layout = 'stack'
+			choiceNode.layoutOptions = new LayoutOptions [
+				HAlign = 'center'
+				VAlign = 'center'
+				paddingFactor = 2.0
+			]
+			return choiceNode			
+		}
 	}
 
 	protected def dispatch SModelElement generateElement(Case caseStmt, SModelElement viewParentElement,
