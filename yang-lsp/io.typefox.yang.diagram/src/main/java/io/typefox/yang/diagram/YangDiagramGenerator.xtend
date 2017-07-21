@@ -232,10 +232,12 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		SModelElement modelParentElement) {
 		val choiceNode = createTypedElementWithEdge(modelParentElement, viewParentElement, choiceStmt, 'choice', DASHED_EDGE_TYPE)
 		if (choiceNode !== null) {
-			choiceNode.layout = 'stack'
 			choiceNode.layoutOptions = new LayoutOptions [
 				HAlign = 'center'
-				VAlign = 'center'
+				paddingLeft = 8.0
+				paddingRight = 8.0
+				paddingTop = 8.0
+				paddingBottom = 8.0				
 				paddingFactor = 2.0
 			]
 			return choiceNode			
@@ -244,7 +246,17 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def dispatch SModelElement generateElement(Case caseStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		createTypedElementWithEdge(modelParentElement, viewParentElement, caseStmt, 'case', DASHED_EDGE_TYPE)
+		val caseNode = createTypedElementWithEdge(modelParentElement, viewParentElement, caseStmt, 'case', DASHED_EDGE_TYPE)
+		if (caseNode !== null) {
+			caseNode.layoutOptions = new LayoutOptions [
+				HAlign = 'center'
+				paddingBottom = 10.0
+				paddingTop = 10.0
+				paddingLeft = 8.0
+				paddingRight = 8.0
+			]			
+		}
+		return caseNode
 	}
 
 	protected def dispatch SModelElement generateElement(Uses usesStmt, SModelElement viewParentElement,
@@ -452,6 +464,13 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 			val headingContainer = configSElement(SCompartment, classElement.id + '-heading', 'comp')
 			headingContainer.layout = 'vbox'
+			headingContainer.layoutOptions = new LayoutOptions [
+				paddingFactor = 1.0
+				paddingLeft = 0.0
+				paddingRight = 0.0
+				paddingTop = 0.0
+				paddingBottom = 0.0
+			]
 
 			val heading = configSElement(SLabel, headingContainer.id + '-label', 'heading')
 			heading.text = caseStmt.name
@@ -461,6 +480,13 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			// add class members to compartment element
 			val compartment = configSElement(SCompartment, classElement.id + '-compartment', 'comp')
 			compartment.layout = 'vbox'
+			compartment.layoutOptions = new LayoutOptions [
+				paddingFactor = 1.0
+				paddingLeft = 0.0
+				paddingRight = 0.0
+				paddingTop = 0.0
+				paddingBottom = 0.0
+			]
 			compartment.children.addAll(createChildElements(classElement, compartment, caseStmt.substatements))
 			classElement.children.add(compartment)
 
