@@ -136,7 +136,17 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	protected def dispatch SModelElement generateElement(Submodule submoduleStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
 		val moduleElement = createModule(submoduleStmt.name)
-		initModule(moduleElement, findClass(submoduleStmt), submoduleStmt.name, submoduleStmt)
+		val content = new SNode => [
+			layout = 'free'
+			layoutOptions = new LayoutOptions [
+				paddingLeft = 0.0
+				paddingRight = 0.0
+				paddingTop = 0.0
+				paddingBottom = 0.0
+			]
+		]
+		moduleElement.children.add(content)
+		initModule(content, findClass(submoduleStmt), submoduleStmt.name, submoduleStmt)
 	}
 
 	protected def dispatch SModelElement generateElement(Container containerStmt, SModelElement viewParentElement,
@@ -319,6 +329,12 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		// Module node
 		val moduleNode = configSElement(YangNode, moduleElement.id + '-node', 'class')
 		moduleNode.layout = 'vbox'
+		moduleNode.layoutOptions = new LayoutOptions [
+			paddingLeft = 0.0
+			paddingRight = 0.0
+			paddingTop = 0.0
+			paddingBottom = 0.0
+		]
 		moduleNode.cssClass = 'moduleNode'
 		moduleNode.source = moduleStmt
 
@@ -362,13 +378,16 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	protected def SNode createModule(String name) {
 		// Module
 		val moduleElement = configSElement(SNode, name, 'module')
+		moduleElement.layout = 'vbox'
+		moduleElement.layoutOptions = new LayoutOptions [
+			paddingTop = 5.0
+			paddingBottom = 5.0
+			paddingLeft = 5.0
+			paddingRight = 5.0
+		]
 
 		// Module label
 		val SLabel moduleLabel = configSElement(SLabel, moduleElement.id + '-label', 'heading')
-		moduleLabel.position = new Point => [
-			x = 5
-			y = 5
-		]
 		moduleLabel.text = name
 		moduleElement.children.add(moduleLabel)
 		return moduleElement
@@ -400,6 +419,12 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		if (modelParentElement instanceof SNode) {
 			val classElement = configSElement(YangNode, id, 'class')
 			classElement.layout = 'vbox'
+			classElement.layoutOptions = new LayoutOptions [
+				paddingLeft = 0.0
+				paddingRight = 0.0
+				paddingTop = 0.0
+				paddingBottom = 0.0
+			]
 			classElement.cssClass = cssClass
 			classElement.source = statement
 
