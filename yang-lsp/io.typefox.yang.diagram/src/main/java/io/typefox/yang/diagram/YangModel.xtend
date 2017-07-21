@@ -17,7 +17,5 @@ class YangNode extends YangNodeClassified {
 
 @Accessors
 class YangHeaderNode extends SCompartment {
-	String tag
-	String label
 	String cssClass
 }

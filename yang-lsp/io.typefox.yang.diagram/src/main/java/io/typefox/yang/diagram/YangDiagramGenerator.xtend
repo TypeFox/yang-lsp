@@ -6,6 +6,7 @@
  */
 package io.typefox.yang.diagram
 
+import io.typefox.sprotty.api.LayoutOptions
 import io.typefox.sprotty.api.Point
 import io.typefox.sprotty.api.SCompartment
 import io.typefox.sprotty.api.SEdge
@@ -87,6 +88,15 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			type = 'graph'
 			id = 'yang'
 			children = new ArrayList<SModelElement>
+			layoutOptions = new LayoutOptions [
+				HAlign = 'left'
+				HGap = 10.0
+				VGap = 0.0
+				paddingLeft = 0.0
+				paddingRight = 0.0
+				paddingTop = 0.0
+				paddingBottom = 0.0
+			]
 		]
 
 		val rootChildren = createChildElements(diagramRoot, diagramRoot, #[module])
@@ -293,9 +303,25 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 //FIXME duplicate code
 		val classHeader = configSElement(YangHeaderNode, moduleNode.id + '-header', 'classHeader')
-		classHeader.layout = 'vbox'
-		classHeader.tag = findTag(moduleStmt)
-		classHeader.label = name
+		classHeader.layout = 'hbox'
+		classHeader.layoutOptions = new LayoutOptions [
+			paddingLeft = 8.0
+			paddingRight = 8.0
+			paddingTop = 8.0
+			paddingBottom = 8.0
+		]
+		classHeader.children = #[
+			new SLabel [ l |
+				l.type = "label:classTag"
+				l.id = moduleNode.id + '-tag'
+				l.text = findTag(moduleStmt)
+			],
+			new SLabel [ l |
+				l.type = "label:classHeader"
+				l.id = moduleNode.id + '-header-label'
+				l.text = name
+			]
+		]		
 		moduleNode.children.add(classHeader)
 
 		moduleElement.children.add(moduleNode)
@@ -357,14 +383,39 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			classElement.source = statement
 
 			val classHeader = configSElement(YangHeaderNode, classElement.id + '-header', 'classHeader')
-			classHeader.layout = 'vbox'
-			classHeader.tag = findTag(statement)
-			classHeader.label = label
+			classHeader.layout = 'hbox'
+			classHeader.layoutOptions = new LayoutOptions [
+				paddingLeft = 8.0
+				paddingRight = 8.0
+				paddingTop = 8.0
+				paddingBottom = 8.0
+			]
+			
+			classHeader.children = #[
+				new SLabel [ l |
+					l.type = "label:classTag"
+					l.id = classElement.id + '-tag'
+					l.text = findTag(statement)
+				],
+				new SLabel [ l |
+					l.type = "label:classHeader"
+					l.id = classElement.id + '-header-label'
+					l.text = label
+				]
+			]
 			classElement.children.add(classHeader)
 
 			// add class members to compartment element
 			val compartment = configSElement(SCompartment, classElement.id + '-compartment', 'comp')
 			compartment.layout = 'vbox'
+			compartment.layoutOptions = new LayoutOptions [
+				paddingLeft = 12.0
+				paddingRight = 12.0
+				paddingTop = 12.0
+				paddingBottom = 12.0
+				VGap = 2.0
+			]
+			
 			compartment.children.addAll(createChildElements(classElement, compartment, statement.substatements))
 			classElement.children.add(compartment)
 
