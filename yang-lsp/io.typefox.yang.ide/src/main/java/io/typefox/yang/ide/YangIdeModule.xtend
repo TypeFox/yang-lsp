@@ -67,6 +67,10 @@ class YangIdeModule extends AbstractYangIdeModule {
 		return YangContentProposalCreator;
 	}
 
+	def Class<? extends ICodeActionService> bindICodeActionService() {
+		return CodeActionService
+	}
+	
 	static class NoOpCodeLensResolver implements ICodeLensResolver {
 
 		override resolveCodeLens(Document document, XtextResource resource, CodeLens codeLens,

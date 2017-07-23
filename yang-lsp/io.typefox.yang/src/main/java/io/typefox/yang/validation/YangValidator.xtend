@@ -99,7 +99,7 @@ class YangValidator extends AbstractYangValidator {
 	@Check
 	def void checkVersion(YangVersion it) {
 		if (yangVersion != YANG_1 && yangVersion != YANG_1_1) {
-			val message = '''The version must be either "«YANG_1»" or "YANG_1_1»".''';
+			val message = '''The version must be either "«YANG_1»" or "«YANG_1_1»".''';
 			error(message, it, YANG_VERSION__YANG_VERSION, INCORRECT_VERSION);
 		}
 	}
