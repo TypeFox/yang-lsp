@@ -17,6 +17,8 @@ import org.eclipse.xtext.ide.server.codelens.ICodeLensService
 import org.eclipse.xtext.ide.server.symbol.DocumentSymbolService
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
+import org.eclipse.xtext.ide.server.codeActions.ICodeActionService
+import io.typefox.yang.ide.codeAction.CodeActionService
 
 /**
  * Use this class to register ide components.
@@ -41,6 +43,10 @@ class YangIdeModule extends AbstractYangIdeModule {
 	
 	def Class<? extends ICodeLensResolver> bindICodeLensResolver() {
 		return NoOpCodeLensResolver
+	}
+	
+	def Class<? extends ICodeActionService> bindICodeActionService() {
+		return CodeActionService
 	}
 	
 	static class NoOpCodeLensResolver implements ICodeLensResolver {
