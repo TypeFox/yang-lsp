@@ -158,7 +158,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				(keyReferences).forEach [ keyReference |
 					val leafElement = elementIndex.get(keyReference.node) as SLabel
 					val label = leafElement.text
-					leafElement.text = 'KEY: ' + label
+					leafElement.text = '* ' + label
 				]
 			])
 		}
