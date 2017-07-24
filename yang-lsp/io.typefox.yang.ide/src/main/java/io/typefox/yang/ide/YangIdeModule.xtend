@@ -3,6 +3,7 @@
  */
 package io.typefox.yang.ide
 
+import io.typefox.yang.ide.codeAction.CodeActionService
 import io.typefox.yang.ide.codelens.CodeLensService
 import io.typefox.yang.ide.completion.YangContentAssistService
 import io.typefox.yang.ide.completion.YangContentProposalAcceptor
@@ -70,7 +71,7 @@ class YangIdeModule extends AbstractYangIdeModule {
 	def Class<? extends ICodeActionService> bindICodeActionService() {
 		return CodeActionService
 	}
-	
+
 	static class NoOpCodeLensResolver implements ICodeLensResolver {
 
 		override resolveCodeLens(Document document, XtextResource resource, CodeLens codeLens,
