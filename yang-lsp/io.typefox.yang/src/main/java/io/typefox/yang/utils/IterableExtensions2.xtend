@@ -46,4 +46,11 @@ class IterableExtensions2 {
 		}
 		return sb.toString;
 	}
+	
+	/**
+	 * Returns with an empty, unmodifiable iterable if the argument is {@code null}, otherwise returns with the argument.
+	 */
+	static def <E> nullToEmpty(Iterable<? extends E> iterable) {
+		return if (iterable === null) emptyList else iterable; 
+	}
 }

@@ -9,6 +9,7 @@ import org.eclipse.emf.ecore.EClass
 import org.eclipse.xtend.lib.annotations.Data
 
 import static com.google.common.base.CaseFormat.*
+import static com.google.common.base.CharMatcher.*
 
 /**
  * Utility class for getting the YANG name from EObject instances and EClasses.
@@ -60,6 +61,15 @@ abstract class YangNameUtils {
 	 */
 	static def EClass getEClassForName(String yangName) {
 		return if(yangName.nullOrEmpty) null else NAME_TO_ECLASS_CACHE.getUnchecked(yangName).orNull;
+	}
+
+	/**
+	 * Replaces all whitespace (and invisible) characters with a hyphen (@code {-}) character in the 
+	 * argument and returns with it. Consecutive whitespace character will be replaced with one single
+	 * hyphen. Trailing and leading whitespace characters will not be replaces but just trimmed. 
+	 */	
+	static def String escapeModuleName(String it) {
+		return WHITESPACE.or(BREAKING_WHITESPACE).or(INVISIBLE).trimAndCollapseFrom(trim, '-');
 	}
 
 	private new() {

@@ -1,6 +1,7 @@
 package io.typefox.yang.ide.completion
 
 import com.google.inject.Inject
+import io.typefox.yang.documentation.DocumentationProvider
 import io.typefox.yang.scoping.IScopeContext
 import io.typefox.yang.scoping.ScopeContext.MapScope
 import io.typefox.yang.scoping.ScopeContextProvider
@@ -9,7 +10,6 @@ import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangPackage
-import java.util.Collection
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.util.EcoreUtil
@@ -32,11 +32,12 @@ import static io.typefox.yang.yang.YangPackage.Literals.*
 import static extension io.typefox.yang.utils.YangNameUtils.*
 import static extension org.eclipse.xtext.EcoreUtil2.*
 
-class YangCompletionProvider extends IdeContentProposalProvider {
+class YangContentProposalProvider extends IdeContentProposalProvider {
 
 	static val IGNORED_KEYWORDS = #{'/', '{', ';', '}'}
 
 	@Inject extension CurrentTypeFinder
+	@Inject extension DocumentationProvider
 	@Inject ScopeContextProvider scopeContextProvider
 	@Inject SubstatementRuleProvider ruleProvider
 
@@ -130,6 +131,7 @@ class YangCompletionProvider extends IdeContentProposalProvider {
 						name.toString
 					}
 				val entry = this.proposalCreator.createProposal(proposalName, context) [
+					documentation = e.EObjectOrProxy.documentation
 					// TODO description, etc.
 				]
 				acceptor.accept(entry, this.proposalPriorities.getCrossRefPriority(e, entry))
@@ -159,10 +161,6 @@ class YangCompletionProvider extends IdeContentProposalProvider {
 	private def isStatement(AbstractElement it) {
 		val classifier = getContainerOfType(ParserRule)?.type?.classifier;
 		return classifier instanceof EClass && STATEMENT.isSuperTypeOf(classifier as EClass);
-	}
-
-	override createProposals(Collection<ContentAssistContext> contexts, IIdeContentProposalAcceptor acceptor) {
-		super.createProposals(contexts, acceptor)
 	}
 
 	override protected getCrossrefFilter(CrossReference reference, ContentAssistContext context) {

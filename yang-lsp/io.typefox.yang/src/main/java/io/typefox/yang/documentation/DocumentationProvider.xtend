@@ -7,8 +7,10 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.documentation.IEObjectDocumentationProvider
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.util.internal.Log
+import com.google.inject.Singleton
 
 @Log
+@Singleton
 class DocumentationProvider implements IEObjectDocumentationProvider {
 	
 	def dispatch getDocumentation(EObject o) {
