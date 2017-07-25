@@ -219,11 +219,6 @@ class YangFormatter extends AbstractFormatter2 {
         formatStatement(c)
     }
     
-    def dispatch void format(Must m, extension IFormattableDocument it) {
-        m.regionFor.assignment(mustAccess.constraintAssignment_1).surround[oneSpace]
-        formatStatement(m)
-    }
-    
     def dispatch void format(Mandatory m, extension IFormattableDocument it) {
         m.regionFor.assignment(mandatoryAccess.isMandatoryAssignment_1).surround[oneSpace]
         formatStatement(m)
@@ -267,11 +262,6 @@ class YangFormatter extends AbstractFormatter2 {
     def dispatch void format(Anyxml a, extension IFormattableDocument it) {
         a.regionFor.assignment(anyxmlAccess.nameAssignment_1).surround[oneSpace]
         formatStatement(a)
-    }
-    
-    def dispatch void format(Refine r, extension IFormattableDocument it) {
-        r.regionFor.assignment(refineAccess.nodeAssignment_1).surround[oneSpace]
-        formatStatement(r)
     }
     
     def dispatch void format(Rpc r, extension IFormattableDocument it) {
