@@ -124,16 +124,7 @@ class SubstatementGroup {
 	}
 
 	def boolean canInsert(Statement substatementContainer, EClass toInsert, int toInsertIndex) {
-
-		// We do not allow anything but those types first which satisfies the mandatory cardinalities.
-		val missingMandatoryTypes = substatementContainer.missingMandatoryTypes;
-		// If there are any mandatory ones and the `toInsert` type is not among them. Return.
-		if (!missingMandatoryTypes.empty && !substatementContainer.missingMandatoryTypes.exists[it === toInsert]) {
-			return false;
-		}
-
 		val constraint = constraintMapping.get(toInsert);
-
 		// Unexpected statement.
 		if (constraint === null) {
 			return false;
@@ -155,7 +146,7 @@ class SubstatementGroup {
 			return false;
 		}
 
-		// List of existing sub-statements: [s0, s1, insterAfter, offset (<|>), instertBefore, s4, s5...].
+		// List of existing sub-statements: [s0, s1, insterAfter, toInsertIndex (<|>), instertBefore, s4, s5...].
 		if (!substatements.empty) {
 			val insertAfterStatement = substatements.get(toInsertIndex);
 			val insertAfterConstraint = constraintMapping.get(insertAfterStatement.eClass);
@@ -178,14 +169,6 @@ class SubstatementGroup {
 		}
 
 		return true;
-	}
-
-	def private getMissingMandatoryTypes(Statement substatementContainer) {
-		val substatements = substatementContainer.substatements;
-		val substatementTypes = substatements.toMap([eClass]);
-		return constraintMapping.filter[clazz, constraint|constraint.cardinality === Cardinality.MUST].keySet.filter [
-			!substatementTypes.containsKey(it);
-		];
 	}
 
 	private def void checkStatementInContext(Statement statement, Statement substatementContainer,
