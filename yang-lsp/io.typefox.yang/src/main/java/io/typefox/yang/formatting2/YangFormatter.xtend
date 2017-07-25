@@ -25,13 +25,28 @@ import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
 import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
 import org.eclipse.xtext.formatting2.regionaccess.internal.TextSegment
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
+import io.typefox.yang.yang.Typedef
+import io.typefox.yang.yang.Value
+import io.typefox.yang.yang.Type
 
 class YangFormatter extends AbstractFormatter2 {
     
+    @Inject extension YangGrammarAccess
+    
+    // Defaults
+
     static val INDENTATION = "  "
     public static val MAX_LINE_LENGTH = 72
 
-    @Inject extension YangGrammarAccess
+    override protected initialize(FormatterRequest request) {
+        val preferences = request.preferences
+        if (preferences instanceof MapBasedPreferenceValues) {
+            preferences.put(FormatterPreferenceKeys.indentation, INDENTATION)
+        }
+        super.initialize(request)
+    }
+    
+    // Rules
 
     def dispatch void format(Module m, extension IFormattableDocument it) {
         m.regionFor.assignment(moduleAccess.nameAssignment_1).surround[oneSpace]
@@ -78,6 +93,32 @@ class YangFormatter extends AbstractFormatter2 {
         formatStatement(r)
     }
     
+    def dispatch void format(Typedef t, extension IFormattableDocument it) {
+        t.regionFor.assignment(typedefAccess.nameAssignment_1).surround[oneSpace]
+        formatStatement(t)
+    }
+    
+    def dispatch void format(Type t, extension IFormattableDocument it) {
+        val typeRef = t.typeRef
+        if (typeRef !== null) {
+            typeRef.regionFor.assignment(typeReferenceAccess.typeAssignment_1).surround[oneSpace]
+            typeRef.regionFor.crossRef(typeReferenceAccess.typeTypedefCrossReference_1_0).surround[oneSpace]
+        }
+        formatStatement(t)
+    }
+    
+    def dispatch void format(io.typefox.yang.yang.Enum e, extension IFormattableDocument it) {
+        e.regionFor.assignment(enumAccess.nameAssignment_1).surround[oneSpace]
+        formatStatement(e)
+    }
+    
+    def dispatch void format(Value v, extension IFormattableDocument it) {
+        v.regionFor.assignment(valueAccess.ordinalAssignment_1).surround[oneSpace]
+        formatStatement(v)
+    }
+    
+    // Tools
+    
     def formatMultilineString(extension IFormattableDocument it, Statement s, Assignment a) {
         val textRegion = s.regionFor.assignment(a).prepend[newLine].textRegion
         addReplacer(new MultilineStringReplacer(textRegion))
@@ -107,14 +148,6 @@ class YangFormatter extends AbstractFormatter2 {
     
     def TextSegment textRegion(ISemanticRegion region) {
         return new TextSegment(getTextRegionAccess(), region.offset, region.length)
-    }
-
-    override protected initialize(FormatterRequest request) {
-        val preferences = request.preferences
-        if (preferences instanceof MapBasedPreferenceValues) {
-            preferences.put(FormatterPreferenceKeys.indentation, INDENTATION)
-        }
-        super.initialize(request)
     }
     
 }
@@ -155,7 +188,7 @@ class MultilineStringReplacer implements ITextReplacer {
         if (lines.size === 1) {
             lines.head += '"'
         }
-        if (lines.size > 2) {
+        if (lines.size > 1) {
             lines.tail.take(lines.size - 1).forEach[
                 add(0, indentation + " ")
             ]

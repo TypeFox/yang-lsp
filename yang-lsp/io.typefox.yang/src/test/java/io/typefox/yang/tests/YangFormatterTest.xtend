@@ -325,4 +325,93 @@ class YangFormatterTest extends AbstractYangTest {
             '''
         ]
     }
+    
+@Test
+    def void testFormatting_13_typedef() {
+        assertFormatted[
+            expectation = '''
+                module ietf-inet-types {
+                
+                  typedef ip-version {
+                
+                    type enumeration {
+                
+                      enum unknown {
+                
+                        value "0";
+                
+                        description
+                          "An unknown or unspecified version of the Internet
+                           protocol.
+                          ";
+                      }
+                
+                      enum ipv4 {
+                
+                        value "1";
+                
+                        description
+                          "The IPv4 protocol as defined in RFC 791.";
+                      }
+                
+                      enum ipv6 {
+                
+                        value "2";
+                
+                        description
+                          "The IPv6 protocol as defined in RFC 2460.";
+                      }
+                    }
+                
+                    description
+                      "This value represents the version of the IP protocol.
+                       
+                       In the value set and its semantics, this type is equivalent
+                       to the InetVersion textual convention of the SMIv2.
+                      ";
+                
+                    reference
+                      "RFC  791: Internet Protocol
+                       RFC 2460: Internet Protocol, Version 6 (IPv6) Specification
+                       RFC 4001: Textual Conventions for Internet Network Addresses
+                      ";
+                  }
+                }
+            '''
+            toBeFormatted = '''
+                module ietf-inet-types {
+                
+                      typedef ip-version {
+                        type enumeration {
+                          enum unknown {
+                            value "0";
+                            description
+                             "An unknown or unspecified version of the Internet
+                              protocol.";
+                          }
+                          enum ipv4 {
+                            value "1";
+                            description
+                             "The IPv4 protocol as defined in RFC 791.";
+                          }
+                          enum ipv6 {
+                            value "2";
+                            description
+                             "The IPv6 protocol as defined in RFC 2460.";
+                          }
+                        }
+                        description
+                         "This value represents the version of the IP protocol.
+                    
+                          In the value set and its semantics, this type is equivalent
+                          to the InetVersion textual convention of the SMIv2.";
+                        reference
+                         "RFC  791: Internet Protocol
+                          RFC 2460: Internet Protocol, Version 6 (IPv6) Specification
+                          RFC 4001: Textual Conventions for Internet Network Addresses";
+                      }
+                }
+            '''
+        ]
+    }
 }
