@@ -21,6 +21,7 @@ import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import io.typefox.yang.yang.Organization
 import io.typefox.yang.yang.Namespace
 import io.typefox.yang.yang.Prefix
+import io.typefox.yang.yang.Contact
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -33,13 +34,7 @@ class YangFormatter extends AbstractFormatter2 {
         m.regionFor.assignment(moduleAccess.nameAssignment_1).surround[oneSpace]
         formatStatement(m)
     }
-    
-    def dispatch void format(Description d, extension IFormattableDocument it) {
-        val textRegion = d.regionFor.assignment(descriptionAccess.descriptionAssignment_1).prepend[newLine].textRegion
-        addReplacer(new MultilineStringReplacer(textRegion))
-        formatStatement(d)
-    }
-    
+
     def dispatch void format(YangVersion v, extension IFormattableDocument it) {
         v.regionFor.assignment(yangVersionAccess.yangVersionAssignment_1).surround[oneSpace]
         formatStatement(v)
@@ -59,6 +54,18 @@ class YangFormatter extends AbstractFormatter2 {
         val textRegion = o.regionFor.assignment(organizationAccess.organizationAssignment_1).prepend[newLine].textRegion
         addReplacer(new MultilineStringReplacer(textRegion))
         formatStatement(o)
+    }
+    
+    def dispatch void format(Description d, extension IFormattableDocument it) {
+        val textRegion = d.regionFor.assignment(descriptionAccess.descriptionAssignment_1).prepend[newLine].textRegion
+        addReplacer(new MultilineStringReplacer(textRegion))
+        formatStatement(d)
+    }
+    
+    def dispatch void format(Contact c, extension IFormattableDocument it) {
+        val textRegion = c.regionFor.assignment(contactAccess.contactAssignment_1).prepend[newLine].textRegion
+        addReplacer(new MultilineStringReplacer(textRegion))
+        formatStatement(c)
     }
     
     def void formatStatement(extension IFormattableDocument it, Statement s) {
@@ -123,7 +130,10 @@ class MultilineStringReplacer implements ITextReplacer {
             if (currentLine.length > 0) {
                 currentLine += " "
             }
-            currentLine += s.trim
+            val word = s.ltrim
+            if (!word.empty) {
+                currentLine += word
+            }
         }
         
         lines.head.add(0, currentIndentation + '"')
@@ -145,6 +155,12 @@ class MultilineStringReplacer implements ITextReplacer {
     
     static def length(List<String> strings)  {
         return strings.fold(0, [r, w| r + w.length])
+    }
+    
+    static def String ltrim(String s) {
+        val char space = ' '
+        val beginIndex = (0..<s.length).findFirst[i | s.charAt(i) !== space]?:s.length
+        return s.substring(beginIndex)
     }
     
 }

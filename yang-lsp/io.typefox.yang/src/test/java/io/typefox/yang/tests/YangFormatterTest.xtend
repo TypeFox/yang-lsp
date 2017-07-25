@@ -147,7 +147,7 @@ class YangFormatterTest extends AbstractYangTest {
                      YANG data types for Internet addresses and related things.
                      
                      Copyright (c) 2013 IETF Trust and the persons identified as
-                     authors of the code. All rights reserved.
+                     authors of the code.  All rights reserved.
                      
                      Redistribution and use in source and binary forms, with or
                      without modification, is permitted pursuant to, and subject
@@ -225,6 +225,46 @@ class YangFormatterTest extends AbstractYangTest {
                 "urn:ietf:params:xml:ns:yang:ietf-inet-types";
                 prefix       
                 "inet";
+                }
+            '''
+        ]
+    }
+    
+    @Test
+    def void testFormatting_09_contact() {
+        assertFormatted[
+            expectation = '''
+                module ietf-inet-types {
+                
+                  contact
+                    "WG Web:   <http://tools.ietf.org/wg/netmod/>
+                     WG List:  <mailto:netmod@ietf.org>
+                     
+                     WG Chair: David Kessens
+                     <mailto:david.kessens@nsn.com>
+                     
+                     WG Chair: Juergen Schoenwaelder
+                     <mailto:j.schoenwaelder@jacobs-university.de>
+                     
+                     Editor:   Juergen Schoenwaelder
+                     <mailto:j.schoenwaelder@jacobs-university.de>
+                    ";
+                }
+            '''
+            toBeFormatted = '''
+                module ietf-inet-types {
+                  contact
+                   "WG Web:   <http://tools.ietf.org/wg/netmod/>
+                    WG List:  <mailto:netmod@ietf.org>
+                
+                    WG Chair: David Kessens
+                              <mailto:david.kessens@nsn.com>
+                
+                    WG Chair: Juergen Schoenwaelder
+                              <mailto:j.schoenwaelder@jacobs-university.de>
+                
+                    Editor:   Juergen Schoenwaelder
+                              <mailto:j.schoenwaelder@jacobs-university.de>";
                 }
             '''
         ]
