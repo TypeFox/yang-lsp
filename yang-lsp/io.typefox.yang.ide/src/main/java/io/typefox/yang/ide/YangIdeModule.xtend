@@ -20,6 +20,7 @@ import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalCreator
 import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider
 import org.eclipse.xtext.ide.editor.contentassist.IdeCrossrefProposalProvider
 import org.eclipse.xtext.ide.server.Document
+import org.eclipse.xtext.ide.server.codeActions.ICodeActionService
 import org.eclipse.xtext.ide.server.codelens.ICodeLensResolver
 import org.eclipse.xtext.ide.server.codelens.ICodeLensService
 import org.eclipse.xtext.ide.server.contentassist.ContentAssistService
