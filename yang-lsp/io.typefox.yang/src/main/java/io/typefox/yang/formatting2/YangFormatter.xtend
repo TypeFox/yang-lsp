@@ -19,6 +19,8 @@ import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
 import org.eclipse.xtext.formatting2.regionaccess.internal.TextSegment
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import io.typefox.yang.yang.Organization
+import io.typefox.yang.yang.Namespace
+import io.typefox.yang.yang.Prefix
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -41,6 +43,16 @@ class YangFormatter extends AbstractFormatter2 {
     def dispatch void format(YangVersion v, extension IFormattableDocument it) {
         v.regionFor.assignment(yangVersionAccess.yangVersionAssignment_1).surround[oneSpace]
         formatStatement(v)
+    }
+    
+    def dispatch void format(Namespace ns, extension IFormattableDocument it) {
+        ns.regionFor.assignment(namespaceAccess.uriAssignment_1).surround[oneSpace]
+        formatStatement(ns)
+    }
+    
+    def dispatch void format(Prefix p, extension IFormattableDocument it) {
+        p.regionFor.assignment(prefixAccess.prefixAssignment_1).surround[oneSpace]
+        formatStatement(p)
     }
     
     def dispatch void format(Organization o, extension IFormattableDocument it) {

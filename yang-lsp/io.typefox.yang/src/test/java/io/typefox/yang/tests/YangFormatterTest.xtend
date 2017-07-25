@@ -201,7 +201,6 @@ class YangFormatterTest extends AbstractYangTest {
             '''
             toBeFormatted = '''
                 module ietf-inet-types {
-                
                   organization
                   "IETF NETMOD (NETCONF Data Modeling Language) Working Group";
                 }
@@ -209,5 +208,26 @@ class YangFormatterTest extends AbstractYangTest {
         ]
     }
     
+    @Test
+    def void testFormatting_09_namespace_prefix() {
+        assertFormatted[
+            expectation = '''
+                module ietf-inet-types {
+                
+                  namespace "urn:ietf:params:xml:ns:yang:ietf-inet-types";
+                
+                  prefix "inet";
+                }
+            '''
+            toBeFormatted = '''
+                module ietf-inet-types {
+                namespace    
+                "urn:ietf:params:xml:ns:yang:ietf-inet-types";
+                prefix       
+                "inet";
+                }
+            '''
+        ]
+    }
     
 }
