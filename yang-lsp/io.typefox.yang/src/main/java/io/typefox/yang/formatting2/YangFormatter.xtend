@@ -4,13 +4,18 @@ import com.google.inject.Inject
 import io.typefox.yang.services.YangGrammarAccess
 import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Description
+import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.Module
 import io.typefox.yang.yang.Namespace
 import io.typefox.yang.yang.Organization
+import io.typefox.yang.yang.Pattern
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Reference
 import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.Statement
+import io.typefox.yang.yang.Type
+import io.typefox.yang.yang.Typedef
+import io.typefox.yang.yang.Value
 import io.typefox.yang.yang.YangVersion
 import java.util.List
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
@@ -25,9 +30,6 @@ import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
 import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
 import org.eclipse.xtext.formatting2.regionaccess.internal.TextSegment
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
-import io.typefox.yang.yang.Typedef
-import io.typefox.yang.yang.Value
-import io.typefox.yang.yang.Type
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -88,6 +90,11 @@ class YangFormatter extends AbstractFormatter2 {
         formatStatement(r)
     }
     
+    def dispatch void format(Pattern p, extension IFormattableDocument it) {
+        formatMultilineString(p, patternAccess.regexpAssignment_1)
+        formatStatement(p)
+    }
+    
     def dispatch void format(Revision r, extension IFormattableDocument it) {
         r.regionFor.assignment(revisionAccess.revisionAssignment_1).surround[oneSpace]
         formatStatement(r)
@@ -107,7 +114,7 @@ class YangFormatter extends AbstractFormatter2 {
         formatStatement(t)
     }
     
-    def dispatch void format(io.typefox.yang.yang.Enum e, extension IFormattableDocument it) {
+    def dispatch void format(Enum e, extension IFormattableDocument it) {
         e.regionFor.assignment(enumAccess.nameAssignment_1).surround[oneSpace]
         formatStatement(e)
         
@@ -121,7 +128,11 @@ class YangFormatter extends AbstractFormatter2 {
     // Tools
     
     def formatMultilineString(extension IFormattableDocument it, Statement s, Assignment a) {
-        val textRegion = s.regionFor.assignment(a).prepend[newLine].textRegion
+        val region = s.regionFor.assignment(a)
+        if (MultilineStringReplacer.isConcatenation(region.text)) {
+            return;
+        }
+        val textRegion = region.prepend[newLine].textRegion
         addReplacer(new MultilineStringReplacer(textRegion))
     }
     
@@ -141,7 +152,7 @@ class YangFormatter extends AbstractFormatter2 {
     }
     
     def formatSubstatements(extension IFormattableDocument it, Statement s) {
-        val condensed = s instanceof io.typefox.yang.yang.Enum
+        val condensed = s instanceof Enum
         	
         for (substatement : s.substatements) {
             if (condensed) {
@@ -172,6 +183,9 @@ class MultilineStringReplacer implements ITextReplacer {
         val currentIndentation = context.indentationString
         val indentation = currentIndentation + defaultIndentation
         val original = segment.text
+        if (original.isConcatenation) {
+            return context
+        }
         val splitted = original.substring(1, original.length - 1).split("(\\s(?=\\S)|\\n(?!' '))")
         var currentLine = <String> newLinkedList()
         val lines = <List<String>> newArrayList(currentLine)
@@ -206,6 +220,12 @@ class MultilineStringReplacer implements ITextReplacer {
         val newText = lines.map[join()].join("\n")
         context.addReplacement(segment.replaceWith(newText))
         return context
+    }
+    
+    public static def isConcatenation(String s) {
+        val singleQuoted = s.startsWith("'") && s.endsWith("'")
+        val containsPlus = java.util.regex.Pattern.compile("\\n\\s*\\+").matcher(s).find()
+        return singleQuoted && containsPlus
     }
     
     static def length(List<String> strings)  {

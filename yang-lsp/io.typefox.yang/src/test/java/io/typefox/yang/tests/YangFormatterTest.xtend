@@ -326,7 +326,7 @@ class YangFormatterTest extends AbstractYangTest {
         ]
     }
     
-@Test
+    @Test
     def void testFormatting_13_typedef() {
         assertFormatted[
             expectation = '''
@@ -404,6 +404,49 @@ class YangFormatterTest extends AbstractYangTest {
                           RFC 2460: Internet Protocol, Version 6 (IPv6) Specification
                           RFC 4001: Textual Conventions for Internet Network Addresses";
                       }
+                }
+            '''
+        ]
+    }
+
+    @Test
+    def void testFormatting_14_pattern() {
+        assertFormatted[
+            expectation = '''
+                module ietf-inet-types {
+                
+                  typedef ipv6-address {
+                
+                    type string {
+                
+                      pattern '((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}'
+                            + '((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|'
+                            + '(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.){3}'
+                            + '(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))'
+                            + '(%[\p{N}\p{L}]+)?';
+                
+                      pattern '(([^:]+:){6}(([^:]+:[^:]+)|(.*\..*)))|'
+                            + '((([^:]+:)*[^:]+)?::(([^:]+:)*[^:]+)?)'
+                            + '(%.+)?';
+                    }
+                  }
+                }
+            '''
+            toBeFormatted = '''
+                module ietf-inet-types {
+                
+                  typedef ipv6-address {
+                    type string {
+                      pattern '((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}'
+                            + '((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|'
+                            + '(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.){3}'
+                            + '(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))'
+                            + '(%[\p{N}\p{L}]+)?';
+                      pattern '(([^:]+:){6}(([^:]+:[^:]+)|(.*\..*)))|'
+                            + '((([^:]+:)*[^:]+)?::(([^:]+:)*[^:]+)?)'
+                            + '(%.+)?';
+                    }
+                  }
                 }
             '''
         ]
