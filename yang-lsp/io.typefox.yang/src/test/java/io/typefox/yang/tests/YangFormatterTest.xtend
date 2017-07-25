@@ -14,9 +14,9 @@ class YangFormatterTest extends AbstractYangTest {
 			expectation = '''
 				module mytestid {
 				
-				    yang-version 1.1;
+				  yang-version 1.1;
 				
-				    yang-version 1.1;
+				  yang-version 1.1;
 				}
 			'''
 			toBeFormatted = '''
@@ -31,17 +31,17 @@ class YangFormatterTest extends AbstractYangTest {
             expectation = '''
                 module mytestid {
                 
-                    description
-                        "35-columns------------------------ 35-columns------------------------
-                         15-columns---- 35-columns------------------------
-                         35-columns------------------------ 15-columns---- 15-columns----
-                         35-columns------------------------
-                        ";
+                  description
+                    "35-columns------------------------ 35-columns------------------------
+                     15-columns---- 35-columns------------------------
+                     35-columns------------------------ 15-columns---- 15-columns----
+                     35-columns------------------------
+                    ";
                 }
             '''
             toBeFormatted = '''
                 module mytestid {
-                    description "35-columns------------------------ 35-columns------------------------ 15-columns---- 35-columns------------------------ 35-columns------------------------ 15-columns---- 15-columns---- 35-columns------------------------";
+                        description "35-columns------------------------ 35-columns------------------------ 15-columns---- 35-columns------------------------ 35-columns------------------------ 15-columns---- 15-columns---- 35-columns------------------------";
                 }
             '''
         ]
@@ -53,8 +53,8 @@ class YangFormatterTest extends AbstractYangTest {
             expectation = '''
                 module mytestid {
                 
-                    description
-                        "35-columns------------------------ 15-columns----";
+                  description
+                    "35-columns------------------------ 15-columns----";
                 }
             '''
             toBeFormatted = '''
@@ -71,11 +71,11 @@ class YangFormatterTest extends AbstractYangTest {
             expectation = '''
                 module mytestid {
                 
-                    description
-                        "35-columns------------------------
-                         
-                         15-columns----
-                        ";
+                  description
+                    "35-columns------------------------
+                     
+                     15-columns----
+                    ";
                 }
             '''
             toBeFormatted = '''
@@ -94,11 +94,11 @@ class YangFormatterTest extends AbstractYangTest {
             expectation = '''
                 module mytestid {
                 
-                    description
-                        "35-columns------------------------
-                         100-columns----------------------------------------------------------------------------------------
-                         15-columns----
-                        ";
+                  description
+                    "35-columns------------------------
+                     100-columns----------------------------------------------------------------------------------------
+                     15-columns----
+                    ";
                 }
             '''
             toBeFormatted = '''
@@ -116,14 +116,14 @@ class YangFormatterTest extends AbstractYangTest {
             expectation = '''
                 module mytestid {
                 
+                  yang-version 1.1;
+                
+                  module mytestid {
+                
                     yang-version 1.1;
                 
-                    module mytestid {
-                
-                        yang-version 1.1;
-                
-                        yang-version 1.1;
-                    }
+                    yang-version 1.1;
+                  }
                 }
             '''
             toBeFormatted = '''
@@ -131,4 +131,62 @@ class YangFormatterTest extends AbstractYangTest {
             '''
         ]
     }
+    
+    @Test
+    def void testFormatting_07() {
+        assertFormatted[
+            expectation = '''
+                module ietf-inet-types {
+                
+                  namespace "urn:ietf:params:xml:ns:yang:ietf-inet-types";
+                
+                  prefix "inet";
+                
+                  description
+                    "This module contains a collection of generally useful derived
+                     YANG data types for Internet addresses and related things.
+                     
+                     Copyright (c) 2013 IETF Trust and the persons identified as
+                     authors of the code. All rights reserved.
+                     
+                     Redistribution and use in source and binary forms, with or
+                     without modification, is permitted pursuant to, and subject
+                     to the license terms contained in, the Simplified BSD License
+                     set forth in Section 4.c of the IETF Trust's Legal Provisions
+                     Relating to IETF Documents
+                     (http://trustee.ietf.org/license-info).
+                     
+                     This version of this YANG module is part of RFC 6991; see
+                     the RFC itself for full legal notices.
+                    ";
+                }
+            '''
+            toBeFormatted = '''
+                module ietf-inet-types {
+                
+                  namespace "urn:ietf:params:xml:ns:yang:ietf-inet-types";
+                  
+                  prefix "inet";
+                
+                  description
+                   "This module contains a collection of generally useful derived
+                    YANG data types for Internet addresses and related things.
+                
+                    Copyright (c) 2013 IETF Trust and the persons identified as
+                    authors of the code.  All rights reserved.
+                
+                    Redistribution and use in source and binary forms, with or
+                    without modification, is permitted pursuant to, and subject
+                    to the license terms contained in, the Simplified BSD License
+                    set forth in Section 4.c of the IETF Trust's Legal Provisions
+                    Relating to IETF Documents
+                    (http://trustee.ietf.org/license-info).
+                
+                    This version of this YANG module is part of RFC 6991; see
+                    the RFC itself for full legal notices.";
+                }
+            '''
+        ]
+    }
+    
 }

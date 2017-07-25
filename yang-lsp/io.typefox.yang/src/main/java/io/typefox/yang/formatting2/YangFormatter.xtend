@@ -21,7 +21,7 @@ import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 
 class YangFormatter extends AbstractFormatter2 {
     
-    static val INDENTATION = "    "
+    static val INDENTATION = "  "
     public static val MAX_LINE_LENGTH = 72
 
     @Inject extension YangGrammarAccess
