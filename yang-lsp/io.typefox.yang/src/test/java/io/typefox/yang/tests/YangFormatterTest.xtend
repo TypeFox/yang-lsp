@@ -189,4 +189,25 @@ class YangFormatterTest extends AbstractYangTest {
         ]
     }
     
+    @Test
+    def void testFormatting_08_organization() {
+        assertFormatted[
+            expectation = '''
+                module ietf-inet-types {
+                
+                  organization
+                    "IETF NETMOD (NETCONF Data Modeling Language) Working Group";
+                }
+            '''
+            toBeFormatted = '''
+                module ietf-inet-types {
+                
+                  organization
+                  "IETF NETMOD (NETCONF Data Modeling Language) Working Group";
+                }
+            '''
+        ]
+    }
+    
+    
 }

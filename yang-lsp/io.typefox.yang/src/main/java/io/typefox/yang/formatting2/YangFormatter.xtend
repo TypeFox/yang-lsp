@@ -18,6 +18,7 @@ import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
 import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
 import org.eclipse.xtext.formatting2.regionaccess.internal.TextSegment
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
+import io.typefox.yang.yang.Organization
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -40,6 +41,12 @@ class YangFormatter extends AbstractFormatter2 {
     def dispatch void format(YangVersion v, extension IFormattableDocument it) {
         v.regionFor.assignment(yangVersionAccess.yangVersionAssignment_1).surround[oneSpace]
         formatStatement(v)
+    }
+    
+    def dispatch void format(Organization o, extension IFormattableDocument it) {
+        val textRegion = o.regionFor.assignment(organizationAccess.organizationAssignment_1).prepend[newLine].textRegion
+        addReplacer(new MultilineStringReplacer(textRegion))
+        formatStatement(o)
     }
     
     def void formatStatement(extension IFormattableDocument it, Statement s) {
