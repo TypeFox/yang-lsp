@@ -209,11 +209,6 @@ class YangFormatter extends AbstractFormatter2 {
         formatStatement(l)
     }
     
-    def dispatch void format(When w, extension IFormattableDocument it) {
-        w.regionFor.assignment(whenAccess.conditionAssignment_1).surround[oneSpace]
-        formatStatement(w)
-    }
-    
     def dispatch void format(Container c, extension IFormattableDocument it) {
         c.regionFor.assignment(containerAccess.nameAssignment_1).surround[oneSpace]
         formatStatement(c)
