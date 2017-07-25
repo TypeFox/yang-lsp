@@ -5,6 +5,8 @@ import io.typefox.yang.services.YangGrammarAccess
 import io.typefox.yang.yang.Description
 import io.typefox.yang.yang.Module
 import io.typefox.yang.yang.Statement
+import io.typefox.yang.yang.YangVersion
+import java.util.List
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.eclipse.xtext.formatting2.AbstractFormatter2
 import org.eclipse.xtext.formatting2.FormatterPreferenceKeys
@@ -16,11 +18,11 @@ import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
 import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
 import org.eclipse.xtext.formatting2.regionaccess.internal.TextSegment
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
-import io.typefox.yang.yang.YangVersion
 
 class YangFormatter extends AbstractFormatter2 {
     
     static val INDENTATION = "    "
+    public static val MAX_LINE_LENGTH = 72
 
     @Inject extension YangGrammarAccess
 
@@ -89,29 +91,41 @@ class MultilineStringReplacer implements ITextReplacer {
         val currentIndentation = context.indentationString
         val indentation = currentIndentation + defaultIndentation
         val original = segment.text
-        val splitted = original.substring(1, original.length - 1).split("\\s(?=\\S)")
-        val sb = new StringBuilder(currentIndentation).append('"')
-        var lineLength = 0
-        var first = true
-        var singleline = true
+        val splitted = original.substring(1, original.length - 1).split("(\\s(?=\\S)|\\n(?!' '))")
+        var currentLine = <String> newLinkedList()
+        val lines = <List<String>> newArrayList(currentLine)
         for (s : splitted) {
-            if ((lineLength += s.length) > 72) {
-                singleline = false
-                sb.append("\n").append(indentation).append(" ")
-                lineLength = s.length
-            } else {
-                if (!first) {
-                    sb.append(" ")
-                }
+            val currentLength = currentLine.length
+            if (currentLength + s.length > YangFormatter.MAX_LINE_LENGTH || s.length > YangFormatter.MAX_LINE_LENGTH) {
+                lines += (currentLine = <String> newLinkedList())
+            } else if (s.trim.empty) {
+                lines += (currentLine = <String> newLinkedList())
             }
-            first = false
-            sb.append(s.replace("\n", "\n" + currentIndentation + " " ))
+            if (currentLine.length > 0) {
+                currentLine += " "
+            }
+            currentLine += s.trim
         }
-        if (!singleline) {
-            sb.append("\n").append(indentation)
+        
+        lines.head.add(0, currentIndentation + '"')
+        if (lines.size === 1) {
+            lines.head += '"'
         }
-        sb.append('"')
-        context.addReplacement(segment.replaceWith(sb.toString))
+        if (lines.size > 2) {
+            lines.tail.take(lines.size - 1).forEach[
+                add(0, indentation + " ")
+            ]
+        }
+        if (lines.size > 1) {
+            lines += <String> newLinkedList(indentation, '"')
+        }
+        val newText = lines.map[join()].join("\n")
+        context.addReplacement(segment.replaceWith(newText))
         return context
     }
+    
+    static def length(List<String> strings)  {
+        return strings.fold(0, [r, w| r + w.length])
+    }
+    
 }
