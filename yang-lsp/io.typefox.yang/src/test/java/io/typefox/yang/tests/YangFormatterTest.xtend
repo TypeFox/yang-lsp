@@ -337,9 +337,7 @@ class YangFormatterTest extends AbstractYangTest {
                     type enumeration {
                 
                       enum unknown {
-                
                         value "0";
-                
                         description
                           "An unknown or unspecified version of the Internet
                            protocol.
@@ -347,17 +345,13 @@ class YangFormatterTest extends AbstractYangTest {
                       }
                 
                       enum ipv4 {
-                
                         value "1";
-                
                         description
                           "The IPv4 protocol as defined in RFC 791.";
                       }
                 
                       enum ipv6 {
-                
                         value "2";
-                
                         description
                           "The IPv6 protocol as defined in RFC 2460.";
                       }

@@ -110,6 +110,7 @@ class YangFormatter extends AbstractFormatter2 {
     def dispatch void format(io.typefox.yang.yang.Enum e, extension IFormattableDocument it) {
         e.regionFor.assignment(enumAccess.nameAssignment_1).surround[oneSpace]
         formatStatement(e)
+        
     }
     
     def dispatch void format(Value v, extension IFormattableDocument it) {
@@ -140,8 +141,14 @@ class YangFormatter extends AbstractFormatter2 {
     }
     
     def formatSubstatements(extension IFormattableDocument it, Statement s) {
+        val condensed = s instanceof io.typefox.yang.yang.Enum
+        	
         for (substatement : s.substatements) {
-            substatement.prepend[setNewLines(2, 2, 3)]
+            if (condensed) {
+                substatement.prepend[setNewLines(1, 1, 2)]
+            } else {
+                substatement.prepend[setNewLines(2, 2, 3)]
+            }
             substatement.format
         }
     }
