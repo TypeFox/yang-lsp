@@ -379,10 +379,6 @@ class YangFormatter extends AbstractFormatter2 {
         formatStatement(s)
     }
     
-    def dispatch void format(Path s, extension IFormattableDocument it) {
-        s.regionFor.assignment(pathAccess.referenceAssignment_1).surround[oneSpace]
-        formatStatement(s)
-    }
     
     def dispatch void format(RequireInstance s, extension IFormattableDocument it) {
         s.regionFor.assignment(requireInstanceAccess.isRequireInstanceAssignment_1).surround[oneSpace]
