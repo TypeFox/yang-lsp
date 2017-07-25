@@ -231,7 +231,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting_09_contact() {
+    def void testFormatting_10_contact() {
         assertFormatted[
             expectation = '''
                 module ietf-inet-types {
@@ -270,4 +270,59 @@ class YangFormatterTest extends AbstractYangTest {
         ]
     }
     
+    @Test
+    def void testFormatting_11_reference() {
+        assertFormatted[
+            expectation = '''
+                module ietf-inet-types {
+                
+                  reference
+                    "RFC 6021: Common YANG Data Types";
+                }
+            '''
+            toBeFormatted = '''
+                module ietf-inet-types {
+                  reference                    "RFC 6021: Common YANG Data Types";
+                }
+            '''
+        ]
+    }
+    
+    @Test
+    def void testFormatting_12_revision() {
+        assertFormatted[
+            expectation = '''
+                module ietf-inet-types {
+                
+                  revision 2013-07-15 {
+                
+                    description
+                      "This revision adds the following new data types:
+                       - ip-address-no-zone
+                       - ipv4-address-no-zone
+                       - ipv6-address-no-zone
+                      ";
+                
+                    reference
+                      "RFC 6991: Common YANG Data Types";
+                  }
+                }
+            '''
+            toBeFormatted = '''
+                module ietf-inet-types {
+                
+                    revision 
+                    2013-07-15 {
+                      description
+                       "This revision adds the following new data types:
+                        - ip-address-no-zone
+                        - ipv4-address-no-zone
+                        - ipv6-address-no-zone";
+                      reference
+                       "RFC 6991: Common YANG Data Types";
+                    }
+                }
+            '''
+        ]
+    }
 }
