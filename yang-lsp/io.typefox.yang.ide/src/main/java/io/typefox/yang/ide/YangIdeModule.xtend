@@ -29,7 +29,7 @@ import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
 
 /**
- * Use this class to register generic IDE components.
+ * Use this class to register ide components.
  */
 class YangIdeModule extends AbstractYangIdeModule {
 
@@ -70,7 +70,7 @@ class YangIdeModule extends AbstractYangIdeModule {
 	}
 
 	def Class<? extends ICodeActionService> bindICodeActionService() {
-		return CodeActionService
+		return CodeActionService;
 	}
 
 	static class NoOpCodeLensResolver implements ICodeLensResolver {
