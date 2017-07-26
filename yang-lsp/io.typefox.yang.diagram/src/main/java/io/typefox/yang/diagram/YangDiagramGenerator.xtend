@@ -118,8 +118,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			var SModelElement element = null
 			element = generateElement(statement, viewParentElement, modelParentElement)
 			if (element !== null) {
-				if(parentStmt instanceof Choice) {
-				    // between element and viewparentElement must be a case element  
+				if (parentStmt instanceof Choice) {
+					// between element and viewparentElement must be a case element  
 				}
 				elementIndex.put(statement, element)
 				rootChildren.add(element)
@@ -190,7 +190,9 @@ class YangDiagramGenerator implements IDiagramGenerator {
 					findClass(identityStmt))
 				modelParentElement.children.add(identityElement)
 				val baseIdentityElement = elementIndex.get(base.reference)
-				modelParentElement.children.add(createEdge(baseIdentityElement, identityElement, STRAIGHT_EDGE_TYPE))
+				if (baseIdentityElement !== null)
+					modelParentElement.children.add(
+						createEdge(baseIdentityElement, identityElement, STRAIGHT_EDGE_TYPE))
 			])
 			return null
 		}
@@ -213,7 +215,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				element.type == 'comp:comp'
 			]
 			sameAugmentTargetCompartment.children.addAll(
-				createChildElements(sameAugmentTarget, sameAugmentTargetCompartment, augmentStmt.substatements, augmentStmt))
+				createChildElements(sameAugmentTarget, sameAugmentTargetCompartment, augmentStmt.substatements,
+					augmentStmt))
 		} else {
 			augmentElement = createClassElement(augmentStmt, path, augmentElementId, viewParentElement,
 				modelParentElement, COMPOSITION_EDGE_TYPE, findClass(augmentStmt))
@@ -356,7 +359,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		moduleNode.children.add(classHeader)
 
 		moduleElement.children.add(moduleNode)
-		moduleElement.children.addAll(createChildElements(moduleNode, moduleElement, moduleStmt.substatements, moduleStmt))
+		moduleElement.children.addAll(
+			createChildElements(moduleNode, moduleElement, moduleStmt.substatements, moduleStmt))
 
 		return moduleElement
 	}
@@ -404,7 +408,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def SModelElement createClassElement(SchemaNode statement, SModelElement viewParentElement,
 		SModelElement modelParentElement, String edgeType, String cssClass) {
-		createClassElement(statement, statement.name, viewParentElement.id + '-' + findClass(statement) + '-' + statement.name, viewParentElement,
+		createClassElement(statement, statement.name,
+			viewParentElement.id + '-' + findClass(statement) + '-' + statement.name, viewParentElement,
 			modelParentElement, edgeType, cssClass)
 	}
 
@@ -456,7 +461,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				VGap = 2.0
 			]
 
-			compartment.children.addAll(createChildElements(classElement, compartment, statement.substatements, statement))
+			compartment.children.addAll(
+				createChildElements(classElement, compartment, statement.substatements, statement))
 			classElement.children.add(compartment)
 
 			// add composition elements 
