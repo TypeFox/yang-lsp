@@ -29,7 +29,8 @@ class YangLayoutEngine extends ElkLayoutEngine {
 			val configurator = new SprottyLayoutConfigurator
 			configurator.configureByType('graph')
 				.setProperty(CoreOptions.DIRECTION, Direction.DOWN)
-				.setProperty(LayeredOptions.SPACING_NODE_NODE_BETWEEN_LAYERS, 50.0)
+				.setProperty(CoreOptions.SPACING_NODE_NODE, 30.0)
+				.setProperty(LayeredOptions.SPACING_EDGE_NODE_BETWEEN_LAYERS, 30.0)
 			configurator.configureByType('node:module')
 				.setProperty(CoreOptions.DIRECTION, Direction.DOWN)
 				.setProperty(CoreOptions.SPACING_NODE_NODE, 100.0)
