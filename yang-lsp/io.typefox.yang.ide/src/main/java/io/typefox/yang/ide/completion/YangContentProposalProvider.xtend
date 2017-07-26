@@ -63,7 +63,7 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 	}
 	
 	override protected _createProposals(Keyword keyword, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
-		if (keyword === grammarAccess.importAccess.importKeyword_0) {
+		if (keyword === grammarAccess.importAccess.importKeyword_0 && filterKeyword(keyword, context)) {
 			val module = EcoreUtil2.getContainerOfType(context.currentModel, AbstractModule)
 			val scopeCtx = scopeContextProvider.getScopeContext(module)
 			val indentString = whitespaceInformation.getIndentationInformation(context.resource.URI).indentString
