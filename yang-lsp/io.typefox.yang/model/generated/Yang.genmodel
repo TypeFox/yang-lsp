@@ -41,7 +41,7 @@
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Import"/>
     <genClasses ecoreClass="Yang.ecore#//RevisionDate">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//RevisionDate/date"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//RevisionDate/date"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Include"/>
     <genClasses ecoreClass="Yang.ecore#//Organization">

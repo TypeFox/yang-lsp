@@ -38,7 +38,7 @@
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Import" eSuperTypes="#//AbstractImport"/>
   <eClassifiers xsi:type="ecore:EClass" name="RevisionDate" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="date" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
+    <eStructuralFeatures xsi:type="ecore:EReference" name="date" eType="#//Revision"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Include" eSuperTypes="#//AbstractImport"/>
   <eClassifiers xsi:type="ecore:EClass" name="Organization" eSuperTypes="#//OtherStatement">

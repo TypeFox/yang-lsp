@@ -50,6 +50,9 @@ import org.eclipse.xtext.scoping.impl.SelectableBasedScope
 import org.eclipse.xtext.util.internal.EmfAdaptable
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
+import io.typefox.yang.yang.Revision
+import org.eclipse.xtext.resource.EObjectDescription
+import org.eclipse.emf.ecore.util.EcoreUtil
 
 /**
  * Links the imported modules and included submodules, as well as computing the IScopeContext for them. 
@@ -363,20 +366,22 @@ class ScopeContextProvider {
 	}
 	
 	protected dispatch def void computeScope(AbstractImport element, QualifiedName currentPrefix, IScopeContext ctx, boolean isConfig) {
+		val rev = element.substatements.filter(RevisionDate).head
 		val importedModule = linker.<AbstractModule>link(element, ABSTRACT_IMPORT__MODULE) [ name |
-			val rev = element.substatements.filter(RevisionDate).head
 			val candidates = ctx.moduleScope.getElements(name)
 			if (rev !== null) {
-				val match = candidates.filter[
-					val userData = getUserData(ResourceDescriptionStrategy.REVISION)
-					return userData !== null && userData == rev.date
-				].head
-				if (match !== null) {
-					return match
-				}
-				val other = candidates.head
-				if (other !== null) {				
-					validator.addIssue(rev, REVISION_DATE__DATE, "The "+other.getEClass.name.toLowerCase+" '" + name + "' doesn't exist in revision '"+rev.date+"'.", IssueCodes.UNKNOWN_REVISION)
+				for (it : candidates) {
+					val resolved = EcoreUtil.resolve(EObjectOrProxy, element) as AbstractModule
+					val revision = linker.<Revision>link(rev, REVISION_DATE__DATE) [ revisionName |
+						val revision = resolved.substatements.filter(Revision).findFirst[it.revision == revisionName.toString]
+						if (revision === null) {
+							return null
+						}
+						return new EObjectDescription(QualifiedName.create(revision.revision), revision, emptyMap)
+					]
+					if (revision !== null && !revision.eIsProxy) {
+						return it
+					}
 				}
 			}
 			val iter = candidates.iterator
@@ -386,6 +391,7 @@ class ScopeContextProvider {
 			}
 			return result
 		]
+		
 		val prefix = element.substatements.filter(Prefix).head?.prefix
 		
 		if (importedModule instanceof Submodule) {

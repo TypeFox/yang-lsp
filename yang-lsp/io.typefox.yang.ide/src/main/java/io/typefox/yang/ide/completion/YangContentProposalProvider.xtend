@@ -31,6 +31,11 @@ import static io.typefox.yang.yang.YangPackage.Literals.*
 
 import static extension io.typefox.yang.utils.YangNameUtils.*
 import static extension org.eclipse.xtext.EcoreUtil2.*
+import io.typefox.yang.yang.AbstractImport
+import org.eclipse.xtext.EcoreUtil2
+import io.typefox.yang.yang.Revision
+import io.typefox.yang.yang.Description
+import org.eclipse.xtext.ide.editor.contentassist.ContentAssistEntry
 
 class YangContentProposalProvider extends IdeContentProposalProvider {
 
@@ -59,12 +64,27 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 			if (ereference !== null && currentModel !== null) {
 				if (YangPackage.Literals.SCHEMA_NODE_IDENTIFIER__SCHEMA_NODE === ereference) {
 					computeIdentifierRefProposals(reference, context, acceptor)
+				} else if (YangPackage.Literals.REVISION_DATE__DATE === ereference) {
+					computeRevisionProposals(reference, context, acceptor) 
 				} else {
 					val scope = scopeProvider.getScope(currentModel, ereference)
 
 					crossrefProposalProvider.lookupCrossReference(scope, reference, context, acceptor,
 						getCrossrefFilter(reference, context))
 				}
+			}
+		}
+	}
+	
+	def computeRevisionProposals(CrossReference reference, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
+		val imp = EcoreUtil2.getContainerOfType(context.currentModel, AbstractImport)
+		if (imp !== null && imp.module !== null && !imp.module.eIsProxy) {
+			for (rev : imp.module.substatements.filter(Revision)) {
+				val entry = this.proposalCreator.createProposal(rev.revision, context) => [
+					documentation = rev.substatements.filter(Description).head?.description
+					kind = ContentAssistEntry.KIND_REFERENCE
+				]
+				acceptor.accept(entry, proposalPriorities.getDefaultPriority(entry))
 			}
 		}
 	}

@@ -132,7 +132,7 @@ Import:
 	
 // 7.1.5.1
 RevisionDate:
-	'revision-date' date=StringValue StatementEnd
+	'revision-date' date=[Revision|StringValue] StatementEnd
 ;
 
 // 7.1.6
