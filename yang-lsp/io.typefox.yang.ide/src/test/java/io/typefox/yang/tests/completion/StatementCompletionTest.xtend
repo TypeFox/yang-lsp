@@ -1,9 +1,13 @@
 package io.typefox.yang.tests.completion
 
+import com.google.common.base.Splitter
 import io.typefox.yang.tests.AbstractYangLSPTest
+import java.util.Date
 import org.eclipse.xtext.ide.server.Document
 import org.eclipse.xtext.testing.TestCompletionConfiguration
 import org.junit.Test
+
+import static io.typefox.yang.utils.YangDateUtils.getRevisionDateFormat
 
 class StatementCompletionTest extends AbstractYangLSPTest {
 
@@ -108,17 +112,18 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 	}
 
 	@Test def void testStatement_05() {
+		val now = now;
 		testCompletion(MODEL.createConfiguration('/*05*/', [
 			'''
 				description (Creates a new "description" statement.) -> description "${1:}";$0
 				 [[5, 6] .. [5, 6]]
 				import (Creates a new "import" statement.) -> import ${1:} {
 				  prefix ${1:};
-				  revision-date ${2:2017}-${3:07}-${4:25};
+				  revision-date ${2:«now.get(0)»}-${3:«now.get(1)»}-${4:«now.get(2)»};
 				}$0
 				 [[5, 6] .. [5, 6]]
 				include (Creates a new "include" statement.) -> include ${1:} {
-				  revision-date ${2:2017}-${3:07}-${4:25};
+				  revision-date ${2:«now.get(0)»}-${3:«now.get(1)»}-${4:«now.get(2)»};
 				}$0
 				 [[5, 6] .. [5, 6]]
 				reference (Creates a new "reference" statement.) -> reference "${1:}";$0
@@ -141,6 +146,7 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 	}
 
 	@Test def void testStatement_07() {
+		val now = now;
 		testCompletion(MODEL.createConfiguration('/*07*/', [
 			'''
 				anyxml (Creates a new "anyxml" statement.) -> anyxml ${1:xml};$0
@@ -204,7 +210,7 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				 [[10, 6] .. [10, 6]]
 				reference (Creates a new "reference" statement.) -> reference "${1:}";$0
 				 [[10, 6] .. [10, 6]]
-				revision (Creates a new "revision" statement.) -> revision ${1:2017}-${2:07}-${3:25} {
+				revision (Creates a new "revision" statement.) -> revision ${1:«now.get(0)»}-${2:«now.get(1)»}-${3:«now.get(2)»} {
 				  description "${4}";$0
 				}
 				 [[10, 6] .. [10, 6]]
@@ -697,6 +703,10 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 			column = position.character
 			expectedCompletionItems = expected.apply().toString
 		];
+	}
+	
+	private def getNow() {
+		Splitter.on('-').trimResults.splitToList(revisionDateFormat.format(new Date()));
 	}
 
 }
