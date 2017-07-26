@@ -6,6 +6,7 @@ import io.typefox.yang.yang.Action
 import io.typefox.yang.yang.Anydata
 import io.typefox.yang.yang.Anyxml
 import io.typefox.yang.yang.Argument
+import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Base
 import io.typefox.yang.yang.BelongsTo
 import io.typefox.yang.yang.Bit
@@ -47,6 +48,7 @@ import io.typefox.yang.yang.Position
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Presence
 import io.typefox.yang.yang.Reference
+import io.typefox.yang.yang.Refine
 import io.typefox.yang.yang.RequireInstance
 import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.RevisionDate
@@ -57,6 +59,7 @@ import io.typefox.yang.yang.Submodule
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.Units
+import io.typefox.yang.yang.Uses
 import io.typefox.yang.yang.Value
 import io.typefox.yang.yang.YangVersion
 import io.typefox.yang.yang.YinElement
@@ -74,6 +77,8 @@ import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
 import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
 import org.eclipse.xtext.formatting2.regionaccess.internal.TextSegment
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
+import io.typefox.yang.yang.SchemaNodeIdentifier
+import io.typefox.yang.yang.Unique
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -204,6 +209,10 @@ class YangFormatter extends AbstractFormatter2 {
         formatStatement(l)
     }
     
+    def dispatch void format(Augment a, extension IFormattableDocument it) {
+        formatIdentifier(a.path)
+        formatStatement(a)
+    }
     def dispatch void format(Uses u, extension IFormattableDocument it) {
         if (u.grouping !== null) {
             u.grouping.regionFor.crossRef(groupingRefAccess.nodeGroupingCrossReference_0).surround[oneSpace]
@@ -259,6 +268,11 @@ class YangFormatter extends AbstractFormatter2 {
     def dispatch void format(Anyxml a, extension IFormattableDocument it) {
         a.regionFor.assignment(anyxmlAccess.nameAssignment_1).surround[oneSpace]
         formatStatement(a)
+    }
+    
+    def dispatch void format(Refine r, extension IFormattableDocument it) {
+        formatIdentifier(r.node)
+        formatStatement(r)
     }
     
     def dispatch void format(Rpc r, extension IFormattableDocument it) {
@@ -322,7 +336,7 @@ class YangFormatter extends AbstractFormatter2 {
     }
     
     def dispatch void format(Deviation d, extension IFormattableDocument it) {
-        d.regionFor.assignment(deviationAccess.referenceAssignment_1).surround[oneSpace]
+        formatIdentifier(d.reference)
         formatStatement(d)
     }
     
@@ -355,7 +369,6 @@ class YangFormatter extends AbstractFormatter2 {
         s.regionFor.assignment(positionAccess.ordinalAssignment_1).surround[oneSpace]
         formatStatement(s)
     }
-    
     
     def dispatch void format(RequireInstance s, extension IFormattableDocument it) {
         s.regionFor.assignment(requireInstanceAccess.isRequireInstanceAssignment_1).surround[oneSpace]
@@ -397,9 +410,16 @@ class YangFormatter extends AbstractFormatter2 {
         formatStatement(s)
     }
     
+    def dispatch void format(Unique u, extension IFormattableDocument it) {
+        for (reference : u.references) {
+            formatIdentifier(reference)
+        }
+        formatStatement(u)
+    }
+    
     // Tools
     
-    def formatMultilineString(extension IFormattableDocument it, Statement s, Assignment a) {
+    protected def formatMultilineString(extension IFormattableDocument it, Statement s, Assignment a) {
         val region = s.regionFor.assignment(a)
         if (MultilineStringReplacer.isConcatenation(region.text)) {
             return;
@@ -408,7 +428,7 @@ class YangFormatter extends AbstractFormatter2 {
         addReplacer(new MultilineStringReplacer(textRegion))
     }
     
-    def void formatStatement(extension IFormattableDocument it, Statement s) {
+    protected def void formatStatement(extension IFormattableDocument it, Statement s) {
         s.regionFor.keyword(statementEndAccess.semicolonKeyword_1)
             .prepend[noSpace; highPriority]
             
@@ -423,7 +443,7 @@ class YangFormatter extends AbstractFormatter2 {
         formatSubstatements(s)
     }
     
-    def formatSubstatements(extension IFormattableDocument it, Statement s) {
+    protected def formatSubstatements(extension IFormattableDocument it, Statement s) {
         val condensed = s instanceof Enum
         	
         for (substatement : s.substatements) {
@@ -436,7 +456,19 @@ class YangFormatter extends AbstractFormatter2 {
         }
     }
     
-    def TextSegment textRegion(ISemanticRegion region) {
+    protected def formatIdentifier(extension IFormattableDocument it, SchemaNodeIdentifier id) {
+        if (id === null) {
+            return;
+        }
+        val nodeRegions = id.regionForEObject.allSemanticRegions.toList
+        nodeRegions.head.prepend[oneSpace]
+        nodeRegions.last.append[oneSpace]
+        if (nodeRegions.length > 1) {
+            nodeRegions.tail.take(nodeRegions.length - 2).forEach[surround[noSpace]]
+        }
+    }
+    
+    protected def TextSegment textRegion(ISemanticRegion region) {
         return new TextSegment(getTextRegionAccess(), region.offset, region.length)
     }
     

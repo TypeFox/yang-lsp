@@ -510,7 +510,7 @@ class YangFormatterTest extends AbstractYangTest {
                   rpc agoj {
                     input {
                       uses foobar {
-                        augment outer/inner {
+                        augment   outer / inner  {
                           leaf bar {
                             type string;
                           }
