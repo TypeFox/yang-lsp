@@ -5,7 +5,12 @@ import io.typefox.yang.documentation.DocumentationProvider
 import io.typefox.yang.scoping.IScopeContext
 import io.typefox.yang.scoping.ScopeContext.MapScope
 import io.typefox.yang.scoping.ScopeContextProvider
+import io.typefox.yang.services.YangGrammarAccess
 import io.typefox.yang.validation.SubstatementRuleProvider
+import io.typefox.yang.yang.AbstractImport
+import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Description
+import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.Statement
@@ -15,11 +20,13 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtext.AbstractElement
 import org.eclipse.xtext.CrossReference
+import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.GrammarUtil
 import org.eclipse.xtext.Keyword
 import org.eclipse.xtext.ParserRule
 import org.eclipse.xtext.RuleCall
 import org.eclipse.xtext.ide.editor.contentassist.ContentAssistContext
+import org.eclipse.xtext.ide.editor.contentassist.ContentAssistEntry
 import org.eclipse.xtext.ide.editor.contentassist.IIdeContentProposalAcceptor
 import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider
 import org.eclipse.xtext.naming.QualifiedName
@@ -31,11 +38,9 @@ import static io.typefox.yang.yang.YangPackage.Literals.*
 
 import static extension io.typefox.yang.utils.YangNameUtils.*
 import static extension org.eclipse.xtext.EcoreUtil2.*
-import io.typefox.yang.yang.AbstractImport
-import org.eclipse.xtext.EcoreUtil2
-import io.typefox.yang.yang.Revision
-import io.typefox.yang.yang.Description
-import org.eclipse.xtext.ide.editor.contentassist.ContentAssistEntry
+import org.eclipse.xtext.formatting.IWhitespaceInformationProvider
+import io.typefox.yang.yang.Prefix
+import io.typefox.yang.yang.Module
 
 class YangContentProposalProvider extends IdeContentProposalProvider {
 
@@ -45,6 +50,8 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 	@Inject extension DocumentationProvider
 	@Inject ScopeContextProvider scopeContextProvider
 	@Inject SubstatementRuleProvider ruleProvider
+	@Inject YangGrammarAccess grammarAccess
+	@Inject IWhitespaceInformationProvider whitespaceInformation
 
 	override protected _createProposals(RuleCall ruleCall, ContentAssistContext context,
 		IIdeContentProposalAcceptor acceptor) {
@@ -53,6 +60,37 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 				createProposals(kw, context, acceptor)
 			}
 		}
+	}
+	
+	override protected _createProposals(Keyword keyword, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
+		if (keyword === grammarAccess.importAccess.importKeyword_0) {
+			val module = EcoreUtil2.getContainerOfType(context.currentModel, AbstractModule)
+			val scopeCtx = scopeContextProvider.getScopeContext(module)
+			val indentString = whitespaceInformation.getIndentationInformation(context.resource.URI).indentString
+			for (e : scopeCtx.moduleScope.allElements) {
+				val m = EcoreUtil.resolve(e.EObjectOrProxy, context.resource) as AbstractModule
+				if (m instanceof Module && m !== module) {
+					val rev = m.substatements.filter(Revision).sortBy[revision].reverseView.head
+					val entry = new ContentAssistEntry() => [
+						prefix = context.prefix;
+						label = "import "+e.qualifiedName
+						proposal = '''
+							import «e.qualifiedName» {
+								prefix «m.substatements.filter(Prefix).head?.prefix»;
+								«IF rev!==null»
+									revision-date «rev.revision»;
+								«ENDIF»
+							}
+						'''.toString.replaceAll('  ', indentString);
+						description = "module "+m.name
+						documentation = m.documentation
+						kind = ContentAssistEntry.KIND_MODULE
+					];
+					acceptor.accept(entry, this.proposalPriorities.getDefaultPriority(entry)+1)
+				}
+			}
+		}
+		super._createProposals(keyword, context, acceptor)
 	}
 
 	override protected _createProposals(CrossReference reference, ContentAssistContext context,
