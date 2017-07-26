@@ -275,5 +275,41 @@ class ModuleLinkingTest extends AbstractYangTest {
 		assertSame(m2.root, m.root.substatementsOfType(BelongsTo).head.module)
 	}
 	
+	@Test def void testMultiModuleRevisions() {
+		val m = load('''
+			module xt11 {
+			  namespace "urn:xt11";
+			  prefix "xt11";
+			
+			  import xt10 {
+			    prefix x1;
+			    revision-date 2009-01-01;
+			  }
+			
+			  import xt10 {
+			    prefix x2;
+			    revision-date "2009-02-01";
+			  }
+			
+			}
+		''')
+		val m2 = load('''
+			module xt10 {
+				revision "2009-01-01" {
+				}
+			}
+		''')
+		val m3 = load('''
+			module xt10 {
+				revision 2009-01-01 {
+				}
+				revision 2009-02-01 {
+				}
+			}
+		''')
+		assertSame(m2.root, m.root.substatementsOfType(Import).get(0).module)
+		assertSame(m3.root, m.root.substatementsOfType(Import).get(1).module)
+	}
+	
 	
 }

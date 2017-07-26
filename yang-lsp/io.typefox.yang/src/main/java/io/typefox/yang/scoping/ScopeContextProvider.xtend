@@ -373,11 +373,15 @@ class ScopeContextProvider {
 				for (it : candidates) {
 					val resolved = EcoreUtil.resolve(EObjectOrProxy, element) as AbstractModule
 					val revision = linker.<Revision>link(rev, REVISION_DATE__DATE) [ revisionName |
-						val revision = resolved.substatements.filter(Revision).findFirst[it.revision == revisionName.toString]
-						if (revision === null) {
+						val revisions = resolved.substatements.filter(Revision)
+						if (revisions.isEmpty) {
 							return null
 						}
-						return new EObjectDescription(QualifiedName.create(revision.revision), revision, emptyMap)
+						val bestRevision = revisions.maxBy[revision]
+						if (bestRevision.revision != revisionName.toString) {
+							return null
+						}
+						return new EObjectDescription(QualifiedName.create(bestRevision.revision), bestRevision, emptyMap)
 					]
 					if (revision !== null && !revision.eIsProxy) {
 						return it

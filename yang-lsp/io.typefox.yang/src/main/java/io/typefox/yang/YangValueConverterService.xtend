@@ -18,6 +18,11 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 		return stringValueConverter;
 	}
 	
+	@ValueConverter(rule = "StringValue")
+	public def IValueConverter<String> StringValue2() {
+		return stringValueConverter;
+	}
+	
 	static class StringConverter implements IValueConverter<String>, IValueConverter.RuleSpecific {
 		
 		override toString(String value) throws ValueConverterException {
@@ -27,10 +32,8 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 			return  ""
 		}
 		
-		static val char[] quotes = newCharArrayOfSize(2) => [
-			set(0, '"')
-			set(1,'\'')
-		]
+		static val char[] quotes = #['"','\'']
+		
 		override toValue(String string, INode node) throws ValueConverterException {
 			val result = new StringBuilder
 			for (n : node.leafNodes) {
