@@ -63,6 +63,7 @@ import io.typefox.yang.yang.YinElement
 import java.util.List
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.eclipse.xtext.Assignment
+import org.eclipse.xtext.formatting.IIndentationInformation
 import org.eclipse.xtext.formatting2.AbstractFormatter2
 import org.eclipse.xtext.formatting2.FormatterPreferenceKeys
 import org.eclipse.xtext.formatting2.FormatterRequest
@@ -77,16 +78,16 @@ import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 class YangFormatter extends AbstractFormatter2 {
     
     @Inject extension YangGrammarAccess
+    @Inject IIndentationInformation indentationInformation
     
     // Defaults
 
-    static val INDENTATION = "  "
     public static val MAX_LINE_LENGTH = 72
 
     override protected initialize(FormatterRequest request) {
         val preferences = request.preferences
         if (preferences instanceof MapBasedPreferenceValues) {
-            preferences.put(FormatterPreferenceKeys.indentation, INDENTATION)
+            preferences.put(FormatterPreferenceKeys.indentation, indentationInformation.indentString)
         }
         super.initialize(request)
     }
