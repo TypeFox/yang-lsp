@@ -4,12 +4,14 @@
 package io.typefox.yang
 
 import io.typefox.yang.documentation.DocumentationProvider
+import io.typefox.yang.formatting2.YangIndentationInformation
 import io.typefox.yang.resource.YangResource
 import io.typefox.yang.scoping.QualifiedNameConverter
 import io.typefox.yang.scoping.ResourceDescriptionStrategy
 import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.validation.ResourceValidator
 import org.eclipse.xtext.documentation.IEObjectDocumentationProvider
+import org.eclipse.xtext.formatting.IIndentationInformation
 import org.eclipse.xtext.naming.IQualifiedNameConverter
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy
 import org.eclipse.xtext.validation.ConfigurableIssueCodesProvider
@@ -46,6 +48,10 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 
 	def Class<? extends IEObjectDocumentationProvider> bindIEObjectDocumentationProvider() {
 		DocumentationProvider
+	}
+	
+	def Class< ? extends IIndentationInformation> bindIIndentationInformation() {
+		return YangIndentationInformation;
 	}
 
 }

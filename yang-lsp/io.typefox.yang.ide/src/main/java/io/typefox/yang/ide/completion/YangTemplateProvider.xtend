@@ -1,7 +1,7 @@
 package io.typefox.yang.ide.completion
 
+import com.google.common.base.Preconditions
 import com.google.common.base.Splitter
-import com.google.common.base.Suppliers
 import com.google.common.collect.HashMultimap
 import com.google.common.collect.Multimap
 import com.google.inject.Singleton
@@ -10,15 +10,12 @@ import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.EqualsHashCode
 import org.eclipse.xtend.lib.annotations.ToString
 import org.eclipse.xtext.ide.editor.contentassist.ContentAssistEntry
-import org.eclipse.xtext.xbase.lib.Functions.Function1
 
-import static com.google.common.base.CaseFormat.*
 import static io.typefox.yang.utils.YangDateUtils.*
 
 import static extension com.google.common.collect.Multimaps.unmodifiableMultimap
 import static extension io.typefox.yang.ide.completion.ContentAssistEntryUtils.*
 import static extension io.typefox.yang.utils.YangNameUtils.escapeModuleName
-import static extension java.lang.reflect.Modifier.*
 
 /**
  * Template provider for YANG.
@@ -35,7 +32,7 @@ class YangTemplateProvider {
 	val Multimap<String, (ContentAssistEntry)=>Template> templates;
 
 	new() {
-		templates = YangTemplates.ALL_TEMPLATES.get;
+		templates = YangTemplates.ALL_TEMPLATES;
 	}
 
 	/**
@@ -46,6 +43,11 @@ class YangTemplateProvider {
 		return templates.get(entry.proposal ?: entry.label).map[apply(entry)];
 	}
 
+	/**
+	 * Bare minimum representation of a template.
+	 * <p>
+	 * The templates uses two spaces {@code /\s\s/} as indentations at the definition-site.
+	 */
 	@EqualsHashCode
 	@Accessors(PACKAGE_GETTER)
 	@ToString(skipNulls=true)
@@ -56,27 +58,31 @@ class YangTemplateProvider {
 		String documentation;
 		String description;
 
+		package new() {
+		}
+
+		package new(String label) {
+			this.label = Preconditions.checkNotNull(label, 'label');
+			description = '''Creates a new "«label»" statement.''';
+		}
+
 	}
 
 	/**
 	 * All the available YANG templates.
 	 */
-	package static interface YangTemplates {
+	package static class YangTemplates {
 
-		val ALL_TEMPLATES = Suppliers.memoize [
-			val templates = HashMultimap.create;
-			val nameConverter = [String name|UPPER_UNDERSCORE.converterTo(LOWER_HYPHEN).convert(name)];
-			YangTemplates.declaredFields.filter[modifiers.static && modifiers.public && type === Function1].map [
-				nameConverter.apply(name) -> get(null) as Function1<? super ContentAssistEntry, ? extends Template>
-			].forEach [
-				templates.put(key, value);
-			];
-			return templates.unmodifiableMultimap;
-		];
+		private static def register(Multimap<String, (ContentAssistEntry)=>Template> map, String key,
+			(ContentAssistEntry)=>Template it) {
 
-		val (ContentAssistEntry)=>Template MODULE = [
+			map.put(key, it);
+			return map;
+		}
+
+		static val ALL_TEMPLATES = HashMultimap.<String, (ContentAssistEntry)=>Template>create.register('module', [
 			val moduleName = resourceName.escapeModuleName ?: 'module-name';
-			new Template() => [
+			new Template('module') => [
 				template = '''
 					module ${1:«moduleName»} {
 					  yang-version 1.1;
@@ -91,13 +97,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.1: https://tools.ietf.org/html/rfc7950#section-7.1
 				''';
-				label = 'module';
-				description = 'Creates a new "module" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template YANG_VERSION = [
-			new Template() => [
+		]).register('yang-version', [
+			new Template('yang-version') => [
 				template = '''
 					yang-version ${1:1.1};$0
 				''';
@@ -106,15 +108,11 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.1.2: https://tools.ietf.org/html/rfc7950#section-7.1.2
 				''';
-				label = 'yang-version';
-				description = 'Creates a new "yang-version" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template NAMESPACE = [
+		]).register('namespace', [
 			val moduleName = resourceName.escapeModuleName ?: 'urn:namespace';
 			val uri = '''urn:ietf:params:xml:ns:yang:«moduleName»''';
-			new Template() => [
+			new Template('namespace') => [
 				template = '''
 					namespace ${1:«uri»};$0
 				''';
@@ -123,14 +121,10 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.1.3: https://tools.ietf.org/html/rfc7950#section-7.1.3
 				''';
-				label = 'namespace';
-				description = 'Creates a new "namespace" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template PREFIX = [
+		]).register('prefix', [
 			val moduleName = resourceName.escapeModuleName ?: 'prefix';
-			new Template() => [
+			new Template('prefix') => [
 				template = '''
 					prefix ${1:«moduleName»};$0
 				''';
@@ -139,14 +133,10 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.1.4: https://tools.ietf.org/html/rfc7950#section-7.1.4
 				''';
-				label = 'prefix';
-				description = 'Creates a new "prefix" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template IMPORT = [
+		]).register('import', [
 			val segments = Splitter.on('-').trimResults.splitToList(revisionDateFormat.format(new Date)).iterator;
-			new Template() => [
+			new Template('import') => [
 				template = '''
 					import ${1:} {
 					  prefix ${1:};
@@ -158,14 +148,10 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.1.5: https://tools.ietf.org/html/rfc7950#section-7.1.5
 				''';
-				label = 'import';
-				description = 'Creates a new "import" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template INCLUDE = [
+		]).register('include', [
 			val segments = Splitter.on('-').trimResults.splitToList(revisionDateFormat.format(new Date)).iterator;
-			new Template() => [
+			new Template('include') => [
 				template = '''
 					include ${1:} {
 					  revision-date ${2:«segments.next»}-${3:«segments.next»}-${4:«segments.next»};
@@ -176,13 +162,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.1.6: https://tools.ietf.org/html/rfc7950#section-7.1.6
 				''';
-				label = 'include';
-				description = 'Creates a new "include" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template ORGANIZATION = [
-			new Template() => [
+		]).register('organization', [
+			new Template('organization') => [
 				template = '''
 					organization "${1:}";$0
 				''';
@@ -191,13 +173,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.1.7: https://tools.ietf.org/html/rfc7950#section-7.1.7
 				''';
-				label = 'organization';
-				description = 'Creates a new "organization" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template CONTACT = [
-			new Template() => [
+		]).register('contact', [
+			new Template('contact') => [
 				template = '''
 					contact "${1:}";$0
 				''';
@@ -206,14 +184,10 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.1.8: https://tools.ietf.org/html/rfc7950#section-7.1.8
 				''';
-				label = 'contact';
-				description = 'Creates a new "contact" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template REVISION = [
+		]).register('revision', [
 			val segments = Splitter.on('-').trimResults.splitToList(revisionDateFormat.format(new Date)).iterator;
-			new Template() => [
+			new Template('revision') => [
 				template = '''
 					revision ${1:«segments.next»}-${2:«segments.next»}-${3:«segments.next»} {
 					  description "${4}";$0
@@ -224,15 +198,11 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.1.9: https://tools.ietf.org/html/rfc7950#section-7.1.9
 				''';
-				label = 'revision';
-				description = 'Creates a new "revision" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template SUBMODULE = [
+		]).register('submodule', [
 			val moduleName = resourceName.escapeModuleName ?: 'module-name';
 			val uri = '''urn:ietf:params:xml:ns:yang:«moduleName»''';
-			new Template() => [
+			new Template('submodule') => [
 				template = '''
 					submodule ${1:«moduleName»} {
 					  yang-version 1.1;
@@ -248,13 +218,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.2: https://tools.ietf.org/html/rfc7950#section-7.2
 				''';
-				label = 'submodule';
-				description = 'Creates a new "submodule" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template BELONGS_TO = [
-			new Template() => [
+		]).register('belongs-to', [
+			new Template('belongs-to') => [
 				template = '''
 					belongs-to ${1:} {
 					  prefix ${1:};
@@ -265,13 +231,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.2.2: https://tools.ietf.org/html/rfc7950#section-7.2.2
 				''';
-				label = 'submodule';
-				description = 'Creates a new "submodule" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template TYPEDEF = [
-			new Template() => [
+		]).register('typedef', [
+			new Template('typedef') => [
 				template = '''
 					typedef ${1:type-name} {
 					  type ${2:};$0
@@ -282,13 +244,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.3: https://tools.ietf.org/html/rfc7950#section-7.3
 				''';
-				label = 'typedef';
-				description = 'Creates a new "typedef" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template UNITS = [
-			new Template() => [
+		]).register('units', [
+			new Template('units') => [
 				template = '''
 					units ${1:unit};$0
 				'''
@@ -297,13 +255,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.3.3: https://tools.ietf.org/html/rfc7950#section-7.3.3
 				''';
-				label = 'units';
-				description = 'Creates a new "units" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template DEFAULT = [
-			new Template() => [
+		]).register('default', [
+			new Template('default') => [
 				template = '''
 					default ${1:};$0
 				'''
@@ -312,13 +266,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.3.4: https://tools.ietf.org/html/rfc7950#section-7.3.4
 				''';
-				label = 'default';
-				description = 'Creates a new "default" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template TYPE = [
-			new Template() => [
+		]).register('type', [
+			new Template('type') => [
 				template = '''
 					type ${1:type-name};$0
 				''';
@@ -327,13 +277,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.4: https://tools.ietf.org/html/rfc7950#section-7.4
 				''';
-				label = 'type';
-				description = 'Creates a new "type" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template CONTAINER = [
-			new Template() => [
+		]).register('container', [
+			new Template('container') => [
 				template = '''
 					container ${1:container-name} {
 					  $0
@@ -344,13 +290,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.5: https://tools.ietf.org/html/rfc7950#section-7.5
 				''';
-				label = 'container';
-				description = 'Creates a new "container" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template MUST = [
-			new Template() => [
+		]).register('must', [
+			new Template('must') => [
 				template = '''
 					must "${1:expression}";$0
 				''';
@@ -359,13 +301,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.5.3: https://tools.ietf.org/html/rfc7950#section-7.5.3
 				''';
-				label = 'must';
-				description = 'Creates a new "must" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template ERROR_MESSAGE = [
-			new Template() => [
+		]).register('error-message', [
+			new Template('error-message') => [
 				template = '''
 					error-message "${1:error-message}";$0
 				''';
@@ -374,13 +312,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.5.4.1: https://tools.ietf.org/html/rfc7950#section-7.5.4.1
 				''';
-				label = 'error-message';
-				description = 'Creates a new "error-message" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template ERROR_APP_TAG = [
-			new Template() => [
+		]).register('error-app-tag', [
+			new Template('error-app-tag') => [
 				template = '''
 					error-app-tag ${1:error-app-tag};$0
 				''';
@@ -389,13 +323,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.5.4.2: https://tools.ietf.org/html/rfc7950#section-7.5.4.2
 				''';
-				label = 'error-app-tag';
-				description = 'Creates a new "error-app-tag" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template PRESENCE = [
-			new Template() => [
+		]).register('presence', [
+			new Template('presence') => [
 				template = '''
 					presence ${1:meaning};$0
 				''';
@@ -404,13 +334,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.5.5: https://tools.ietf.org/html/rfc7950#section-7.5.5
 				''';
-				label = 'presence';
-				description = 'Creates a new "presence" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template LEAF = [
-			new Template() => [
+		]).register('leaf', [
+			new Template('leaf') => [
 				template = '''
 					leaf ${1:leaf-name} {
 					  type ${2:type-name} {
@@ -423,13 +349,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.6: https://tools.ietf.org/html/rfc7950#section-7.6
 				''';
-				label = 'leaf';
-				description = 'Creates a new "leaf" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template MANDATORY = [
-			new Template() => [
+		]).register('mandatory', [
+			new Template('mandatory') => [
 				template = '''
 					mandatory ${1:true};$0
 				''';
@@ -438,13 +360,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.6.5: https://tools.ietf.org/html/rfc7950#section-7.6.5
 				''';
-				label = 'mandatory';
-				description = 'Creates a new "mandatory" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template LEAF_LIST = [
-			new Template() => [
+		]).register('leaf-list', [
+			new Template('leaf-list') => [
 				template = '''
 					leaf-list ${1:leaf-list-name} {
 					  type ${2:type-name} {
@@ -457,13 +375,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.7: https://tools.ietf.org/html/rfc7950#section-7.7
 				''';
-				label = 'leaf-list';
-				description = 'Creates a new "leaf-list" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template MIN_ELEMENTS = [
-			new Template() => [
+		]).register('min-elements', [
+			new Template('min-elements') => [
 				template = '''
 					min-elements ${1:0};$0
 				''';
@@ -472,13 +386,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.7.5: https://tools.ietf.org/html/rfc7950#section-7.7.5
 				''';
-				label = 'min-elements';
-				description = 'Creates a new "min-elements" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template MAX_ELEMENTS = [
-			new Template() => [
+		]).register('max-elements', [
+			new Template('max-elements') => [
 				template = '''
 					max-elements ${1:unbounded};$0
 				''';
@@ -487,13 +397,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.7.6: https://tools.ietf.org/html/rfc7950#section-7.7.6
 				''';
-				label = 'max-elements';
-				description = 'Creates a new "max-elements" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template ORDERED_BY = [
-			new Template() => [
+		]).register('ordered-by', [
+			new Template('ordered-by') => [
 				template = '''
 					ordered-by ${1:system};$0
 				''';
@@ -502,13 +408,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.7.7: https://tools.ietf.org/html/rfc7950#section-7.7.7
 				''';
-				label = 'ordered-by';
-				description = 'Creates a new "ordered-by" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template LIST = [
-			new Template() => [
+		]).register('list', [
+			new Template('list') => [
 				template = '''
 					list ${1:list-name} {
 					  $0
@@ -519,13 +421,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.8: https://tools.ietf.org/html/rfc7950#section-7.8
 				''';
-				label = 'list';
-				description = 'Creates a new "list" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template KEY = [
-			new Template() => [
+		]).register('key', [
+			new Template('key') => [
 				template = '''
 					key ${1:};$0
 				''';
@@ -534,13 +432,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.8.2: https://tools.ietf.org/html/rfc7950#section-7.8.2
 				''';
-				label = 'key';
-				description = 'Creates a new "key" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template UNIQUE = [
-			new Template() => [
+		]).register('unique', [
+			new Template('unique') => [
 				template = '''
 					unique ${1:}$2;$0
 				''';
@@ -549,13 +443,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.8.3: https://tools.ietf.org/html/rfc7950#section-7.8.3
 				''';
-				label = 'unique';
-				description = 'Creates a new "unique" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template CHOICE = [
-			new Template() => [
+		]).register('choice', [
+			new Template('choice') => [
 				template = '''
 					choice ${1:choice-name} {
 					  $0
@@ -566,13 +456,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.8.3: https://tools.ietf.org/html/rfc7950#section-7.8.3
 				''';
-				label = 'choice';
-				description = 'Creates a new "choice" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template CASE = [
-			new Template() => [
+		]).register('case', [
+			new Template('case') => [
 				template = '''
 					case ${1:case-name} {
 					  $0
@@ -583,13 +469,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.9.1: https://tools.ietf.org/html/rfc7950#section-7.9.2
 				''';
-				label = 'case';
-				description = 'Creates a new "case" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template ANYDATA = [
-			new Template() => [
+		]).register('anydata', [
+			new Template('anydata') => [
 				template = '''
 					anydata ${1:data};$0
 				''';
@@ -598,13 +480,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.10: https://tools.ietf.org/html/rfc7950#section-7.10
 				''';
-				label = 'anydata';
-				description = 'Creates a new "anydata" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template ANYXML = [
-			new Template() => [
+		]).register('anyxml', [
+			new Template('anyxml') => [
 				template = '''
 					anyxml ${1:xml};$0
 				''';
@@ -613,13 +491,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.11: https://tools.ietf.org/html/rfc7950#section-7.11
 				''';
-				label = 'anyxml';
-				description = 'Creates a new "anyxml" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template GROUPING = [
-			new Template() => [
+		]).register('grouping', [
+			new Template('grouping') => [
 				template = '''
 					grouping ${1:grouping-name} {
 					  $0
@@ -630,13 +504,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.12: https://tools.ietf.org/html/rfc7950#section-7.12
 				''';
-				label = 'grouping';
-				description = 'Creates a new "grouping" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template USES = [
-			new Template() => [
+		]).register('uses', [
+			new Template('uses') => [
 				template = '''
 					uses ${1:group-name} {
 					  $0
@@ -647,13 +517,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.13: https://tools.ietf.org/html/rfc7950#section-7.13
 				''';
-				label = 'uses';
-				description = 'Creates a new "uses" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template REFINE = [
-			new Template() => [
+		]).register('refine', [
+			new Template('refine') => [
 				template = '''
 					uses ${1:node-} {
 					  $0
@@ -664,13 +530,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.13.2: https://tools.ietf.org/html/rfc7950#section-7.13.2
 				''';
-				label = 'refine';
-				description = 'Creates a new "refine" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template RPC = [
-			new Template() => [
+		]).register('rpc', [
+			new Template('rpc') => [
 				template = '''
 					rpc ${1:rpc-name} {
 					  $0
@@ -681,13 +543,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.14: https://tools.ietf.org/html/rfc7950#section-7.14
 				''';
-				label = 'rpc';
-				description = 'Creates a new "rpc" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template INPUT = [
-			new Template() => [
+		]).register('input', [
+			new Template('input') => [
 				template = '''
 					input {
 					  $0
@@ -698,13 +556,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.14.2: https://tools.ietf.org/html/rfc7950#section-7.14.2
 				''';
-				label = 'input';
-				description = 'Creates a new "input" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template OUTPUT = [
-			new Template() => [
+		]).register('output', [
+			new Template('output') => [
 				template = '''
 					output {
 					  $0
@@ -715,13 +569,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.14.3: https://tools.ietf.org/html/rfc7950#section-7.14.3
 				''';
-				label = 'output';
-				description = 'Creates a new "output" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template ACTION = [
-			new Template() => [
+		]).register('action', [
+			new Template('action') => [
 				template = '''
 					action ${1:action-name} {
 					  $0
@@ -732,13 +582,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.15: https://tools.ietf.org/html/rfc7950#section-7.15
 				''';
-				label = 'action';
-				description = 'Creates a new "action" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template NOTIFICATION = [
-			new Template() => [
+		]).register('notification', [
+			new Template('notification') => [
 				template = '''
 					notification ${1:action-name} {
 					  $0
@@ -749,13 +595,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.16: https://tools.ietf.org/html/rfc7950#section-7.16
 				''';
-				label = 'notification';
-				description = 'Creates a new "notification" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template AUGMENT = [
-			new Template() => [
+		]).register('augment', [
+			new Template('augment') => [
 				template = '''
 					augment ${1:} {
 					  $0
@@ -766,13 +608,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.17: https://tools.ietf.org/html/rfc7950#section-7.17
 				''';
-				label = 'augment';
-				description = 'Creates a new "augment" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template IDENTITY = [
-			new Template() => [
+		]).register('identity', [
+			new Template('identity') => [
 				template = '''
 					identity ${1:identity-name} {
 					  $0
@@ -783,13 +621,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.18: https://tools.ietf.org/html/rfc7950#section-7.18
 				''';
-				label = 'identity';
-				description = 'Creates a new "identity" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template BASE = [
-			new Template() => [
+		]).register('base', [
+			new Template('base') => [
 				template = '''
 					base ${1:};$0
 				''';
@@ -798,13 +632,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.18.2: https://tools.ietf.org/html/rfc7950#section-7.18.2
 				''';
-				label = 'base';
-				description = 'Creates a new "base" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template EXTENSION = [
-			new Template() => [
+		]).register('extension', [
+			new Template('extension') => [
 				template = '''
 					extension ${1:extension-name} {
 					  $0
@@ -815,13 +645,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.19: https://tools.ietf.org/html/rfc7950#section-7.19
 				''';
-				label = 'extension';
-				description = 'Creates a new "extension" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template ARGUMENT = [
-			new Template() => [
+		]).register('argument', [
+			new Template('argument') => [
 				template = '''
 					argument ${1:argument-name} {
 					  $0
@@ -832,13 +658,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.19.2: https://tools.ietf.org/html/rfc7950#section-7.19.2
 				''';
-				label = 'argument';
-				description = 'Creates a new "argument" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template YIN_ELEMENT = [
-			new Template() => [
+		]).register('yin-element', [
+			new Template('yin-element') => [
 				template = '''
 					yin-element ${1:yin-element-name} {
 					  $0
@@ -849,13 +671,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.19.2.2: https://tools.ietf.org/html/rfc7950#section-7.19.2.2
 				''';
-				label = 'yin-element';
-				description = 'Creates a new "yin-element" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template FEATURE = [
-			new Template() => [
+		]).register('feature', [
+			new Template('feature') => [
 				template = '''
 					feature ${1:feature-name} {
 					  $0
@@ -866,13 +684,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.20.1: https://tools.ietf.org/html/rfc7950#section-7.20.1
 				''';
-				label = 'feature';
-				description = 'Creates a new "feature" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template IF_FEATURE = [
-			new Template() => [
+		]).register('if-feature', [
+			new Template('if-feature') => [
 				template = '''
 					if-feature ${1:}$2;$0
 				''';
@@ -881,13 +695,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.20.2: https://tools.ietf.org/html/rfc7950#section-7.20.2
 				''';
-				label = 'if-feature';
-				description = 'Creates a new "if-feature" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template DEVIATION = [
-			new Template() => [
+		]).register('deviation', [
+			new Template('deviation') => [
 				template = '''
 					deviation ${1:node-identifier} {
 					  deviate ${2:deviate-action} {
@@ -901,13 +711,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.20.3: https://tools.ietf.org/html/rfc7950#section-7.20.3
 				''';
-				label = 'deviation';
-				description = 'Creates a new "deviation" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template DEVIATE = [
-			new Template() => [
+		]).register('deviate', [
+			new Template('deviate') => [
 				template = '''
 					deviate ${1:deviate-action} {
 					  $2
@@ -918,13 +724,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.20.3.2: https://tools.ietf.org/html/rfc7950#section-7.20.3.2
 				''';
-				label = 'deviate';
-				description = 'Creates a new "deviate" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template CONFIG = [
-			new Template() => [
+		]).register('config', [
+			new Template('config') => [
 				template = '''
 					config ${1:false};$0
 				''';
@@ -933,13 +735,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.21.1: https://tools.ietf.org/html/rfc7950#section-7.21.1
 				''';
-				label = 'config';
-				description = 'Creates a new "config" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template STATUS = [
-			new Template() => [
+		]).register('status', [
+			new Template('status') => [
 				template = '''
 					status ${1:current};$0
 				''';
@@ -948,13 +746,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.21.2: https://tools.ietf.org/html/rfc7950#section-7.21.2
 				''';
-				label = 'status';
-				description = 'Creates a new "status" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template DESCRIPTION = [
-			new Template() => [
+		]).register('description', [
+			new Template('description') => [
 				template = '''
 					description "${1:}";$0
 				''';
@@ -963,13 +757,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.21.3: https://tools.ietf.org/html/rfc7950#section-7.21.3
 				''';
-				label = 'description';
-				description = 'Creates a new "description" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template REFERENCE = [
-			new Template() => [
+		]).register('reference', [
+			new Template('reference') => [
 				template = '''
 					reference "${1:}";$0
 				''';
@@ -978,13 +768,9 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.21.4: https://tools.ietf.org/html/rfc7950#section-7.21.4
 				''';
-				label = 'reference';
-				description = 'Creates a new "reference" statement.';
 			];
-		];
-
-		val (ContentAssistEntry)=>Template WHEN = [
-			new Template() => [
+		]).register('when', [
+			new Template('when') => [
 				template = '''
 					when "${1:expression}";$0
 				''';
@@ -993,10 +779,8 @@ class YangTemplateProvider {
 					
 					RFC 7950, Section 7.21.5: https://tools.ietf.org/html/rfc7950#section-7.21.5
 				''';
-				label = 'when';
-				description = 'Creates a new "when" statement.';
 			];
-		];
+		]).unmodifiableMultimap;
 
 	}
 
