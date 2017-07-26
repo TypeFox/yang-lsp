@@ -419,7 +419,7 @@ class YangFormatter extends AbstractFormatter2 {
     
     // Tools
     
-    protected def formatMultilineString(extension IFormattableDocument it, Statement s, Assignment a) {
+    protected def formatMultilineString(extension IFormattableDocument document, Statement s, Assignment a) {
         val region = s.regionFor.assignment(a)
         if (MultilineStringReplacer.isConcatenation(region.text)) {
             return;
@@ -428,35 +428,25 @@ class YangFormatter extends AbstractFormatter2 {
         addReplacer(new MultilineStringReplacer(textRegion))
     }
     
-    protected def void formatStatement(extension IFormattableDocument it, Statement s) {
-        s.regionFor.keyword(statementEndAccess.semicolonKeyword_1)
-            .prepend[noSpace; highPriority]
+    protected def void formatStatement(extension IFormattableDocument document, Statement it) {
+        regionFor.keyword(statementEndAccess.semicolonKeyword_1).prepend[noSpace; highPriority]
             
-        val leftCurly = s.regionFor.keyword(statementEndAccess.leftCurlyBracketKeyword_0_0)
-        val rightCurly = s.regionFor.keyword(statementEndAccess.rightCurlyBracketKeyword_0_2)
+        val leftCurly = regionFor.keyword(statementEndAccess.leftCurlyBracketKeyword_0_0)
+        val rightCurly = regionFor.keyword(statementEndAccess.rightCurlyBracketKeyword_0_2)
 
         interior(
             leftCurly,
-            rightCurly.prepend[newLine]
-        ) [indent]
+            rightCurly.prepend[newLine],
+            [indent]
+        ) 
         // continue
-        formatSubstatements(s)
+        substatements.forEach[
+            prepend[setNewLines(1, 1, 2)]
+            format
+        ]
     }
     
-    protected def formatSubstatements(extension IFormattableDocument it, Statement s) {
-        val condensed = s instanceof Enum
-        	
-        for (substatement : s.substatements) {
-            if (condensed) {
-                substatement.prepend[setNewLines(1, 1, 2)]
-            } else {
-                substatement.prepend[setNewLines(2, 2, 3)]
-            }
-            substatement.format
-        }
-    }
-    
-    protected def formatIdentifier(extension IFormattableDocument it, SchemaNodeIdentifier id) {
+    protected def formatIdentifier(extension IFormattableDocument document, SchemaNodeIdentifier id) {
         if (id === null) {
             return;
         }

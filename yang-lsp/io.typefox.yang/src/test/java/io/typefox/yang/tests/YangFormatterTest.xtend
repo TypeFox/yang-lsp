@@ -13,14 +13,19 @@ class YangFormatterTest extends AbstractYangTest {
 		assertFormatted[
 			expectation = '''
 				module mytestid {
-				
+				  yang-version 1.1;
 				  yang-version 1.1;
 				
 				  yang-version 1.1;
 				}
 			'''
 			toBeFormatted = '''
-				module  mytestid  { yang-version   1.1 ; yang-version   1.1 ; }
+				module  mytestid  { yang-version   1.1 ; yang-version   1.1 ; 
+				
+				
+				
+				yang-version 1.1;
+				}
 			'''
 		]
 	}
@@ -30,7 +35,6 @@ class YangFormatterTest extends AbstractYangTest {
         assertFormatted[
             expectation = '''
                 module mytestid {
-                
                   description
                     "35-columns------------------------ 35-columns------------------------
                      15-columns---- 35-columns------------------------
@@ -52,7 +56,6 @@ class YangFormatterTest extends AbstractYangTest {
         assertFormatted[
             expectation = '''
                 module mytestid {
-                
                   description
                     "35-columns------------------------ 15-columns----";
                 }
@@ -70,7 +73,6 @@ class YangFormatterTest extends AbstractYangTest {
         assertFormatted[
             expectation = '''
                 module mytestid {
-                
                   description
                     "35-columns------------------------
                      
@@ -93,7 +95,6 @@ class YangFormatterTest extends AbstractYangTest {
         assertFormatted[
             expectation = '''
                 module mytestid {
-                
                   description
                     "35-columns------------------------
                      100-columns----------------------------------------------------------------------------------------
@@ -115,11 +116,9 @@ class YangFormatterTest extends AbstractYangTest {
         assertFormatted[
             expectation = '''
                 module mytestid {
-                
                   yang-version 1.1;
-                
                   module mytestid {
-                
+                    yang-version 1.1;
                     yang-version 1.1;
                 
                     yang-version 1.1;
@@ -127,7 +126,11 @@ class YangFormatterTest extends AbstractYangTest {
                 }
             '''
             toBeFormatted = '''
-                module  mytestid  { yang-version   1.1 ; module  mytestid  { yang-version   1.1 ; yang-version   1.1 ; } }
+                module  mytestid  { yang-version   1.1 ; module  mytestid  { yang-version   1.1 ; yang-version   1.1 ; 
+                
+                
+                yang-version 1.1;
+                } }
             '''
         ]
     }
@@ -194,7 +197,6 @@ class YangFormatterTest extends AbstractYangTest {
         assertFormatted[
             expectation = '''
                 module ietf-inet-types {
-                
                   organization
                     "IETF NETMOD (NETCONF Data Modeling Language) Working Group";
                 }
@@ -213,9 +215,7 @@ class YangFormatterTest extends AbstractYangTest {
         assertFormatted[
             expectation = '''
                 module ietf-inet-types {
-                
                   namespace "urn:ietf:params:xml:ns:yang:ietf-inet-types";
-                
                   prefix "inet";
                 }
             '''
@@ -235,7 +235,6 @@ class YangFormatterTest extends AbstractYangTest {
         assertFormatted[
             expectation = '''
                 module ietf-inet-types {
-                
                   contact
                     "WG Web:   <http://tools.ietf.org/wg/netmod/>
                      WG List:  <mailto:netmod@ietf.org>
@@ -282,6 +281,8 @@ class YangFormatterTest extends AbstractYangTest {
             '''
             toBeFormatted = '''
                 module ietf-inet-types {
+                    
+                    
                   reference                    "RFC 6021: Common YANG Data Types";
                 }
             '''
@@ -295,14 +296,12 @@ class YangFormatterTest extends AbstractYangTest {
                 module ietf-inet-types {
                 
                   revision 2013-07-15 {
-                
                     description
                       "This revision adds the following new data types:
                        - ip-address-no-zone
                        - ipv4-address-no-zone
                        - ipv6-address-no-zone
                       ";
-                
                     reference
                       "RFC 6991: Common YANG Data Types";
                   }
@@ -333,9 +332,7 @@ class YangFormatterTest extends AbstractYangTest {
                 module ietf-inet-types {
                 
                   typedef ip-version {
-                
                     type enumeration {
-                
                       enum unknown {
                         value "0";
                         description
@@ -343,27 +340,23 @@ class YangFormatterTest extends AbstractYangTest {
                            protocol.
                           ";
                       }
-                
                       enum ipv4 {
                         value "1";
                         description
                           "The IPv4 protocol as defined in RFC 791.";
                       }
-                
                       enum ipv6 {
                         value "2";
                         description
                           "The IPv6 protocol as defined in RFC 2460.";
                       }
                     }
-                
                     description
                       "This value represents the version of the IP protocol.
                        
                        In the value set and its semantics, this type is equivalent
                        to the InetVersion textual convention of the SMIv2.
                       ";
-                
                     reference
                       "RFC  791: Internet Protocol
                        RFC 2460: Internet Protocol, Version 6 (IPv6) Specification
@@ -416,15 +409,12 @@ class YangFormatterTest extends AbstractYangTest {
                 module ietf-inet-types {
                 
                   typedef ipv6-address {
-                
                     type string {
-                
                       pattern '((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}'
                             + '((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|'
                             + '(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.){3}'
                             + '(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))'
                             + '(%[\p{N}\p{L}]+)?';
-                
                       pattern '(([^:]+:){6}(([^:]+:[^:]+)|(.*\..*)))|'
                             + '((([^:]+:)*[^:]+)?::(([^:]+:)*[^:]+)?)'
                             + '(%.+)?';
@@ -457,35 +447,22 @@ class YangFormatterTest extends AbstractYangTest {
         assertFormatted[
             expectation = '''
                 module augtest {
-                
                   namespace "http://example.com/augtest";
-                
                   prefix "at";
-                
                   grouping foobar {
-                
                     container outer {
-                
                       container inner {
-                
                         leaf foo {
-                
                           type uint8;
                         }
                       }
                     }
                   }
-                
                   rpc agoj {
-                
                     input {
-                
                       uses foobar {
-                
                         augment outer/inner {
-                
                           leaf bar {
-                
                             type string;
                           }
                         }
