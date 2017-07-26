@@ -6,7 +6,6 @@ import io.typefox.yang.yang.Action
 import io.typefox.yang.yang.Anydata
 import io.typefox.yang.yang.Anyxml
 import io.typefox.yang.yang.Argument
-import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Base
 import io.typefox.yang.yang.BelongsTo
 import io.typefox.yang.yang.Bit
@@ -15,6 +14,7 @@ import io.typefox.yang.yang.Choice
 import io.typefox.yang.yang.Config
 import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Container
+import io.typefox.yang.yang.Default
 import io.typefox.yang.yang.Description
 import io.typefox.yang.yang.Deviate
 import io.typefox.yang.yang.Deviation
@@ -37,19 +37,16 @@ import io.typefox.yang.yang.MaxElements
 import io.typefox.yang.yang.MinElements
 import io.typefox.yang.yang.Modifier
 import io.typefox.yang.yang.Module
-import io.typefox.yang.yang.Must
 import io.typefox.yang.yang.Namespace
 import io.typefox.yang.yang.Notification
 import io.typefox.yang.yang.OrderedBy
 import io.typefox.yang.yang.Organization
 import io.typefox.yang.yang.Output
-import io.typefox.yang.yang.Path
 import io.typefox.yang.yang.Pattern
 import io.typefox.yang.yang.Position
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Presence
 import io.typefox.yang.yang.Reference
-import io.typefox.yang.yang.Refine
 import io.typefox.yang.yang.RequireInstance
 import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.RevisionDate
@@ -60,9 +57,7 @@ import io.typefox.yang.yang.Submodule
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.Units
-import io.typefox.yang.yang.Uses
 import io.typefox.yang.yang.Value
-import io.typefox.yang.yang.When
 import io.typefox.yang.yang.YangVersion
 import io.typefox.yang.yang.YinElement
 import java.util.List
@@ -78,7 +73,6 @@ import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
 import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
 import org.eclipse.xtext.formatting2.regionaccess.internal.TextSegment
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
-import io.typefox.yang.yang.Default
 
 class YangFormatter extends AbstractFormatter2 {
     
