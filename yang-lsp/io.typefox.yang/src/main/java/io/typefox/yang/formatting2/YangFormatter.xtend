@@ -203,6 +203,13 @@ class YangFormatter extends AbstractFormatter2 {
         formatStatement(l)
     }
     
+    def dispatch void format(Uses u, extension IFormattableDocument it) {
+        if (u.grouping !== null) {
+            u.grouping.regionFor.crossRef(groupingRefAccess.nodeGroupingCrossReference_0).surround[oneSpace]
+        }
+        formatStatement(u)
+    }
+    
     def dispatch void format(Container c, extension IFormattableDocument it) {
         c.regionFor.assignment(containerAccess.nameAssignment_1).surround[oneSpace]
         formatStatement(c)

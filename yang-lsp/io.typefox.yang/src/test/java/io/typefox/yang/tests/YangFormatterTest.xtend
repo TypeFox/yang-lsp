@@ -451,4 +451,75 @@ class YangFormatterTest extends AbstractYangTest {
             '''
         ]
     }
+
+    @Test
+    def void testFormatting_15_uses_augment() {
+        assertFormatted[
+            expectation = '''
+                module augtest {
+                
+                  namespace "http://example.com/augtest";
+                
+                  prefix "at";
+                
+                  grouping foobar {
+                
+                    container outer {
+                
+                      container inner {
+                
+                        leaf foo {
+                
+                          type uint8;
+                        }
+                      }
+                    }
+                  }
+                
+                  rpc agoj {
+                
+                    input {
+                
+                      uses foobar {
+                
+                        augment outer/inner {
+                
+                          leaf bar {
+                
+                            type string;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+            '''
+            toBeFormatted = '''
+                module augtest {
+                  namespace "http://example.com/augtest";
+                  prefix "at";
+                  grouping foobar {
+                    container outer {
+                      container inner {
+                        leaf foo {
+                          type uint8;
+                        }
+                      }
+                    }
+                  }
+                  rpc agoj {
+                    input {
+                      uses foobar {
+                        augment outer/inner {
+                          leaf bar {
+                            type string;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+            '''
+        ]
+    }
 }
