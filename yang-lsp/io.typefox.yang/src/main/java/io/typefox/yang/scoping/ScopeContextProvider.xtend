@@ -301,7 +301,7 @@ class ScopeContextProvider {
 					}
 					return true
 				].head
-				if (result.userDataKeys.contains(NO_CONFIG_USER_DATA) === isConfig) {
+				if (result !== null && result.userDataKeys.contains(NO_CONFIG_USER_DATA) === isConfig) {
 					validator.addIssue(node, YangPackage.Literals.KEY_REFERENCE__NODE, "The list's keys must have the same `config` value as the list itself.", IssueCodes.INVALID_CONFIG)
 				}
 				return result

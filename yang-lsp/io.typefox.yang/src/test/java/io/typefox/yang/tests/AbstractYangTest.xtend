@@ -76,11 +76,20 @@ abstract class AbstractYangTest {
 		validator.assertNoIssues(eObject)
 	}
 
+	protected def Resource loadWithSyntaxErrors(CharSequence contents) {
+		load(contents, true)
+	}
+	
 	protected def Resource load(CharSequence contents) {
+		load(contents, false)
+	}
+	
+	protected def Resource load(CharSequence contents, boolean allowErrors) {
 		val uri = URI.createURI("synthetic:///__synthetic" + resourceSet.resources.size + ".yang")
 		val resource = resourceHelper.resource(contents.toString, uri, resourceSet)
 		resource.load(emptyMap)
-		Assert.assertTrue(resource.errors.join('\n')[message], resource.errors.empty)
+		if (!allowErrors)
+			Assert.assertTrue(resource.errors.join('\n')[message], resource.errors.empty)
 		return resource
 	}
 
