@@ -521,7 +521,7 @@ class YangTemplateProvider {
 		]).register('refine', [
 			new Template('refine') => [
 				template = '''
-					uses ${1:node-} {
+					refine ${1:} {
 					  $0
 					}
 				''';
