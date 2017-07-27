@@ -122,7 +122,6 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				if (elementIndex.filter[k, v|v.id == eid].size > 0) {
 					LOG.debug(eid + " ALREADY EXISTS!!!")
 				}
-
 				elementIndex.put(statement, element)
 				rootChildren.add(element)
 			}
