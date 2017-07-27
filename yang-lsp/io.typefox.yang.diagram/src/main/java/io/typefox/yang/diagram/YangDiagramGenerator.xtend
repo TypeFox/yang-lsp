@@ -56,6 +56,7 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.util.CancelIndicator
+import io.typefox.yang.yang.impl.UsesImpl
 
 class YangDiagramGenerator implements IDiagramGenerator {
 	static val LOG = Logger.getLogger(YangDiagramGenerator)
@@ -118,9 +119,9 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			element = generateElement(statement, viewParentElement, modelParentElement)
 			if (element !== null) {
 				val eid = element.id
-				LOG.debug("CREATED ELEMENT FOR statement:" + statement.toString + " WITH ID " + eid)
+				LOG.info("CREATED ELEMENT FOR statement:" + statement.toString + " WITH ID " + eid)
 				if (elementIndex.filter[k, v|v.id == eid].size > 0) {
-					LOG.debug(eid + " ALREADY EXISTS!!!")
+					LOG.info(eid + " ALREADY EXISTS!!!")
 				}
 				elementIndex.put(statement, element)
 				rootChildren.add(element)
@@ -197,42 +198,41 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def dispatch SModelElement generateElement(Augment augmentStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		val SchemaNodeIdentifier schemaNodeIdentifier = augmentStmt.path
-		val node = NodeModelUtils.getNode(schemaNodeIdentifier)
-		val path = node.leafNodes.filter[!hidden].map[text].join
-		val targetNode = schemaNodeIdentifier.schemaNode
-		val augmentElementId = viewParentElement.id + '-' + targetNode.name + '-augmentation'
-		var SModelElement augmentElement = null
-		var sameAugmentTarget = elementIndex.values.findFirst [ element |
-			element.id == augmentElementId
-		]
-
-		if (sameAugmentTarget !== null) {
-			val sameAugmentTargetCompartment = sameAugmentTarget.children.findFirst [ element |
-				element.type == 'comp:comp'
+		if (modelParentElement instanceof SNode) {
+			val SchemaNodeIdentifier schemaNodeIdentifier = augmentStmt.path
+			val node = NodeModelUtils.getNode(schemaNodeIdentifier)
+			val path = node.leafNodes.filter[!hidden].map[text].join
+			val targetNode = schemaNodeIdentifier.schemaNode
+			val augmentElementId = viewParentElement.id + '-' + targetNode.name + '-augmentation'
+			var SModelElement augmentElement = null
+			var sameAugmentTarget = elementIndex.values.findFirst [ element |
+				element.id == augmentElementId
 			]
-			sameAugmentTargetCompartment.children.addAll(
-				createChildElements(sameAugmentTarget, sameAugmentTargetCompartment, augmentStmt.substatements))
-		} else {
-			augmentElement = createClassElement(augmentStmt, path, augmentElementId, viewParentElement,
-				modelParentElement, COMPOSITION_EDGE_TYPE, findClass(augmentStmt))
-
-			postProcesses.add([
-				val targetElement = elementIndex.get(targetNode)
-				if (targetElement !== null) {
-					modelParentElement.children.add(
-						createEdge(elementIndex.get(augmentStmt), targetElement, AUGMENTS_EDGE_TYPE))
-				}
-			])
+			if (sameAugmentTarget !== null) {
+				val sameAugmentTargetCompartment = sameAugmentTarget.children.findFirst [ element |
+					element.type == 'comp:comp'
+				]
+				sameAugmentTargetCompartment.children.addAll(
+					createChildElements(sameAugmentTarget, sameAugmentTargetCompartment, augmentStmt.substatements))
+			} else {
+				augmentElement = createClassElement(augmentStmt, path, augmentElementId, viewParentElement,
+					modelParentElement, COMPOSITION_EDGE_TYPE, findClass(augmentStmt))
+				postProcesses.add([
+					val targetElement = elementIndex.get(targetNode)
+					val a = elementIndex.get(augmentStmt)
+					if (targetElement !== null) {
+						modelParentElement.children.add(createEdge(a, targetElement, AUGMENTS_EDGE_TYPE))
+					}
+				])
+			}
+			return augmentElement
 		}
-
-		return augmentElement
 	}
 
 	protected def dispatch SModelElement generateElement(Choice choiceStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
 		if (modelParentElement instanceof SNode) {
-			val choiceNode = createClassElementWithHeader(viewParentElement.id, choiceStmt.name, 'choice')
+			val choiceNode = createNodeWithHeadingLabel(viewParentElement.id, choiceStmt.name, 'choice')
 			choiceNode.source = choiceStmt
 			val SEdge toChoiceEdge = createEdge(viewParentElement, choiceNode, DASHED_EDGE_TYPE)
 			modelParentElement.children.add(toChoiceEdge)
@@ -240,7 +240,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				choiceStmt.substatements.forEach([
 					if (!(it instanceof Case)) {
 						if (it instanceof SchemaNode) {
-							val caseElement = createClassElementWithHeader(choiceNode.id + "-" + it.name + "-case",
+							val caseElement = createNodeWithHeadingLabel(choiceNode.id + "-" + it.name + "-case",
 								it.name, 'case')
 							caseElement.source = it
 							val caseCompartment = createClassMemberCompartment(caseElement.id)
@@ -291,19 +291,22 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def dispatch SModelElement generateElement(Uses usesStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		if (modelParentElement instanceof SCompartment) {
-			val SLabel memberElement = configSElement(SLabel,
-				viewParentElement.id + '-uses-' + usesStmt.grouping.node.name, 'text')
-			memberElement.text = 'uses ' + usesStmt.grouping.node.name
-			return memberElement
-		} else {
+		if (modelParentElement instanceof SNode) {
+			val usesElement = createNodeWithHeadingLabel(viewParentElement.id, 'uses ' + usesStmt.grouping.node.name, 'uses')
+			modelParentElement.children.addAll(
+				createChildElements(usesElement, modelParentElement, usesStmt.substatements))
+
+			val SEdge edge = createEdge(viewParentElement, usesElement, COMPOSITION_EDGE_TYPE)
+			modelParentElement.children.add(edge)
+			
 			postProcesses.add([
 				val groupingElement = elementIndex.get(usesStmt.grouping.node)
+				val ue = usesElement
 				// is there a grouping element in this module? If not its usage relates to an external module grouping
 				if (groupingElement !== null)
-					modelParentElement.children.add(createEdge(viewParentElement, groupingElement, USES_EDGE_TYPE))
+					modelParentElement.children.add(createEdge(ue, groupingElement, USES_EDGE_TYPE))
 			])
-			return null
+			return usesElement
 		}
 	}
 
@@ -488,7 +491,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 			val name = stmt.name
 
-			val classElement = createClassElementWithHeader(viewParentElement.id, name, type)
+			val classElement = createNodeWithHeadingLabel(viewParentElement.id, name, type)
 
 			// add class members to compartment element
 			val compartment = createClassMemberCompartment(classElement.id)
@@ -518,7 +521,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		return compartment
 	}
 
-	protected def YangNode createClassElementWithHeader(String id, String name, String type) {
+	protected def YangNode createNodeWithHeadingLabel(String id, String name, String type) {
 		val classElement = configSElement(YangNode, id + '-' + name + '-' + type, type)
 		classElement.layout = 'vbox'
 
@@ -572,6 +575,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			GroupingImpl: 'G'
 			TypedefImpl: 'T'
 			IdentityImpl: 'I'
+			UsesImpl: 'U'
 			default: ''
 		}
 	}
