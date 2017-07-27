@@ -117,6 +117,12 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			var SModelElement element = null
 			element = generateElement(statement, viewParentElement, modelParentElement)
 			if (element !== null) {
+				val eid = element.id
+				LOG.debug("CREATED ELEMENT FOR statement:" + statement.toString + " WITH ID " + eid)
+				if (elementIndex.filter[k, v|v.id == eid].size > 0) {
+					LOG.debug(eid + " ALREADY EXISTS!!!")
+				}
+
 				elementIndex.put(statement, element)
 				rootChildren.add(element)
 			}
@@ -226,34 +232,45 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def dispatch SModelElement generateElement(Choice choiceStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		val choiceNode = createClassElementWithHeader(viewParentElement.id, choiceStmt.name, 'choice')
-		val SEdge toChoiceEdge = createEdge(viewParentElement, choiceNode, DASHED_EDGE_TYPE)
-		modelParentElement.children.add(toChoiceEdge)
+		if (modelParentElement instanceof SNode) {
+			val choiceNode = createClassElementWithHeader(viewParentElement.id, choiceStmt.name, 'choice')
+			choiceNode.source = choiceStmt
+			val SEdge toChoiceEdge = createEdge(viewParentElement, choiceNode, DASHED_EDGE_TYPE)
+			modelParentElement.children.add(toChoiceEdge)
+			if (choiceNode !== null) {
+				choiceStmt.substatements.forEach([
+					if (!(it instanceof Case)) {
+						if (it instanceof SchemaNode) {
+							val caseElement = createClassElementWithHeader(choiceNode.id + "-" + it.name + "-case",
+								it.name, 'case')
+							caseElement.source = it
+							val caseCompartment = createClassMemberCompartment(caseElement.id)
+							caseElement.children.add(caseCompartment)
+							modelParentElement.children.add(caseElement)
+							val toCaseEdge = createEdge(choiceNode, caseElement, DASHED_EDGE_TYPE)
+							modelParentElement.children.add(toCaseEdge)
 
-		if (choiceNode !== null) {
+							caseCompartment.children.addAll(createChildElements(caseElement, caseCompartment, #[it]))
 
-			choiceStmt.substatements.forEach([
-				if (!(it instanceof Case)) {
-					val statement = it as SchemaNode
-					val caseElement = createClassElementWithHeader(choiceNode.id + "-" + statement.name + "-case-",
-						statement.name, 'case')
-					modelParentElement.children.add(caseElement)
-					val toCaseEdge = createEdge(choiceNode, caseElement, DASHED_EDGE_TYPE)
-					modelParentElement.children.add(toCaseEdge)
-					
-					createChildElements(caseElement, modelParentElement, #[it])			
-				}
-			])
-
-			choiceNode.layoutOptions = new LayoutOptions [
-				HAlign = 'center'
-				paddingLeft = 25.0
-				paddingRight = 25.0
-				paddingTop = 20.0
-				paddingBottom = 20.0
-				paddingFactor = 3.0
-			]
-			return choiceNode
+							modelParentElement.children.addAll(
+								createChildElements(caseElement, modelParentElement, #[it]))
+						}
+					} else {
+						modelParentElement.children.add(
+							createTypedElementWithEdge(modelParentElement, choiceNode, (it as SchemaNode), 'case',
+								DASHED_EDGE_TYPE))
+					}
+				])
+				choiceNode.layoutOptions = new LayoutOptions [
+					HAlign = 'center'
+					paddingLeft = 25.0
+					paddingRight = 25.0
+					paddingTop = 20.0
+					paddingBottom = 20.0
+					paddingFactor = 3.0
+				]
+				return choiceNode
+			}
 		}
 	}
 
@@ -482,8 +499,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			modelParentElement.children.addAll(
 				createChildElements(classElement, modelParentElement, stmt.substatements))
 
-			val SEdge compositionEdge = createEdge(viewParentElement, classElement, edgeType)
-			modelParentElement.children.add(compositionEdge)
+			val SEdge edge = createEdge(viewParentElement, classElement, edgeType)
+			modelParentElement.children.add(edge)
 
 			return classElement
 		}
@@ -502,8 +519,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		return compartment
 	}
 
-	protected def SNode createClassElementWithHeader(String id, String name, String type) {
-		val classElement = configSElement(SNode, id + '-' + name + '-' + type, type)
+	protected def YangNode createClassElementWithHeader(String id, String name, String type) {
+		val classElement = configSElement(YangNode, id + '-' + name + '-' + type, type)
 		classElement.layout = 'vbox'
 
 		val headingContainer = configSElement(SCompartment, classElement.id + '-heading', 'comp')
