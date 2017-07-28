@@ -25,11 +25,16 @@ import io.typefox.yang.yang.Grouping
 import io.typefox.yang.yang.Identity
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Include
+import io.typefox.yang.yang.Input
 import io.typefox.yang.yang.Key
 import io.typefox.yang.yang.Leaf
 import io.typefox.yang.yang.LeafList
 import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.Must
+import io.typefox.yang.yang.Notification
+import io.typefox.yang.yang.Output
 import io.typefox.yang.yang.Prefix
+import io.typefox.yang.yang.Rpc
 import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.Statement
@@ -43,10 +48,15 @@ import io.typefox.yang.yang.impl.ChoiceImpl
 import io.typefox.yang.yang.impl.ContainerImpl
 import io.typefox.yang.yang.impl.GroupingImpl
 import io.typefox.yang.yang.impl.IdentityImpl
+import io.typefox.yang.yang.impl.InputImpl
 import io.typefox.yang.yang.impl.ListImpl
 import io.typefox.yang.yang.impl.ModuleImpl
+import io.typefox.yang.yang.impl.NotificationImpl
+import io.typefox.yang.yang.impl.OutputImpl
+import io.typefox.yang.yang.impl.RpcImpl
 import io.typefox.yang.yang.impl.SubmoduleImpl
 import io.typefox.yang.yang.impl.TypedefImpl
+import io.typefox.yang.yang.impl.UsesImpl
 import java.util.ArrayList
 import java.util.HashMap
 import java.util.List
@@ -56,7 +66,8 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.util.CancelIndicator
-import io.typefox.yang.yang.impl.UsesImpl
+import io.typefox.yang.yang.Action
+import io.typefox.yang.yang.impl.ActionImpl
 
 class YangDiagramGenerator implements IDiagramGenerator {
 	static val LOG = Logger.getLogger(YangDiagramGenerator)
@@ -292,13 +303,15 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	protected def dispatch SModelElement generateElement(Uses usesStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
 		if (modelParentElement instanceof SNode) {
-			val usesElement = createNodeWithHeadingLabel(viewParentElement.id, 'uses ' + usesStmt.grouping.node.name, 'uses')
+			val usesElement = createNodeWithHeadingLabel(viewParentElement.id, 'uses ' + usesStmt.grouping.node.name,
+				'pill')
+			usesElement.cssClass = findClass(usesStmt)
 			modelParentElement.children.addAll(
 				createChildElements(usesElement, modelParentElement, usesStmt.substatements))
 
 			val SEdge edge = createEdge(viewParentElement, usesElement, COMPOSITION_EDGE_TYPE)
 			modelParentElement.children.add(edge)
-			
+
 			postProcesses.add([
 				val groupingElement = elementIndex.get(usesStmt.grouping.node)
 				val ue = usesElement
@@ -308,6 +321,63 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			])
 			return usesElement
 		}
+	}
+
+	protected def dispatch SModelElement generateElement(Rpc rpcStmt, SModelElement viewParentElement,
+		SModelElement modelParentElement) {
+		if (modelParentElement instanceof SNode) {
+			val rpcElement = createNodeWithHeadingLabel(viewParentElement.id, 'rpc ' + rpcStmt.name, 'pill')
+			rpcElement.cssClass = findClass(rpcStmt)
+			modelParentElement.children.addAll(
+				createChildElements(rpcElement, modelParentElement, rpcStmt.substatements))
+
+			val SEdge edge = createEdge(viewParentElement, rpcElement, STRAIGHT_EDGE_TYPE)
+			modelParentElement.children.add(edge)
+
+			return rpcElement
+		}
+	}
+
+	protected def dispatch SModelElement generateElement(Action actionStmt, SModelElement viewParentElement,
+		SModelElement modelParentElement) {
+		if (modelParentElement instanceof SNode) {
+			val actionElement = createNodeWithHeadingLabel(viewParentElement.id, 'action ' + actionStmt.name, 'pill')
+			actionElement.cssClass = findClass(actionStmt)
+			modelParentElement.children.addAll(
+				createChildElements(actionElement, modelParentElement, actionStmt.substatements))
+
+			val SEdge edge = createEdge(viewParentElement, actionElement, STRAIGHT_EDGE_TYPE)
+			modelParentElement.children.add(edge)
+
+			return actionElement
+		}
+	}
+
+	protected def dispatch SModelElement generateElement(Input inputStmt, SModelElement viewParentElement,
+		SModelElement modelParentElement) {
+		var id = viewParentElement.id + "-input"
+		var n = 1
+		while(elementIndex.get(id) !== null){
+		    n++
+		    id += '-'+n
+		}
+		return createClassElement(inputStmt, '', id, viewParentElement, modelParentElement, STRAIGHT_EDGE_TYPE, findClass(inputStmt) )
+	}
+
+	protected def dispatch SModelElement generateElement(Output outputStmt, SModelElement viewParentElement,
+		SModelElement modelParentElement) {
+		var id = viewParentElement.id + "-output"
+		var n = 1
+		while(elementIndex.get(id) !== null){
+		    n++
+		    id += '-'+n
+		}
+		return createClassElement(outputStmt, '', id, viewParentElement, modelParentElement, STRAIGHT_EDGE_TYPE, findClass(outputStmt) )
+	}
+
+	protected def dispatch SModelElement generateElement(Notification notificationStmt, SModelElement viewParentElement,
+		SModelElement modelParentElement) {
+		return createClassElement(notificationStmt, viewParentElement, modelParentElement, STRAIGHT_EDGE_TYPE)
 	}
 
 	protected def dispatch SModelElement generateElement(Import importStmt, SModelElement viewParentElement,
@@ -529,8 +599,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		headingContainer.layout = 'vbox'
 		headingContainer.layoutOptions = new LayoutOptions [
 			paddingFactor = 1.0
-			paddingLeft = 0.0
-			paddingRight = 0.0
+			paddingLeft = 10.0
+			paddingRight = 10.0
 			paddingTop = 0.0
 			paddingBottom = 0.0
 		]
@@ -554,6 +624,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			TypedefImpl: 'typedef'
 			ChoiceImpl: 'choice'
 			CaseImpl: 'case'
+			UsesImpl: 'uses'
 			AugmentImpl: 'augment'
 			ListImpl: 'list'
 			ContainerImpl: 'container'
@@ -561,6 +632,11 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			SubmoduleImpl: 'submodule'
 			GroupingImpl: 'grouping'
 			IdentityImpl: 'identity'
+			RpcImpl: 'rpc'
+			InputImpl: 'input'
+			OutputImpl: 'output'
+			NotificationImpl: 'notification'
+			ActionImpl: 'action'
 			default: ''
 		}
 	}
@@ -576,6 +652,9 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			TypedefImpl: 'T'
 			IdentityImpl: 'I'
 			UsesImpl: 'U'
+			NotificationImpl: 'N'
+			InputImpl: 'in'
+			OutputImpl: 'out'
 			default: ''
 		}
 	}
