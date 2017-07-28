@@ -16,6 +16,8 @@ import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsData
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
+import org.eclipse.xtext.testing.formatter.FormatterTestHelper
+import org.eclipse.xtext.testing.formatter.FormatterTestRequest
 import org.eclipse.xtext.testing.util.ResourceHelper
 import org.eclipse.xtext.testing.validation.ValidationTestHelper
 import org.junit.Assert
@@ -31,6 +33,7 @@ abstract class AbstractYangTest {
 	@Inject protected IResourceDescription.Manager mnr
 	@Inject protected ValidationTestHelper validator
 	@Inject extension protected YangExtensions
+	@Inject extension protected FormatterTestHelper
 
 	protected XtextResourceSet resourceSet
 
@@ -128,5 +131,12 @@ abstract class AbstractYangTest {
 		if (resourceDescription !== null) {
 			index.addDescription(uri, resourceDescription)
 		}
+	}
+	
+	protected def assertFormattedWithoutSerialization((FormatterTestRequest)=>void init) {
+	    assertFormatted[
+	        init.apply(it)
+	        useSerializer = false
+	    ]
 	}
 }

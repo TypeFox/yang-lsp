@@ -1,16 +1,12 @@
 package io.typefox.yang.tests
 
-import com.google.inject.Inject
-import org.eclipse.xtext.testing.formatter.FormatterTestHelper
 import org.junit.Test
 
 class YangFormatterTest extends AbstractYangTest {
 
-	@Inject extension protected FormatterTestHelper
-
 	@Test
 	def void testFormatting_01() {
-		assertFormatted[
+		assertFormattedWithoutSerialization[
 			expectation = '''
 				module mytestid {
 				  yang-version 1.1;
@@ -32,7 +28,7 @@ class YangFormatterTest extends AbstractYangTest {
 
     @Test
     def void testFormatting_02_multiline_string_replacement() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
             expectation = '''
                 module mytestid {
                   description
@@ -53,7 +49,7 @@ class YangFormatterTest extends AbstractYangTest {
     
     @Test
     def void testFormatting_03_singleline_description() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
             expectation = '''
                 module mytestid {
                   description
@@ -70,7 +66,7 @@ class YangFormatterTest extends AbstractYangTest {
     
     @Test
     def void testFormatting_04_additional_newlines_description() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
             expectation = '''
                 module mytestid {
                   description
@@ -92,7 +88,7 @@ class YangFormatterTest extends AbstractYangTest {
     
     @Test
     def void testFormatting_05_extra_long_line_description() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
             expectation = '''
                 module mytestid {
                   description
@@ -113,7 +109,7 @@ class YangFormatterTest extends AbstractYangTest {
     
     @Test
     def void testFormatting_06() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
             expectation = '''
                 module mytestid {
                   yang-version 1.1;
@@ -137,7 +133,7 @@ class YangFormatterTest extends AbstractYangTest {
     
     @Test
     def void testFormatting_07() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
                 
@@ -194,7 +190,7 @@ class YangFormatterTest extends AbstractYangTest {
     
     @Test
     def void testFormatting_08_organization() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
                   organization
@@ -212,7 +208,7 @@ class YangFormatterTest extends AbstractYangTest {
     
     @Test
     def void testFormatting_09_namespace_prefix() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
                   namespace "urn:ietf:params:xml:ns:yang:ietf-inet-types";
@@ -232,7 +228,7 @@ class YangFormatterTest extends AbstractYangTest {
     
     @Test
     def void testFormatting_10_contact() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
                   contact
@@ -271,7 +267,7 @@ class YangFormatterTest extends AbstractYangTest {
     
     @Test
     def void testFormatting_11_reference() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
                 
@@ -291,7 +287,7 @@ class YangFormatterTest extends AbstractYangTest {
     
     @Test
     def void testFormatting_12_revision() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
                 
@@ -327,7 +323,7 @@ class YangFormatterTest extends AbstractYangTest {
     
     @Test
     def void testFormatting_13_typedef() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
                 
@@ -404,7 +400,7 @@ class YangFormatterTest extends AbstractYangTest {
 
     @Test
     def void testFormatting_14_pattern() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
                 
@@ -444,7 +440,8 @@ class YangFormatterTest extends AbstractYangTest {
 
     @Test
     def void testFormatting_15_uses_augment() {
-        assertFormatted[
+        assertFormattedWithoutSerialization[
+            useSerializer = false
             expectation = '''
                 module augtest {
                   namespace "http://example.com/augtest";
