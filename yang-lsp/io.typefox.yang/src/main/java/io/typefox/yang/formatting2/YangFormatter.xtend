@@ -53,11 +53,13 @@ import io.typefox.yang.yang.RequireInstance
 import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.RevisionDate
 import io.typefox.yang.yang.Rpc
+import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Status
 import io.typefox.yang.yang.Submodule
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
+import io.typefox.yang.yang.Unique
 import io.typefox.yang.yang.Units
 import io.typefox.yang.yang.Uses
 import io.typefox.yang.yang.Value
@@ -73,12 +75,13 @@ import org.eclipse.xtext.formatting2.FormatterRequest
 import org.eclipse.xtext.formatting2.IFormattableDocument
 import org.eclipse.xtext.formatting2.ITextReplacer
 import org.eclipse.xtext.formatting2.ITextReplacerContext
+import org.eclipse.xtext.formatting2.regionaccess.IComment
 import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
+import org.eclipse.xtext.formatting2.regionaccess.ITextReplacement
 import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
 import org.eclipse.xtext.formatting2.regionaccess.internal.TextSegment
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
-import io.typefox.yang.yang.SchemaNodeIdentifier
-import io.typefox.yang.yang.Unique
+import org.eclipse.xtext.xbase.lib.Functions.Function1
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -95,6 +98,21 @@ class YangFormatter extends AbstractFormatter2 {
             preferences.put(FormatterPreferenceKeys.indentation, indentationInformation.indentString)
         }
         super.initialize(request)
+    }
+    
+    override createCommentReplacer(IComment comment) {
+        if ('"' == comment.text || "'" == comment.text) {
+            return new ITextReplacer {
+                override createReplacements(ITextReplacerContext context) {
+                    return context
+                }
+                
+                override getRegion() {
+                    return comment
+                }
+            }
+        }
+        return super.createCommentReplacer(comment)
     }
     
     // Rules
@@ -181,7 +199,6 @@ class YangFormatter extends AbstractFormatter2 {
     def dispatch void format(Enum e, extension IFormattableDocument it) {
         e.regionFor.assignment(enumAccess.nameAssignment_1).surround[oneSpace]
         formatStatement(e)
-        
     }
     
     def dispatch void format(Value v, extension IFormattableDocument it) {
@@ -451,11 +468,33 @@ class YangFormatter extends AbstractFormatter2 {
             return;
         }
         val nodeRegions = id.regionForEObject.allSemanticRegions.toList
-        nodeRegions.head.prepend[oneSpace]
-        nodeRegions.last.append[oneSpace]
         if (nodeRegions.length > 1) {
             nodeRegions.tail.take(nodeRegions.length - 2).forEach[surround[noSpace]]
         }
+        
+        val previousHiddenRegion = id.regionForEObject.previousHiddenRegion
+        document.replace(previousHiddenRegion) [
+            replaceWith(" " + text.trim)
+        ]
+        
+        val nextHiddenRegion = id.regionForEObject.nextHiddenRegion
+        document.replace(nextHiddenRegion) [
+            replaceWith(text.trim + " ")
+        ]
+    }
+    
+    static def <T extends ITextSegment> replace(IFormattableDocument document, T region, Function1<T, ITextReplacement> replacer) {
+        val thisRegion = region
+        document.addReplacer(new ITextReplacer() {
+            override createReplacements(ITextReplacerContext context) {
+                val replacement = replacer.apply(thisRegion as T)
+                context.addReplacement(replacement)
+                return context
+            }
+            override getRegion() {
+                thisRegion
+            }
+        })
     }
     
     protected def TextSegment textRegion(ISemanticRegion region) {
@@ -477,7 +516,7 @@ class MultilineStringReplacer implements ITextReplacer {
         val currentIndentation = context.indentationString
         val indentation = currentIndentation + defaultIndentation
         val original = segment.text
-        if (original.isConcatenation) {
+        if (!original.isQuoted || original.isConcatenation) {
             return context
         }
         val splitted = original.substring(1, original.length - 1).split("(\\s(?=\\S)|\\n(?!' '))")
@@ -517,9 +556,15 @@ class MultilineStringReplacer implements ITextReplacer {
     }
     
     public static def isConcatenation(String s) {
-        val singleQuoted = s.startsWith("'") && s.endsWith("'")
         val containsPlus = java.util.regex.Pattern.compile("\\n\\s*\\+").matcher(s).find()
-        return singleQuoted && containsPlus
+        return s.isQuoted && containsPlus
+    }
+    
+    public static def isQuoted(String s) {
+        if (s.length < 2) {
+            return false;
+        }
+        return s.startsWith("'") && s.endsWith("'") || s.startsWith('"') && s.endsWith('"')
     }
     
     static def length(List<String> strings)  {

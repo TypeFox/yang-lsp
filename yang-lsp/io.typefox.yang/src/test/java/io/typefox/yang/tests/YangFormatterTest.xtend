@@ -496,4 +496,62 @@ class YangFormatterTest extends AbstractYangTest {
             '''
         ]
     }
+    
+    @Test
+    def void testFormatting_16_augment_path() {
+        assertFormattedWithoutSerialization[
+            expectation = '''
+                module augtest {
+                  namespace "ns";
+                  prefix "at";
+                  grouping foobar {
+                    container outer {
+                      container inner {
+                        leaf foo {
+                          type uint8;
+                        }
+                      }
+                    }
+                  }
+                  rpc agoj {
+                    input {
+                      uses foobar {
+                        augment "outer/inner" {
+                          leaf bar {
+                            type string;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+            '''
+            toBeFormatted = '''
+                module augtest {
+                  namespace "ns";
+                  prefix "at";
+                  grouping foobar {
+                    container outer {
+                      container inner {
+                        leaf foo {
+                          type uint8;
+                        }
+                      }
+                    }
+                  }
+                  rpc agoj {
+                    input {
+                      uses foobar {
+                        augment      " outer / inner "     {
+                          leaf bar {
+                            type string;
+                          }
+                        }
+                      }
+                    }
+                  }
+                }
+            '''
+        ]
+    }
 }
