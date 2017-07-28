@@ -554,4 +554,57 @@ class YangFormatterTest extends AbstractYangTest {
             '''
         ]
     }
+    
+    @Test
+    def void testFormatting_17_indentation() {
+        assertFormattedWithoutSerialization[
+            expectation = '''
+            submodule augment-sub1 {
+              belongs-to augment-super {
+                prefix "as";
+              }
+            
+              include augment-sub0;
+            
+              augment "/interfaces" {
+                list ifEntry {
+                  key "ifIndex";
+            
+                  leaf ifIndex {
+                    type int32;
+                  }
+                }
+                leaf llm1 {
+                  type string;
+                  mandatory true;
+                }
+              }
+            }
+            
+            '''
+            toBeFormatted = '''
+            submodule augment-sub1 {
+              belongs-to augment-super {
+                prefix "as";
+              }
+            
+              include augment-sub0;
+            
+              augment "/interfaces" {
+                list ifEntry {
+                key "ifIndex";
+            
+                leaf ifIndex {
+                  type int32;
+                }
+              }
+                leaf llm1 {
+                type string;
+                mandatory true;
+              }
+              }
+            }
+            '''
+        ]
+    } 
 }
