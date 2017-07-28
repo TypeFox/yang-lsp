@@ -38,11 +38,13 @@ import io.typefox.yang.yang.MaxElements
 import io.typefox.yang.yang.MinElements
 import io.typefox.yang.yang.Modifier
 import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.Must
 import io.typefox.yang.yang.Namespace
 import io.typefox.yang.yang.Notification
 import io.typefox.yang.yang.OrderedBy
 import io.typefox.yang.yang.Organization
 import io.typefox.yang.yang.Output
+import io.typefox.yang.yang.Path
 import io.typefox.yang.yang.Pattern
 import io.typefox.yang.yang.Position
 import io.typefox.yang.yang.Prefix
@@ -63,6 +65,8 @@ import io.typefox.yang.yang.Unique
 import io.typefox.yang.yang.Units
 import io.typefox.yang.yang.Uses
 import io.typefox.yang.yang.Value
+import io.typefox.yang.yang.When
+import io.typefox.yang.yang.XpathExpression
 import io.typefox.yang.yang.YangVersion
 import io.typefox.yang.yang.YinElement
 import java.util.List
@@ -82,6 +86,8 @@ import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
 import org.eclipse.xtext.formatting2.regionaccess.internal.TextSegment
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import org.eclipse.xtext.xbase.lib.Functions.Function1
+import io.typefox.yang.yang.Expression
+import io.typefox.yang.yang.Range
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -207,8 +213,13 @@ class YangFormatter extends AbstractFormatter2 {
     }
     
     def dispatch void format(Length l, extension IFormattableDocument it) {
-        l.regionFor.assignment(lengthAccess.expressionAssignment_1).surround[oneSpace]
+        formatRefinement(l.expression)
         formatStatement(l)
+    }
+    
+    def dispatch void format(Range r, extension IFormattableDocument it) {
+        formatRefinement(r.expression)
+        formatStatement(r)
     }
     
     def dispatch void format(Grouping g, extension IFormattableDocument it) {
@@ -230,6 +241,17 @@ class YangFormatter extends AbstractFormatter2 {
         formatIdentifier(a.path)
         formatStatement(a)
     }
+    
+    def dispatch void format(When w, extension IFormattableDocument it) {
+        formatXpath(w.condition)
+        formatStatement(w)
+    }
+    
+    def dispatch void format(Path p, extension IFormattableDocument it) {
+        formatXpath(p.reference)
+        formatStatement(p)
+    }
+    
     def dispatch void format(Uses u, extension IFormattableDocument it) {
         if (u.grouping !== null) {
             u.grouping.regionFor.crossRef(groupingRefAccess.nodeGroupingCrossReference_0).surround[oneSpace]
@@ -240,6 +262,11 @@ class YangFormatter extends AbstractFormatter2 {
     def dispatch void format(Container c, extension IFormattableDocument it) {
         c.regionFor.assignment(containerAccess.nameAssignment_1).surround[oneSpace]
         formatStatement(c)
+    }
+    
+    def dispatch void format(Must m, extension IFormattableDocument it) {
+        formatXpath(m.constraint)
+        formatStatement(m)
     }
     
     def dispatch void format(Mandatory m, extension IFormattableDocument it) {
@@ -499,6 +526,12 @@ class YangFormatter extends AbstractFormatter2 {
     
     protected def TextSegment textRegion(ISemanticRegion region) {
         return new TextSegment(getTextRegionAccess(), region.offset, region.length)
+    }
+    
+    protected def formatXpath(extension IFormattableDocument document, XpathExpression expression) {
+    }
+    
+    protected def formatRefinement(extension IFormattableDocument document, Expression expression) {
     }
     
 }
