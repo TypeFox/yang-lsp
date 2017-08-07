@@ -19,7 +19,7 @@ class FormattingTest extends AbstractYangLSPTest {
     @Parameters(name= "{0}")
     static def Collection<Object[]> getFiles() {
         val params = newArrayList
-        scan(new File("./src/test/resources/good")) [
+        scan(new File("./src/test/resources")) [
             val arr = <Object>newArrayOfSize(1)
             arr.set(0, it)
             params.add(arr)
@@ -27,9 +27,11 @@ class FormattingTest extends AbstractYangLSPTest {
         return params
     }
     
-    static def void scan(File directory, (File)=>void acceptor) {
-        if (directory.isDirectory) {
-            directory.listFiles.filter[it.isFile].forEach[acceptor.apply(it)]
+    static def void scan(File it, extension (File)=>void acceptor) {
+        if (isDirectory) {
+            val contents = listFiles
+            contents.filter[isFile].forEach[apply]
+            contents.filter[isDirectory].forEach[scan(acceptor)]
         }
     }
     
