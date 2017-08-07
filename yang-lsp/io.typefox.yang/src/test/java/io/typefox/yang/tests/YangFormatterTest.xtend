@@ -5,18 +5,16 @@ import org.junit.Test
 class YangFormatterTest extends AbstractYangTest {
 
 	@Test
-	def void testFormatting_01() {
+	def void testFormatting_01_version() {
 		assertFormattedWithoutSerialization[
 			expectation = '''
 				module mytestid {
-				  yang-version 1.1;
-				  yang-version 1.1;
 				
 				  yang-version 1.1;
 				}
 			'''
 			toBeFormatted = '''
-				module  mytestid  { yang-version   1.1 ; yang-version   1.1 ; 
+				module  mytestid  {
 				
 				
 				
@@ -108,7 +106,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting_06() {
+    def void testFormatting_06_new_lines() {
         assertFormattedWithoutSerialization[
             expectation = '''
                 module mytestid {
@@ -132,7 +130,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting_07() {
+    def void testFormatting_07_description() {
         assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
@@ -232,34 +230,13 @@ class YangFormatterTest extends AbstractYangTest {
             expectation = '''
                 module ietf-inet-types {
                   contact
-                    "WG Web:   <http://tools.ietf.org/wg/netmod/>
-                     WG List:  <mailto:netmod@ietf.org>
-                     
-                     WG Chair: David Kessens
-                     <mailto:david.kessens@nsn.com>
-                     
-                     WG Chair: Juergen Schoenwaelder
-                     <mailto:j.schoenwaelder@jacobs-university.de>
-                     
-                     Editor:   Juergen Schoenwaelder
-                     <mailto:j.schoenwaelder@jacobs-university.de>
-                    ";
+                    "WG Web:   <http://tools.ietf.org/wg/netmod/>";
                 }
             '''
             toBeFormatted = '''
                 module ietf-inet-types {
                   contact
-                   "WG Web:   <http://tools.ietf.org/wg/netmod/>
-                    WG List:  <mailto:netmod@ietf.org>
-                
-                    WG Chair: David Kessens
-                              <mailto:david.kessens@nsn.com>
-                
-                    WG Chair: Juergen Schoenwaelder
-                              <mailto:j.schoenwaelder@jacobs-university.de>
-                
-                    Editor:   Juergen Schoenwaelder
-                              <mailto:j.schoenwaelder@jacobs-university.de>";
+                   "WG Web:   <http://tools.ietf.org/wg/netmod/>";
                 }
             '''
         ]
@@ -605,5 +582,119 @@ class YangFormatterTest extends AbstractYangTest {
             }
             '''
         ]
-    } 
+    }
+    
+    @Test
+    def void testFormatting17_refinable() {
+        assertFormattedWithoutSerialization[
+            expectation = '''
+            module foo {
+              yang-version 1.1;
+              namespace "foo:bar";
+              prefix x;
+            
+              typedef foo {
+                type int32 {
+                  range "1..40 | 60..100";
+                }
+              }
+              typedef foo2 {
+                type foo {
+                  range "4..20";
+                }
+              }
+              typedef bar {
+                type bar {
+                  range 4..20;
+                }
+              }
+            }
+            '''
+            toBeFormatted = '''
+            module foo {
+              yang-version 1.1;
+              namespace "foo:bar";
+              prefix x;
+              
+              typedef foo {
+                type int32 {
+                  range  "1..40 | 60..100" ;
+                }
+              } 
+              typedef foo2 {
+                type foo {
+                  range  "4..20 " ;
+                }
+              }
+              typedef bar {
+                type bar {
+                  range  4..20 ;
+                }
+              }
+            }
+            '''
+        ]
+    }
+    
+    @Test
+    def void testFormatting18_xpath() {
+        assertFormattedWithoutSerialization[
+            expectation = '''
+            module augtest {
+              namespace "http://example.com/augtest";
+              prefix "at";
+              grouping foobar {
+                container outer {
+                  container inner {
+                    leaf foo {
+                      type uint8;
+                    }
+                  }
+                }
+              }
+              rpc agoj {
+                input {
+                  uses foobar {
+                    augment "outer/inner" {
+                      when "foo!=42";
+                      leaf bar {
+                        type string;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            '''
+            toBeFormatted = '''
+            module augtest {
+              namespace "http://example.com/augtest";
+              prefix "at";
+              grouping foobar {
+                container outer {
+                  container inner {
+                    leaf foo {
+                      type uint8;
+                    }
+                  }
+                }
+              }
+              rpc agoj {
+                input {
+                  uses foobar {
+                    augment "outer/inner" {
+                      when   "foo!=42"  ;
+                      leaf bar {
+                        type string;
+                      }
+                    }
+                  }
+                }
+              }
+            }
+
+            '''
+        ]
+    }
 }

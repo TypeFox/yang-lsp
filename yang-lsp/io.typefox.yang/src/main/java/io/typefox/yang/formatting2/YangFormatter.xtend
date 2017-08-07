@@ -496,9 +496,25 @@ class YangFormatter extends AbstractFormatter2 {
     }
     
     protected def formatXpath(extension IFormattableDocument document, XpathExpression expression) {
+        val nodeRegions = expression.allSemanticRegions.toList
+        nodeRegions.head.prepend[oneSpace]
+        val nextSemanticRegion = nodeRegions.last.nextSemanticRegion
+        if (HIDDENRule == nextSemanticRegion.grammarElement) {
+            nextSemanticRegion.prepend[noSpace].append[oneSpace]
+        } else {
+            nodeRegions.last.append[oneSpace]
+        }
     }
     
     protected def formatRefinement(extension IFormattableDocument document, Expression expression) {
+        val nodeRegions = expression.allSemanticRegions.toList
+        nodeRegions.head.prepend[oneSpace]
+        val nextSemanticRegion = nodeRegions.last.nextSemanticRegion
+        if (HIDDENRule == nextSemanticRegion.grammarElement) {
+            nextSemanticRegion.prepend[noSpace].append[oneSpace]
+        } else {
+            nodeRegions.last.append[oneSpace]
+        }
     }
     
 }
