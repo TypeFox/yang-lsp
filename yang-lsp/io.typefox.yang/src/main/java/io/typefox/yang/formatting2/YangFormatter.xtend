@@ -22,6 +22,7 @@ import io.typefox.yang.yang.Deviation
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.ErrorAppTag
 import io.typefox.yang.yang.ErrorMessage
+import io.typefox.yang.yang.Expression
 import io.typefox.yang.yang.Extension
 import io.typefox.yang.yang.Feature
 import io.typefox.yang.yang.FractionDigits
@@ -49,6 +50,7 @@ import io.typefox.yang.yang.Pattern
 import io.typefox.yang.yang.Position
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Presence
+import io.typefox.yang.yang.Range
 import io.typefox.yang.yang.Reference
 import io.typefox.yang.yang.Refine
 import io.typefox.yang.yang.RequireInstance
@@ -79,15 +81,10 @@ import org.eclipse.xtext.formatting2.FormatterRequest
 import org.eclipse.xtext.formatting2.IFormattableDocument
 import org.eclipse.xtext.formatting2.ITextReplacer
 import org.eclipse.xtext.formatting2.ITextReplacerContext
-import org.eclipse.xtext.formatting2.regionaccess.IComment
 import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
-import org.eclipse.xtext.formatting2.regionaccess.ITextReplacement
 import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
 import org.eclipse.xtext.formatting2.regionaccess.internal.TextSegment
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
-import org.eclipse.xtext.xbase.lib.Functions.Function1
-import io.typefox.yang.yang.Expression
-import io.typefox.yang.yang.Range
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -106,20 +103,6 @@ class YangFormatter extends AbstractFormatter2 {
         super.initialize(request)
     }
     
-    override createCommentReplacer(IComment comment) {
-        if ('"' == comment.text || "'" == comment.text) {
-            return new ITextReplacer {
-                override createReplacements(ITextReplacerContext context) {
-                    return context
-                }
-                
-                override getRegion() {
-                    return comment
-                }
-            }
-        }
-        return super.createCommentReplacer(comment)
-    }
     
     // Rules
 
@@ -494,34 +477,18 @@ class YangFormatter extends AbstractFormatter2 {
         if (id === null) {
             return;
         }
-        val nodeRegions = id.regionForEObject.allSemanticRegions.toList
+        
+        val nodeRegions = id.allSemanticRegions.toList
+        nodeRegions.head.prepend[oneSpace]
         if (nodeRegions.length > 1) {
             nodeRegions.tail.take(nodeRegions.length - 2).forEach[surround[noSpace]]
         }
-        
-        val previousHiddenRegion = id.regionForEObject.previousHiddenRegion
-        document.replace(previousHiddenRegion) [
-            replaceWith(" " + text.trim)
-        ]
-        
-        val nextHiddenRegion = id.regionForEObject.nextHiddenRegion
-        document.replace(nextHiddenRegion) [
-            replaceWith(text.trim + " ")
-        ]
-    }
-    
-    static def <T extends ITextSegment> replace(IFormattableDocument document, T region, Function1<T, ITextReplacement> replacer) {
-        val thisRegion = region
-        document.addReplacer(new ITextReplacer() {
-            override createReplacements(ITextReplacerContext context) {
-                val replacement = replacer.apply(thisRegion as T)
-                context.addReplacement(replacement)
-                return context
-            }
-            override getRegion() {
-                thisRegion
-            }
-        })
+        val nextSemanticRegion = nodeRegions.last.nextSemanticRegion
+        if (HIDDENRule == nextSemanticRegion.grammarElement) {
+            nextSemanticRegion.prepend[noSpace].append[oneSpace]
+        } else {
+            nodeRegions.last.append[oneSpace]
+        }
     }
     
     protected def TextSegment textRegion(ISemanticRegion region) {

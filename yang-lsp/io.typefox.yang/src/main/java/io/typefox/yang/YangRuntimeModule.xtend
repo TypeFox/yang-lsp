@@ -14,6 +14,7 @@ import io.typefox.yang.validation.ResourceValidator
 import org.eclipse.xtext.documentation.IEObjectDocumentationProvider
 import org.eclipse.xtext.formatting.IIndentationInformation
 import org.eclipse.xtext.formatting2.FormatterRequest
+import org.eclipse.xtext.formatting2.regionaccess.TextRegionAccessBuilder
 import org.eclipse.xtext.naming.IQualifiedNameConverter
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy
 import org.eclipse.xtext.util.ExceptionAcceptor
@@ -23,6 +24,7 @@ import org.eclipse.xtext.workspace.IProjectConfigProvider
 import org.eclipse.xtext.workspace.ProjectConfigProvider
 import org.eclipse.xtext.preferences.IPreferenceValuesProvider
 import io.typefox.yang.settings.PreferenceValuesProvider
+import io.typefox.yang.formatting2.YangTextRegionAccessBuilder
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
@@ -74,6 +76,10 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 	
 	def Class<? extends IPreferenceValuesProvider> bindIPreferenceValuProvider() {
 		PreferenceValuesProvider
+	}
+	
+	def Class<? extends TextRegionAccessBuilder> bindTextRegionAccessBuilder() {
+	    YangTextRegionAccessBuilder
 	}
 
 }

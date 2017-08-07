@@ -580,7 +580,6 @@ class YangFormatterTest extends AbstractYangTest {
                 }
               }
             }
-            
             '''
             toBeFormatted = '''
             submodule augment-sub1 {
