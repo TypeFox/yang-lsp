@@ -91,9 +91,14 @@ class YangFormatter extends AbstractFormatter2 {
     @Inject extension YangGrammarAccess
     @Inject IIndentationInformation indentationInformation
     
+    // Option Keys
+    
+    public static val FORCE_NEW_LINE = 'FORCE_NEW_LINE'
+    public static val MAX_LINE_LENGTH = 'MAX_LINE_LENGTH'
+    
     // Defaults
 
-    public static val MAX_LINE_LENGTH = 72
+    public static val MAX_LINE_LENGTH_DEFAULT = 72
 
     override protected initialize(FormatterRequest request) {
         val preferences = request.preferences
@@ -540,7 +545,7 @@ class MultilineStringReplacer implements ITextReplacer {
         val lines = <List<String>> newArrayList(currentLine)
         for (s : splitted) {
             val currentLength = currentLine.length
-            if (currentLength + s.length > YangFormatter.MAX_LINE_LENGTH || s.length > YangFormatter.MAX_LINE_LENGTH) {
+            if (currentLength + s.length > YangFormatter.MAX_LINE_LENGTH_DEFAULT || s.length > YangFormatter.MAX_LINE_LENGTH_DEFAULT) {
                 lines += (currentLine = <String> newLinkedList())
             } else if (s.trim.empty) {
                 lines += (currentLine = <String> newLinkedList())

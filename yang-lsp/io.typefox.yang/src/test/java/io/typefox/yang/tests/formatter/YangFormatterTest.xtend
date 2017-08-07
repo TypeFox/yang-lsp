@@ -1,11 +1,12 @@
-package io.typefox.yang.tests
+package io.typefox.yang.tests.formatter
 
+import io.typefox.yang.tests.AbstractYangTest
 import org.junit.Test
 
 class YangFormatterTest extends AbstractYangTest {
 
 	@Test
-	def void testFormatting_01_version() {
+	def void test_version() {
 		assertFormattedWithoutSerialization[
 			expectation = '''
 				module mytestid {
@@ -25,88 +26,7 @@ class YangFormatterTest extends AbstractYangTest {
 	}
 
     @Test
-    def void testFormatting_02_multiline_string_replacement() {
-        assertFormattedWithoutSerialization[
-            expectation = '''
-                module mytestid {
-                  description
-                    "35-columns------------------------ 35-columns------------------------
-                     15-columns---- 35-columns------------------------
-                     35-columns------------------------ 15-columns---- 15-columns----
-                     35-columns------------------------
-                    ";
-                }
-            '''
-            toBeFormatted = '''
-                module mytestid {
-                        description "35-columns------------------------ 35-columns------------------------ 15-columns---- 35-columns------------------------ 35-columns------------------------ 15-columns---- 15-columns---- 35-columns------------------------";
-                }
-            '''
-        ]
-    }
-    
-    @Test
-    def void testFormatting_03_singleline_description() {
-        assertFormattedWithoutSerialization[
-            expectation = '''
-                module mytestid {
-                  description
-                    "35-columns------------------------ 15-columns----";
-                }
-            '''
-            toBeFormatted = '''
-                module mytestid {
-                    description        "35-columns------------------------ 15-columns----";
-                }
-            '''
-        ]
-    }
-    
-    @Test
-    def void testFormatting_04_additional_newlines_description() {
-        assertFormattedWithoutSerialization[
-            expectation = '''
-                module mytestid {
-                  description
-                    "35-columns------------------------
-                     
-                     15-columns----
-                    ";
-                }
-            '''
-            toBeFormatted = '''
-                module mytestid {
-                    description        "35-columns------------------------
-                    
-                    15-columns----";
-                }
-            '''
-        ]
-    }
-    
-    @Test
-    def void testFormatting_05_extra_long_line_description() {
-        assertFormattedWithoutSerialization[
-            expectation = '''
-                module mytestid {
-                  description
-                    "35-columns------------------------
-                     100-columns----------------------------------------------------------------------------------------
-                     15-columns----
-                    ";
-                }
-            '''
-            toBeFormatted = '''
-                module mytestid {
-                    description        "35-columns------------------------ 100-columns----------------------------------------------------------------------------------------
-                    15-columns----";
-                }
-            '''
-        ]
-    }
-    
-    @Test
-    def void testFormatting_06_new_lines() {
+    def void test_new_lines() {
         assertFormattedWithoutSerialization[
             expectation = '''
                 module mytestid {
@@ -130,7 +50,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting_07_description() {
+    def void test_description() {
         assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
@@ -140,22 +60,7 @@ class YangFormatterTest extends AbstractYangTest {
                   prefix "inet";
                 
                   description
-                    "This module contains a collection of generally useful derived
-                     YANG data types for Internet addresses and related things.
-                     
-                     Copyright (c) 2013 IETF Trust and the persons identified as
-                     authors of the code.  All rights reserved.
-                     
-                     Redistribution and use in source and binary forms, with or
-                     without modification, is permitted pursuant to, and subject
-                     to the license terms contained in, the Simplified BSD License
-                     set forth in Section 4.c of the IETF Trust's Legal Provisions
-                     Relating to IETF Documents
-                     (http://trustee.ietf.org/license-info).
-                     
-                     This version of this YANG module is part of RFC 6991; see
-                     the RFC itself for full legal notices.
-                    ";
+                    "This module contains a collection of generally useful derived...";
                 }
             '''
             toBeFormatted = '''
@@ -166,28 +71,14 @@ class YangFormatterTest extends AbstractYangTest {
                   prefix "inet";
                 
                   description
-                   "This module contains a collection of generally useful derived
-                    YANG data types for Internet addresses and related things.
-                
-                    Copyright (c) 2013 IETF Trust and the persons identified as
-                    authors of the code.  All rights reserved.
-                
-                    Redistribution and use in source and binary forms, with or
-                    without modification, is permitted pursuant to, and subject
-                    to the license terms contained in, the Simplified BSD License
-                    set forth in Section 4.c of the IETF Trust's Legal Provisions
-                    Relating to IETF Documents
-                    (http://trustee.ietf.org/license-info).
-                
-                    This version of this YANG module is part of RFC 6991; see
-                    the RFC itself for full legal notices.";
+                "This module contains a collection of generally useful derived...";
                 }
             '''
         ]
     }
     
     @Test
-    def void testFormatting_08_organization() {
+    def void test_organization() {
         assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
@@ -205,7 +96,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting_09_namespace_prefix() {
+    def void test_namespace_and_prefix() {
         assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
@@ -225,7 +116,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting_10_contact() {
+    def void test_contact() {
         assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
@@ -243,7 +134,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting_11_reference() {
+    def void test_reference() {
         assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
@@ -263,7 +154,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting_12_revision() {
+    def void test_revision() {
         assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
@@ -299,7 +190,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting_13_typedef() {
+    def void test_typedef() {
         assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
@@ -376,21 +267,15 @@ class YangFormatterTest extends AbstractYangTest {
     }
 
     @Test
-    def void testFormatting_14_pattern() {
+    def void test_pattern() {
         assertFormattedWithoutSerialization[
             expectation = '''
                 module ietf-inet-types {
                 
                   typedef ipv6-address {
                     type string {
-                      pattern '((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}'
-                            + '((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|'
-                            + '(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.){3}'
-                            + '(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))'
-                            + '(%[\p{N}\p{L}]+)?';
-                      pattern '(([^:]+:){6}(([^:]+:[^:]+)|(.*\..*)))|'
-                            + '((([^:]+:)*[^:]+)?::(([^:]+:)*[^:]+)?)'
-                            + '(%.+)?';
+                      pattern 
+                        '(([^:]+:){6}(([^:]+:[^:]+)|(.*\..*)))';
                     }
                   }
                 }
@@ -400,14 +285,7 @@ class YangFormatterTest extends AbstractYangTest {
                 
                   typedef ipv6-address {
                     type string {
-                      pattern '((:|[0-9a-fA-F]{0,4}):)([0-9a-fA-F]{0,4}:){0,5}'
-                            + '((([0-9a-fA-F]{0,4}:)?(:|[0-9a-fA-F]{0,4}))|'
-                            + '(((25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])\.){3}'
-                            + '(25[0-5]|2[0-4][0-9]|[01]?[0-9]?[0-9])))'
-                            + '(%[\p{N}\p{L}]+)?';
-                      pattern '(([^:]+:){6}(([^:]+:[^:]+)|(.*\..*)))|'
-                            + '((([^:]+:)*[^:]+)?::(([^:]+:)*[^:]+)?)'
-                            + '(%.+)?';
+                      pattern '(([^:]+:){6}(([^:]+:[^:]+)|(.*\..*)))';
                     }
                   }
                 }
@@ -416,7 +294,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
 
     @Test
-    def void testFormatting_15_uses_augment() {
+    def void test_uses_augment() {
         assertFormattedWithoutSerialization[
             useSerializer = false
             expectation = '''
@@ -475,7 +353,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting_16_augment_path() {
+    def void test_augment_path() {
         assertFormattedWithoutSerialization[
             expectation = '''
                 module augtest {
@@ -533,7 +411,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting_17_indentation() {
+    def void test_indentation() {
         assertFormattedWithoutSerialization[
             expectation = '''
             submodule augment-sub1 {
@@ -585,7 +463,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting17_refinable() {
+    def void test_refinable() {
         assertFormattedWithoutSerialization[
             expectation = '''
             module foo {
@@ -637,7 +515,7 @@ class YangFormatterTest extends AbstractYangTest {
     }
     
     @Test
-    def void testFormatting18_xpath() {
+    def void test_xpath() {
         assertFormattedWithoutSerialization[
             expectation = '''
             module augtest {
@@ -697,4 +575,5 @@ class YangFormatterTest extends AbstractYangTest {
             '''
         ]
     }
+    
 }
