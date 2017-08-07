@@ -158,12 +158,16 @@ class ScopeContext implements IScopeContext {
 	private def IScope computeParentNodeScope() {
 		var result = newArrayList()
 		for (subModule : moduleBelongingSubModules) {
-			val scope = subModule.nodeScope.getLocalOnly()
-			result.add(scope)
+			val subModuleScope = subModule.nodeScope
+			if (subModuleScope !== null) {			
+				result.add(subModuleScope.getLocalOnly())
+			}
 		}
 		for (imported : this.importedModules.entrySet) {
 			val scope = imported.value.nodeScope
-			result.add(scope)
+			if (scope !== null) {			
+				result.add(scope)
+			}
 		}
 		return new CompositeScope(result)
 	}
