@@ -74,6 +74,7 @@ import io.typefox.yang.yang.YinElement
 import java.util.List
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.eclipse.xtext.Assignment
+import org.eclipse.xtext.Keyword
 import org.eclipse.xtext.formatting.IIndentationInformation
 import org.eclipse.xtext.formatting2.AbstractFormatter2
 import org.eclipse.xtext.formatting2.FormatterPreferenceKeys
@@ -81,10 +82,16 @@ import org.eclipse.xtext.formatting2.FormatterRequest
 import org.eclipse.xtext.formatting2.IFormattableDocument
 import org.eclipse.xtext.formatting2.ITextReplacer
 import org.eclipse.xtext.formatting2.ITextReplacerContext
-import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
 import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
-import org.eclipse.xtext.formatting2.regionaccess.internal.TextSegment
+import org.eclipse.xtext.formatting2.regionaccess.internal.NodeSemanticRegion
+import org.eclipse.xtext.nodemodel.ILeafNode
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils
+import org.eclipse.xtext.preferences.BooleanKey
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
+
+import static io.typefox.yang.formatting2.MultilineStringReplacer.Line.PartType.*
+
+import static extension com.google.common.base.Strings.*
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -93,12 +100,9 @@ class YangFormatter extends AbstractFormatter2 {
     
     // Option Keys
     
-    public static val FORCE_NEW_LINE = 'FORCE_NEW_LINE'
-    public static val MAX_LINE_LENGTH = 'MAX_LINE_LENGTH'
+    public static val FORCE_NEW_LINE = new BooleanKey("FORCE_NEW_LINE", true)
     
     // Defaults
-
-    public static val MAX_LINE_LENGTH_DEFAULT = 72
 
     override protected initialize(FormatterRequest request) {
         val preferences = request.preferences
@@ -107,7 +111,6 @@ class YangFormatter extends AbstractFormatter2 {
         }
         super.initialize(request)
     }
-    
     
     // Rules
 
@@ -452,12 +455,21 @@ class YangFormatter extends AbstractFormatter2 {
     // Tools
     
     protected def formatMultilineString(extension IFormattableDocument document, Statement s, Assignment a) {
-        val region = s.regionFor.assignment(a)
-        if (MultilineStringReplacer.isConcatenation(region.text)) {
-            return;
+        val region = s.regionFor.assignment(a) as NodeSemanticRegion
+        var trailingLinesIndent = 0
+        if (preferences.getPreference(YangFormatter.FORCE_NEW_LINE)) {
+            region.prepend[newLine]
+        } else {
+            region.prepend[oneSpace]
+            val keyword = s.findFirstKeyword
+            trailingLinesIndent = keyword.length
         }
-        val textRegion = region.prepend[newLine].textRegion
-        addReplacer(new MultilineStringReplacer(textRegion))
+        addReplacer(new MultilineStringReplacer(_yangGrammarAccess, region, trailingLinesIndent))
+    }
+    
+    protected def String findFirstKeyword(Statement statement) {
+        val node = NodeModelUtils.findActualNodeFor(statement)
+        return node.leafNodes.findFirst[grammarElement instanceof Keyword]?.text?:""
     }
     
     protected def void formatStatement(extension IFormattableDocument document, Statement it) {
@@ -482,7 +494,6 @@ class YangFormatter extends AbstractFormatter2 {
         if (id === null) {
             return;
         }
-        
         val nodeRegions = id.allSemanticRegions.toList
         nodeRegions.head.prepend[oneSpace]
         if (nodeRegions.length > 1) {
@@ -494,10 +505,6 @@ class YangFormatter extends AbstractFormatter2 {
         } else {
             nodeRegions.last.append[oneSpace]
         }
-    }
-    
-    protected def TextSegment textRegion(ISemanticRegion region) {
-        return new TextSegment(getTextRegionAccess(), region.offset, region.length)
     }
     
     protected def formatXpath(extension IFormattableDocument document, XpathExpression expression) {
@@ -526,76 +533,213 @@ class YangFormatter extends AbstractFormatter2 {
 
 @FinalFieldsConstructor
 class MultilineStringReplacer implements ITextReplacer {
-    val TextSegment segment
+    val YangGrammarAccess grammerAccess
+    val NodeSemanticRegion region
+    val int trailingLinesIndent
 
     override ITextSegment getRegion() {
-        segment
+        region
+    }
+    
+    def boolean alignWithKeyword() {
+        return trailingLinesIndent !== 0
+    }
+    
+    def String getFirstLineIndentation() {
+        return if (alignWithKeyword) "" else "  " 
+    }
+
+    def String getTrailingLinesIndentation() {
+        return if (alignWithKeyword) " ".repeat(trailingLinesIndent - 1) else ""
     }
     
     override createReplacements(ITextReplacerContext context) {
-        val defaultIndentation = context.formatter.preferences.getPreference(FormatterPreferenceKeys.indentation)
         val currentIndentation = context.indentationString
-        val indentation = currentIndentation + defaultIndentation
-        val original = segment.text
-        if (!original.isQuoted || original.isConcatenation) {
-            return context
-        }
-        val splitted = original.substring(1, original.length - 1).split("(\\s(?=\\S)|\\n(?!' '))")
-        var currentLine = <String> newLinkedList()
-        val lines = <List<String>> newArrayList(currentLine)
-        for (s : splitted) {
-            val currentLength = currentLine.length
-            if (currentLength + s.length > YangFormatter.MAX_LINE_LENGTH_DEFAULT || s.length > YangFormatter.MAX_LINE_LENGTH_DEFAULT) {
-                lines += (currentLine = <String> newLinkedList())
-            } else if (s.trim.empty) {
-                lines += (currentLine = <String> newLinkedList())
-            }
-            if (currentLine.length > 0) {
-                currentLine += " "
-            }
-            val word = s.ltrim
-            if (!word.empty) {
-                currentLine += word
-            }
-        }
+        val firstLineIndentation = firstLineIndentation 
+        val trailingLinesIndentation = currentIndentation + trailingLinesIndentation 
         
-        lines.head.add(0, defaultIndentation + '"')
-        if (lines.size === 1) {
-            lines.head += '"'
-        }
-        if (lines.size > 1) {
-            lines.tail.take(lines.size - 1).forEach[
-                add(0, indentation + " ")
-            ]
-        }
-        if (lines.size > 1) {
-            lines += <String> newLinkedList(indentation, '"')
-        }
-        val newText = lines.map[join()].join("\n")
-        context.addReplacement(segment.replaceWith(newText))
+        val leafNodes = region.node.leafNodes.toList
+        
+        val model = new LinesModel(grammerAccess, firstLineIndentation, trailingLinesIndentation)
+        model.build(leafNodes)
+        val newText = model.toString()
+        
+        context.addReplacement(region.replaceWith(newText))
         return context
     }
     
-    public static def isConcatenation(String s) {
-        val containsPlus = java.util.regex.Pattern.compile("\\n\\s*\\+").matcher(s).find()
-        return s.isQuoted && containsPlus
-    }
+    @FinalFieldsConstructor
+    static class LinesModel {
+        val lines = newLinkedList(new Line)
+        
+        val extension YangGrammarAccess
+        val String firstLineIndentation
+        val String trailingLinesIndentation
     
-    public static def isQuoted(String s) {
-        if (s.length < 2) {
-            return false;
+        def getLast() {
+            return lines.last
         }
-        return s.startsWith("'") && s.endsWith("'") || s.startsWith('"') && s.endsWith('"')
+        
+        def addSpace() {
+            if (!last.empty && !last.last.trim.empty) {
+                last.append(" ", Hidden)
+            }
+        }
+        
+        def addStringValue(String text) {
+            val parts = text.split("\n")
+            if (parts.length === 1) {
+                last.append(text, Value)
+            } else {
+                last.append(parts.head, Value)
+                val indentToRemoved = indentToRemoved(parts)
+                val rest = parts.tail.map[leftTrim(indentToRemoved)].toList
+                if (rest.last.trim == '"') {
+                    rest.set(rest.length - 1, '"')
+                }
+                for (part : rest) {
+                    newLine()
+                    last.append(part, ValueContinuation)
+                }
+            }
+        }
+    
+        static def String leftTrim(String string, int trimLength) {
+            val beginIndex = (0 ..< Math.min(string.length, trimLength)).findFirst[index | !Character.isWhitespace(string.charAt(index))]?:trimLength
+            return string.substring(Math.min(string.length, beginIndex))
+        }
+        
+        static def String leftTrim(String s) {
+            val beginIndex = (0 ..< s.length).findFirst[index | !Character.isWhitespace(s.charAt(index))]?:s.length
+            return s.substring(beginIndex)
+        }
+    
+        static def indentToRemoved(String[] strings) {
+            val (String)=>Integer countLeadingWS = [(0 ..< length).findFirst[index | !Character.isWhitespace(charAt(index))]?:Integer.MAX_VALUE]
+            var count = strings.length - 1
+            if (strings.last.trim == '"') {
+                count -= 1
+            }
+            return strings.tail.take(count).map[countLeadingWS.apply(it)].min
+        }
+
+        def addSingleLineComment(String text) {
+            last.append(text, SingleLineComment)
+        }
+        
+        def newLine() {
+            if (!last.empty) {
+                lines += new Line
+            }
+        }
+    
+        def addMultiLineComment(String text) {
+            var parts = text.split("\n")
+            var first = true
+            for (part : parts) {
+                if (first) {
+                    first = false
+                    last.append(part, MultiLineComment)
+                } else {
+                    newLine()
+                    last.append(" " + part.leftTrim, MultiLineComment)
+                }
+            }
+            return this
+        }
+    
+        def addPlus() {
+            if (!last.empty) {
+                last.append("+", Hidden)
+            }
+        }
+        
+        def build(List<ILeafNode> leafNodes) {
+            for (it : leafNodes) {
+                if (isHidden) {
+                    val grammarElement = grammarElement
+                    if (ML_COMMENTRule == grammarElement) {
+                        addSpace()
+                        addMultiLineComment(text)
+                    }
+                    if (SL_COMMENTRule == grammarElement) {
+                        val text = text.replace("\n", "")
+                        addSpace()
+                        addSingleLineComment(text)
+                        newLine()
+                    }
+                    if (WSRule == grammarElement) {
+                        if (text.contains("\n")) {
+                            newLine()
+                        } else {
+                            addSpace()
+                        }
+                    }
+                    if (HIDDENRule == grammarElement) {
+                        if (text.contains("+")) {
+                            addPlus()
+                        }
+                    }
+                } else {
+                    addStringValue(text)
+                }
+            }
+            lines.head.prepend(firstLineIndentation, Hidden)
+            lines.tail.forEach[
+                val lineTypePrefix = prefix
+                prepend(trailingLinesIndentation + lineTypePrefix, Hidden)
+            ]
+        }
+        
+        override toString() {
+            val string = lines.join("\n")
+            return string
+        }
     }
     
-    static def length(List<String> strings)  {
-        return strings.fold(0, [r, w| r + w.length])
-    }
+    static class Line {
+        val parts = <String> newLinkedList()
+        val types = <PartType> newLinkedList()
+        
+        def isEmpty() {
+            return parts.empty
+        }
+        
+        def getLast() {
+            if (!parts.empty) {
+                return parts.last
+            }
+            return null
+        }
+        
+        def prepend(String string, PartType type) {
+            parts.add(0, string)
+            types.add(0, type)
+        }
     
-    static def String ltrim(String s) {
-        val char space = ' '
-        val beginIndex = (0..<s.length).findFirst[i | s.charAt(i) !== space]?:s.length
-        return s.substring(beginIndex)
-    }
+        def append(String string, PartType type) {
+            parts += string
+            types += type
+        }
+        
+        enum PartType {
+            Hidden, Value, ValueContinuation, SingleLineComment, MultiLineComment
+        }
     
+        def getPrefix() {
+            val startsWithValueContinuation = !types.empty && types.first == PartType.ValueContinuation
+            if (startsWithValueContinuation) {
+                return if (parts.first == '"') "  " else "   ";
+            }
+            val containsValue = types.contains(PartType.Value)
+            if (containsValue) {
+                return "+ ";
+            }
+            return "  "
+        }
+        
+        override toString() {
+            return parts.join
+        }
+    }
 }

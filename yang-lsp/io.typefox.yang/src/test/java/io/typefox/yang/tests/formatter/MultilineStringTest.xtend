@@ -1,57 +1,83 @@
 package io.typefox.yang.tests.formatter
 
-import io.typefox.yang.tests.AbstractYangTest
-import org.junit.Ignore
-import org.junit.Test
 import io.typefox.yang.formatting2.YangFormatter
+import io.typefox.yang.tests.AbstractYangTest
+import org.junit.Test
 
 class MultilineStringTest extends AbstractYangTest {
     
-    static def wrapInModule(CharSequence s) '''
+    static def String wrapUnformatted(CharSequence s) '''
+    module m1 {
+         module m2 {
+            module m2 {
+                «s»
+              }
+      }
+    }
+    '''
+    
+    static def String wrapFormatted(CharSequence s) '''
     module m1 {
       module m2 {
-        «s»
+        module m2 {
+          «s»
+        }
       }
     }
     '''
     
     @Test
-    def void test_indentation_1() {
+    def void test_SL_concatenation() {
         assertFormattedWithoutSerialization[
+            preferences[put(YangFormatter.FORCE_NEW_LINE, false)]
             expectation = '''
-              description
-                "This revision adds the following new data types:
-                 Foo
-                ";
-            '''.wrapInModule
+            description "foo" /* a */ /* b */ + "bar";
+            '''.wrapFormatted
             toBeFormatted = '''
-                    description "This revision adds the following new data types:
-               Foo
-                            ";
-            '''.wrapInModule
+            description "foo"/* a *//* b */    +      "bar";
+            '''.wrapUnformatted
+        ]
+    }
+    
+    @Test
+    def void test_indentation_1a() {
+        assertFormattedWithoutSerialization[
+            preferences[put(YangFormatter.FORCE_NEW_LINE, true)] // default
+            expectation = '''
+            description
+              "foo"
+            + "bar";
+            '''.wrapFormatted
+            toBeFormatted = '''
+            description "foo"
+                 + "bar";
+            '''.wrapUnformatted
+        ]
+    }
+    
+    @Test
+    def void test_indentation_1b() {
+        assertFormattedWithoutSerialization[
+            preferences[put(YangFormatter.FORCE_NEW_LINE, false)]
+            expectation = '''
+               description "foo"
+                         + "bar";
+            '''.wrapFormatted
+            toBeFormatted = '''
+                    description "foo"
+               + "bar";
+            '''.wrapUnformatted
         ]
     }
     
     @Test
     def void test_indentation_2() {
         assertFormattedWithoutSerialization[
-            expectation = '''
-              description
-                "This revision adds the following new data types:
-                 - yang-identifier
-                 - hex-string
-                 - uuid
-                 - dotted-quad
-                ";
-            '''.wrapInModule
+            preferences[put(YangFormatter.FORCE_NEW_LINE, false)]
             toBeFormatted = '''
-                description "This revision adds the following new data types:
-                         - yang-identifier
-                      - hex-string
-                         - uuid
-                            - dotted-quad
-                        ";
-            '''.wrapInModule
+               description "foo"
+                         + "bar";
+            '''.wrapFormatted
         ]
     }
     
@@ -65,14 +91,14 @@ class MultilineStringTest extends AbstractYangTest {
               + '|$1$[a-zA-Z0-9./]{1,8}$[a-zA-Z0-9./]{22}'
               + '|$5$(rounds=\d+$)?[a-zA-Z0-9./]{1,16}$[a-zA-Z0-9./]{43}'
               + /* comment */ '|$6$(rounds=\d+$)?[a-zA-Z0-9./]{1,16}$[a-zA-Z0-9./]{86}';
-            '''.wrapInModule
+            '''.wrapFormatted
             toBeFormatted = '''
                 pattern '$0$.*'
                  // comment
                       + '|$1$[a-zA-Z0-9./]{1,8}$[a-zA-Z0-9./]{22}'
                    + '|$5$(rounds=\d+$)?[a-zA-Z0-9./]{1,16}$[a-zA-Z0-9./]{43}'
                  + /* comment */ '|$6$(rounds=\d+$)?[a-zA-Z0-9./]{1,16}$[a-zA-Z0-9./]{86}';
-            '''.wrapInModule
+            '''.wrapUnformatted
         ]
     }
 
@@ -87,49 +113,131 @@ class MultilineStringTest extends AbstractYangTest {
               + '|$1$[a-zA-Z0-9./]{1,8}$[a-zA-Z0-9./]{22}'
               + '|$5$(rounds=\d+$)?[a-zA-Z0-9./]{1,16}$[a-zA-Z0-9./]{43}'
               + /* comment */ '|$6$(rounds=\d+$)?[a-zA-Z0-9./]{1,16}$[a-zA-Z0-9./]{86}';
-            '''.wrapInModule
+            '''.wrapFormatted
         ]
     }
-
+    
     @Test
     def void test_indentation_5() {
+        assertFormattedWithoutSerialization[
+            expectation = '''
+              pattern
+                '$0$.*'
+                /* comment
+                 * foo
+                 */
+              + '|$1$[a-zA-Z0-9./]{1,8}$[a-zA-Z0-9./]{22}'
+              + '|$5$(rounds=\d+$)?[a-zA-Z0-9./]{1,16}$[a-zA-Z0-9./]{43}'
+              + /* comment */ '|$6$(rounds=\d+$)?[a-zA-Z0-9./]{1,16}$[a-zA-Z0-9./]{86}';
+            '''.wrapFormatted
+            toBeFormatted = '''
+                pattern '$0$.*'
+                                 /* comment
+                              * foo
+                  */
+                      + '|$1$[a-zA-Z0-9./]{1,8}$[a-zA-Z0-9./]{22}'
+                   + '|$5$(rounds=\d+$)?[a-zA-Z0-9./]{1,16}$[a-zA-Z0-9./]{43}'
+                 + /* comment */ '|$6$(rounds=\d+$)?[a-zA-Z0-9./]{1,16}$[a-zA-Z0-9./]{86}';
+            '''.wrapUnformatted
+        ]
+    }
+    
+    @Test
+    def void test_ML_indentation_1() {
+        assertFormattedWithoutSerialization[
+            expectation = '''
+              description
+                "This revision adds the following new data types:
+                 Foo
+                ";
+            '''.wrapFormatted
+            toBeFormatted = '''
+                    description "This revision adds the following new data types:
+               Foo
+                            ";
+            '''.wrapUnformatted
+        ]
+    }
+    
+    @Test
+    def void test_ML_indentation_2() {
+        assertFormattedWithoutSerialization[
+            preferences[put(YangFormatter.FORCE_NEW_LINE, false)]
+            expectation = '''
+               description "This revision adds the following new data types: "
+                         + "foo
+                            bar";
+            '''.wrapFormatted
+            toBeFormatted = '''
+                    description "This revision adds the following new data types: "
+               + "foo
+               bar";
+            '''.wrapUnformatted
+        ]
+    }    
+    
+    @Test
+    def void test_ML_indentation_3() {
+        assertFormattedWithoutSerialization[
+            expectation = '''
+              description
+                "This revision adds the following new data types:
+                 - yang-identifier
+                 - hex-string
+                 - uuid
+                 - dotted-quad
+                ";
+            '''.wrapFormatted
+            toBeFormatted = '''
+                description "This revision adds the following new data types:
+                      - yang-identifier
+                      - hex-string
+                      - uuid
+                      - dotted-quad
+                        ";
+            '''.wrapUnformatted
+        ]
+    }
+    
+    @Test
+    def void test_ML_indentation_4() {
         assertFormattedWithoutSerialization[
             toBeFormatted = '''
                 contact
                   "WG Web:   <http://tools.ietf.org/wg/netmod/>
                    WG List:  <mailto:netmod@ietf.org>
-                
+                   
                    WG Chair: David Kessens
                              <mailto:david.kessens@nsn.com>
-                
+                   
                    WG Chair: Juergen Schoenwaelder
                              <mailto:j.schoenwaelder@jacobs-university.de>
-                
+                   
                    Editor:   Juergen Schoenwaelder
                              <mailto:j.schoenwaelder@jacobs-university.de>
                   ";
-            '''.wrapInModule
+            '''.wrapFormatted
         ]
     }
     
     @Test
-    def void test_indentation_6() {
+    def void test_ML_indentation_5() {
         assertFormattedWithoutSerialization[
             expectation = '''
             contact
               "WG Web:   <http://tools.ietf.org/wg/netmod/>
                WG List:  <mailto:netmod@ietf.org>
-            
+               
                WG Chair: David Kessens
                          <mailto:david.kessens@nsn.com>
-            
+               
                WG Chair: Juergen Schoenwaelder
                          <mailto:j.schoenwaelder@jacobs-university.de>
-            
+               
                Editor:   Juergen Schoenwaelder
                          <mailto:j.schoenwaelder@jacobs-university.de>
               ";
-            '''.wrapInModule
+            '''.wrapFormatted
             toBeFormatted = '''
             contact
                   "WG Web:   <http://tools.ietf.org/wg/netmod/>
@@ -144,30 +252,7 @@ class MultilineStringTest extends AbstractYangTest {
                    Editor:   Juergen Schoenwaelder
                              <mailto:j.schoenwaelder@jacobs-university.de>
                   ";
-            '''.wrapInModule
-        ]
-    }
-    
-    @Test
-    @Ignore
-    def void test_line_break_indentation() {
-        assertFormattedWithoutSerialization[
-            preferences[
-                put(YangFormatter.MAX_LINE_LENGTH, "73")
-            ]
-            expectation = '''
-            contact
-              "Foo:     bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar
-                        bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar
-                        xyz
-              ";
-            '''.wrapInModule
-            toBeFormatted = '''
-            contact
-              "Foo:     bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar bar
-                        xyz
-              ";
-            '''.wrapInModule
+            '''.wrapUnformatted
         ]
     }
     
@@ -179,10 +264,10 @@ class MultilineStringTest extends AbstractYangTest {
             ]
             expectation = '''
             contact "xyz";
-            '''.wrapInModule
+            '''.wrapFormatted
             toBeFormatted = '''
             contact "xyz";
-            '''.wrapInModule
+            '''.wrapUnformatted
         ]
     }
 
@@ -195,10 +280,10 @@ class MultilineStringTest extends AbstractYangTest {
             expectation = '''
             contact
               "xyz";
-            '''.wrapInModule
+            '''.wrapFormatted
             toBeFormatted = '''
             contact "xyz";
-            '''.wrapInModule
+            '''.wrapUnformatted
         ]
     }
     

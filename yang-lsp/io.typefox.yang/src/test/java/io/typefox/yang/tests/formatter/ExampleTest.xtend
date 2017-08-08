@@ -393,8 +393,7 @@ class ExampleTest extends AbstractYangTest {
               identity crypto-alg {
                 description
                   "Base identity from which all crypto algorithms
-                   are derived.
-                  ";
+                   are derived.";
               }
             
               identity des {
@@ -419,8 +418,7 @@ class ExampleTest extends AbstractYangTest {
                 description
                   "This feature means the device supports local
                    storage (memory, flash or disk) that can be used to
-                   store syslog messages.
-                  ";
+                   store syslog messages.";
                 reference
                   "yang-02";
                 status current;
@@ -432,8 +430,7 @@ class ExampleTest extends AbstractYangTest {
                   config false;
                   description
                     "The amount of local storage that can be
-                     used to hold syslog messages.
-                    ";
+                     used to hold syslog messages.";
                   // !! not in the draft !!
                   type uint32;
                   units bytes;

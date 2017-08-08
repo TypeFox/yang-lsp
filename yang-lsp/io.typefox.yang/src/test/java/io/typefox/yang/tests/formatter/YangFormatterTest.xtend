@@ -164,8 +164,7 @@ class YangFormatterTest extends AbstractYangTest {
                       "This revision adds the following new data types:
                        - ip-address-no-zone
                        - ipv4-address-no-zone
-                       - ipv6-address-no-zone
-                      ";
+                       - ipv6-address-no-zone";
                     reference
                       "RFC 6991: Common YANG Data Types";
                   }
@@ -201,8 +200,7 @@ class YangFormatterTest extends AbstractYangTest {
                         value "0";
                         description
                           "An unknown or unspecified version of the Internet
-                           protocol.
-                          ";
+                           protocol.";
                       }
                       enum ipv4 {
                         value "1";
@@ -219,13 +217,11 @@ class YangFormatterTest extends AbstractYangTest {
                       "This value represents the version of the IP protocol.
                        
                        In the value set and its semantics, this type is equivalent
-                       to the InetVersion textual convention of the SMIv2.
-                      ";
+                       to the InetVersion textual convention of the SMIv2.";
                     reference
                       "RFC  791: Internet Protocol
                        RFC 2460: Internet Protocol, Version 6 (IPv6) Specification
-                       RFC 4001: Textual Conventions for Internet Network Addresses
-                      ";
+                       RFC 4001: Textual Conventions for Internet Network Addresses";
                   }
                 }
             '''
@@ -274,7 +270,7 @@ class YangFormatterTest extends AbstractYangTest {
                 
                   typedef ipv6-address {
                     type string {
-                      pattern 
+                      pattern
                         '(([^:]+:){6}(([^:]+:[^:]+)|(.*\..*)))';
                     }
                   }
