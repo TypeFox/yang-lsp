@@ -6,6 +6,7 @@ configurations {
 
 dependencies {
 	compile "org.eclipse.xtext:org.eclipse.xtext:${versions.xtext}"
+	compile "com.google.code.gson:gson:2.7"
 	testCompile "junit:junit:4.12"
 	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
     

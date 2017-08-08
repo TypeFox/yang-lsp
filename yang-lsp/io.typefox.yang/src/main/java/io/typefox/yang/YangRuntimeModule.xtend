@@ -16,6 +16,8 @@ import org.eclipse.xtext.naming.IQualifiedNameConverter
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy
 import org.eclipse.xtext.validation.ConfigurableIssueCodesProvider
 import org.eclipse.xtext.validation.ResourceValidatorImpl
+import org.eclipse.xtext.workspace.IProjectConfigProvider
+import org.eclipse.xtext.workspace.ProjectConfigProvider
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
@@ -51,7 +53,11 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 	}
 	
 	def Class< ? extends IIndentationInformation> bindIIndentationInformation() {
-		return YangIndentationInformation;
+		YangIndentationInformation;
+	}
+	
+	def Class<? extends IProjectConfigProvider> bindProjectConfigPRovider() {
+		ProjectConfigProvider
 	}
 
 }

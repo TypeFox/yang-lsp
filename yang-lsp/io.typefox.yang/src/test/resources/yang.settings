@@ -1,0 +1,6 @@
+{
+	"diagnostics" : {
+		"foo" : "error",
+		"baz" : "error"
+	}
+}

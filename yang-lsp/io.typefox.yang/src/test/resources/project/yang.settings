@@ -1,0 +1,6 @@
+{
+	"diagnostics" : {
+		"bar" : "error",
+		"foo" : "info"
+	}
+}
