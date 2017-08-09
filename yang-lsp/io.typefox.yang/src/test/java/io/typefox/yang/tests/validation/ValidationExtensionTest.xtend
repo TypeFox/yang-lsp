@@ -2,8 +2,10 @@ package io.typefox.yang.tests.validation
 
 import io.typefox.yang.tests.AbstractYangTest
 import java.io.File
+import org.eclipse.xtext.diagnostics.Severity
 import org.eclipse.xtext.workspace.FileProjectConfig
 import org.eclipse.xtext.workspace.ProjectConfigAdapter
+import org.junit.Assert
 import org.junit.Test
 
 class ValidationExtensionTest extends AbstractYangTest {
@@ -28,6 +30,8 @@ class ValidationExtensionTest extends AbstractYangTest {
 				
 			}
 		''')
-		assertError(m.root, BAD_NAME)
+		val validate = this.validator.validate(m.root.eResource)
+		val issue = validate.findFirst[code == BAD_NAME]
+		Assert.assertEquals(Severity.WARNING, issue.severity)
 	}
 }

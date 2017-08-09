@@ -3,6 +3,9 @@
 		"bar" : "error",
 		"foo" : "info"
 	},
+	"diagnostic" : {
+		"bad_name" : "warning"
+	},
 	"extension" : {
 		"classpath" : "extension.jar",
 		"validators" : "io.typefox.yang.tests.validation.MyValidatorExtension"
