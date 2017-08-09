@@ -272,6 +272,24 @@ class MultilineStringTest extends AbstractYangTest {
     }
     
     @Test
+    def void test_ML_indentation_7() {
+        assertFormattedWithoutSerialization[
+            expectation = '''
+              description
+                'foo
+                 bar
+                ';
+            '''.wrapFormatted
+            toBeFormatted = '''
+                description
+                  'foo
+                    bar
+                    ';
+            '''.wrapUnformatted
+        ]
+    }
+    
+    @Test
     def void test_option_forceNewLine_off() {
         assertFormattedWithoutSerialization[
             preferences[

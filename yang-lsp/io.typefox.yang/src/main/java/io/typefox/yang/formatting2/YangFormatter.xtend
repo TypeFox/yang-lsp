@@ -568,6 +568,11 @@ class MultilineStringReplacer implements ITextReplacer {
         return context
     }
     
+    static def isQuote(String s) {
+        val trimmed = s.trim
+        return trimmed == '"' || trimmed == "'"
+    }
+    
     @FinalFieldsConstructor
     static class LinesModel {
         val lines = newLinkedList(new Line)
@@ -594,8 +599,8 @@ class MultilineStringReplacer implements ITextReplacer {
                 last.append(parts.head, Value)
                 val indentToRemoved = indentToRemoved(parts)
                 val rest = parts.tail.map[leftTrim(indentToRemoved)].toList
-                if (rest.last.trim == '"') {
-                    rest.set(rest.length - 1, '"')
+                if (rest.last.isQuote) {
+                    rest.set(rest.length - 1, rest.last.trim)
                 }
                 for (part : rest) {
                     newLine()
@@ -617,7 +622,7 @@ class MultilineStringReplacer implements ITextReplacer {
         static def indentToRemoved(String[] strings) {
             val (String)=>Integer countLeadingWS = [(0 ..< length).findFirst[index | !Character.isWhitespace(charAt(index))]?:Integer.MAX_VALUE]
             var count = strings.length - 1
-            if (strings.last.trim == '"') {
+            if (strings.last.isQuote) {
                 count -= 1
             }
             if (count < 1) {
@@ -732,7 +737,7 @@ class MultilineStringReplacer implements ITextReplacer {
         def getPrefix() {
             val startsWithValueContinuation = !types.empty && types.first == PartType.ValueContinuation
             if (startsWithValueContinuation) {
-                return if (parts.first == '"') "  " else "   ";
+                return if (parts.first.isQuote) "  " else "   ";
             }
             val containsValue = types.contains(PartType.Value)
             if (containsValue) {
