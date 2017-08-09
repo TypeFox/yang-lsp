@@ -40,21 +40,21 @@ class DocumentSymbolsTest extends AbstractYangLSPTest {
 				    location: MyModel.yang [[1, 10] .. [1, 11]]
 				}
 				symbol "bla" {
-				    kind: 7
+				    kind: 8
 				    location: MyModel.yang [[5, 11] .. [5, 14]]
 				}
 				symbol "test" {
-				    kind: 7
+				    kind: 8
 				    location: MyModel.yang [[6, 7] .. [6, 11]]
 				    container: "bla"
 				}
 				symbol "bla2" {
-				    kind: 7
+				    kind: 8
 				    location: MyModel.yang [[7, 12] .. [7, 16]]
 				    container: "bla"
 				}
 				symbol "test2" {
-				    kind: 7
+				    kind: 8
 				    location: MyModel.yang [[8, 8] .. [8, 13]]
 				    container: "bla2"
 				}
@@ -63,7 +63,7 @@ class DocumentSymbolsTest extends AbstractYangLSPTest {
 				    location: MyModel.yang [[12, 10] .. [12, 20]]
 				}
 				symbol "myType" {
-				    kind: 10
+				    kind: 7
 				    location: MyModel.yang [[13, 9] .. [13, 15]]
 				}
 				symbol "someFeature" {
