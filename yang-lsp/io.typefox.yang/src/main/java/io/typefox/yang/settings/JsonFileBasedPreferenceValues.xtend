@@ -44,6 +44,8 @@ class JsonFileBasedPreferenceValues extends MapBasedPreferenceValues {
 		} catch (Exception e) {
 			if (!(e instanceof NoSuchFileException)) {
 				LOG.error("Error reading settings '"+path+"' : "+e.message)
+			} else {
+				lastModification = null
 			}
 			clear()
 			return
