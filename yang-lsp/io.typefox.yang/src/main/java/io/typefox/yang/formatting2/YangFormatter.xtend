@@ -591,13 +591,13 @@ class MultilineStringReplacer implements ITextReplacer {
             }
         }
         
-        def addStringValue(String text) {
+        def addStringValue(String text, int originalStartColumn) {
             val parts = text.split("\n")
             if (parts.length === 1) {
                 last.append(text, Value)
             } else {
                 last.append(parts.head, Value)
-                val indentToRemoved = indentToRemoved(parts)
+                val indentToRemoved = indentToRemoved(parts, originalStartColumn)
                 val rest = parts.tail.map[leftTrim(indentToRemoved)].toList
                 if (rest.last.isQuote) {
                     rest.set(rest.length - 1, rest.last.trim)
@@ -619,7 +619,7 @@ class MultilineStringReplacer implements ITextReplacer {
             return s.substring(beginIndex)
         }
     
-        static def indentToRemoved(String[] strings) {
+        static def indentToRemoved(String[] strings, int originalStartColumn) {
             val (String)=>Integer countLeadingWS = [(0 ..< length).findFirst[index | !Character.isWhitespace(charAt(index))]?:Integer.MAX_VALUE]
             var count = strings.length - 1
             if (strings.last.isQuote) {
@@ -628,7 +628,8 @@ class MultilineStringReplacer implements ITextReplacer {
             if (count < 1) {
                 return 0;
             }
-            return strings.tail.take(count).map[countLeadingWS.apply(it)].min
+            val minCountLeadingWS = strings.tail.take(count).map[countLeadingWS.apply(it)].min
+            return Math.min(minCountLeadingWS, originalStartColumn)
         }
 
         def addSingleLineComment(String text) {
@@ -689,7 +690,8 @@ class MultilineStringReplacer implements ITextReplacer {
                         }
                     }
                 } else {
-                    addStringValue(text)
+                    val originalStartColumn = NodeModelUtils.getLineAndColumn(it, offset).column
+                    addStringValue(text, originalStartColumn)
                 }
             }
             lines.head.prepend(firstLineIndentation, Hidden)

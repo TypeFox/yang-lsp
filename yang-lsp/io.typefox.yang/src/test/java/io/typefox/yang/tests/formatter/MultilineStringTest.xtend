@@ -277,7 +277,7 @@ class MultilineStringTest extends AbstractYangTest {
             expectation = '''
               description
                 'foo
-                 bar
+                  bar
                 ';
             '''.wrapFormatted
             toBeFormatted = '''
@@ -286,6 +286,30 @@ class MultilineStringTest extends AbstractYangTest {
                     bar
                     ';
             '''.wrapUnformatted
+        ]
+    }
+    
+    @Test
+    def void test_ML_indentation_8() {
+        assertFormattedWithoutSerialization[
+            toBeFormatted = '''
+            contact
+              "WG Chair: David Kessens
+                         <mailto:david.kessens@nsn.com>";
+            '''.wrapFormatted
+        ]
+    }
+    
+    @Test
+    def void test_ML_indentation_9() {
+        assertFormattedWithoutSerialization[
+            preferences[
+                put(YangFormatter.FORCE_NEW_LINE, "false")
+            ]
+            toBeFormatted = '''
+            contact "WG Chair: David Kessens
+                               <mailto:david.kessens@nsn.com>";
+            '''.wrapFormatted
         ]
     }
     
