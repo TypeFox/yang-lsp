@@ -11,3 +11,7 @@ mainClassName = 'org.eclipse.xtext.ide.server.ServerLauncher'
 applicationName = 'yang-language-server'
 applicationDefaultJvmArgs = ['-agentlib:jdwp=transport=dt_socket,address=localhost:8787,server=y,suspend=n,quiet=y']
 build.dependsOn(installDist)
+
+test {
+    maxHeapSize '512m'
+}
