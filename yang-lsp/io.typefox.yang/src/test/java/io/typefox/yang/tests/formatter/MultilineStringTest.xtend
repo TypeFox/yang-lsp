@@ -18,11 +18,11 @@ class MultilineStringTest extends AbstractYangTest {
     
     static def String wrapFormatted(CharSequence s) '''
     module m1 {
-      module m2 {
         module m2 {
-          «s»
+            module m2 {
+                «s»
+            }
         }
-      }
     }
     '''
     
