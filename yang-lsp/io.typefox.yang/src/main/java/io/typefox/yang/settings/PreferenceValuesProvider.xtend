@@ -20,8 +20,10 @@ class PreferenceValuesProvider implements IPreferenceValuesProvider {
 		if (context === null) {
 			return new MapBasedPreferenceValues(emptyMap) 
 		}
-		var valuesByLanguage = PreferenceValuesByLanguage.findInEmfObject(context.getResourceSet()) ?: new PreferenceValuesByLanguage()
-		valuesByLanguage.attachToEmfObject(context.resourceSet)
+		var valuesByLanguage = PreferenceValuesByLanguage.findInEmfObject(context.getResourceSet()) 
+			?: (new PreferenceValuesByLanguage() => [
+				attachToEmfObject(context.resourceSet)	
+			])
 		 
 		var values = valuesByLanguage.get(language.getLanguageName()) ?:
 					 createPreferenceValues(context) 
@@ -40,6 +42,9 @@ class PreferenceValuesProvider implements IPreferenceValuesProvider {
 			return result
 		}
 		val config = configProvider.getProjectConfig(resource.resourceSet)
+		if (config === null) {
+			return result
+		}
 		// add workspace settings
 		val segmentsToRemove = if (config.path.lastSegment.isEmpty) 2 else 1 
 		val workspaceSettings = fs.getPath(config.path.trimSegments(segmentsToRemove).toFileString, "yang.settings")

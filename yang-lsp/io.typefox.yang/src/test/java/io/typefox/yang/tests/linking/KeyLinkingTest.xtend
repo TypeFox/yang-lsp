@@ -1,11 +1,10 @@
 package io.typefox.yang.tests.linking
 
 import io.typefox.yang.tests.AbstractYangTest
-import io.typefox.yang.yang.Container
 import io.typefox.yang.yang.Key
+import io.typefox.yang.yang.List
 import org.junit.Assert
 import org.junit.Test
-import io.typefox.yang.yang.List
 
 class KeyLinkingTest extends AbstractYangTest {
 

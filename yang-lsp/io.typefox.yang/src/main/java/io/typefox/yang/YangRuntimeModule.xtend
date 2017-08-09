@@ -18,6 +18,8 @@ import org.eclipse.xtext.validation.ConfigurableIssueCodesProvider
 import org.eclipse.xtext.validation.ResourceValidatorImpl
 import org.eclipse.xtext.workspace.IProjectConfigProvider
 import org.eclipse.xtext.workspace.ProjectConfigProvider
+import org.eclipse.xtext.preferences.IPreferenceValuesProvider
+import io.typefox.yang.settings.PreferenceValuesProvider
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
@@ -58,6 +60,10 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 	
 	def Class<? extends IProjectConfigProvider> bindProjectConfigPRovider() {
 		ProjectConfigProvider
+	}
+	
+	def Class<? extends IPreferenceValuesProvider> bindIPreferenceValuProvider() {
+		PreferenceValuesProvider
 	}
 
 }

@@ -32,7 +32,7 @@ abstract class AbstractYangTest {
 	@Inject protected ValidationTestHelper validator
 	@Inject extension protected YangExtensions
 
-	XtextResourceSet resourceSet
+	protected XtextResourceSet resourceSet
 
 	@Before def void setup() {
 		resourceSet = resourceSetProvider.get
@@ -60,6 +60,10 @@ abstract class AbstractYangTest {
 		validator.assertWarning(obj, obj.eClass, code, offset, searchTerm.length, messageParts);
 	}
 
+	protected def assertNoErrors(EObject object, String code) {
+		validator.assertNoErrors(object, code)
+	}
+	
 	protected def assertNoErrors(Resource resource) {
 		validator.assertNoErrors(resource)
 	}

@@ -16,6 +16,7 @@ import io.typefox.sprotty.api.SModelRoot
 import io.typefox.sprotty.api.SNode
 import io.typefox.sprotty.server.xtext.IDiagramGenerator
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Action
 import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Base
 import io.typefox.yang.yang.Case
@@ -30,7 +31,6 @@ import io.typefox.yang.yang.Key
 import io.typefox.yang.yang.Leaf
 import io.typefox.yang.yang.LeafList
 import io.typefox.yang.yang.Module
-import io.typefox.yang.yang.Must
 import io.typefox.yang.yang.Notification
 import io.typefox.yang.yang.Output
 import io.typefox.yang.yang.Prefix
@@ -42,6 +42,7 @@ import io.typefox.yang.yang.Submodule
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.Uses
+import io.typefox.yang.yang.impl.ActionImpl
 import io.typefox.yang.yang.impl.AugmentImpl
 import io.typefox.yang.yang.impl.CaseImpl
 import io.typefox.yang.yang.impl.ChoiceImpl
@@ -66,8 +67,6 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.util.CancelIndicator
-import io.typefox.yang.yang.Action
-import io.typefox.yang.yang.impl.ActionImpl
 
 class YangDiagramGenerator implements IDiagramGenerator {
 	static val LOG = Logger.getLogger(YangDiagramGenerator)
