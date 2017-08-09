@@ -17,5 +17,5 @@ sourceSets.test.runtimeClasspath += project(':io.typefox.yang').sourceSets.test.
 
 mainClassName = 'io.typefox.yang.diagram.YangServerLauncher'
 applicationName = 'yang-language-server'
-applicationDefaultJvmArgs = ['-agentlib:jdwp=transport=dt_socket,address=localhost:8787,server=y,suspend=n,quiet=y']
+applicationDefaultJvmArgs = []
 build.dependsOn(installDist)

@@ -17,13 +17,19 @@ import io.typefox.yang.ide.YangIdeSetup
 import java.util.concurrent.Executors
 import java.util.function.Consumer
 import java.util.function.Function
-import org.apache.log4j.FileAppender
+import org.apache.log4j.AppenderSkeleton
+import org.apache.log4j.AsyncAppender
+import org.apache.log4j.Level
 import org.apache.log4j.Logger
+import org.apache.log4j.spi.LoggingEvent
 import org.eclipse.elk.alg.layered.options.LayeredMetaDataProvider
+import org.eclipse.lsp4j.MessageParams
+import org.eclipse.lsp4j.MessageType
 import org.eclipse.lsp4j.jsonrpc.Launcher
 import org.eclipse.lsp4j.jsonrpc.MessageConsumer
 import org.eclipse.lsp4j.jsonrpc.validation.ReflectiveMessageValidator
 import org.eclipse.lsp4j.services.LanguageClient
+import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.ide.server.LanguageServerImpl
 import org.eclipse.xtext.ide.server.LaunchArgs
 import org.eclipse.xtext.ide.server.ServerLauncher
@@ -34,13 +40,7 @@ import org.eclipse.xtext.util.Modules2
 class YangServerLauncher extends ServerLauncher {
 	
 	def static void main(String[] args) {
-		// Redirect Log4J output to a file
-		Logger.rootLogger => [
-			val defaultAppender = getAppender('default')
-			removeAllAppenders()
-			addAppender(new FileAppender(defaultAppender.layout, 'yang-server.log', false))
-		]
-
+		
 		// Initialize ELK
 		ElkLayoutEngine.initialize(new LayeredMetaDataProvider)
 
@@ -67,7 +67,15 @@ class YangServerLauncher extends ServerLauncher {
 		]
 		val launcher = Launcher.createIoLauncher(languageServer, LanguageClient, args.in, args.out, executorService,
 				args.wrapper, configureGson)
-		languageServer.connect(launcher.remoteProxy)
+		val client = launcher.remoteProxy
+		languageServer.connect(client)
+		// Redirect Log4J output to a file
+		Logger.rootLogger => [
+			removeAllAppenders()
+			addAppender(new AsyncAppender() => [
+				addAppender(new LanguageClientAppender(client))
+			])
+		]
 		val future = launcher.startListening
 		while (!future.done) {
 			Thread.sleep(10_000l)
@@ -91,4 +99,28 @@ class YangServerLauncher extends ServerLauncher {
 		]
 	}
 	
+	@Data static class LanguageClientAppender extends AppenderSkeleton {
+		LanguageClient client
+		
+		override protected append(LoggingEvent event) {
+			client.logMessage(new MessageParams => [
+				message = event.message.toString
+				type = switch event.getLevel {
+					case Level.ERROR: MessageType.Error
+					case Level.INFO : MessageType.Info
+					case Level.WARN : MessageType.Warning
+					default : MessageType.Log
+				}
+			])	
+		}
+		
+		override close() {
+			
+		}
+		
+		override requiresLayout() {
+			return false
+		}
+		
+	}
 }
