@@ -620,6 +620,9 @@ class MultilineStringReplacer implements ITextReplacer {
             if (strings.last.trim == '"') {
                 count -= 1
             }
+            if (count < 1) {
+                return 0;
+            }
             return strings.tail.take(count).map[countLeadingWS.apply(it)].min
         }
 
