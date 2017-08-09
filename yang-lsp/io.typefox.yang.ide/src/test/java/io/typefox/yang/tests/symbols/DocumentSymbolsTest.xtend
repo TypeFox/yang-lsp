@@ -22,8 +22,8 @@ class DocumentSymbolsTest extends AbstractYangLSPTest {
 					
 					container bla {
 						leaf test { type string; }
-						container bla {
-							leaf test { type string; }
+						container bla2 {
+							leaf test2 { type string; }
 						}
 					}
 					
@@ -39,37 +39,36 @@ class DocumentSymbolsTest extends AbstractYangLSPTest {
 				    kind: 5
 				    location: MyModel.yang [[1, 10] .. [1, 11]]
 				}
-				symbol "myIdentity" {
-				    kind: 14
-				    location: MyModel.yang [[12, 10] .. [12, 20]]
-				}
-				symbol "someFeature" {
-				    kind: 14
-				    location: MyModel.yang [[16, 9] .. [16, 20]]
-				}
-				symbol "myType" {
-				    kind: 11
-				    location: MyModel.yang [[13, 9] .. [13, 15]]
-				}
 				symbol "bla" {
-				    kind: 11
-				    location: MyModel.yang [[5, 11] .. [5, 14]]
-				    container: "/"
-				}
-				symbol "test" {
 				    kind: 7
-				    location: MyModel.yang [[8, 8] .. [8, 12]]
-				    container: "/bla/bla"
+				    location: MyModel.yang [[5, 11] .. [5, 14]]
 				}
 				symbol "test" {
 				    kind: 7
 				    location: MyModel.yang [[6, 7] .. [6, 11]]
-				    container: "/bla"
+				    container: "bla"
 				}
-				symbol "bla" {
-				    kind: 11
-				    location: MyModel.yang [[7, 12] .. [7, 15]]
-				    container: "/bla"
+				symbol "bla2" {
+				    kind: 7
+				    location: MyModel.yang [[7, 12] .. [7, 16]]
+				    container: "bla"
+				}
+				symbol "test2" {
+				    kind: 7
+				    location: MyModel.yang [[8, 8] .. [8, 13]]
+				    container: "bla2"
+				}
+				symbol "myIdentity" {
+				    kind: 14
+				    location: MyModel.yang [[12, 10] .. [12, 20]]
+				}
+				symbol "myType" {
+				    kind: 10
+				    location: MyModel.yang [[13, 9] .. [13, 15]]
+				}
+				symbol "someFeature" {
+				    kind: 17
+				    location: MyModel.yang [[16, 9] .. [16, 20]]
 				}
 			'''
 		]	
