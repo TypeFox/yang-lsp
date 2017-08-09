@@ -2,5 +2,9 @@
 	"diagnostics" : {
 		"bar" : "error",
 		"foo" : "info"
+	},
+	"extension" : {
+		"classpath" : "extension.jar",
+		"validators" : "io.typefox.yang.tests.validation.MyValidatorExtension"
 	}
 }

@@ -1,16 +1,14 @@
 package io.typefox.yang.tests.validation
 
 import io.typefox.yang.tests.AbstractYangTest
+import java.io.File
+import org.eclipse.xtext.workspace.FileProjectConfig
+import org.eclipse.xtext.workspace.ProjectConfigAdapter
 import org.junit.Test
-import org.eclipse.xtext.preferences.PreferenceValuesByLanguage
-import com.google.inject.Inject
-import org.eclipse.xtext.LanguageInfo
-import org.eclipse.xtext.preferences.MapBasedPreferenceValues
-import io.typefox.yang.validation.ResourceValidator
 
 class ValidationExtensionTest extends AbstractYangTest {
 	
-	@Inject LanguageInfo language
+	static val BAD_NAME = "bad_name"
 	
 	@Test def void testExtensionNotRegistered() {
 		val m  = load('''
@@ -18,21 +16,18 @@ class ValidationExtensionTest extends AbstractYangTest {
 				
 			}
 		''')
-		assertNoErrors(m.root, MyValidatorExtension.BAD_NAME)
+		assertNoErrors(m.root, BAD_NAME)
 	}
 	
 	@Test def void testExtensionRegistered() {
-		val prefByLang = new PreferenceValuesByLanguage()
-		prefByLang.attachToEmfObject(resourceSet)
-		prefByLang.put(language.languageName, new MapBasedPreferenceValues(#{
-			ResourceValidator.VALIDATORS.id -> MyValidatorExtension.name
-		}))
+		val root = new File("./src/test/resources/project").canonicalFile
+		ProjectConfigAdapter.install(resourceSet, new FileProjectConfig(root))
 		
 		val m  = load('''
 			module foo {
 				
 			}
 		''')
-		assertError(m.root, MyValidatorExtension.BAD_NAME)
+		assertError(m.root, BAD_NAME)
 	}
 }

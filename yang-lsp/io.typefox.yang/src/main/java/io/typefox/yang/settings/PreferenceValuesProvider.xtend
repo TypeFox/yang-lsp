@@ -10,7 +10,9 @@ import org.eclipse.xtext.preferences.IPreferenceValuesProvider
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import org.eclipse.xtext.preferences.PreferenceValuesByLanguage
 import org.eclipse.xtext.workspace.IProjectConfigProvider
+import org.eclipse.xtext.util.internal.Log
 
+@Log
 class PreferenceValuesProvider implements IPreferenceValuesProvider {
 	
 	@Inject(optional=true) IProjectConfigProvider configProvider
@@ -20,13 +22,14 @@ class PreferenceValuesProvider implements IPreferenceValuesProvider {
 		if (context === null) {
 			return new MapBasedPreferenceValues(emptyMap) 
 		}
-		var valuesByLanguage = PreferenceValuesByLanguage.findInEmfObject(context.getResourceSet()) 
+		val valuesByLanguage = PreferenceValuesByLanguage.findInEmfObject(context.getResourceSet()) 
 			?: (new PreferenceValuesByLanguage() => [
 				attachToEmfObject(context.resourceSet)	
 			])
 		 
 		var values = valuesByLanguage.get(language.getLanguageName()) ?:
-					 createPreferenceValues(context) 
+					 createPreferenceValues(context)
+		valuesByLanguage.put(language.languageName, values)
 		if (values instanceof JsonFileBasedPreferenceValues) {
 			values.checkUpToDate
 		} 

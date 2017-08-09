@@ -8,13 +8,12 @@ import java.io.BufferedReader
 import java.io.ByteArrayInputStream
 import java.io.InputStreamReader
 import java.nio.file.Files
+import java.nio.file.NoSuchFileException
 import java.nio.file.Path
 import java.nio.file.attribute.FileTime
-import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import org.eclipse.xtext.preferences.IPreferenceValues
-import java.io.IOException
+import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import org.eclipse.xtext.util.internal.Log
-import java.nio.file.NoSuchFileException
 
 @Log
 class JsonFileBasedPreferenceValues extends MapBasedPreferenceValues {
@@ -42,12 +41,11 @@ class JsonFileBasedPreferenceValues extends MapBasedPreferenceValues {
 				lastModification = localLastMod
 				read()
 			}
-		} catch (IOException e) {
+		} catch (Exception e) {
 			if (!(e instanceof NoSuchFileException)) {
 				LOG.error("Error reading settings '"+path+"' : "+e.message)
 			}
 			clear()
-			lastModification = null
 			return
 		}
 	}
