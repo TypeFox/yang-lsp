@@ -1,22 +1,22 @@
 package io.typefox.yang.ide.symbols
 
 import com.google.inject.Inject
+import io.typefox.yang.scoping.ScopeContextProvider
+import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Container
+import io.typefox.yang.yang.Leaf
+import io.typefox.yang.yang.LeafList
+import io.typefox.yang.yang.List
+import org.eclipse.lsp4j.SymbolInformation
+import org.eclipse.lsp4j.SymbolKind
 import org.eclipse.xtext.findReferences.IReferenceFinder.IResourceAccess
 import org.eclipse.xtext.ide.server.DocumentExtensions
 import org.eclipse.xtext.ide.server.symbol.DocumentSymbolService
+import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.EObjectAtOffsetHelper
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.util.TextRegion
-import io.typefox.yang.scoping.ScopeContextProvider
-import org.eclipse.lsp4j.SymbolInformation
-import io.typefox.yang.yang.AbstractModule
-import org.eclipse.lsp4j.SymbolKind
-import org.eclipse.xtext.naming.QualifiedName
-import io.typefox.yang.yang.Leaf
-import io.typefox.yang.yang.Container
-import io.typefox.yang.yang.LeafList
-import io.typefox.yang.yang.List
 
 class YangDocumentSymbolService extends DocumentSymbolService {
 	
@@ -37,8 +37,12 @@ class YangDocumentSymbolService extends DocumentSymbolService {
 	
 	
 	override getSymbols(XtextResource resource, CancelIndicator cancelIndicator) {
-		val x = provider.getScopeContext(resource.contents.head as AbstractModule)
 		val result = newArrayList
+		val module = resource.contents.head
+		if (!(module instanceof AbstractModule)) {
+			return result
+		}
+		val x = provider.getScopeContext(module as AbstractModule)
 		for (g : x.groupingScope.localOnly.allElements) {
 			result += new SymbolInformation => [
 				name = g.qualifiedName.lastSegment

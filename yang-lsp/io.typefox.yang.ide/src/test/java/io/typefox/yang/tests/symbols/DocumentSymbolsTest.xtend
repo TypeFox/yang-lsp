@@ -5,6 +5,13 @@ import org.junit.Test
 
 class DocumentSymbolsTest extends AbstractYangLSPTest {
 	
+	@Test def void testEmpty() {		
+		testDocumentSymbol[
+	            model = '''
+	            '''
+	    ]
+	}
+	
 	@Test def void testDocumentSymbols() {
 		testDocumentSymbol[
 			model = '''
