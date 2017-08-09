@@ -63,11 +63,11 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 			column = 1
 			expectedCompletionItems = '''
 				module (Creates a new "module" statement.) -> module ${1:MyModel} {
-				  yang-version 1.1;
-				  namespace urn:ietf:params:xml:ns:yang:${1:MyModel};
-				  prefix ${1:MyModel};
+				    yang-version 1.1;
+				    namespace urn:ietf:params:xml:ns:yang:${1:MyModel};
+				    prefix ${1:MyModel};
 				
-				  $0
+				    $0
 				}
 				 [[0, 0] .. [0, 1]]
 			'''
@@ -82,11 +82,11 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 			column = 2
 			expectedCompletionItems = '''
 				module (Creates a new "module" statement.) -> module ${1:MyModel} {
-				  yang-version 1.1;
-				  namespace urn:ietf:params:xml:ns:yang:${1:MyModel};
-				  prefix ${1:MyModel};
+				    yang-version 1.1;
+				    namespace urn:ietf:params:xml:ns:yang:${1:MyModel};
+				    prefix ${1:MyModel};
 				
-				  $0
+				    $0
 				}
 				 [[0, 0] .. [0, 2]]
 			'''
@@ -118,12 +118,12 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				description (Creates a new "description" statement.) -> description "${1:}";$0
 				 [[5, 6] .. [5, 6]]
 				import (Creates a new "import" statement.) -> import ${1:} {
-				  prefix ${1:};
-				  revision-date ${2:«now.get(0)»}-${3:«now.get(1)»}-${4:«now.get(2)»};
+				    prefix ${1:};
+				    revision-date ${2:«now.get(0)»}-${3:«now.get(1)»}-${4:«now.get(2)»};
 				}$0
 				 [[5, 6] .. [5, 6]]
 				include (Creates a new "include" statement.) -> include ${1:} {
-				  revision-date ${2:«now.get(0)»}-${3:«now.get(1)»}-${4:«now.get(2)»};
+				    revision-date ${2:«now.get(0)»}-${3:«now.get(1)»}-${4:«now.get(2)»};
 				}$0
 				 [[5, 6] .. [5, 6]]
 				reference (Creates a new "reference" statement.) -> reference "${1:}";$0
@@ -152,78 +152,78 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				anyxml (Creates a new "anyxml" statement.) -> anyxml ${1:xml};$0
 				 [[10, 6] .. [10, 6]]
 				augment (Creates a new "augment" statement.) -> augment ${1:} {
-				  $0
+				    $0
 				}
 				 [[10, 6] .. [10, 6]]
 				choice (Creates a new "choice" statement.) -> choice ${1:choice-name} {
-				  $0
+				    $0
 				}
 				 [[10, 6] .. [10, 6]]
 				container (Creates a new "container" statement.) -> container ${1:container-name} {
-				  $0
+				    $0
 				}
 				 [[10, 6] .. [10, 6]]
 				description (Creates a new "description" statement.) -> description "${1:}";$0
 				 [[10, 6] .. [10, 6]]
 				deviation (Creates a new "deviation" statement.) -> deviation ${1:node-identifier} {
-				  deviate ${2:deviate-action} {
-				    $3
-				  }
-				  $0
+				    deviate ${2:deviate-action} {
+				        $3
+				    }
+				    $0
 				}
 				 [[10, 6] .. [10, 6]]
 				extension (Creates a new "extension" statement.) -> extension ${1:extension-name} {
-				  $0
+				    $0
 				}
 				 [[10, 6] .. [10, 6]]
 				feature (Creates a new "feature" statement.) -> feature ${1:feature-name} {
-				  $0
+				    $0
 				}
 				 [[10, 6] .. [10, 6]]
 				grouping (Creates a new "grouping" statement.) -> grouping ${1:grouping-name} {
-				  $0
+				    $0
 				}
 				 [[10, 6] .. [10, 6]]
 				identity (Creates a new "identity" statement.) -> identity ${1:identity-name} {
-				  $0
+				    $0
 				}
 				 [[10, 6] .. [10, 6]]
 				leaf (Creates a new "leaf" statement.) -> leaf ${1:leaf-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[10, 6] .. [10, 6]]
 				leaf-list (Creates a new "leaf-list" statement.) -> leaf-list ${1:leaf-list-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[10, 6] .. [10, 6]]
 				list (Creates a new "list" statement.) -> list ${1:list-name} {
-				  $0
+				    $0
 				}
 				 [[10, 6] .. [10, 6]]
 				notification (Creates a new "notification" statement.) -> notification ${1:action-name} {
-				  $0
+				    $0
 				}
 				 [[10, 6] .. [10, 6]]
 				reference (Creates a new "reference" statement.) -> reference "${1:}";$0
 				 [[10, 6] .. [10, 6]]
 				revision (Creates a new "revision" statement.) -> revision ${1:«now.get(0)»}-${2:«now.get(1)»}-${3:«now.get(2)»} {
-				  description "${4}";$0
+				    description "${4}";$0
 				}
 				 [[10, 6] .. [10, 6]]
 				rpc (Creates a new "rpc" statement.) -> rpc ${1:rpc-name} {
-				  $0
+				    $0
 				}
 				 [[10, 6] .. [10, 6]]
 				typedef (Creates a new "typedef" statement.) -> typedef ${1:type-name} {
-				  type ${2:};$0
+				    type ${2:};$0
 				}
 				 [[10, 6] .. [10, 6]]
 				uses (Creates a new "uses" statement.) -> uses ${1:group-name} {
-				  $0
+				    $0
 				}
 				 [[10, 6] .. [10, 6]]
 			'''
@@ -236,33 +236,33 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				anyxml (Creates a new "anyxml" statement.) -> anyxml ${1:xml};$0
 				 [[13, 6] .. [13, 6]]
 				choice (Creates a new "choice" statement.) -> choice ${1:choice-name} {
-				  $0
+				    $0
 				}
 				 [[13, 6] .. [13, 6]]
 				container (Creates a new "container" statement.) -> container ${1:container-name} {
-				  $0
+				    $0
 				}
 				 [[13, 6] .. [13, 6]]
 				description (Creates a new "description" statement.) -> description "${1:}";$0
 				 [[13, 6] .. [13, 6]]
 				grouping (Creates a new "grouping" statement.) -> grouping ${1:grouping-name} {
-				  $0
+				    $0
 				}
 				 [[13, 6] .. [13, 6]]
 				leaf (Creates a new "leaf" statement.) -> leaf ${1:leaf-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[13, 6] .. [13, 6]]
 				leaf-list (Creates a new "leaf-list" statement.) -> leaf-list ${1:leaf-list-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[13, 6] .. [13, 6]]
 				list (Creates a new "list" statement.) -> list ${1:list-name} {
-				  $0
+				    $0
 				}
 				 [[13, 6] .. [13, 6]]
 				reference (Creates a new "reference" statement.) -> reference "${1:}";$0
@@ -270,11 +270,11 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				status (Creates a new "status" statement.) -> status ${1:current};$0
 				 [[13, 6] .. [13, 6]]
 				typedef (Creates a new "typedef" statement.) -> typedef ${1:type-name} {
-				  type ${2:};$0
+				    type ${2:};$0
 				}
 				 [[13, 6] .. [13, 6]]
 				uses (Creates a new "uses" statement.) -> uses ${1:group-name} {
-				  $0
+				    $0
 				}
 				 [[13, 6] .. [13, 6]]
 			'''
@@ -287,33 +287,33 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				anyxml (Creates a new "anyxml" statement.) -> anyxml ${1:xml};$0
 				 [[15, 6] .. [15, 6]]
 				choice (Creates a new "choice" statement.) -> choice ${1:choice-name} {
-				  $0
+				    $0
 				}
 				 [[15, 6] .. [15, 6]]
 				container (Creates a new "container" statement.) -> container ${1:container-name} {
-				  $0
+				    $0
 				}
 				 [[15, 6] .. [15, 6]]
 				description (Creates a new "description" statement.) -> description "${1:}";$0
 				 [[15, 6] .. [15, 6]]
 				grouping (Creates a new "grouping" statement.) -> grouping ${1:grouping-name} {
-				  $0
+				    $0
 				}
 				 [[15, 6] .. [15, 6]]
 				leaf (Creates a new "leaf" statement.) -> leaf ${1:leaf-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[15, 6] .. [15, 6]]
 				leaf-list (Creates a new "leaf-list" statement.) -> leaf-list ${1:leaf-list-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[15, 6] .. [15, 6]]
 				list (Creates a new "list" statement.) -> list ${1:list-name} {
-				  $0
+				    $0
 				}
 				 [[15, 6] .. [15, 6]]
 				reference (Creates a new "reference" statement.) -> reference "${1:}";$0
@@ -321,11 +321,11 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				status (Creates a new "status" statement.) -> status ${1:current};$0
 				 [[15, 6] .. [15, 6]]
 				typedef (Creates a new "typedef" statement.) -> typedef ${1:type-name} {
-				  type ${2:};$0
+				    type ${2:};$0
 				}
 				 [[15, 6] .. [15, 6]]
 				uses (Creates a new "uses" statement.) -> uses ${1:group-name} {
-				  $0
+				    $0
 				}
 				 [[15, 6] .. [15, 6]]
 			'''
@@ -338,70 +338,70 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				anyxml (Creates a new "anyxml" statement.) -> anyxml ${1:xml};$0
 				 [[17, 6] .. [17, 6]]
 				augment (Creates a new "augment" statement.) -> augment ${1:} {
-				  $0
+				    $0
 				}
 				 [[17, 6] .. [17, 6]]
 				choice (Creates a new "choice" statement.) -> choice ${1:choice-name} {
-				  $0
+				    $0
 				}
 				 [[17, 6] .. [17, 6]]
 				container (Creates a new "container" statement.) -> container ${1:container-name} {
-				  $0
+				    $0
 				}
 				 [[17, 6] .. [17, 6]]
 				deviation (Creates a new "deviation" statement.) -> deviation ${1:node-identifier} {
-				  deviate ${2:deviate-action} {
-				    $3
-				  }
-				  $0
+				    deviate ${2:deviate-action} {
+				        $3
+				    }
+				    $0
 				}
 				 [[17, 6] .. [17, 6]]
 				extension (Creates a new "extension" statement.) -> extension ${1:extension-name} {
-				  $0
+				    $0
 				}
 				 [[17, 6] .. [17, 6]]
 				feature (Creates a new "feature" statement.) -> feature ${1:feature-name} {
-				  $0
+				    $0
 				}
 				 [[17, 6] .. [17, 6]]
 				grouping (Creates a new "grouping" statement.) -> grouping ${1:grouping-name} {
-				  $0
+				    $0
 				}
 				 [[17, 6] .. [17, 6]]
 				identity (Creates a new "identity" statement.) -> identity ${1:identity-name} {
-				  $0
+				    $0
 				}
 				 [[17, 6] .. [17, 6]]
 				leaf (Creates a new "leaf" statement.) -> leaf ${1:leaf-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[17, 6] .. [17, 6]]
 				leaf-list (Creates a new "leaf-list" statement.) -> leaf-list ${1:leaf-list-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[17, 6] .. [17, 6]]
 				list (Creates a new "list" statement.) -> list ${1:list-name} {
-				  $0
+				    $0
 				}
 				 [[17, 6] .. [17, 6]]
 				notification (Creates a new "notification" statement.) -> notification ${1:action-name} {
-				  $0
+				    $0
 				}
 				 [[17, 6] .. [17, 6]]
 				rpc (Creates a new "rpc" statement.) -> rpc ${1:rpc-name} {
-				  $0
+				    $0
 				}
 				 [[17, 6] .. [17, 6]]
 				typedef (Creates a new "typedef" statement.) -> typedef ${1:type-name} {
-				  type ${2:};$0
+				    type ${2:};$0
 				}
 				 [[17, 6] .. [17, 6]]
 				uses (Creates a new "uses" statement.) -> uses ${1:group-name} {
-				  $0
+				    $0
 				}
 				 [[17, 6] .. [17, 6]]
 			'''
@@ -414,7 +414,7 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				description (Creates a new "description" statement.) -> description "${1:}";$0
 				 [[21, 6] .. [21, 6]]
 				grouping (Creates a new "grouping" statement.) -> grouping ${1:grouping-name} {
-				  $0
+				    $0
 				}
 				 [[21, 6] .. [21, 6]]
 				if-feature (Creates a new "if-feature" statement.) -> if-feature ${1:}$2;$0
@@ -424,7 +424,7 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				status (Creates a new "status" statement.) -> status ${1:current};$0
 				 [[21, 6] .. [21, 6]]
 				typedef (Creates a new "typedef" statement.) -> typedef ${1:type-name} {
-				  type ${2:};$0
+				    type ${2:};$0
 				}
 				 [[21, 6] .. [21, 6]]
 			'''
@@ -437,70 +437,70 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				anyxml (Creates a new "anyxml" statement.) -> anyxml ${1:xml};$0
 				 [[24, 6] .. [24, 6]]
 				augment (Creates a new "augment" statement.) -> augment ${1:} {
-				  $0
+				    $0
 				}
 				 [[24, 6] .. [24, 6]]
 				choice (Creates a new "choice" statement.) -> choice ${1:choice-name} {
-				  $0
+				    $0
 				}
 				 [[24, 6] .. [24, 6]]
 				container (Creates a new "container" statement.) -> container ${1:container-name} {
-				  $0
+				    $0
 				}
 				 [[24, 6] .. [24, 6]]
 				deviation (Creates a new "deviation" statement.) -> deviation ${1:node-identifier} {
-				  deviate ${2:deviate-action} {
-				    $3
-				  }
-				  $0
+				    deviate ${2:deviate-action} {
+				        $3
+				    }
+				    $0
 				}
 				 [[24, 6] .. [24, 6]]
 				extension (Creates a new "extension" statement.) -> extension ${1:extension-name} {
-				  $0
+				    $0
 				}
 				 [[24, 6] .. [24, 6]]
 				feature (Creates a new "feature" statement.) -> feature ${1:feature-name} {
-				  $0
+				    $0
 				}
 				 [[24, 6] .. [24, 6]]
 				grouping (Creates a new "grouping" statement.) -> grouping ${1:grouping-name} {
-				  $0
+				    $0
 				}
 				 [[24, 6] .. [24, 6]]
 				identity (Creates a new "identity" statement.) -> identity ${1:identity-name} {
-				  $0
+				    $0
 				}
 				 [[24, 6] .. [24, 6]]
 				leaf (Creates a new "leaf" statement.) -> leaf ${1:leaf-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[24, 6] .. [24, 6]]
 				leaf-list (Creates a new "leaf-list" statement.) -> leaf-list ${1:leaf-list-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[24, 6] .. [24, 6]]
 				list (Creates a new "list" statement.) -> list ${1:list-name} {
-				  $0
+				    $0
 				}
 				 [[24, 6] .. [24, 6]]
 				notification (Creates a new "notification" statement.) -> notification ${1:action-name} {
-				  $0
+				    $0
 				}
 				 [[24, 6] .. [24, 6]]
 				rpc (Creates a new "rpc" statement.) -> rpc ${1:rpc-name} {
-				  $0
+				    $0
 				}
 				 [[24, 6] .. [24, 6]]
 				typedef (Creates a new "typedef" statement.) -> typedef ${1:type-name} {
-				  type ${2:};$0
+				    type ${2:};$0
 				}
 				 [[24, 6] .. [24, 6]]
 				uses (Creates a new "uses" statement.) -> uses ${1:group-name} {
-				  $0
+				    $0
 				}
 				 [[24, 6] .. [24, 6]]
 			'''
@@ -513,37 +513,37 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				anyxml (Creates a new "anyxml" statement.) -> anyxml ${1:xml};$0
 				 [[26, 6] .. [26, 6]]
 				choice (Creates a new "choice" statement.) -> choice ${1:choice-name} {
-				  $0
+				    $0
 				}
 				 [[26, 6] .. [26, 6]]
 				config (Creates a new "config" statement.) -> config ${1:false};$0
 				 [[26, 6] .. [26, 6]]
 				container (Creates a new "container" statement.) -> container ${1:container-name} {
-				  $0
+				    $0
 				}
 				 [[26, 6] .. [26, 6]]
 				description (Creates a new "description" statement.) -> description "${1:}";$0
 				 [[26, 6] .. [26, 6]]
 				grouping (Creates a new "grouping" statement.) -> grouping ${1:grouping-name} {
-				  $0
+				    $0
 				}
 				 [[26, 6] .. [26, 6]]
 				if-feature (Creates a new "if-feature" statement.) -> if-feature ${1:}$2;$0
 				 [[26, 6] .. [26, 6]]
 				leaf (Creates a new "leaf" statement.) -> leaf ${1:leaf-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[26, 6] .. [26, 6]]
 				leaf-list (Creates a new "leaf-list" statement.) -> leaf-list ${1:leaf-list-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[26, 6] .. [26, 6]]
 				list (Creates a new "list" statement.) -> list ${1:list-name} {
-				  $0
+				    $0
 				}
 				 [[26, 6] .. [26, 6]]
 				must (Creates a new "must" statement.) -> must "${1:expression}";$0
@@ -555,11 +555,11 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				status (Creates a new "status" statement.) -> status ${1:current};$0
 				 [[26, 6] .. [26, 6]]
 				typedef (Creates a new "typedef" statement.) -> typedef ${1:type-name} {
-				  type ${2:};$0
+				    type ${2:};$0
 				}
 				 [[26, 6] .. [26, 6]]
 				uses (Creates a new "uses" statement.) -> uses ${1:group-name} {
-				  $0
+				    $0
 				}
 				 [[26, 6] .. [26, 6]]
 				when (Creates a new "when" statement.) -> when "${1:expression}";$0
@@ -574,15 +574,15 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				anyxml (Creates a new "anyxml" statement.) -> anyxml ${1:xml};$0
 				 [[31, 6] .. [31, 6]]
 				case (Creates a new "case" statement.) -> case ${1:case-name} {
-				  $0
+				    $0
 				}
 				 [[31, 6] .. [31, 6]]
 				choice (Creates a new "choice" statement.) -> choice ${1:choice-name} {
-				  $0
+				    $0
 				}
 				 [[31, 6] .. [31, 6]]
 				container (Creates a new "container" statement.) -> container ${1:container-name} {
-				  $0
+				    $0
 				}
 				 [[31, 6] .. [31, 6]]
 				description (Creates a new "description" statement.) -> description "${1:}";$0
@@ -590,19 +590,19 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				if-feature (Creates a new "if-feature" statement.) -> if-feature ${1:}$2;$0
 				 [[31, 6] .. [31, 6]]
 				leaf (Creates a new "leaf" statement.) -> leaf ${1:leaf-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[31, 6] .. [31, 6]]
 				leaf-list (Creates a new "leaf-list" statement.) -> leaf-list ${1:leaf-list-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[31, 6] .. [31, 6]]
 				list (Creates a new "list" statement.) -> list ${1:list-name} {
-				  $0
+				    $0
 				}
 				 [[31, 6] .. [31, 6]]
 				reference (Creates a new "reference" statement.) -> reference "${1:}";$0
@@ -610,7 +610,7 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				status (Creates a new "status" statement.) -> status ${1:current};$0
 				 [[31, 6] .. [31, 6]]
 				uses (Creates a new "uses" statement.) -> uses ${1:group-name} {
-				  $0
+				    $0
 				}
 				 [[31, 6] .. [31, 6]]
 				when (Creates a new "when" statement.) -> when "${1:expression}";$0
@@ -625,37 +625,37 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				anyxml (Creates a new "anyxml" statement.) -> anyxml ${1:xml};$0
 				 [[33, 6] .. [33, 6]]
 				choice (Creates a new "choice" statement.) -> choice ${1:choice-name} {
-				  $0
+				    $0
 				}
 				 [[33, 6] .. [33, 6]]
 				config (Creates a new "config" statement.) -> config ${1:false};$0
 				 [[33, 6] .. [33, 6]]
 				container (Creates a new "container" statement.) -> container ${1:container-name} {
-				  $0
+				    $0
 				}
 				 [[33, 6] .. [33, 6]]
 				description (Creates a new "description" statement.) -> description "${1:}";$0
 				 [[33, 6] .. [33, 6]]
 				grouping (Creates a new "grouping" statement.) -> grouping ${1:grouping-name} {
-				  $0
+				    $0
 				}
 				 [[33, 6] .. [33, 6]]
 				if-feature (Creates a new "if-feature" statement.) -> if-feature ${1:}$2;$0
 				 [[33, 6] .. [33, 6]]
 				leaf (Creates a new "leaf" statement.) -> leaf ${1:leaf-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[33, 6] .. [33, 6]]
 				leaf-list (Creates a new "leaf-list" statement.) -> leaf-list ${1:leaf-list-name} {
-				  type ${2:type-name} {
-				    $0
-				  }
+				    type ${2:type-name} {
+				        $0
+				    }
 				}
 				 [[33, 6] .. [33, 6]]
 				list (Creates a new "list" statement.) -> list ${1:list-name} {
-				  $0
+				    $0
 				}
 				 [[33, 6] .. [33, 6]]
 				must (Creates a new "must" statement.) -> must "${1:expression}";$0
@@ -667,11 +667,11 @@ class StatementCompletionTest extends AbstractYangLSPTest {
 				status (Creates a new "status" statement.) -> status ${1:current};$0
 				 [[33, 6] .. [33, 6]]
 				typedef (Creates a new "typedef" statement.) -> typedef ${1:type-name} {
-				  type ${2:};$0
+				    type ${2:};$0
 				}
 				 [[33, 6] .. [33, 6]]
 				uses (Creates a new "uses" statement.) -> uses ${1:group-name} {
-				  $0
+				    $0
 				}
 				 [[33, 6] .. [33, 6]]
 				when (Creates a new "when" statement.) -> when "${1:expression}";$0
