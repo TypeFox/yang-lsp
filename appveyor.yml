@@ -1,0 +1,19 @@
+shallow_clone: true
+
+branches:
+  only:
+  - master
+
+platform:
+  - x64
+
+install:
+  - git clone --depth 1 https://github.com/TypeFox/xtext-jflex.git
+  - mvn -f ./xtext-jflex/jflex-fragment/pom.xml clean install
+
+build_script:
+  - ./yang-lsp/gradlew.bat -p yang-lsp installDist --refresh-dependencies --no-daemon
+
+cache:
+ - C:\Users\appveyor\.gradle
+ - C:\Users\appveyor\.m2
