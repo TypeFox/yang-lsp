@@ -36,7 +36,7 @@ class SchemaNodeIdentifierLinkingTest extends AbstractYangTest {
 				}
 			}
 		''')
-		val elements = ctxProvider.getScopeContext(m1.root).nodeScope.localOnly.allElements.map[name].toList.sortBy[it]
+		val elements = ctxProvider.getScopeContext(m1.root).schemaNodeScope.localOnly.allElements.map[name].toList.sortBy[it]
 		Assert.assertEquals('''
 		foo.c12
 		foo.c12.foo.c22
@@ -81,7 +81,7 @@ class SchemaNodeIdentifierLinkingTest extends AbstractYangTest {
 				}
 			}
 		''')
-		val elements = ctxProvider.getScopeContext(m2.root).nodeScope.localOnly.allElements.map[name].toList.sortBy[it]
+		val elements = ctxProvider.getScopeContext(m2.root).schemaNodeScope.localOnly.allElements.map[name].toList.sortBy[it]
 		Assert.assertEquals('''
 		foo.c12.foo.c22.bar.c32'''.toString, elements.join("\n"))
 		this.validator.assertNoErrors(m2)

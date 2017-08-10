@@ -151,7 +151,7 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 		IIdeContentProposalAcceptor acceptor) {
 
 		val scopeCtx = scopeContextProvider.findScopeContext(context.currentModel)
-		val nodeScope = scopeCtx.nodeScope
+		val nodeScope = scopeCtx.schemaNodeScope
 		val prefix = computeNodeSchemaPrefix(context.currentModel, nodeScope)
 		val isInPath = context.currentModel instanceof SchemaNodeIdentifier
 		computeSchemaNodePathProposals(prefix, nodeScope, scopeCtx, context, acceptor)

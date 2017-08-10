@@ -172,7 +172,7 @@ class ScopeContextProvider {
 		}
 		val pref = identifier.internalGetQualifiedName(prefix, context)
 		linker.link(identifier, YangPackage.Literals.SCHEMA_NODE_IDENTIFIER__SCHEMA_NODE) [
-			val result = context.nodeScope.getSingleElement(pref)
+			val result = context.schemaNodeScope.getSingleElement(pref)
 			return result
 		]
 		return pref
@@ -289,7 +289,7 @@ class ScopeContextProvider {
 	protected dispatch def void computeScope(KeyReference node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		ctx.runAfterAll [
 			linker.link(node, KEY_REFERENCE__NODE) [ syntaxName |
-				val result = ctx.nodeScope.allElements.filter[ candidate |
+				val result = ctx.schemaNodeScope.allElements.filter[ candidate |
 					if (candidate.EClass !== LEAF) {
 						return false
 					} 
@@ -357,7 +357,7 @@ class ScopeContextProvider {
 		ctx.onComputeNodeScope 
 		[
 			val options = if (isConfig) emptyMap else #{NO_CONFIG_USER_DATA -> 't'}
-			if (!ctx.nodeScope.tryAddLocal(name, node, options)) {
+			if (!ctx.schemaNodeScope.tryAddLocal(name, node, options)) {
 				validator.addIssue(node, SCHEMA_NODE__NAME, '''A schema node with the name '«name»' already exists.''', IssueCodes.DUPLICATE_NAME)
 			}
 		]

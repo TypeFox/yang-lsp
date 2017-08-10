@@ -35,7 +35,7 @@ interface IScopeContext {
 	def MapScope getIdentityScope()
 	def MapScope getFeatureScope()
 	def MapScope getExtensionScope()
-	def MapScope getNodeScope()
+	def MapScope getSchemaNodeScope()
 	
 	def void onResolveDefinitions(Runnable callback)
 	def void onComputeNodeScope(Runnable callback)
@@ -83,14 +83,14 @@ class LocalNodeScopeContext extends LocalScopeContext {
 		super(parent)
 	}
 	
-	MapScope nodeScope; 
+	MapScope schemaNodeScope; 
 	
-	override getNodeScope() {
-		if (nodeScope === null) {
-			this.nodeScope = new MapScope
-			parent.nodeScope // initialize
+	override getSchemaNodeScope() {
+		if (schemaNodeScope === null) {
+			this.schemaNodeScope = new MapScope
+			parent.schemaNodeScope // initialize
 		}
-		return nodeScope
+		return schemaNodeScope
 	}
 }
 
@@ -104,7 +104,7 @@ class ScopeContext implements IScopeContext {
 	@Accessors(PUBLIC_GETTER) MapScope identityScope = new MapScope(new LazyScope[computeParentDefinitionScope[getIdentityScope]])
 	@Accessors(PUBLIC_GETTER) MapScope featureScope = new MapScope(new LazyScope[computeParentDefinitionScope[getFeatureScope]])
 	@Accessors(PUBLIC_GETTER) MapScope extensionScope = new MapScope(new LazyScope[computeParentDefinitionScope[getExtensionScope]])
-	MapScope nodeScope
+	MapScope schemaNodeScope
 	
 	List<Runnable> resolveDefinitions = newArrayList
 	List<Runnable> computeNodeScope = newArrayList
@@ -125,9 +125,9 @@ class ScopeContext implements IScopeContext {
 		this.moduleName = moduleName
 	}
 	
-	override getNodeScope() {
+	override getSchemaNodeScope() {
 		resolveDefinitionPhase
-		return this.nodeScope
+		return this.schemaNodeScope
 	}
 	
 	override void resolveDefinitionPhase() {
@@ -141,7 +141,7 @@ class ScopeContext implements IScopeContext {
 		val copy2 = computeNodeScope
 		computeNodeScope = null
 		// assign the node scope
-		this.nodeScope = new MapScope(computeParentNodeScope)
+		this.schemaNodeScope = new MapScope(computeParentSchemaNodeScope)
 		copy2.forEach[run]
 	}
 	
@@ -155,16 +155,16 @@ class ScopeContext implements IScopeContext {
 		copy.forEach[run]
 	}
 	
-	private def IScope computeParentNodeScope() {
+	private def IScope computeParentSchemaNodeScope() {
 		var result = newArrayList()
 		for (subModule : moduleBelongingSubModules) {
-			val subModuleScope = subModule.nodeScope
+			val subModuleScope = subModule.schemaNodeScope
 			if (subModuleScope !== null) {			
 				result.add(subModuleScope.getLocalOnly())
 			}
 		}
 		for (imported : this.importedModules.entrySet) {
-			val scope = imported.value.nodeScope
+			val scope = imported.value.schemaNodeScope
 			if (scope !== null) {			
 				result.add(scope)
 			}

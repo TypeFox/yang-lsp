@@ -38,7 +38,7 @@ class YangScopeProvider implements IScopeProvider {
 				return ctx.extensionScope
 			}
 			default : {
-				return ctx.nodeScope
+				return ctx.schemaNodeScope
 			}
 		}
 	}
