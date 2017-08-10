@@ -12,24 +12,35 @@ import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.utils.YangNameUtils
 import io.typefox.yang.utils.YangTypesExtensions
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Anydata
+import io.typefox.yang.yang.Anyxml
 import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Base
+import io.typefox.yang.yang.Choice
+import io.typefox.yang.yang.Container
+import io.typefox.yang.yang.Default
+import io.typefox.yang.yang.Deviate
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Include
 import io.typefox.yang.yang.Key
+import io.typefox.yang.yang.Leaf
+import io.typefox.yang.yang.LeafList
+import io.typefox.yang.yang.List
 import io.typefox.yang.yang.Mandatory
 import io.typefox.yang.yang.MaxElements
 import io.typefox.yang.yang.MinElements
 import io.typefox.yang.yang.Modifier
 import io.typefox.yang.yang.OrderedBy
 import io.typefox.yang.yang.Pattern
+import io.typefox.yang.yang.Presence
 import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.Statement
+import io.typefox.yang.yang.Status
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.YangVersion
@@ -373,6 +384,41 @@ class YangValidator extends AbstractYangValidator {
 	}
 
 	@Check
+	def checkDeviate(Deviate it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.20.3.2
+		// The argument is one of the strings "not-supported", "add", "replace", or "delete".
+		val argument = argument;
+		if (!argument.nullOrEmpty) {
+			val validArguments = #{"not-supported", "add", "replace", "delete"};
+			if (!validArguments.contains(argument)) {
+				val message = '''The argument of the "deviate" statement must be «validArguments.toPrettyString('or')».''';
+				error(message, it, DEVIATE__ARGUMENT, TYPE_ERROR);
+			}
+		}
+	}
+
+	@Check
+	def checkStatus(Status it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.21.2
+		// The "status" statement takes as an argument one of the strings "current", "deprecated", or "obsolete".
+		val status = argument;
+		if (!argument.nullOrEmpty) {
+			val validArguments = #{"current", "deprecated", "obsolete"};
+			if (!validArguments.contains(status)) {
+				val message = '''The argument of the "status" statement must be «validArguments.toPrettyString('or')».''';
+				error(message, it, STATUS__ARGUMENT, TYPE_ERROR);
+			}
+		}
+	}
+
+	@Check
+	def checkStatus(SchemaNode it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.21.2
+		// If a definition is "current", it MUST NOT reference a "deprecated" or "obsolete" definition within the same module.
+		// If a definition is "deprecated", it MUST NOT reference an "obsolete" definition within the same module.
+	}
+
+	@Check
 	def checkAugment(Augment it) {
 		// https://tools.ietf.org/html/rfc7950#section-7.17
 		// https://github.com/yang-tools/yang-lsp/issues/25
@@ -431,6 +477,90 @@ class YangValidator extends AbstractYangValidator {
 		}
 	}
 	
+	@Check
+	def void checkDefault(Choice it) {
+		// The "default" statement must not be present on choices where "mandatory" is "true".
+		// https://tools.ietf.org/html/rfc7950#section-7.9.3
+		val ^default = firstSubstatementsOfType(Default);
+		if (^default !== null) {
+			val mandatory = firstSubstatementsOfType(Mandatory);
+			if ('true' == mandatory?.isMandatory) {
+				val message = '''The "default" statement must not be present on choices where "mandatory" is "true"''';
+				error(message, it, SCHEMA_NODE__NAME, INVALID_DEFAULT);
+			}
+			// There must not be any mandatory nodes (Terminology: https://tools.ietf.org/html/rfc7950#section-3) directly under the default case.
+			val substatements = substatements;
+			val length = substatements.length;
+			val index = substatements.indexOf(^default);
+			if (index > 0 && index < length - 1) {
+				for (var i = index; i < length; i++) {
+					val statement = substatements.get(i);
+					if (statement.mandatory) {
+						val message = '''There must not be any mandatory nodes directly under the default case.''';
+						error(message, statement, null, MANDATORY_AFTER_DEFAULT_CASE);
+					}
+				}
+			}
+		}
+		
+		
+	}
+
+	/**
+	 * Returns {@code true} if the argument is a mandatory node, otherwise {@code false}.
+	 * A mandatory node is one of:
+	 * <ul>
+	 * <li>A leaf, choice, anydata, or anyxml node with a "mandatory" statement with the value "true".</li>
+	 * <li>A list or leaf-list node with a "min-elements" statement with a value greater than zero.</li>
+	 * <li>A container node without a "presence" statement and that has at least one mandatory node as a child.</li>
+	 * </ul>
+	 * See: https://tools.ietf.org/html/rfc7950#section-3
+	 */
+	private dispatch def boolean isMandatory(Statement it) {
+		return false;
+	}
+	
+	private dispatch def boolean isMandatory(Leaf it) {
+		return firstSubstatementsOfType(Mandatory).mandatory;
+	}
+	
+	private dispatch def boolean isMandatory(Choice it) {
+		return firstSubstatementsOfType(Mandatory).mandatory;
+	}
+	
+	private dispatch def boolean isMandatory(Anydata it) {
+		return firstSubstatementsOfType(Mandatory).mandatory;
+	}
+	
+	private dispatch def boolean isMandatory(Anyxml it) {
+		return firstSubstatementsOfType(Mandatory).mandatory;
+	}
+	
+	private dispatch def boolean isMandatory(List it) {
+		return firstSubstatementsOfType(MinElements).mandatory;
+	}
+	
+	private dispatch def boolean isMandatory(LeafList it) {
+		return firstSubstatementsOfType(MinElements).mandatory;
+	}
+	
+	private dispatch def boolean isMandatory(Container it) {
+		return substatementsOfType(Presence).nullOrEmpty && substatements.exists[mandatory];
+	}
+
+	private dispatch def boolean isMandatory(MinElements it) {
+		val value = minElements.parseIntSafe;
+		return value !== null && value.intValue > 0;
+	}
+	
+	private dispatch def boolean isMandatory(Mandatory it) {
+		return 'true' == isMandatory;
+	}
+	
+	private dispatch def boolean isMandatory(Void it) {
+		return false;
+	}
+
 	/**
 	 * Returns with the text of the last non-hidden leaf node of the argument, or {@code null}.
 	 */

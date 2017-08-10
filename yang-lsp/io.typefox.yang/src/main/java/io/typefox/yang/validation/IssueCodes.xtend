@@ -111,6 +111,16 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 * Issue code when an augmented node declares invalid sub-statements. For instance when an augmented leaf node has leaf nodes.
 	 */
 	public static val INVALID_AUGMENTATION = 'INVALID_AUGMENTATION'.error;
+	
+	/**
+	 * Issue code for cases when the a choice has default value and the mandatory sub-statement is "true".
+	 */
+	public static val INVALID_DEFAULT = 'INVALID_DEFAULT'.error;
+	
+	/**
+	 * Issue code when any mandatory nodes are declared after the default case in a "choice".
+	 */
+	public static val MANDATORY_AFTER_DEFAULT_CASE = 'MANDATORY_AFTER_DEFAULT_CASE'.error; 
 
 	private static val Map<String, PreferenceKey> CODES = BUILDER.build;
 
