@@ -65,6 +65,7 @@ import static extension com.google.common.base.Strings.nullToEmpty
 import static extension io.typefox.yang.utils.IterableExtensions2.*
 import static extension io.typefox.yang.utils.YangDateUtils.*
 import static extension io.typefox.yang.utils.YangNameUtils.*
+import org.eclipse.emf.ecore.EStructuralFeature
 
 /**
  * This class contains custom validation rules for the YANG language. 
@@ -482,19 +483,34 @@ class YangValidator extends AbstractYangValidator {
 
 	@Check
 	def void checkAction(Action it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.15
+		// An action must not have any ancestor node that is a list node without a "key" statement.
+		// An action must not be defined within an rpc, another action, or a notification, i.e., an action node must 
+		// not have an rpc, action, or a notification node as one of its ancestors in the schema tree.
+		checkAncestors(ACTION__NAME);
+	}
+
+	@Check
+	def void checkNotification(Notification it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.16
+		// A notification must not have any ancestor node that is a list node without a "key" statement.
+		// A notification must not be defined within an rpc, another action, or a notification, i.e., a notification node must 
+		// not have an rpc, action, or a notification node as one of its ancestors in the schema tree.
+		checkAncestors(SCHEMA_NODE__NAME);
+	}
+
+	private def checkAncestors(Statement it, EStructuralFeature feature) {
+		val name = yangName;
 		var ancestor = eContainer;
 		while (ancestor instanceof Statement) {
 			if (ancestor instanceof List) {
-				// An action must not have any ancestor node that is a list node without a "key" statement.
 				if (ancestor.firstSubstatementsOfType(Key) === null) {
-					val message = '''An action must not have any ancestor node that is a list node without a "key" statement.''';
-					error(message, it, ACTION__NAME, INVALID_ACTION_ANCESTOR);
+					val message = '''"«name»" node must not have any ancestor node that is a list node without a "key" statement.''';
+					error(message, it, feature, INVALID_ANCESTOR);
 				}
 			} else if (ancestor instanceof Action || ancestor instanceof Rpc || ancestor instanceof Notification) {
-				// An action must not be defined within an rpc, another action, or a notification, i.e., an action node must not have an rpc, action, or a
-				// notification node as one of its ancestors in the schema tree.
-				val message = '''An action must not be defined within a "«ancestor.yangName»" statement.''';
-				error(message, it, ACTION__NAME, INVALID_ACTION_ANCESTOR);
+				val message = '''"«name»" node must not be defined within a "«ancestor.yangName»" statement.''';
+				error(message, it, feature, INVALID_ANCESTOR);
 			}
 			ancestor = ancestor.eContainer;
 		}
