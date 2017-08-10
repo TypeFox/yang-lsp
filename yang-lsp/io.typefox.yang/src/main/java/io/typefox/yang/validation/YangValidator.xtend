@@ -426,13 +426,6 @@ class YangValidator extends AbstractYangValidator {
 	}
 
 	@Check
-	def checkStatus(SchemaNode it) {
-		// https://tools.ietf.org/html/rfc7950#section-7.21.2
-		// If a definition is "current", it MUST NOT reference a "deprecated" or "obsolete" definition within the same module.
-		// If a definition is "deprecated", it MUST NOT reference an "obsolete" definition within the same module.
-	}
-
-	@Check
 	def checkAugment(Augment it) {
 		// https://tools.ietf.org/html/rfc7950#section-7.17
 		// (1) The target node MUST be either a container, list, choice, case, input,
