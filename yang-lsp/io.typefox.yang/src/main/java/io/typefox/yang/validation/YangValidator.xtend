@@ -23,6 +23,8 @@ import io.typefox.yang.yang.Default
 import io.typefox.yang.yang.Deviate
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.FractionDigits
+import io.typefox.yang.yang.Identity
+import io.typefox.yang.yang.IfFeature
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Include
 import io.typefox.yang.yang.Key
@@ -49,6 +51,7 @@ import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.YangVersion
 import java.util.Collection
 import org.eclipse.emf.ecore.EClass
+import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.ParseException
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression
 import org.eclipse.xtext.naming.IQualifiedNameProvider
@@ -65,7 +68,6 @@ import static extension com.google.common.base.Strings.nullToEmpty
 import static extension io.typefox.yang.utils.IterableExtensions2.*
 import static extension io.typefox.yang.utils.YangDateUtils.*
 import static extension io.typefox.yang.utils.YangNameUtils.*
-import org.eclipse.emf.ecore.EStructuralFeature
 
 /**
  * This class contains custom validation rules for the YANG language. 
@@ -385,6 +387,14 @@ class YangValidator extends AbstractYangValidator {
 				];
 			}
 		];
+		// https://tools.ietf.org/html/rfc7950#section-7.20.2
+		// A leaf that is a list key must not have any "if-feature" statements.
+		key.references.map[it -> node].filterNull.forEach [ pair |
+			if (pair.value.firstSubstatementsOfType(IfFeature) !== null) {
+				val message = '''A leaf that is a list key must not have any "if-feature" statements.''';
+				error(message, pair.key, KEY_REFERENCE__NODE, LEAF_KEY_WITH_IF_FEATURE);
+			}
+		];
 	}
 
 	@Check
@@ -425,8 +435,6 @@ class YangValidator extends AbstractYangValidator {
 	@Check
 	def checkAugment(Augment it) {
 		// https://tools.ietf.org/html/rfc7950#section-7.17
-		// https://github.com/yang-tools/yang-lsp/issues/25
-		//
 		// (1) The target node MUST be either a container, list, choice, case, input,
 		// output, or notification node.
 		// (2) If the target node is a container, list, case, input, output, or
@@ -479,6 +487,9 @@ class YangValidator extends AbstractYangValidator {
 				}
 			}
 		}
+		// The "augment" statement must not add multiple nodes with the same name from the same module to the target node.
+		// https://tools.ietf.org/html/rfc7950#section-7.17
+		// Done by the scoping.
 	}
 
 	@Check
@@ -517,9 +528,24 @@ class YangValidator extends AbstractYangValidator {
 	}
 
 	@Check
+	def void checkIdentity(Identity it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.18.2
+		// An identity must not reference itself, neither directly nor indirectly through a chain of other identities.
+		val (Identity)=>Identity getBase = [firstSubstatementsOfType(Base)?.reference];
+		var base = getBase.apply(it);
+		while (base !== null) {
+			if (it == base) {
+				val message = '''An identity must not reference itself, neither directly nor indirectly through a chain of other identities.''';
+				error(message, it, SCHEMA_NODE__NAME, IDENTITY_CYCLE);
+			}
+			base = getBase.apply(base);
+		}
+	}
+
+	@Check
 	def void checkDefault(Choice it) {
-		// The "default" statement must not be present on choices where "mandatory" is "true".
 		// https://tools.ietf.org/html/rfc7950#section-7.9.3
+		// The "default" statement must not be present on choices where "mandatory" is "true".
 		val ^default = firstSubstatementsOfType(Default);
 		if (^default !== null) {
 			val mandatory = firstSubstatementsOfType(Mandatory);
