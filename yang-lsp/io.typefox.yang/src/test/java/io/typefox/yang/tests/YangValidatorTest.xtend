@@ -4,6 +4,7 @@ import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Bit
 import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Description
+import io.typefox.yang.yang.Deviate
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.Expression
 import io.typefox.yang.yang.FractionDigits
@@ -17,6 +18,7 @@ import io.typefox.yang.yang.Position
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Revision
+import io.typefox.yang.yang.Status
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.Value
@@ -82,7 +84,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(root.firstSubstatementsOfType(Prefix), SUBSTATEMENT_ORDERING, 'prefix');
 	}
-	
+
 	@Test
 	def void checkSubstatement_Order_02() {
 		load('''
@@ -90,7 +92,7 @@ class YangValidatorTest extends AbstractYangTest {
 			  namespace "urn:yang:types";
 			  prefix "yang";
 			}
-			''');
+		''');
 		val it = load('''
 			module example-system {
 			  namespace "urn:example:system";
@@ -103,7 +105,8 @@ class YangValidatorTest extends AbstractYangTest {
 			  }
 			}
 		''');
-		assertError(root.firstSubstatementsOfType(Import), SUBSTATEMENT_ORDERING, 'import', '''Substatement 'import' must be declared before 'organization'.''');
+		assertError(root.firstSubstatementsOfType(Import), SUBSTATEMENT_ORDERING,
+			'import', '''Substatement 'import' must be declared before 'organization'.''');
 	}
 
 	@Test
@@ -1210,7 +1213,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertNoIssues;
 	}
-	
+
 	@Test
 	def void checkRevisionFormat_02() {
 		val it = load('''
@@ -1228,7 +1231,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertWarning(EcoreUtil2.getAllContentsOfType(root, Revision).head, INVALID_REVISION_FORMAT, '10-01-2017');
 	}
-	
+
 	@Test
 	def void checkRevisionOrder_01() {
 		val it = load('''
@@ -1244,7 +1247,7 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertNoIssues;
 	}
-	
+
 	@Test
 	def void checkRevisionOrder_02() {
 		val it = load('''
@@ -1261,7 +1264,7 @@ class YangValidatorTest extends AbstractYangTest {
 		assertWarning(EcoreUtil2.getAllContentsOfType(root, Revision).head, REVISION_ORDER, '2017-01-12');
 	}
 
-	@Test	
+	@Test
 	def void checkTypedef_01() {
 		val it = load('''
 			module foo {
@@ -1274,8 +1277,8 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(root.firstSubstatementsOfType(Typedef), SUBSTATEMENT_CARDINALITY);
 	}
-	
-	@Test	
+
+	@Test
 	def void checkTypedef_02() {
 		val it = load('''
 			module foo {
@@ -1291,119 +1294,119 @@ class YangValidatorTest extends AbstractYangTest {
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Typedef).head, BAD_TYPE_NAME, 'string');
 	}
-	
+
 	@Test
 	def void checkKey_01() {
 		val it = load('''
-		module deref {
-		  yang-version 1.1;
-		  namespace urn:deref;
-		  prefix d;
-		  list a {
-		    key "ka1 ka2";
-		    leaf ka1 { type string; }
-		    leaf ka2 { type string; }
-		    list b {
-		      key kb;
-		      leaf kb { type string; }
-		      list c {
-		        key kc;
-		        leaf kc { type string; }
-		      }
-		      leaf lb { type string; }
-		    }
-		    leaf la { type string; }
-		  }
-		}
+			module deref {
+			  yang-version 1.1;
+			  namespace urn:deref;
+			  prefix d;
+			  list a {
+			    key "ka1 ka2";
+			    leaf ka1 { type string; }
+			    leaf ka2 { type string; }
+			    list b {
+			      key kb;
+			      leaf kb { type string; }
+			      list c {
+			        key kc;
+			        leaf kc { type string; }
+			      }
+			      leaf lb { type string; }
+			    }
+			    leaf la { type string; }
+			  }
+			}
 		''');
 		assertNoErrors;
 	}
-	
+
 	@Test
 	def void checkKey_02() {
 		val it = load('''
-		module deref {
-		  yang-version 1.1;
-		  namespace urn:deref;
-		  prefix d;
-		  list a {
-		    key "ka1 ka2 ka1";
-		    leaf ka1 { type string; }
-		    leaf ka2 { type string; }
-		    list b {
-		      key kb;
-		      leaf kb { type string; }
-		      list c {
-		        key kc;
-		        leaf kc { type string; }
-		      }
-		      leaf lb { type string; }
-		    }
-		    leaf la { type string; }
-		  }
-		}
+			module deref {
+			  yang-version 1.1;
+			  namespace urn:deref;
+			  prefix d;
+			  list a {
+			    key "ka1 ka2 ka1";
+			    leaf ka1 { type string; }
+			    leaf ka2 { type string; }
+			    list b {
+			      key kb;
+			      leaf kb { type string; }
+			      list c {
+			        key kc;
+			        leaf kc { type string; }
+			      }
+			      leaf lb { type string; }
+			    }
+			    leaf la { type string; }
+			  }
+			}
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Key).head, KEY_DUPLICATE_LEAF_NAME, 'ka1');
 	}
-	
+
 	@Test
 	def void checkKey_Config() {
 		val it = load('''
-		module deref {
-		  yang-version 1.1;
-		  namespace urn:deref;
-		  prefix d;
-		  list a {
-		    key "ka1";
-		    leaf ka1 { type string; config false; }
-		    leaf la { type string; }
-		  }
-		}
+			module deref {
+			  yang-version 1.1;
+			  namespace urn:deref;
+			  prefix d;
+			  list a {
+			    key "ka1";
+			    leaf ka1 { type string; config false; }
+			    leaf la { type string; }
+			  }
+			}
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, KeyReference).head, INVALID_CONFIG, 'ka1');
 	}
-	
+
 	@Test
 	def void checkConfig_01() {
 		val it = load('''
-		module deref {
-		  yang-version 1.1;
-		  namespace urn:deref;
-		  prefix d;
-		  container a {
-		    config false;
-		    choice c {
-		      case a {
-		        leaf myLeaf {
-		          config true;
-		        }
-		      }
-		    }
-		  }
-		}
+			module deref {
+			  yang-version 1.1;
+			  namespace urn:deref;
+			  prefix d;
+			  container a {
+			    config false;
+			    choice c {
+			      case a {
+			        leaf myLeaf {
+			          config true;
+			        }
+			      }
+			    }
+			  }
+			}
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Leaf).head.substatements.head, INVALID_CONFIG);
 	}
-	
+
 	@Test
 	def void checkConfig_02() {
 		val it = load('''
-		module deref {
-		  yang-version 1.1;
-		  namespace urn:deref;
-		  prefix d;
-		  container a {
-		    config true;
-		    choice c {
-		      case a {
-		        leaf myLeaf {
-		          type string;
-		          config false;
-		        }
-		      }
-		    }
-		  }
-		}
+			module deref {
+			  yang-version 1.1;
+			  namespace urn:deref;
+			  prefix d;
+			  container a {
+			    config true;
+			    choice c {
+			      case a {
+			        leaf myLeaf {
+			          type string;
+			          config false;
+			        }
+			      }
+			    }
+			  }
+			}
 		''');
 		assertNoErrors(root);
 	}
@@ -1411,27 +1414,115 @@ class YangValidatorTest extends AbstractYangTest {
 	@Test
 	def void checkAugmentContent_01() {
 		val it = load('''
-		module amodule {
-		  namespace "urn:test:amodule";
-		  prefix "amodule";
-		  grouping g {
-		    leaf l { type string; }
-		  }
-		  rpc run {
-		    input { uses g; }
-		    output { 
-		      uses g {
-		        augment l {
-		          leaf xxx {
-		            type string;
-		          }
-		        }
-		      }
-		    }
-		  }
-		}
+			module amodule {
+			  namespace "urn:test:amodule";
+			  prefix "amodule";
+			  grouping g {
+			    leaf l { type string; }
+			  }
+			  rpc run {
+			    input { uses g; }
+			    output { 
+			      uses g {
+			        augment l {
+			          leaf xxx {
+			            type string;
+			          }
+			        }
+			      }
+			    }
+			  }
+			}
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Augment).last, INVALID_AUGMENTATION);
+	}
+
+	@Test
+	def void checkDeviateArgument_01() {
+		#["not-supported", "add", "replace", "delete"].forEach [
+			val it = load('''
+				module d {
+				  namespace urn:d;
+				  prefix d;
+				
+				  container x {
+				    choice c {
+				      leaf d {
+				        type string;
+				      }
+				    }
+				  }
+				
+				  deviation /x/c/d {
+				    deviate «it»;
+				  }
+				}
+			''');
+			assertNoErrors;
+		];
+	}
+
+	@Test
+	def void checkDeviateArgument_02() {
+		val it = load('''
+			module d {
+			  namespace urn:d;
+			  prefix d;
+			
+			  container x {
+			    choice c {
+			      leaf d {
+			        type string;
+			      }
+			    }
+			  }
+			
+			  deviation /x/c/d {
+			    deviate blabla;
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Deviate).head, TYPE_ERROR);
+	}
+
+	@Test
+	def void checkStatusArgument_01() {
+		#["current", "deprecated", "obsolete"].forEach [
+			val it = load('''
+				module d {
+				  namespace urn:d;
+				  prefix d;
+				
+				  leaf Num1 {
+				    type int32 {
+				      range min..max;
+				    }
+				    description "test 1";
+				    status «it»;
+				  }
+				}
+			''');
+			assertNoErrors;
+		];
+	}
+
+	@Test
+	def void checkStatusArgument_02() {
+		val it = load('''
+			module d {
+			  namespace urn:d;
+			  prefix d;
+			
+			  leaf Num1 {
+			    type int32 {
+			      range min..max;
+			    }
+			    description "test 1";
+			    status blabla;
+			  }
+			}
+		''');
+		assertError(EcoreUtil2.getAllContentsOfType(root, Status).head, TYPE_ERROR);
 	}
 
 }

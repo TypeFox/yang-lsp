@@ -112,6 +112,32 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 */
 	public static val INVALID_AUGMENTATION = 'INVALID_AUGMENTATION'.error;
 
+	/**
+	 * Issue code for cases when the a choice has default value and the mandatory sub-statement is "true".
+	 */
+	public static val INVALID_DEFAULT = 'INVALID_DEFAULT'.error;
+
+	/**
+	 * Issue code when any mandatory nodes are declared after the default case in a "choice".
+	 */
+	public static val MANDATORY_AFTER_DEFAULT_CASE = 'MANDATORY_AFTER_DEFAULT_CASE'.error;
+
+	/**
+	 * Issue code when an action (or notification) has a "list" ancestor node without a "key" statement.
+	 * Also applies, when an action (or notification) is declared within another action, rpc or notification.
+	 */
+	public static val INVALID_ANCESTOR = 'INVALID_ACTION_ANCESTOR'.error;
+
+	/**
+	 * Issue code when an identity references itself, either directly or indirectly through a chain of other identities.
+	 */
+	public static val IDENTITY_CYCLE = 'IDENTITY_CYCLE'.error;
+
+	/**
+	 * This issue code is used when a leaf node is declared as a list key and have any "if-feature" statements.
+	 */
+	public static val LEAF_KEY_WITH_IF_FEATURE = 'LEAF_KEY_WITH_IF_FEATURE'.error;
+
 	private static val Map<String, PreferenceKey> CODES = BUILDER.build;
 
 	override getConfigurableIssueCodes() {

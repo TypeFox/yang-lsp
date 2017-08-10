@@ -12,29 +12,45 @@ import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.utils.YangNameUtils
 import io.typefox.yang.utils.YangTypesExtensions
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Action
+import io.typefox.yang.yang.Anydata
+import io.typefox.yang.yang.Anyxml
 import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Base
+import io.typefox.yang.yang.Choice
+import io.typefox.yang.yang.Default
+import io.typefox.yang.yang.Deviate
 import io.typefox.yang.yang.Enum
 import io.typefox.yang.yang.FractionDigits
+import io.typefox.yang.yang.Identity
+import io.typefox.yang.yang.IfFeature
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Include
 import io.typefox.yang.yang.Key
+import io.typefox.yang.yang.Leaf
+import io.typefox.yang.yang.LeafList
+import io.typefox.yang.yang.List
 import io.typefox.yang.yang.Mandatory
 import io.typefox.yang.yang.MaxElements
 import io.typefox.yang.yang.MinElements
 import io.typefox.yang.yang.Modifier
+import io.typefox.yang.yang.Notification
 import io.typefox.yang.yang.OrderedBy
 import io.typefox.yang.yang.Pattern
+import io.typefox.yang.yang.Presence
 import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Revision
+import io.typefox.yang.yang.Rpc
 import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.Statement
+import io.typefox.yang.yang.Status
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.YangVersion
 import java.util.Collection
 import org.eclipse.emf.ecore.EClass
+import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.ParseException
 import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression
 import org.eclipse.xtext.naming.IQualifiedNameProvider
@@ -370,13 +386,47 @@ class YangValidator extends AbstractYangValidator {
 				];
 			}
 		];
+		// https://tools.ietf.org/html/rfc7950#section-7.20.2
+		// A leaf that is a list key must not have any "if-feature" statements.
+		key.references.map[it -> node].filterNull.forEach [ pair |
+			if (pair.value.firstSubstatementsOfType(IfFeature) !== null) {
+				val message = '''A leaf that is a list key must not have any "if-feature" statements.''';
+				error(message, pair.key, KEY_REFERENCE__NODE, LEAF_KEY_WITH_IF_FEATURE);
+			}
+		];
+	}
+
+	@Check
+	def checkDeviate(Deviate it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.20.3.2
+		// The argument is one of the strings "not-supported", "add", "replace", or "delete".
+		val argument = argument;
+		if (!argument.nullOrEmpty) {
+			val validArguments = #{"not-supported", "add", "replace", "delete"};
+			if (!validArguments.contains(argument)) {
+				val message = '''The argument of the "deviate" statement must be «validArguments.toPrettyString('or')».''';
+				error(message, it, DEVIATE__ARGUMENT, TYPE_ERROR);
+			}
+		}
+	}
+
+	@Check
+	def checkStatus(Status it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.21.2
+		// The "status" statement takes as an argument one of the strings "current", "deprecated", or "obsolete".
+		val status = argument;
+		if (!argument.nullOrEmpty) {
+			val validArguments = #{"current", "deprecated", "obsolete"};
+			if (!validArguments.contains(status)) {
+				val message = '''The argument of the "status" statement must be «validArguments.toPrettyString('or')».''';
+				error(message, it, STATUS__ARGUMENT, TYPE_ERROR);
+			}
+		}
 	}
 
 	@Check
 	def checkAugment(Augment it) {
 		// https://tools.ietf.org/html/rfc7950#section-7.17
-		// https://github.com/yang-tools/yang-lsp/issues/25
-		//
 		// (1) The target node MUST be either a container, list, choice, case, input,
 		// output, or notification node.
 		// (2) If the target node is a container, list, case, input, output, or
@@ -429,8 +479,121 @@ class YangValidator extends AbstractYangValidator {
 				}
 			}
 		}
+	// The "augment" statement must not add multiple nodes with the same name from the same module to the target node.
+	// https://tools.ietf.org/html/rfc7950#section-7.17
+	// Done by the scoping.
 	}
-	
+
+	@Check
+	def void checkAction(Action it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.15
+		// An action must not have any ancestor node that is a list node without a "key" statement.
+		// An action must not be defined within an rpc, another action, or a notification, i.e., an action node must 
+		// not have an rpc, action, or a notification node as one of its ancestors in the schema tree.
+		checkAncestors(ACTION__NAME);
+	}
+
+	@Check
+	def void checkNotification(Notification it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.16
+		// A notification must not have any ancestor node that is a list node without a "key" statement.
+		// A notification must not be defined within an rpc, another action, or a notification, i.e., a notification node must 
+		// not have an rpc, action, or a notification node as one of its ancestors in the schema tree.
+		checkAncestors(SCHEMA_NODE__NAME);
+	}
+
+	private def checkAncestors(Statement it, EStructuralFeature feature) {
+		val name = yangName;
+		var ancestor = eContainer;
+		while (ancestor instanceof Statement) {
+			if (ancestor instanceof List) {
+				if (ancestor.firstSubstatementsOfType(Key) === null) {
+					val message = '''"«name»" node must not have any ancestor node that is a list node without a "key" statement.''';
+					error(message, it, feature, INVALID_ANCESTOR);
+				}
+			} else if (ancestor instanceof Action || ancestor instanceof Rpc || ancestor instanceof Notification) {
+				val message = '''"«name»" node must not be defined within a "«ancestor.yangName»" statement.''';
+				error(message, it, feature, INVALID_ANCESTOR);
+			}
+			ancestor = ancestor.eContainer;
+		}
+	}
+
+	@Check
+	def void checkIdentity(Identity it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.18.2
+		// An identity must not reference itself, neither directly nor indirectly through a chain of other identities.
+		val (Identity)=>Identity getBase = [firstSubstatementsOfType(Base)?.reference];
+		var base = getBase.apply(it);
+		while (base !== null) {
+			if (it == base) {
+				val message = '''An identity must not reference itself, neither directly nor indirectly through a chain of other identities.''';
+				error(message, it, SCHEMA_NODE__NAME, IDENTITY_CYCLE);
+			}
+			base = getBase.apply(base);
+		}
+	}
+
+	@Check
+	def void checkDefault(Choice it) {
+		// https://tools.ietf.org/html/rfc7950#section-7.9.3
+		// The "default" statement must not be present on choices where "mandatory" is "true".
+		val ^default = firstSubstatementsOfType(Default);
+		if (^default !== null) {
+			val mandatory = firstSubstatementsOfType(Mandatory);
+			if ('true' == mandatory?.isMandatory) {
+				val message = '''The "default" statement must not be present on choices where "mandatory" is "true"''';
+				error(message, it, SCHEMA_NODE__NAME, INVALID_DEFAULT);
+			}
+			// There must not be any mandatory nodes (Terminology: https://tools.ietf.org/html/rfc7950#section-3) directly under the default case.
+			val substatements = substatements;
+			val length = substatements.length;
+			val index = substatements.indexOf(^default);
+			if (index > 0 && index < length - 1) {
+				for (var i = index; i < length; i++) {
+					val statement = substatements.get(i);
+					if (statement.mandatory) {
+						val message = '''There must not be any mandatory nodes directly under the default case.''';
+						error(message, statement, null, MANDATORY_AFTER_DEFAULT_CASE);
+					}
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * Returns {@code true} if the argument is a mandatory node, otherwise {@code false}.
+	 * A mandatory node is one of:
+	 * <ul>
+	 * <li>A leaf, choice, anydata, or anyxml node with a "mandatory" statement with the value "true".</li>
+	 * <li>A list or leaf-list node with a "min-elements" statement with a value greater than zero.</li>
+	 * <li>A container node without a "presence" statement and that has at least one mandatory node as a child.</li>
+	 * </ul>
+	 * See: https://tools.ietf.org/html/rfc7950#section-3
+	 */
+	private def boolean isMandatory(Statement it) {
+		return switch (it) {
+			case Leaf,
+			Choice,
+			Anydata,
+			Anyxml: {
+				'true' == firstSubstatementsOfType(Mandatory)?.isMandatory
+			}
+			case List,
+			LeafList: {
+				val value = firstSubstatementsOfType(MinElements)?.minElements.parseIntSafe;
+				return value !== null && value.intValue > 0;
+			}
+			case Choice: {
+				substatementsOfType(Presence).nullOrEmpty && substatements.exists[mandatory];
+			}
+			default: {
+				false;
+			}
+		}
+	}
+
 	/**
 	 * Returns with the text of the last non-hidden leaf node of the argument, or {@code null}.
 	 */
