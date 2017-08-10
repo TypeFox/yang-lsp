@@ -18,7 +18,6 @@ import io.typefox.yang.yang.Anyxml
 import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Base
 import io.typefox.yang.yang.Choice
-import io.typefox.yang.yang.Container
 import io.typefox.yang.yang.Default
 import io.typefox.yang.yang.Deviate
 import io.typefox.yang.yang.Enum
@@ -480,9 +479,9 @@ class YangValidator extends AbstractYangValidator {
 				}
 			}
 		}
-		// The "augment" statement must not add multiple nodes with the same name from the same module to the target node.
-		// https://tools.ietf.org/html/rfc7950#section-7.17
-		// Done by the scoping.
+	// The "augment" statement must not add multiple nodes with the same name from the same module to the target node.
+	// https://tools.ietf.org/html/rfc7950#section-7.17
+	// Done by the scoping.
 	}
 
 	@Check
@@ -573,49 +572,26 @@ class YangValidator extends AbstractYangValidator {
 	 * </ul>
 	 * See: https://tools.ietf.org/html/rfc7950#section-3
 	 */
-	private dispatch def boolean isMandatory(Statement it) {
-		return false;
-	}
-
-	private dispatch def boolean isMandatory(Leaf it) {
-		return firstSubstatementsOfType(Mandatory).mandatory;
-	}
-
-	private dispatch def boolean isMandatory(Choice it) {
-		return firstSubstatementsOfType(Mandatory).mandatory;
-	}
-
-	private dispatch def boolean isMandatory(Anydata it) {
-		return firstSubstatementsOfType(Mandatory).mandatory;
-	}
-
-	private dispatch def boolean isMandatory(Anyxml it) {
-		return firstSubstatementsOfType(Mandatory).mandatory;
-	}
-
-	private dispatch def boolean isMandatory(List it) {
-		return firstSubstatementsOfType(MinElements).mandatory;
-	}
-
-	private dispatch def boolean isMandatory(LeafList it) {
-		return firstSubstatementsOfType(MinElements).mandatory;
-	}
-
-	private dispatch def boolean isMandatory(Container it) {
-		return substatementsOfType(Presence).nullOrEmpty && substatements.exists[mandatory];
-	}
-
-	private dispatch def boolean isMandatory(MinElements it) {
-		val value = minElements.parseIntSafe;
-		return value !== null && value.intValue > 0;
-	}
-
-	private dispatch def boolean isMandatory(Mandatory it) {
-		return 'true' == isMandatory;
-	}
-
-	private dispatch def boolean isMandatory(Void it) {
-		return false;
+	private def boolean isMandatory(Statement it) {
+		return switch (it) {
+			case Leaf,
+			Choice,
+			Anydata,
+			Anyxml: {
+				'true' == firstSubstatementsOfType(Mandatory)?.isMandatory
+			}
+			case List,
+			LeafList: {
+				val value = firstSubstatementsOfType(MinElements)?.minElements.parseIntSafe;
+				return value !== null && value.intValue > 0;
+			}
+			case Choice: {
+				substatementsOfType(Presence).nullOrEmpty && substatements.exists[mandatory];
+			}
+			default: {
+				false;
+			}
+		}
 	}
 
 	/**
