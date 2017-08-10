@@ -122,6 +122,11 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 */
 	public static val MANDATORY_AFTER_DEFAULT_CASE = 'MANDATORY_AFTER_DEFAULT_CASE'.error; 
 
+	/**
+	 * Issues code when an action has a "list" ancestor node without a "key" statement.
+	 */
+	public static val INVALID_ACTION_ANCESTOR = 'INVALID_ACTION_ANCESTOR'.error;
+
 	private static val Map<String, PreferenceKey> CODES = BUILDER.build;
 
 	override getConfigurableIssueCodes() {

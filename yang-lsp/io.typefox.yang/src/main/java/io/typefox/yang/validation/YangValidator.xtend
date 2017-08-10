@@ -12,6 +12,7 @@ import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.utils.YangNameUtils
 import io.typefox.yang.utils.YangTypesExtensions
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Action
 import io.typefox.yang.yang.Anydata
 import io.typefox.yang.yang.Anyxml
 import io.typefox.yang.yang.Augment
@@ -32,11 +33,13 @@ import io.typefox.yang.yang.Mandatory
 import io.typefox.yang.yang.MaxElements
 import io.typefox.yang.yang.MinElements
 import io.typefox.yang.yang.Modifier
+import io.typefox.yang.yang.Notification
 import io.typefox.yang.yang.OrderedBy
 import io.typefox.yang.yang.Pattern
 import io.typefox.yang.yang.Presence
 import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Revision
+import io.typefox.yang.yang.Rpc
 import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.Statement
@@ -476,7 +479,27 @@ class YangValidator extends AbstractYangValidator {
 			}
 		}
 	}
-	
+
+	@Check
+	def void checkAction(Action it) {
+		var ancestor = eContainer;
+		while (ancestor instanceof Statement) {
+			if (ancestor instanceof List) {
+				// An action must not have any ancestor node that is a list node without a "key" statement.
+				if (ancestor.firstSubstatementsOfType(Key) === null) {
+					val message = '''An action must not have any ancestor node that is a list node without a "key" statement.''';
+					error(message, it, ACTION__NAME, INVALID_ACTION_ANCESTOR);
+				}
+			} else if (ancestor instanceof Action || ancestor instanceof Rpc || ancestor instanceof Notification) {
+				// An action must not be defined within an rpc, another action, or a notification, i.e., an action node must not have an rpc, action, or a
+				// notification node as one of its ancestors in the schema tree.
+				val message = '''An action must not be defined within a "«ancestor.yangName»" statement.''';
+				error(message, it, ACTION__NAME, INVALID_ACTION_ANCESTOR);
+			}
+			ancestor = ancestor.eContainer;
+		}
+	}
+
 	@Check
 	def void checkDefault(Choice it) {
 		// The "default" statement must not be present on choices where "mandatory" is "true".
@@ -502,8 +525,7 @@ class YangValidator extends AbstractYangValidator {
 				}
 			}
 		}
-		
-		
+
 	}
 
 	/**
@@ -519,31 +541,31 @@ class YangValidator extends AbstractYangValidator {
 	private dispatch def boolean isMandatory(Statement it) {
 		return false;
 	}
-	
+
 	private dispatch def boolean isMandatory(Leaf it) {
 		return firstSubstatementsOfType(Mandatory).mandatory;
 	}
-	
+
 	private dispatch def boolean isMandatory(Choice it) {
 		return firstSubstatementsOfType(Mandatory).mandatory;
 	}
-	
+
 	private dispatch def boolean isMandatory(Anydata it) {
 		return firstSubstatementsOfType(Mandatory).mandatory;
 	}
-	
+
 	private dispatch def boolean isMandatory(Anyxml it) {
 		return firstSubstatementsOfType(Mandatory).mandatory;
 	}
-	
+
 	private dispatch def boolean isMandatory(List it) {
 		return firstSubstatementsOfType(MinElements).mandatory;
 	}
-	
+
 	private dispatch def boolean isMandatory(LeafList it) {
 		return firstSubstatementsOfType(MinElements).mandatory;
 	}
-	
+
 	private dispatch def boolean isMandatory(Container it) {
 		return substatementsOfType(Presence).nullOrEmpty && substatements.exists[mandatory];
 	}
@@ -552,11 +574,11 @@ class YangValidator extends AbstractYangValidator {
 		val value = minElements.parseIntSafe;
 		return value !== null && value.intValue > 0;
 	}
-	
+
 	private dispatch def boolean isMandatory(Mandatory it) {
 		return 'true' == isMandatory;
 	}
-	
+
 	private dispatch def boolean isMandatory(Void it) {
 		return false;
 	}
