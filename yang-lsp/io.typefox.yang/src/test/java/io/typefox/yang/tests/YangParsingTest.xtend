@@ -42,17 +42,26 @@ class YangParsingTest {
 		        cref XpathExpression target XpathLocation {
 		            cref XpathExpression target AbsolutePath {
 		                cref XpathStep step XpathStep {
-		                    attr EString node 'll:x'
+		                    cref XpathNodeTest node XpathNameTest {
+		                        attr EString prefix 'll'
+		                        ref SchemaNode ref ref: SchemaNode@(unresolved proxy __synthetic0.yang#|0)
+		                    }
 		                }
 		            }
 		            cref XpathStep step XpathStep {
-		                attr EString node 'll:q'
+		                cref XpathNodeTest node XpathNameTest {
+		                    attr EString prefix 'll'
+		                    ref SchemaNode ref ref: SchemaNode@(unresolved proxy __synthetic0.yang#|1)
+		                }
 		            }
 		        }
-		        cref XpathExpression predicate XpathBinaryOperation {
+		        cref XpathExpression predicate XpathEqualityOperation {
 		            cref XpathExpression left RelativePath {
 		                cref XpathStep step XpathStep {
-		                    attr EString node 'll:a'
+		                    cref XpathNodeTest node XpathNameTest {
+		                        attr EString prefix 'll'
+		                        ref SchemaNode ref ref: SchemaNode@(unresolved proxy __synthetic0.yang#|2)
+		                    }
 		                }
 		            }
 		            attr EString operator '='
@@ -62,16 +71,22 @@ class YangParsingTest {
 		                        attr EString name 'current'
 		                    }
 		                    cref XpathStep step ParentRef {
+		                        ref SchemaNode ref ref: SchemaNode@(unresolved proxy __synthetic0.yang#|3)
 		                    }
 		                }
 		                cref XpathStep step XpathStep {
-		                    attr EString node 'a'
+		                    cref XpathNodeTest node XpathNameTest {
+		                        ref SchemaNode ref ref: SchemaNode@(unresolved proxy __synthetic0.yang#|4)
+		                    }
 		                }
 		            }
 		        }
 		    }
 		    cref XpathStep step XpathStep {
-		        attr EString node 'll:b'
+		        cref XpathNodeTest node XpathNameTest {
+		            attr EString prefix 'll'
+		            ref SchemaNode ref ref: SchemaNode@(unresolved proxy __synthetic0.yang#|5)
+		        }
 		    }
 		}'''.toString, EmfFormatter.objToStr((model.substatements.head as Path).reference))
 	}

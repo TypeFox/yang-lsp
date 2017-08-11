@@ -53,6 +53,10 @@ import static io.typefox.yang.yang.YangPackage.Literals.*
 import io.typefox.yang.yang.Revision
 import org.eclipse.xtext.resource.EObjectDescription
 import org.eclipse.emf.ecore.util.EcoreUtil
+import io.typefox.yang.scoping.xpath.XpathResolver
+import io.typefox.yang.yang.When
+import io.typefox.yang.yang.Must
+import io.typefox.yang.yang.Path
 
 /**
  * Links the imported modules and included submodules, as well as computing the IScopeContext for them. 
@@ -63,6 +67,7 @@ class ScopeContextProvider {
 	@Inject Linker linker
 	@Inject ResourceDescriptionsProvider indexProvider
 	@Inject extension YangExtensions
+	@Inject XpathResolver xpathResolver
 	
 	@EmfAdaptable
 	@Data
@@ -320,6 +325,27 @@ class ScopeContextProvider {
 		handleGeneric(node, nodePath, ctx, isConfig)
 	}
 	
+	protected dispatch def void computeScope(When when, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
+		ctx.runAfterAll [
+			xpathResolver.doResolve(when.condition, nodePath, ctx)
+		]
+		handleGeneric(when, nodePath, ctx, isConfig)
+	}
+	
+	protected dispatch def void computeScope(Must must, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
+		ctx.runAfterAll [
+			xpathResolver.doResolve(must.constraint, nodePath, ctx)
+		]
+		handleGeneric(must, nodePath, ctx, isConfig)
+	}
+	
+	protected dispatch def void computeScope(Path path, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
+		ctx.runAfterAll [
+			xpathResolver.doResolve(path.reference, nodePath, ctx)
+		]
+		handleGeneric(path, nodePath, ctx, isConfig)
+	}
+	
 	protected def void handleGeneric(EObject node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		var newIsConfig = isConfig
 		if (node instanceof SchemaNode) {		
@@ -354,8 +380,7 @@ class ScopeContextProvider {
 	private static val NO_CONFIG_USER_DATA = 'NO_CONFIG'
 	
 	private def void addToNodeScope(EObject node, QualifiedName name, IScopeContext ctx, boolean isConfig) {
-		ctx.onComputeNodeScope 
-		[
+		ctx.onComputeNodeScope [
 			val options = if (isConfig) emptyMap else #{NO_CONFIG_USER_DATA -> 't'}
 			if (!ctx.schemaNodeScope.tryAddLocal(name, node, options)) {
 				validator.addIssue(node, SCHEMA_NODE__NAME, '''A schema node with the name '«name»' already exists.''', IssueCodes.DUPLICATE_NAME)

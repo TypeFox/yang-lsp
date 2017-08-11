@@ -203,7 +203,12 @@
     <genClasses ecoreClass="Yang.ecore#//XpathExpression"/>
     <genClasses ecoreClass="Yang.ecore#//XpathStep">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathStep/axis"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathStep/node"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathStep/node"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//XpathNodeTest"/>
+    <genClasses ecoreClass="Yang.ecore#//XpathNameTest">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathNameTest/prefix"/>
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathNameTest/ref"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//BinaryOperator">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//BinaryOperator/left"/>
@@ -227,18 +232,48 @@
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Min"/>
     <genClasses ecoreClass="Yang.ecore#//Max"/>
-    <genClasses ecoreClass="Yang.ecore#//XpathBinaryOperation">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathBinaryOperation/left"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathBinaryOperation/operator"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathBinaryOperation/right"/>
+    <genClasses ecoreClass="Yang.ecore#//XpathOrOperation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathOrOperation/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathOrOperation/operator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathOrOperation/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//XpathAndOperation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathAndOperation/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathAndOperation/operator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathAndOperation/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//XpathEqualityOperation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathEqualityOperation/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathEqualityOperation/operator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathEqualityOperation/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//XpathRelationalOperation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathRelationalOperation/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathRelationalOperation/operator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathRelationalOperation/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//XpathAdditiveOperation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathAdditiveOperation/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathAdditiveOperation/operator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathAdditiveOperation/right"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//XpathMultiplicativeOperation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathMultiplicativeOperation/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathMultiplicativeOperation/operator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathMultiplicativeOperation/right"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//XpathUnaryOperation">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathUnaryOperation/operator"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathUnaryOperation/target"/>
     </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//XpathUnionOperation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathUnionOperation/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathUnionOperation/operator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathUnionOperation/right"/>
+    </genClasses>
     <genClasses ecoreClass="Yang.ecore#//XpathLocation">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathLocation/target"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathLocation/isAbbreviated"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathLocation/isDescendants"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathLocation/step"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//XpathFilter">
@@ -262,13 +297,23 @@
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//RelativePath/step"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//AbsolutePath">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//AbsolutePath/isAbbreviated"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//AbsolutePath/isDescendants"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//AbsolutePath/step"/>
     </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//CurrentRef"/>
-    <genClasses ecoreClass="Yang.ecore#//ParentRef"/>
+    <genClasses ecoreClass="Yang.ecore#//CurrentRef">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//CurrentRef/ref"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//ParentRef">
+      <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//ParentRef/ref"/>
+    </genClasses>
     <genClasses ecoreClass="Yang.ecore#//AbbrevAttributeStep">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//AbbrevAttributeStep/attributeName"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//XpathNodeType">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathNodeType/name"/>
+    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//ProcessingInstruction">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//ProcessingInstruction/instruction"/>
     </genClasses>
   </genPackages>
 </genmodel:GenModel>

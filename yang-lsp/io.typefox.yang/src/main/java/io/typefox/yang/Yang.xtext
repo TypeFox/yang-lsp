@@ -509,27 +509,27 @@ XpathExpression returns XpathExpression:
 ;
 
 XpathOrExpr  returns XpathExpression:  
-	XpathAndExpr ({XpathBinaryOperation.left=current} operator='or' right=XpathAndExpr)*
+	XpathAndExpr ({XpathOrOperation.left=current} operator='or' right=XpathAndExpr)*
 ;
 
 XpathAndExpr  returns XpathExpression:  
-	XpathEqualityExpr ({XpathBinaryOperation.left=current} operator='and' right=XpathEqualityExpr)*
+	XpathEqualityExpr ({XpathAndOperation.left=current} operator='and' right=XpathEqualityExpr)*
 ;
 
 XpathEqualityExpr returns XpathExpression:  
-	XpathRelationalExpr ({XpathBinaryOperation.left=current} operator=('='|'!=') right=XpathRelationalExpr)*
+	XpathRelationalExpr ({XpathEqualityOperation.left=current} operator=('='|'!=') right=XpathRelationalExpr)*
 ;
 
 XpathRelationalExpr returns XpathExpression : 
-	XpathAdditiveExpr ({XpathBinaryOperation.left=current} operator=('<'|'>'|'<='|'>=') right=XpathAdditiveExpr)*
+	XpathAdditiveExpr ({XpathRelationalOperation.left=current} operator=('<'|'>'|'<='|'>=') right=XpathAdditiveExpr)*
 ;
 
 XpathAdditiveExpr returns XpathExpression :  
-	XpathMultiplicativeExpr ({XpathBinaryOperation.left=current} operator=('+'|'-') right=XpathMultiplicativeExpr)*
+	XpathMultiplicativeExpr ({XpathAdditiveOperation.left=current} operator=('+'|'-') right=XpathMultiplicativeExpr)*
 ;
 
 XpathMultiplicativeExpr returns XpathExpression :  
-	XpathUnaryExpr ({XpathBinaryOperation.left=current} operator=('*'|'div'|'mod') right=XpathMultiplicativeExpr)?
+	XpathUnaryExpr ({XpathMultiplicativeOperation.left=current} operator=('*'|'div'|'mod') right=XpathMultiplicativeExpr)?
 ;
 
 XpathUnaryExpr returns XpathExpression :
@@ -538,12 +538,12 @@ XpathUnaryExpr returns XpathExpression :
 ;
 
 XpathUnionExpr returns XpathExpression :  
-	 XpathPathExpr ({XpathBinaryOperation.left=current} operator='|' right=XpathUnionExpr)?
+	 XpathPathExpr ({XpathUnionOperation.left=current} operator='|' right=XpathUnionExpr)?
 ;
 
 
 XpathPathExpr returns XpathExpression :  
-	 XpathFilterExpr ({XpathLocation.target=current} '/' ->(isAbbreviated?='/')? step=XpathStep ({XpathFilter.target = current} '[' predicate=XpathExpression ']')*)*
+	 XpathFilterExpr ({XpathLocation.target=current} '/' ->(isDescendants?='/')? step=XpathStep ({XpathFilter.target = current} '[' predicate=XpathExpression ']')*)*
 ;
 
 XpathFilterExpr returns XpathExpression : 
@@ -557,24 +557,27 @@ XpathPrimaryExpr returns XpathExpression :
   |  {XpathNumberLiteral} value=NUMBER  
   |  {XpathFunctionCall} name=QNAME '(' ( args+=XpathExpression ( ',' args+=XpathExpression )* )? ')'
   |  {RelativePath} step=XpathStep
-  |  {AbsolutePath} '/' ->(isAbbreviated?='/')? ->step=XpathStep?
+  |  {AbsolutePath} '/' ->(isDescendants?='/')? ->step=XpathStep?
 ;
 
 XpathStep returns XpathStep :
-	  {CurrentRef} '.'
-	| {ParentRef} '..'
-	| {AbbrevAttributeStep} '@' attributeName=(XpathIDOrKw|'*')  
+	  {CurrentRef} ref=[SchemaNode|Dot]
+	| {ParentRef} ref=[SchemaNode|DotDot]
+	| {AbbrevAttributeStep} '@' attributeName=(XpathIDOrKw)  
 	| (axis=XpathAxisName ':' ':')? node=XpathNodeTest
 ;
 
+Dot : '.';
+DotDot : '..';
+
 XpathNodeTest:  
 	 XpathNameTest
-  |  XpathNodeType '(' ')'
-  |  'processing-instruction' '(' STRING ')'
+  |  {XpathNodeType} name=XpathNodeType '(' ')'
+  |  {ProcessingInstruction} 'processing-instruction' '(' instruction=STRING ')'
 ;
 
 XpathNameTest:  
-	(ID ':')? ('*'|XpathIDOrKw)
+	(prefix=ID ':')? ref = [SchemaNode|XpathIDOrKw]
 ;
 
 XpathNodeType:  
@@ -600,7 +603,7 @@ XpathAxisName:
 ;
 
 XpathIDOrKw :
-	ID | 'div' | 'and'| 'or' | 'mod' | XpathAxisName | XpathNodeType
+	ID | 'div' | 'and'| 'or' | 'mod' | XpathAxisName | XpathNodeType | '*'
 ;
 
 /////////////////////////////////

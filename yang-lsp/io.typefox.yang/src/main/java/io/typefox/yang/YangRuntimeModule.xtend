@@ -27,6 +27,8 @@ import org.eclipse.xtext.validation.IssueSeveritiesProvider
 import org.eclipse.xtext.validation.ResourceValidatorImpl
 import org.eclipse.xtext.workspace.IProjectConfigProvider
 import org.eclipse.xtext.workspace.ProjectConfigProvider
+import io.typefox.yang.validation.LinkingErrorMessageProvider
+import org.eclipse.xtext.linking.impl.LinkingDiagnosticMessageProvider
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
@@ -86,5 +88,9 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 
 	def Class<? extends IssueSeveritiesProvider> bindIssueSeveritiesProvider() {
 		YangIssueSeverityProvider
+	}
+	
+	def Class<? extends LinkingDiagnosticMessageProvider> bindLinkingDiagnosticMessageProvider() {
+		LinkingErrorMessageProvider
 	}
 }

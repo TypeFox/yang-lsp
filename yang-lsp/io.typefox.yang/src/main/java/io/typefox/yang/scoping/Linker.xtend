@@ -1,6 +1,7 @@
 package io.typefox.yang.scoping
 
 import com.google.inject.Inject
+import io.typefox.yang.validation.LinkingErrorMessageProvider
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.emf.ecore.InternalEObject
@@ -9,20 +10,25 @@ import org.eclipse.xtext.linking.impl.LinkingHelper
 import org.eclipse.xtext.linking.lazy.LazyURIEncoder
 import org.eclipse.xtext.naming.IQualifiedNameConverter
 import org.eclipse.xtext.naming.QualifiedName
-import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
+import org.eclipse.xtext.resource.EObjectDescription
+import org.eclipse.xtext.resource.IEObjectDescription
 
 class Linker {
 
 	@Inject LinkingHelper linkingHelper
 	@Inject LazyURIEncoder lazyURIEncoder
 	@Inject IQualifiedNameConverter qualifiedNameConverter
+	
+	public static IEObjectDescription ANY = new EObjectDescription(QualifiedName.EMPTY, null, null);
 
 	def <T> T link(EObject element, EReference reference, (QualifiedName)=>IEObjectDescription resolver) {
 		val qname = getLinkingName(element, reference)
 		if (qname !== null) {
 			val candidate = resolver.apply(qname)
-			if (candidate !== null) {
+			if (candidate === ANY) {
+				LinkingErrorMessageProvider.markOK(element)
+			} else if (candidate !== null) {
 				val resolved = EcoreUtil.resolve(candidate.getEObjectOrProxy, element)
 				element.eSet(reference, resolved)
 				return resolved as T

@@ -137,6 +137,28 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 * This issue code is used when a leaf node is declared as a list key and have any "if-feature" statements.
 	 */
 	public static val LEAF_KEY_WITH_IF_FEATURE = 'LEAF_KEY_WITH_IF_FEATURE'.error;
+	
+	/**
+	 * Invalid type
+	 */
+	public static val INVALID_TYPE = 'INVALID_TYPE'.error;
+	
+	/**
+	 * Xpath expressions in YANG don't have variables in context
+	 */
+	public static val UNKNOWN_VARIABLE = 'UNKNOWN_VARIABLE'.error;
+	
+	/**
+	 * An unknown function is called
+	 */
+	public static val UNKNOWN_FUNCTION = 'UNKNOWN_FUNCTION'.warn;
+	
+	/**
+	 * Wrong argument arity
+	 */
+	public static val FUNCTION_ARITY = 'FUNCTION_ARITY'.error;
+	
+	
 
 	private static val Map<String, PreferenceKey> CODES = BUILDER.build;
 
@@ -153,5 +175,6 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 		BUILDER.put(code, new PreferenceKey(code, SeverityConverter.SEVERITY_WARNING));
 		return code;
 	}
+	
 
 }
