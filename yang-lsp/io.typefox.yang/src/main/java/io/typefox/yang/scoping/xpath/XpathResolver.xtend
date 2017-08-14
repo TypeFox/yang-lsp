@@ -12,9 +12,12 @@ import io.typefox.yang.yang.AbsolutePath
 import io.typefox.yang.yang.Case
 import io.typefox.yang.yang.Choice
 import io.typefox.yang.yang.CurrentRef
+import io.typefox.yang.yang.Leaf
 import io.typefox.yang.yang.ParentRef
+import io.typefox.yang.yang.Path
 import io.typefox.yang.yang.ProcessingInstruction
 import io.typefox.yang.yang.RelativePath
+import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.XpathAdditiveOperation
 import io.typefox.yang.yang.XpathAndOperation
 import io.typefox.yang.yang.XpathEqualityOperation
@@ -38,9 +41,6 @@ import java.util.concurrent.atomic.AtomicReference
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.IEObjectDescription
-import io.typefox.yang.yang.Leaf
-import io.typefox.yang.yang.Type
-import io.typefox.yang.yang.Path
 
 class XpathResolver {
 	
@@ -50,11 +50,13 @@ class XpathResolver {
 	@Data static class Context {
 		MapScope nodeScope
 		String moduleName
+		XpathType initial
 	}
 	
 	def XpathType doResolve(XpathExpression expression, QualifiedName contextNode, IScopeContext context) {
 		val element = context.schemaNodeScope.getSingleElement(contextNode)
-		internalResolve(expression, Types.nodeSet(element), new Context(context.schemaNodeScope, context.moduleName))
+		val initialContext = Types.nodeSet(element)
+		internalResolve(expression, initialContext, new Context(context.schemaNodeScope, context.moduleName, initialContext))
 	}
 	
 	protected def dispatch XpathType internalResolve(XpathExpression e, XpathType contextType, Context ctx) {
@@ -105,10 +107,10 @@ class XpathResolver {
 	protected def dispatch XpathType internalResolve(XpathUnionOperation e, XpathType contextType, Context ctx) {
 		var left = internalResolve(e.left, contextType, ctx)
 		var right = internalResolve(e.right, contextType, ctx)
-		if (!(left instanceof NodeSetType)) {
+		if (!(left instanceof NodeSetType) && left !== Types.ANY) {
 			validator.addIssue(e.left, null, "The operands of a union operation must return a node set.", IssueCodes.INVALID_TYPE)
 		}
-		if (!(right instanceof NodeSetType)) {
+		if (!(right instanceof NodeSetType) && left !== Types.ANY) {
 			validator.addIssue(e.right, null, "The operands of a union operation must return a node set.", IssueCodes.INVALID_TYPE)
 		}
 		return Types.union(left, right)
@@ -147,7 +149,7 @@ class XpathResolver {
 			return Types.ANY
 		}
 		if (f.name == 'current') {
-			return contextType
+			return ctx.initial
 		}
 		if (f.name == 'deref') {
 			val type = internalResolve(e.args.head, contextType, ctx)
@@ -205,6 +207,11 @@ class XpathResolver {
 	}
 	
 	protected def dispatch XpathType internalResolveStep(ParentRef e, XpathType contextType, Context ctx) {
+		if (contextType == Types.ANY) {
+			// don't report follow up linking problems
+			LinkingErrorMessageProvider.markOK(e);
+			return contextType
+		}
 		val type = computeType(contextType, null, Axis.PARENT, ctx)
 		linker.link(e, YangPackage.Literals.PARENT_REF__REF) [
 			type.EObjectDescription
@@ -229,6 +236,10 @@ class XpathResolver {
 			return Types.BOOLEAN	
 		}
 		if (e.axis == 'self') {
+			if (contextType === Types.ANY) {
+				LinkingErrorMessageProvider.markOK(e.node)
+				return contextType
+			}
 			if (contextType instanceof NodeSetType) {
 				if (!(e.node instanceof XpathNodeType)) {
 					val ref = new AtomicReference<XpathType>()
@@ -238,9 +249,13 @@ class XpathResolver {
 							return contextType.EObjectDescription
 						} else {
 							val descs = contextType.nodes.filter[qualifiedName.lastSegment == qualifiedName.lastSegment].toList
-							val newType = Types.nodeSet(descs)
-							ref.set(newType)
-							return newType.EObjectDescription
+							if (!descs.isEmpty) {
+								val newType = Types.nodeSet(descs)
+								ref.set(newType)
+								return newType.EObjectDescription
+							} else {
+								return null
+							}
 						}
 					]
 					return ref.get
@@ -249,7 +264,7 @@ class XpathResolver {
 			return contextType
 		}
 		
-		val mode = switch e.axis {
+		var tempMode = switch e.axis {
 			case 'ancestor' : Axis.ANCESTOR
 			case 'ancestor-or-self' : Axis.ANCESTOR_OR_SELF
 			case 'child' : Axis.CHILDREN
@@ -258,13 +273,22 @@ class XpathResolver {
 			case 'following' : Axis.ANCESTOR_OR_SELF
 			case 'preceding' : Axis.DESCENDANTS_OR_SELF
 			case 'following-sibling' : Axis.SIBLINGS
-			case 'preceding-siblings' : Axis.SIBLINGS
+			case 'preceding-sibling' : Axis.SIBLINGS
 			case 'parent' : Axis.PARENT
 			default : Axis.CHILDREN
+		}
+		val mode = switch c : e.eContainer {
+			AbsolutePath case c.isDescendants : Axis.DESCENDANTS_OR_SELF
+			XpathLocation case c.isDescendants : Axis.DESCENDANTS_OR_SELF
+			default : tempMode
 		}
 		if (e.node instanceof XpathNodeType) {
 			// it must be axis::node()
 			return computeType(contextType, '*', mode, ctx)
+		}
+		if (contextType === Types.ANY) {
+			LinkingErrorMessageProvider.markOK(e.node)
+			return contextType
 		}
 		val ref = new AtomicReference<XpathType>() 
 		linker.link(e.node, YangPackage.Literals.XPATH_NAME_TEST__REF) [
@@ -289,15 +313,22 @@ class XpathResolver {
 		if (type instanceof NodeSetType) {
 			// handle root
 			if (type.nodes.empty) {
-				return Types.nodeSet(findNodes(QualifiedName.EMPTY, name, mode, ctx))
+				val nodes = findNodes(QualifiedName.EMPTY, name, mode, ctx)
+				if ( nodes.empty) {
+					return Types.ANY
+				}
+				return Types.nodeSet(nodes)
 			}
 			val result = newArrayList()
 			for (n : type.nodes) {
 				val nodes = findNodes(n.qualifiedName, name, mode, ctx)
 				result.addAll(nodes)
 			}
-			return Types.nodeSet(result)
+			if (!result.empty) {
+				return Types.nodeSet(result)
+			}
 		}
+		return Types.ANY
 	}
 	
 	private def QualifiedName skipLast(QualifiedName it) {
@@ -338,10 +369,10 @@ class XpathResolver {
 						return #[p]
 					}
 				} else {	
-					return #[]
+					return #[Linker.ROOT]
 				}
 			}
-			return #[]
+			return #[Linker.ROOT]
 		} else {
 			val elements = ctx.nodeScope.allElements.filter [
 				if (qualifiedName.startsWith(prefix) && qualifiedName.segmentCount > prefix.segmentCount) {
@@ -377,9 +408,6 @@ class XpathResolver {
 	
 	protected def getEObjectDescription(XpathType type) {
 		if (type instanceof NodeSetType) {
-			if (type.nodes.isEmpty) {
-				return Linker.ANY
-			}
 			return type.nodes.head				
 		}
 		return null

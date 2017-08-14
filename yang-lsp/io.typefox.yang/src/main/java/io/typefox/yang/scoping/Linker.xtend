@@ -20,13 +20,13 @@ class Linker {
 	@Inject LazyURIEncoder lazyURIEncoder
 	@Inject IQualifiedNameConverter qualifiedNameConverter
 	
-	public static IEObjectDescription ANY = new EObjectDescription(QualifiedName.EMPTY, null, null);
+	public static IEObjectDescription ROOT = new EObjectDescription(QualifiedName.EMPTY, null, null);
 
 	def <T> T link(EObject element, EReference reference, (QualifiedName)=>IEObjectDescription resolver) {
 		val qname = getLinkingName(element, reference)
 		if (qname !== null) {
 			val candidate = resolver.apply(qname)
-			if (candidate === ANY) {
+			if (candidate === ROOT) {
 				LinkingErrorMessageProvider.markOK(element)
 			} else if (candidate !== null) {
 				val resolved = EcoreUtil.resolve(candidate.getEObjectOrProxy, element)

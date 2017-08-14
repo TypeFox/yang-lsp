@@ -72,7 +72,8 @@ abstract class AbstractYangTest {
 	}
 
 	protected def assertNoErrors(EObject eObject) {
-		validator.assertNoErrors(eObject)
+		val issues = validator.validate(eObject)
+		Assert.assertEquals("", issues.join('\n')[message + " : "+ lineNumber])
 	}
 
 	protected def assertNoIssues(Resource resource) {

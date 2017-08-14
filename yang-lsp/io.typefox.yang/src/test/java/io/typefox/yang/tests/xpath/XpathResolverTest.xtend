@@ -2,15 +2,28 @@ package io.typefox.yang.tests.xpath
 
 import io.typefox.yang.tests.AbstractYangTest
 import io.typefox.yang.yang.Must
-import io.typefox.yang.yang.XpathNameTest
-import io.typefox.yang.yang.YangPackage
-import org.eclipse.xtext.nodemodel.util.NodeModelUtils
-import org.junit.Assert
-import org.junit.Test
 import io.typefox.yang.yang.ParentRef
 import io.typefox.yang.yang.RelativePath
+import io.typefox.yang.yang.XpathNameTest
+import io.typefox.yang.yang.YangPackage
+import java.io.File
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils
+import org.eclipse.xtext.workspace.FileProjectConfig
+import org.eclipse.xtext.workspace.ProjectConfigAdapter
+import org.junit.Assert
+import org.junit.Test
+
 
 class XpathResolverTest extends AbstractYangTest {
+	
+	/**
+	 * XPATH_LINKING_ERRORS are enabled for these tests
+	 */	
+	override load(CharSequence txt) {
+		val root = new File("./src/test/java/io/typefox/yang/tests/xpath/")
+		ProjectConfigAdapter.install(resourceSet, new FileProjectConfig(root))
+		return super.load(txt)
+	}
 	
 	@Test def void testSimple() {
 		val r = '''
@@ -34,6 +47,84 @@ class XpathResolverTest extends AbstractYangTest {
 			val n = NodeModelUtils.findNodesForFeature(e, YangPackage.Literals.XPATH_NAME_TEST__REF)
 			Assert.assertEquals(n.head.text, e.ref.name)
 		}
+	}
+	
+	@Test def void testSibling() {
+		val r = '''
+			module foo {
+				prefix foo;
+				namespace urn:foo;
+				
+				list foo-bar {
+					must "../foo-bar[b = current()/preceding-sibling::foo-bar/b]";
+					container b {
+						leaf c {
+							type string;
+						}
+					}
+				}
+			}
+		'''.load
+		assertNoErrors(r.root)
+	}
+	
+	@Test def void testDescendant() {
+		val r = '''
+			module foo {
+				prefix foo;
+				namespace urn:foo;
+				
+				container a {
+					must "//c";
+«««					must '/*/*/c';
+«««					must */c;
+					
+					container b {
+						container c {
+						}
+					}
+				}
+			}
+		'''.load
+		assertNoErrors(r.root)
+	}
+	
+	@Test def void testGrouping() {
+		val r = '''
+			module foo {
+				prefix foo;
+				namespace urn:foo;
+				
+				identity MyBase {}
+				
+				grouping ggg {
+			       leaf XXX { type int32; }
+			       container test-top {
+			         typedef MyType { type uint16; }
+			         must "foo:bar < 42";
+			
+			         must "bar = 142";
+			         leaf bar { 
+			           type uint8;
+			           when "../../foo:XXX =  11";
+			         }
+			         leaf baz { 
+			             must "../goo = 'my-identity'";
+			             type MyType;
+			         }
+			         leaf goo { 
+			            type identityref {
+			               base MyBase;
+			            }
+			            default my-identity;
+			         }
+			         leaf AA { type MyType; }
+			         leaf BB { type foo:MyType; }
+			      }
+			   }
+			}
+		'''.load
+		assertNoErrors(r.root)
 	}
 	
 	@Test def void testParents() {
@@ -102,504 +193,4 @@ class XpathResolverTest extends AbstractYangTest {
 		assertNoErrors(r.root)
 	}
 	
-	@Test def void testVarious() {
-		val r = '''
-			module testmust {
-			
-			    namespace "http://netconfcentral.org/ns/testmust";
-			    prefix "tm";
-			
-			    organization
-			        "Netconf Central";
-			
-			    contact
-			        "Andy Bierman";
-			
-			    description
-			        "YANG must-stmt test module.";
-			
-			    revision 2011-03-19 {
-			        description "Add more test cases.";
-			    }
-			
-			    revision 2008-12-18 {
-			        description "Initial version.";
-			    }
-			
-			    container test1 {
-			       description
-			         "Test XPath 1.0 location path expression parsing.
-			          These must-stmts are not expected to evaluate to true.
-			          Taken from XPath 1.0, section 2";
-			
-			
-			       must "/child::doc/child::chapter[position()=5]/child::section[position()=2]" {
-			         description "selects the second section of the fifth chapter
-			                      of the doc document element.";
-			       }
-			
-			       must "child::doc/child::chapter[position()=1]/child::section[position()=2]" {
-			         description "selects the second section of the fifth chapter
-			                      of the doc document element.";
-			       }
-			
-			       must "boolean(42) + boolean(/test1) + boolean  (  'test'  )";
-			       
-			       must "/descendant::para" { 
-			         description "selects all the para elements in the same document 
-			                      as the context node.";
-			       }
-			
-			       must "//ancestor::*";
-			    
-			       must "descendant::para" {
-			         description 
-			            "selects the para element descendants of the context node.";
-			       }
-			
-			       must "child::*" {
-			         description "selects all element children of the context node.";
-			       }
-			
-			       must "child::para" {
-			         description "selects the para element children of the context node.";
-			       }
-			
-			       must "child::text()" {
-			         description "selects all text node children of the context node.";
-			       }
-			
-			       must "child::node()" {
-			         description "selects all the children of the context node, 
-			                      whatever their node type.";
-			       }
-			
-			       must "attribute::name" {
-			         description "selects the name attribute of the context node.";
-			       }
-			
-			       must "attribute::*" {
-			         description "selects all the attributes of the context node.";
-			       }
-			
-			
-			       must "ancestor::div" {
-			         description "selects all div ancestors of the context node.";
-			       }
-			
-			       must "ancestor-or-self::div" {
-			         description " selects the div ancestors of the context node and,
-			                       if the context node is a div element,
-			                       the context node as well.";
-			       }
-			
-			       must "descendant-or-self::para" {
-			         description "selects the para element descendants of the context 
-			                      node and, if the context node is a para element, 
-			                      the context node as well.";
-			       }
-			
-			       must "self::para" {
-			         description "selects the context node if it is a para element,
-			                      and otherwise selects nothing.";
-			       }
-			
-			       must "child::chapter/descendant::para" {
-			         description "selects the para element descendants of 
-			                      the chapter element children of the context node.";
-			       }
-			
-			       must "child::*/child::para" {
-			         description "selects all para grandchildren of the context node.";
-			       }
-			
-			       must "/" {
-			         description "selects the document root (which is always the 
-			                      parent of the document element).";
-			       }
-			
-			       must "/descendant::olist/child::item" {
-			         description "selects all the item elements that have an olist 
-			                      parent and that are in the same document as the 
-			                      context node.";
-			       }
-			
-			       must "child::para[position()=1]" {
-			         description "selects the first para child of the context node.";
-			       }
-			
-			       must "child::para[position()=last()]" {
-			         description "selects the last para child of the context node.";
-			       }
-			     
-			       must "child::para[position()=last()-1]" {
-			         description "selects the last but one para child of the context node.";
-			       }
-			
-			       must "child::para[position()>1]" {
-			         description "selects all the para children of the context node
-			                      other than the first para child of the context node.";
-			       }
-			
-			       must "following-sibling::chapter[position()=1]" {
-			         description "selects the next chapter sibling of the context node.";
-			       }
-			
-			       must "preceding-sibling::chapter[position()=1]" {
-			         description "selects the previous chapter sibling of the context node.";
-			       }
-			
-			       must "/descendant::figure[position()=42]" {
-			         description "selects the forty-second figure element in the document.";
-			       }
-			
-			
-			       must "child::para[attribute::type='warning']" {
-			         description "selects all para children of the context node 
-			                      that have a type attribute with value warning.";
-			       }
-			
-			       must "child::para[attribute::type='warning'][position()=5]" {
-			         description "selects the fifth para child of the context node
-			                      that has a type attribute with value warning.";
-			       }
-			
-			       must "child::para[position()=5][attribute::type='warning']" {
-			         description "selects the fifth para child of the context node
-			                      if that child has a type attribute with value warning.";
-			       }
-			
-			       must "child::chapter[child::title='Introduction']" {
-			         description "selects the chapter children of the context node that
-			                      have one or more title children with string-value
-			                      equal to Introduction.";
-			       }
-			
-			       must "child::chapter[child::title]" {
-			         description "selects the chapter children of the context node
-			                      that have one or more title children.";
-			       }
-			
-			       must "child::*[self::chapter or self::appendix]" {
-			        description "selects the chapter and appendix children 
-			                     of the context node.";
-			       }
-			
-			       must "child::*[self::chapter or self::appendix][position()=last()]" {
-			         description "selects the last chapter or appendix child 
-			                      of the context node.";
-			       }
-			
-			/*
-			       must "last()-position() or last-position() or last()-position
-			             or last-position or last - position" {
-			         description "email example with invalid function name";
-			       }
-			*/
-			
-			       must "self::node()/descendant-or-self::node()/child::para" {
-			         description "longhand for .//para";
-			       }
-			
-			       container doc {
-			         list chapter {
-			           key id;
-			
-			           leaf id { type uint32; }
-			
-			           leaf title { type string; }
-			
-			           list section {
-			             key id;
-			
-			             leaf id { type uint32; } 
-			 
-			             leaf para { type string; }
-			           }
-			         }
-			       }
-			
-			       list chapter {
-			         key id;
-			
-			         leaf id { type uint32; }
-			
-			         leaf title { type string; }
-			
-			         list section {
-			           key id;
-			
-			           leaf id { type uint32; } 
-			 
-			           leaf para { type string; }
-			         }
-			       }
-			       leaf-list para { type string; }
-			
-			    }
-			
-			    container test2 {
-			       description
-			         "Test XPath 1.0 abbreviated syntax location path expression parsing.
-			          These must-stmts are not expected to evaluate to true.
-			          Taken from XPath 1.0, section 2.5";
-			
-			       must "para" {
-			         description "selects the para element children of the context node.";
-			       }
-			
-			       must "*" {
-			         description "selects all element children of the context node.";
-			       }
-			
-			       must "text()" {
-			         description "selects all text node children of the context node.";
-			       }
-			
-			       must "@name" {
-			         description "selects the name attribute of the context node.";
-			       }
-			
-			       must "@*" {
-			         description "selects all the attributes of the context node.";
-			       }
-			
-			       must "para[1]" {
-			         description "selects the first para child of the context node.";
-			       }
-			
-			       must "para[last()]" {
-			         description "selects the last para child of the context node.";
-			       }
-			
-			       must "*/para" {
-			         description "selects all para grandchildren of the context node.";
-			       }
-			
-			       must "/doc/chapter[5]/section[2]" {
-			         description "selects the second section of the fifth chapter of the doc.";
-			       }
-			
-			       must "chapter//para" {
-			         description "selects the para element descendants 
-			                      of the chapter element children of the context node.";
-			       }
-			
-			       must "//para" {
-			         description "selects all the para descendants of the document root
-			                       and thus selects all para elements in the same document
-			                       as the context node.";
-			       }
-			
-			       must "//olist/item" {
-			         description "selects all the item elements in the same document
-			                      as the context node that have an olist parent.";
-			       }
-			
-			       must "." {
-			         description "selects the context node";
-			       }
-			
-			       must ".//para" {
-			         description "selects the para element descendants of the context node.";
-			       }
-			
-			       must ".." {
-			         description "selects the parent of the context node.";
-			       }
-			
-			       must "../@lang" {
-			         description "selects the lang attribute of the parent of the context node.";
-			       }
-			
-			       must "para[@type='warning']" {
-			         description "selects all para children of the context node that have
-			                      a type attribute with value warning.";
-			       }
-			
-			       must "para[@type='warning'][5]" {
-			         description "selects the fifth para child of the context node
-			                      that has a type attribute with value warning.";
-			       }
-			
-			       must "para[5][@type='warning']" {
-			         description "selects the fifth para child of the context node
-			                      if that child has a type attribute with value warning.";
-			       }
-			
-			       must "chapter[title='Introduction']" {
-			         description "selects the chapter children of the context node that
-			                      have one or more title children with string-value 
-			                      equal to Introduction.";
-			       }
-			
-			       must "chapter[title]" {
-			         description "selects the chapter children of the context node that 
-			                      have one or more title children.";
-			       }
-			
-			       must "employee[@secretary and @assistant]" {
-			         description "selects all the employee children of the context node
-			                      that have both a secretary attribute and an assistant attribute.";
-			       }
-			
-			       must ".//para" {
-			         description 
-			           "shorthand for self::node()/descendant-or-self::node()/child::para";
-			       }
-			
-			       container doc {
-			         list chapter {
-			           key id;
-			
-			           leaf id { type uint32; }
-			
-			           leaf title { type string; }
-			
-			           list section {
-			             key id;
-			
-			             leaf id { type uint32; } 
-			 
-			             leaf para { type string; }
-			           }
-			         }
-			       }
-			
-			       list chapter {
-			         key id;
-			
-			         leaf id { type uint32; }
-			
-			         leaf title { type string; }
-			
-			         list section {
-			           key id;
-			
-			           leaf id { type uint32; } 
-			 
-			           leaf para { type string; }
-			         }
-			       }
-			       leaf-list para { type string; }
-			
-			     }
-			
-			/*
-			    leaf test-bad-path-syntax {
-			       description
-			         "Test XPath 1.0 location path expression parsing.
-			          These must-stmts are not expected to evaluate to true.
-			          Taken from XPath 1.0, section 2";
-			
-			       type string;
-			
-			       must "child::foo:para";
-			
-			       must "child::**";
-			
-			       must "3 or 4 or 7  7 or or and 4";
-			
-			       must "grandma::foo and (17 div current())";
-			
-			       must (18)(+42);
-			
-			       must ((18)+42);
-			
-			       must 18+42-foo;
-			
-			       must foo-18+9+1+;    // yangdump bug; unquoted strings
-			
-			       must /..;
-			
-			       must "//";
-			
-			       must "///";
-			
-			       must "....";
-			    }
-			*/
-			
-			    leaf A { type int64; }
-			
-			    leaf B { type int32; }
-			
-			    container test4 {
-			      must "a/b/c + ../../A | /B";
-			
-			      must "//B = 4";
-			
-			      must ".//AA";
-			
-			      must "//foo[@x = 1]";
-			
-			      // causing missing prefix error
-			      // must "//foo:*[@x = 1]";
-			
-			      must ".//foo/bar[x='fred'] or .=10";
-			
-			      must "*[.=1 or . = 'fred']";
-			
-			      must "*[.=1 or . = 'fred'][1]";
-			
-			      must "*[.=1 or . = 'fred'][last()]";
-			
-			      must "/a/b | /c/d";
-			
-			      container C {
-			         container D {
-			            leaf AA { type string; }
-			         }
-			      }
-			   }
-			
-			  container doc {
-			    list chapter {
-			      key id;
-			
-			      leaf id { type uint32; }
-			
-			      list section {
-			         key id;
-			
-			         leaf id { type uint32; } 
-			
-			         leaf para { type string; }
-			      }
-			    }
-			  }
-			
-			  rpc rpc-must1 {
-			    input {
-			       leaf a { type int32; }
-			       leaf b { 
-			         type string;
-			         must "../a > 10";
-			       }
-			    }
-			    output {
-			       leaf x { type int32; }
-			       leaf y { 
-			         type string;
-			         must "../x != 10";
-			       }
-			    }
-			  }
-			
-			  notification notif-must1 {
-			     leaf a { type int32; }
-			     leaf b { 
-			       type string;
-			       must "../a > 10 and starts-with(../c/d, 'foo')";
-			     }
-			     container c {
-			       leaf d { type string; }
-			     }
-			  }
-			      
-			
-			}
-		'''.load
-		assertNoErrors(r.root)
-	}
 }

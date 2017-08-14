@@ -158,6 +158,11 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	 */
 	public static val FUNCTION_ARITY = 'FUNCTION_ARITY'.error;
 	
+	/**
+	 * Linking errors in xpath
+	 */
+	public static val XPATH_LINK_ERROR = 'XPATH_LINKING_ERROR'.ignore;
+	
 	
 
 	private static val Map<String, PreferenceKey> CODES = BUILDER.build;
@@ -173,6 +178,11 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 
 	private static def warn(String code) {
 		BUILDER.put(code, new PreferenceKey(code, SeverityConverter.SEVERITY_WARNING));
+		return code;
+	}
+	
+	private static def ignore(String code) {
+		BUILDER.put(code, new PreferenceKey(code, SeverityConverter.SEVERITY_IGNORE));
 		return code;
 	}
 	
