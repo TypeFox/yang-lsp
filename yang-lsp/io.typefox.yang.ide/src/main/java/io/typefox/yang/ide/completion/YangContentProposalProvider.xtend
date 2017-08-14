@@ -3,48 +3,55 @@ package io.typefox.yang.ide.completion
 import com.google.inject.Inject
 import io.typefox.yang.documentation.DocumentationProvider
 import io.typefox.yang.scoping.IScopeContext
+import io.typefox.yang.scoping.Linker
 import io.typefox.yang.scoping.ScopeContext.MapScope
 import io.typefox.yang.scoping.ScopeContextProvider
+import io.typefox.yang.scoping.xpath.NodeSetType
+import io.typefox.yang.scoping.xpath.XpathFunctionLibrary
+import io.typefox.yang.scoping.xpath.XpathResolver
+import io.typefox.yang.scoping.xpath.XpathResolver.Axis
 import io.typefox.yang.services.YangGrammarAccess
 import io.typefox.yang.validation.SubstatementRuleProvider
+import io.typefox.yang.yang.AbsolutePath
 import io.typefox.yang.yang.AbstractImport
 import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.Description
+import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.Statement
+import io.typefox.yang.yang.XpathExpression
 import io.typefox.yang.yang.YangPackage
+import java.util.List
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtext.AbstractElement
+import org.eclipse.xtext.Assignment
 import org.eclipse.xtext.CrossReference
 import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.GrammarUtil
 import org.eclipse.xtext.Keyword
-import org.eclipse.xtext.ParserRule
 import org.eclipse.xtext.RuleCall
+import org.eclipse.xtext.formatting.IWhitespaceInformationProvider
 import org.eclipse.xtext.ide.editor.contentassist.ContentAssistContext
 import org.eclipse.xtext.ide.editor.contentassist.ContentAssistEntry
 import org.eclipse.xtext.ide.editor.contentassist.IIdeContentProposalAcceptor
 import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider
 import org.eclipse.xtext.naming.QualifiedName
+import org.eclipse.xtext.resource.EObjectDescription
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.xtext.CurrentTypeFinder
 
-import static io.typefox.yang.yang.YangPackage.Literals.*
-
 import static extension io.typefox.yang.utils.YangNameUtils.*
-import static extension org.eclipse.xtext.EcoreUtil2.*
-import org.eclipse.xtext.formatting.IWhitespaceInformationProvider
-import io.typefox.yang.yang.Prefix
-import io.typefox.yang.yang.Module
 
 class YangContentProposalProvider extends IdeContentProposalProvider {
 
-	static val IGNORED_KEYWORDS = #{'/', '{', ';', '}'}
+	static val IGNORED_KEYWORDS = #{'/', '{', ';', '}', '+', '-', '*', '/', '>=', '<=', '>', '<', '=', '!=', ':', '[',
+		']', '|', 'or', 'and', 'div', 'mod', '$', '(', '@', 'processing-instruction'}
 
 	@Inject extension CurrentTypeFinder
 	@Inject extension DocumentationProvider
@@ -52,6 +59,31 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 	@Inject SubstatementRuleProvider ruleProvider
 	@Inject YangGrammarAccess grammarAccess
 	@Inject IWhitespaceInformationProvider whitespaceInformation
+
+	override protected _createProposals(AbstractElement element, ContentAssistContext context,
+		IIdeContentProposalAcceptor acceptor) {
+	}
+
+	override protected _createProposals(Assignment assignment, ContentAssistContext context,
+		IIdeContentProposalAcceptor acceptor) {
+		val terminal = assignment.getTerminal();
+		if ((terminal instanceof CrossReference)) {
+			this.createProposals(terminal, context, acceptor);
+		} else if (assignment === grammarAccess.xpathPrimaryExprAccess.nameAssignment_4_1) {
+			if (context.prefix.length > 0) {
+				for (f : XpathFunctionLibrary.FUNCTIONS.values.filter[name.toLowerCase.startsWith(context.prefix.toLowerCase)]) {
+					val entry = new ContentAssistEntry() => [
+						prefix = context.prefix;
+						label = '''«f.name»(«f.paramTypes.join(', ')[name.toLowerCase]»)'''
+						proposal = '''«f.name»(«f.paramTypes.join(', ')['${'+name.toLowerCase+'}']»)'''
+						documentation = f.documentation
+						kind = ContentAssistEntry.KIND_FUNCTION
+					];
+					acceptor.accept(entry, this.proposalPriorities.getDefaultPriority(entry) + 1)
+				}
+			}
+		}
+	}
 
 	override protected _createProposals(RuleCall ruleCall, ContentAssistContext context,
 		IIdeContentProposalAcceptor acceptor) {
@@ -61,8 +93,9 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 			}
 		}
 	}
-	
-	override protected _createProposals(Keyword keyword, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
+
+	override protected _createProposals(Keyword keyword, ContentAssistContext context,
+		IIdeContentProposalAcceptor acceptor) {
 		if (keyword === grammarAccess.importAccess.importKeyword_0 && filterKeyword(keyword, context)) {
 			val module = EcoreUtil2.getContainerOfType(context.currentModel, AbstractModule)
 			val scopeCtx = scopeContextProvider.getScopeContext(module)
@@ -73,7 +106,7 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 					val rev = m.substatements.filter(Revision).sortBy[revision].reverseView.head
 					val entry = new ContentAssistEntry() => [
 						prefix = context.prefix;
-						label = "import "+e.qualifiedName
+						label = "import " + e.qualifiedName
 						proposal = '''
 							import «e.qualifiedName» {
 								prefix «m.substatements.filter(Prefix).head?.prefix»;
@@ -82,11 +115,11 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 								«ENDIF»
 							}
 						'''.toString.replaceAll('  ', indentString);
-						description = "module "+m.name
+						description = "module " + m.name
 						documentation = m.documentation
 						kind = ContentAssistEntry.KIND_MODULE
 					];
-					acceptor.accept(entry, this.proposalPriorities.getDefaultPriority(entry)+1)
+					acceptor.accept(entry, this.proposalPriorities.getDefaultPriority(entry) + 1)
 				}
 			}
 		}
@@ -103,7 +136,9 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 				if (YangPackage.Literals.SCHEMA_NODE_IDENTIFIER__SCHEMA_NODE === ereference) {
 					computeIdentifierRefProposals(reference, context, acceptor)
 				} else if (YangPackage.Literals.REVISION_DATE__DATE === ereference) {
-					computeRevisionProposals(reference, context, acceptor) 
+					computeRevisionProposals(reference, context, acceptor)
+				} else if (YangPackage.Literals.XPATH_NAME_TEST__REF === ereference) {
+					computeXpathStep(reference, context, acceptor)
 				} else {
 					val scope = scopeProvider.getScope(currentModel, ereference)
 
@@ -113,8 +148,51 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 			}
 		}
 	}
-	
-	def computeRevisionProposals(CrossReference reference, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
+
+	@Inject XpathResolver xpathResolver
+
+	def List<IEObjectDescription> findPathes(EObject obj) {
+		return switch obj {
+			AbsolutePath:
+				#[Linker.ROOT]
+			XpathExpression: {
+				val type = xpathResolver.getType(obj)
+				if (type instanceof NodeSetType) {
+					type.nodes
+				} else {
+					#[]
+				}
+			}
+			SchemaNode: {
+				#[new EObjectDescription(scopeContextProvider.findSchemaNodeName(obj), obj, emptyMap)]
+			}
+			EObject: {
+				findPathes(obj.eContainer)
+			}
+			default: {
+				#[]
+			}
+		}
+	}
+
+	def computeXpathStep(CrossReference reference, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
+		val descs = findPathes(context.currentModel)
+		val scopeContext = scopeContextProvider.findScopeContext(context.currentModel)
+		for (d : descs) {
+			val candidates = xpathResolver.findNodes(d.qualifiedName, null, Axis.CHILDREN, scopeContext.schemaNodeScope)
+			for (candidate : candidates) {
+				val entry = this.proposalCreator.createProposal(candidate.qualifiedName.lastSegment, context)
+				if (entry !== null) {
+					entry.documentation = getDocumentation(candidate.EObjectOrProxy)
+					entry.kind = ContentAssistEntry.KIND_VALUE
+					acceptor.accept(entry, proposalPriorities.getDefaultPriority(entry))
+				}
+			}
+		}
+	}
+
+	def computeRevisionProposals(CrossReference reference, ContentAssistContext context,
+		IIdeContentProposalAcceptor acceptor) {
 		val imp = EcoreUtil2.getContainerOfType(context.currentModel, AbstractImport)
 		if (imp !== null && imp.module !== null && !imp.module.eIsProxy) {
 			for (rev : imp.module.substatements.filter(Revision)) {
@@ -190,7 +268,7 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 					}
 				val entry = this.proposalCreator.createProposal(proposalName, context) [
 					documentation = e.EObjectOrProxy.documentation
-					// TODO description, etc.
+				// TODO description, etc.
 				]
 				acceptor.accept(entry, this.proposalPriorities.getCrossRefPriority(e, entry))
 			}
@@ -213,12 +291,11 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 				}
 			}
 		}
-		return super.filterKeyword(keyword, context) && !IGNORED_KEYWORDS.contains(keyword.value);
+		return super.filterKeyword(keyword, context) && (!IGNORED_KEYWORDS.contains(keyword.value) || context.prefix.length > 1);
 	}
 
-	private def isStatement(AbstractElement it) {
-		val classifier = getContainerOfType(ParserRule)?.type?.classifier;
-		return classifier instanceof EClass && STATEMENT.isSuperTypeOf(classifier as EClass);
+	private def isStatement(Keyword it) {
+		return grammarAccess.STATEMENT_KEYWORDAccess.findKeywords(it.value).length > 0
 	}
 
 	override protected getCrossrefFilter(CrossReference reference, ContentAssistContext context) {

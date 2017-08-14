@@ -38,10 +38,15 @@ import io.typefox.yang.yang.XpathVariableReference
 import io.typefox.yang.yang.YangPackage
 import java.util.List
 import java.util.concurrent.atomic.AtomicReference
+import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.IEObjectDescription
+import org.eclipse.xtext.util.internal.EmfAdaptable
+import io.typefox.yang.scoping.xpath.XpathResolver.TypeAdapter
+import org.eclipse.xtext.util.internal.Log
 
+@Log
 class XpathResolver {
 	
 	@Inject Validator validator
@@ -51,6 +56,22 @@ class XpathResolver {
 		MapScope nodeScope
 		String moduleName
 		XpathType initial
+	}
+	
+	@EmfAdaptable @Data static class TypeAdapter {
+		XpathType type
+	}
+	
+	public def XpathType getType(XpathExpression expr) {
+		return TypeAdapter.findInEmfObject(expr)?.type
+	}
+	
+	private def install(XpathType type, EObject obj) {
+		if (TypeAdapter.findInEmfObject(obj) !== null) {
+			return type
+		}
+		new TypeAdapter(type).attachToEmfObject(obj)
+		return type	
 	}
 	
 	def XpathType doResolve(XpathExpression expression, QualifiedName contextNode, IScopeContext context) {
@@ -66,42 +87,42 @@ class XpathResolver {
 	protected def dispatch XpathType internalResolve(XpathOrOperation e, XpathType contextType, Context ctx) {
 		internalResolve(e.left, contextType, ctx)
 		internalResolve(e.right, contextType, ctx)
-		return Types.BOOLEAN
+		return Types.BOOLEAN.install(e)
 	}
 	
 	protected def dispatch XpathType internalResolve(XpathAndOperation e, XpathType contextType, Context ctx) {
 		internalResolve(e.left, contextType, ctx)
 		internalResolve(e.right, contextType, ctx)
-		return Types.BOOLEAN
+		return Types.BOOLEAN.install(e)
 	}
 	
 	protected def dispatch XpathType internalResolve(XpathEqualityOperation e, XpathType contextType, Context ctx) {
 		internalResolve(e.left, contextType, ctx)
 		internalResolve(e.right, contextType, ctx)
-		return Types.BOOLEAN
+		return Types.BOOLEAN.install(e)
 	}
 	
 	protected def dispatch XpathType internalResolve(XpathRelationalOperation e, XpathType contextType, Context ctx) {
 		internalResolve(e.left, contextType, ctx)
 		internalResolve(e.right, contextType, ctx)
-		return Types.BOOLEAN
+		return Types.BOOLEAN.install(e)
 	}
 	
 	protected def dispatch XpathType internalResolve(XpathAdditiveOperation e, XpathType contextType, Context ctx) {
 		internalResolve(e.left, contextType, ctx)
 		internalResolve(e.right, contextType, ctx)
-		return Types.NUMBER
+		return Types.NUMBER.install(e)
 	}
 	
 	protected def dispatch XpathType internalResolve(XpathMultiplicativeOperation e, XpathType contextType, Context ctx) {
 		internalResolve(e.left, contextType, ctx)
 		internalResolve(e.right, contextType, ctx)
-		return Types.NUMBER
+		return Types.NUMBER.install(e)
 	}
 	
 	protected def dispatch XpathType internalResolve(XpathUnaryOperation e, XpathType contextType, Context ctx) {
 		internalResolve(e.target, contextType, ctx)
-		return Types.NUMBER
+		return Types.NUMBER.install(e)
 	}
 	
 	protected def dispatch XpathType internalResolve(XpathUnionOperation e, XpathType contextType, Context ctx) {
@@ -113,30 +134,32 @@ class XpathResolver {
 		if (!(right instanceof NodeSetType) && left !== Types.ANY) {
 			validator.addIssue(e.right, null, "The operands of a union operation must return a node set.", IssueCodes.INVALID_TYPE)
 		}
-		return Types.union(left, right)
+		return Types.union(left, right).install(e)
 	}
 	
 	protected def dispatch XpathType internalResolve(XpathLocation e, XpathType contextType, Context ctx) {
 		var newContext = internalResolve(e.target, contextType, ctx)
-		return internalResolveStep(e.step, newContext, ctx)
+		return internalResolveStep(e.step, newContext, ctx).install(e)
 	}
 	
 	protected def dispatch XpathType internalResolve(XpathFilter e, XpathType contextType, Context ctx) {
 		var newContext = internalResolve(e.target, contextType, ctx)
-		internalResolve(e.predicate, newContext, ctx)
-		return newContext		
+		if (e.predicate !== null) {
+			internalResolve(e.predicate, newContext, ctx)
+		}
+		return newContext.install(e)
 	}
 	protected def dispatch XpathType internalResolve(XpathVariableReference e, XpathType contextType, Context ctx) {
 		validator.addIssue(e, YangPackage.Literals.XPATH_VARIABLE_REFERENCE__NAME, "Unknown variable '"+e.name+"'.", IssueCodes.UNKNOWN_VARIABLE)
-		return Types.ANY
+		return Types.ANY.install(e)
 	}
 	
 	protected def dispatch XpathType internalResolve(XpathStringLiteral e, XpathType contextType, Context ctx) {
-		return Types.STRING
+		return Types.STRING.install(e)
 	}
 	
 	protected def dispatch XpathType internalResolve(XpathNumberLiteral e, XpathType contextType, Context ctx) {
-		return Types.NUMBER
+		return Types.NUMBER.install(e)
 	}
 	
 	protected def dispatch XpathType internalResolve(XpathFunctionCall e, XpathType contextType, Context ctx) {
@@ -146,10 +169,10 @@ class XpathResolver {
 			for (arg : e.args) {
 				internalResolve(arg, contextType, ctx)
 			}
-			return Types.ANY
+			return Types.ANY.install(e)
 		}
 		if (f.name == 'current') {
-			return ctx.initial
+			return ctx.initial.install(e)
 		}
 		if (f.name == 'deref') {
 			val type = internalResolve(e.args.head, contextType, ctx)
@@ -161,22 +184,22 @@ class XpathResolver {
 						val leafType = l.substatements.filter(Type).head
 						if (leafType.typeRef.builtin == 'leafref') {
 							val reference = leafType.substatements.filter(Path).head.reference
-							return this.internalResolve(reference, Types.nodeSet(desc), ctx)
+							return this.internalResolve(reference, Types.nodeSet(desc), ctx).install(e)
 						}
 					}
 				}
 			}
-			return Types.nodeSet(#[])
+			return Types.nodeSet(#[Linker.ROOT]).install(e)
 		}
 		for (arg : e.args) {
 			internalResolve(arg, contextType, ctx)
 		}
-		return switch (f.returnType) {
+		return (switch (f.returnType) {
 			case XpathFunctionLibrary.Type.BOOLEAN : Types.BOOLEAN
 			case XpathFunctionLibrary.Type.NUMBER : Types.NUMBER
 			case XpathFunctionLibrary.Type.STRING : Types.STRING
 			default: Types.ANY
-		}
+		}).install(e)
 	}
 	
 	protected def void checkArity(XpathFunctionCall e, int min, int max) {
@@ -188,17 +211,21 @@ class XpathResolver {
 	}
 	
 	protected def dispatch XpathType internalResolve(RelativePath e, XpathType contextType, Context ctx) {
-		internalResolveStep(e.step, contextType, ctx)
+		internalResolveStep(e.step, contextType, ctx).install(e)
 	}
 	
 	protected def dispatch XpathType internalResolve(AbsolutePath e, XpathType contextType, Context ctx) {
 		if (e.step === null) {
-			return Types.nodeSet(#[])
+			return Types.nodeSet(#[Linker.ROOT]).install(e)
 		}
-		return internalResolveStep(e.step, Types.nodeSet(#[]), ctx)
+		return internalResolveStep(e.step, Types.nodeSet(#[Linker.ROOT]), ctx).install(e)
 	}
 
 	// step resolution	
+	protected def dispatch XpathType internalResolveStep(Void e, XpathType contextType, Context ctx) {
+		contextType
+	}
+	
 	protected def dispatch XpathType internalResolveStep(CurrentRef e, XpathType contextType, Context ctx) {
 		linker.link(e, YangPackage.Literals.CURRENT_REF__REF) [
 			contextType.EObjectDescription	
@@ -313,7 +340,7 @@ class XpathResolver {
 		if (type instanceof NodeSetType) {
 			// handle root
 			if (type.nodes.empty) {
-				val nodes = findNodes(QualifiedName.EMPTY, name, mode, ctx)
+				val nodes = findNodes(QualifiedName.EMPTY, name, mode, ctx.nodeScope)
 				if ( nodes.empty) {
 					return Types.ANY
 				}
@@ -321,7 +348,7 @@ class XpathResolver {
 			}
 			val result = newArrayList()
 			for (n : type.nodes) {
-				val nodes = findNodes(n.qualifiedName, name, mode, ctx)
+				val nodes = findNodes(n.qualifiedName, name, mode, ctx.nodeScope)
 				result.addAll(nodes)
 			}
 			if (!result.empty) {
@@ -339,19 +366,19 @@ class XpathResolver {
 		}
 	}
 	
-	protected def List<IEObjectDescription> findNodes(QualifiedName prefix, String name, Axis mode, Context ctx) {
+	public def List<IEObjectDescription> findNodes(QualifiedName prefix, String name, Axis mode, MapScope nodeScope) {
 		if (mode === Axis.SIBLINGS) {
-			return findNodes(prefix.skipLast, name, Axis.CHILDREN, ctx)
+			return findNodes(prefix.skipLast, name, Axis.CHILDREN, nodeScope)
 		} else if (mode === Axis.DESCENDANTS_OR_SELF) {
-			return findNodes(prefix.skipLast, name, Axis.DESCENDANTS, ctx)
+			return findNodes(prefix.skipLast, name, Axis.DESCENDANTS, nodeScope)
 		} else if (mode == Axis.ANCESTOR) {
-			return findNodes(prefix.skipLast, name, Axis.ANCESTOR_OR_SELF, ctx)
+			return findNodes(prefix.skipLast, name, Axis.ANCESTOR_OR_SELF, nodeScope)
 		} else if (mode == Axis.ANCESTOR_OR_SELF) {
 			val result = newArrayList()
 			var parent = prefix
 			while (parent.segmentCount >= 2) {
 				if (name === null || name == '*' || parent.lastSegment == name) {
-					val p = ctx.nodeScope.getSingleElement(parent)
+					val p = nodeScope.getSingleElement(parent)
 					if (p !== null && isInstanceNode(p)) {
 						result.add(p)
 					}
@@ -363,7 +390,7 @@ class XpathResolver {
 			var parent = prefix
 			while (parent.segmentCount >= 2) {
 				parent = parent.skipLast
-				val p = ctx.nodeScope.getSingleElement(parent)
+				val p = nodeScope.getSingleElement(parent)
 				if (p !== null) {
 					if (isInstanceNode(p)) {						
 						return #[p]
@@ -374,7 +401,7 @@ class XpathResolver {
 			}
 			return #[Linker.ROOT]
 		} else {
-			val elements = ctx.nodeScope.allElements.filter [
+			val elements = nodeScope.allElements.filter [
 				if (qualifiedName.startsWith(prefix) && qualifiedName.segmentCount > prefix.segmentCount) {
 					if (name === null || name == '*' || qualifiedName.lastSegment == name) {
 						if (mode === Axis.DESCENDANTS) {
@@ -383,7 +410,7 @@ class XpathResolver {
 							// check all intermediate nodes, whether they are schema only nodes
 							var parent = qualifiedName.skipLast
 							while (parent.segmentCount > prefix.segmentCount) {
-								val p = ctx.nodeScope.getSingleElement(parent)
+								val p = nodeScope.getSingleElement(parent)
 								if (p !== null && isInstanceNode(p)) {
 									return false
 								}

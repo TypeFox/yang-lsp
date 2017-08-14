@@ -508,11 +508,11 @@ XpathExpression returns XpathExpression:
 	XpathOrExpr
 ;
 
-XpathOrExpr  returns XpathExpression:  
+XpathOrExpr returns XpathExpression:  
 	XpathAndExpr ({XpathOrOperation.left=current} operator='or' right=XpathAndExpr)*
 ;
 
-XpathAndExpr  returns XpathExpression:  
+XpathAndExpr returns XpathExpression:  
 	XpathEqualityExpr ({XpathAndOperation.left=current} operator='and' right=XpathEqualityExpr)*
 ;
 
@@ -710,6 +710,7 @@ STATEMENT_KEYWORD :
 | 'mandatory'
 | 'max-elements'
 | 'min-elements'
+| 'modifier'
 | 'module'
 | 'must'
 | 'namespace'

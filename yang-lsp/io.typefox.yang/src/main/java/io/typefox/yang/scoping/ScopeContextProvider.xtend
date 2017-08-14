@@ -73,6 +73,7 @@ class ScopeContextProvider {
 	@Data
 	private static class Adapter {
 		IScopeContext scopeContext
+		QualifiedName nodePath
 	}
 	
 	def IScopeContext findScopeContext(EObject node) {
@@ -93,6 +94,11 @@ class ScopeContextProvider {
 		return result
 	}
 	
+	def QualifiedName findSchemaNodeName(EObject node) {
+		val adapter = Adapter.findInEmfObject(node)
+		return adapter?.getNodePath
+	}
+	
 	def IScopeContext getScopeContext(AbstractModule module) {
 		val existing = Adapter.findInEmfObject(module)
 		if (existing !== null) {
@@ -104,7 +110,7 @@ class ScopeContextProvider {
 			module.prefix, 
 			module.getBelongingModule(moduleScope)?.name ?: module.name
 		)
-		new Adapter(result).attachToEmfObject(module)
+		new Adapter(result, QualifiedName.EMPTY).attachToEmfObject(module)
 		
 		handleGeneric(module, QualifiedName.EMPTY, result, true)
 		return result
@@ -366,7 +372,7 @@ class ScopeContextProvider {
 				new LocalNodeScopeContext(ctx)
 			SchemaNode : {
 				val scope = Adapter.findInEmfObject(node)?.scopeContext ?: new LocalScopeContext(ctx)
-				new Adapter(scope).attachToEmfObject(node)
+				new Adapter(scope, newPath).attachToEmfObject(node)
 				scope
 			}
 			default : 
