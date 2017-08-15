@@ -1,6 +1,6 @@
 # Adding a Validator Extension
 
-The yang-lsp allows to have additional third party extensions, configured through the `yang.settings` file.
+The yang-lsp allows to have additional third party extensions, configured through the [`yang.settings` file](Settings.md).
 That file must be located in the root of an opened directory must conform to JSON syntax.
 
 # Create a Validator
