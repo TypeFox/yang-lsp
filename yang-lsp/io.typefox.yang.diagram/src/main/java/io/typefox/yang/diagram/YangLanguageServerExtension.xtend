@@ -9,7 +9,9 @@ package io.typefox.yang.diagram
 import io.typefox.sprotty.api.IDiagramServer
 import io.typefox.sprotty.server.xtext.DiagramLanguageServerExtension
 import io.typefox.sprotty.server.xtext.LanguageAwareDiagramServer
+import com.google.inject.Singleton
 
+@Singleton
 class YangLanguageServerExtension extends DiagramLanguageServerExtension {
 	
 	override protected initializeDiagramServer(IDiagramServer server) {
@@ -22,6 +24,10 @@ class YangLanguageServerExtension extends DiagramLanguageServerExtension {
 	override didClose(String clientId) {
 		super.didClose(clientId)
 		LOG.info("Removed diagram server for " + clientId)
+	}
+
+	override findDiagramServersByUri(String uri) {
+		super.findDiagramServersByUri(uri)
 	}
 
 }

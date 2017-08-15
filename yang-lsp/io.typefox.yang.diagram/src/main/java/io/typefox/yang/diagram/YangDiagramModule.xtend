@@ -8,8 +8,13 @@ package io.typefox.yang.diagram
 
 import io.typefox.sprotty.server.xtext.DefaultDiagramModule
 import io.typefox.sprotty.server.xtext.IDiagramGenerator
+import org.eclipse.xtext.ide.server.occurrences.IDocumentHighlightService
 
 class YangDiagramModule extends DefaultDiagramModule {
+	
+	def Class<? extends IDocumentHighlightService> bindIDocumentHighlightService() {
+		YangHighlightService
+	}
 	
 	override bindILanguageServerExtension() {
 		YangLanguageServerExtension

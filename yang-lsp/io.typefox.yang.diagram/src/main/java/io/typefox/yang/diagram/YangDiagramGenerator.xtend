@@ -6,6 +6,7 @@
  */
 package io.typefox.yang.diagram
 
+import com.google.inject.Inject
 import io.typefox.sprotty.api.LayoutOptions
 import io.typefox.sprotty.api.SCompartment
 import io.typefox.sprotty.api.SEdge
@@ -82,6 +83,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	var List<()=>void> postProcesses
 
 	var SGraph diagramRoot
+	
+	@Inject extension TraceRegionProvider
 
 	override generate(Resource resource, Map<String, String> options, CancelIndicator cancelIndicator) {
 		val content = resource.contents.head
@@ -135,6 +138,9 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				}
 				elementIndex.put(statement, element)
 				rootChildren.add(element)
+				if (element instanceof Traceable) {
+					element.traceRegion = statement.traceRegion
+				}
 			}
 		}
 		return rootChildren
