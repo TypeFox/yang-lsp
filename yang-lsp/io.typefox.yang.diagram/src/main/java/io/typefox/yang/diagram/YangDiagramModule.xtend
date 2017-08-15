@@ -36,4 +36,8 @@ class YangDiagramModule extends DefaultDiagramModule {
 		YangPopupModelFactory
 	}
 	
+	override bindIDiagramSelectionListener() {
+		YangDiagramSelectionListener
+	}
+	
 }

@@ -85,7 +85,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	var SGraph diagramRoot
 	
 	@Inject extension TraceRegionProvider
-
+	
 	override generate(Resource resource, Map<String, String> options, CancelIndicator cancelIndicator) {
 		val content = resource.contents.head
 		if (content instanceof AbstractModule) {
@@ -138,12 +138,18 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				}
 				elementIndex.put(statement, element)
 				rootChildren.add(element)
-				if (element instanceof Traceable) {
-					element.traceRegion = statement.traceRegion
-				}
+				if(statement.eContainer !== null)
+					trace(element, statement)
 			}
 		}
 		return rootChildren
+	}
+	
+	protected def void trace(SModelElement element, Statement statement) {
+		if (element instanceof Traceable) {
+			element.traceRegion = statement.traceRegion
+			element.significantRegion = statement.significantRegion
+		}
 	}
 
 	protected def dispatch SModelElement generateElement(Module moduleStmt, SModelElement viewParentElement,
@@ -156,6 +162,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	protected def dispatch SModelElement generateElement(Submodule submoduleStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
 		val moduleElement = createModule(submoduleStmt.name)
+		moduleElement.trace(submoduleStmt)
 		initModule(moduleElement, findClass(submoduleStmt), submoduleStmt.name, submoduleStmt)
 	}
 
@@ -271,9 +278,10 @@ class YangDiagramGenerator implements IDiagramGenerator {
 								createChildElements(caseElement, modelParentElement, #[it]))
 						}
 					} else {
-						modelParentElement.children.add(
-							createTypedElementWithEdge(modelParentElement, choiceNode, (it as SchemaNode), 'case',
-								DASHED_EDGE_TYPE))
+						val caseNode = createTypedElementWithEdge(modelParentElement, choiceNode, (it as SchemaNode), 'case',
+														DASHED_EDGE_TYPE)
+						modelParentElement.children.add(caseNode)
+						caseNode.trace(it)
 					}
 				])
 				choiceNode.layoutOptions = new LayoutOptions [
@@ -301,6 +309,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				paddingLeft = 8.0
 				paddingRight = 8.0
 			]
+			caseNode.trace(caseStmt)
 		}
 		return caseNode
 	}
@@ -391,7 +400,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		val module = createModule(importStmt.module.name, prefix.prefix)
 
 		diagramRoot.children.add(module)
-
+		module.trace(importStmt)
 		postProcesses.add([
 			diagramRoot.children.add(createEdge(module, modelParentElement, IMPORT_EDGE_TYPE))
 		])
@@ -403,6 +412,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		SModelElement modelParentElement) {
 		val submodule = includeStmt.module
 		val module = createModule(submodule.name)
+		module.trace(includeStmt)
 		return module
 	}
 
@@ -476,7 +486,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def SNode createModule(String name) {
 		// Module
-		val moduleElement = configSElement(SNode, name, 'module')
+		val moduleElement = configSElement(YangNode, name, 'module')
 		moduleElement.layout = 'vbox'
 		moduleElement.layoutOptions = new LayoutOptions [
 			paddingTop = 5.0
@@ -499,10 +509,11 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	protected def SModelElement createClassMemberElement(SchemaNode statement, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
 		if (modelParentElement instanceof SCompartment) {
-			val SLabel memberElement = configSElement(SLabel, viewParentElement.id + '-' + statement.name, 'text')
+			val YangLabel memberElement = configSElement(YangLabel, viewParentElement.id + '-' + statement.name, 'text')
 			val Type type = statement.substatements.filter(Type).head
 			val String nameAddition = if(statement instanceof LeafList) '[]' else ''
 			memberElement.text = statement.name + nameAddition + ': ' + type.typeRef.builtin
+			memberElement.trace(statement)
 			return memberElement
 		}
 	}
@@ -667,6 +678,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	protected def String findType(SModelElement element) {
 		switch element {
 			SNode: 'node'
+			YangLabel: 'ylabel'
 			SLabel: 'label'
 			SCompartment: 'comp'
 			SEdge: 'edge'
