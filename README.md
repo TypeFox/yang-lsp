@@ -4,6 +4,13 @@
 
 A Language Server for YANG
 
+## Usage
+
+The YANG Language Server is currently being used in
+ - [YANGSTER](https://github.com/yang-tools/yangster) based on [Theia](https://github.com/theia-ide/theia) (incl. Diagramming Support)
+ - [Yang VsCode](https://marketplace.visualstudio.com/items?itemName=typefox.yang-vscode) [github](https://github.com/yang-tools/yang-vscode)
+ - [Yang Eclipse](https://github.com/yang-tools/yang-eclipse)
+
 ## Build
 
     git clone https://github.com/TypeFox/yang-lsp.git \
