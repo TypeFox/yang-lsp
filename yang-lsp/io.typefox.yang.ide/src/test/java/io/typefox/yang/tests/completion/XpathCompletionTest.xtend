@@ -99,6 +99,79 @@ class XpathCompletionTest extends AbstractYangLSPTest {
 		]
 	}
 	
+	@Test def void testAxis_01() {
+		testXpath[
+			expression = 'following-sibling::'
+			expected = '''
+				outer -> outer [[4, 25] .. [4, 25]]
+			'''
+		]
+	}
+	
+	@Test def void testAxis_02() {
+		testXpath[
+			expression = '//inner-leaf/ancestor::'
+			expected = '''
+				inner -> inner [[4, 29] .. [4, 29]]
+				middle -> middle [[4, 29] .. [4, 29]]
+				outer -> outer [[4, 29] .. [4, 29]]
+			'''
+		]
+	}
+	
+	@Test def void testAxis_03() {
+		testXpath[
+			expression = '//inner-leaf/ancestor-or-self::'
+			expected = '''
+				inner -> inner [[4, 37] .. [4, 37]]
+				inner-leaf -> inner-leaf [[4, 37] .. [4, 37]]
+				middle -> middle [[4, 37] .. [4, 37]]
+				outer -> outer [[4, 37] .. [4, 37]]
+			'''
+		]
+	}
+	
+	@Test def void testAxis_04() {
+		testXpath[
+			expression = 'descendant-or-self::'
+			expected = '''
+				inner -> inner [[4, 26] .. [4, 26]]
+				inner-leaf -> inner-leaf [[4, 26] .. [4, 26]]
+				middle -> middle [[4, 26] .. [4, 26]]
+				middle-leaf -> middle-leaf [[4, 26] .. [4, 26]]
+				outer -> outer [[4, 26] .. [4, 26]]
+				outer-leaf -> outer-leaf [[4, 26] .. [4, 26]]
+			'''
+		]
+	}
+	
+	@Test def void testAxis_05() {
+		testXpath[
+			expression = 'descendant::'
+			expected = '''
+				inner -> inner [[4, 18] .. [4, 18]]
+				inner-leaf -> inner-leaf [[4, 18] .. [4, 18]]
+				middle -> middle [[4, 18] .. [4, 18]]
+				middle-leaf -> middle-leaf [[4, 18] .. [4, 18]]
+				outer-leaf -> outer-leaf [[4, 18] .. [4, 18]]
+			'''
+		]
+	}
+	
+	@Test def void testAxis_06() {
+		testXpath[
+			expression = '//'
+			expected = '''
+				inner -> inner [[4, 8] .. [4, 8]]
+				inner-leaf -> inner-leaf [[4, 8] .. [4, 8]]
+				middle -> middle [[4, 8] .. [4, 8]]
+				middle-leaf -> middle-leaf [[4, 8] .. [4, 8]]
+				outer -> outer [[4, 8] .. [4, 8]]
+				outer-leaf -> outer-leaf [[4, 8] .. [4, 8]]
+			'''
+		]
+	}
+	
 	@Test def void testFunctionProposalsNeedPrefix() {
 		testXpath[
 			expression = './middle[c|]'

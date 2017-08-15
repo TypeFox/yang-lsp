@@ -318,8 +318,12 @@ class XpathResolver {
 			return computeType(contextType, '*', mode, ctx)
 		}
 		if (contextType === Types.ANY) {
-			LinkingErrorMessageProvider.markOK(e.node)
+			if (e.node !== null)
+				LinkingErrorMessageProvider.markOK(e.node)
 			return contextType
+		}
+		if (e.node === null) {
+			return Types.ANY
 		}
 		val ref = new AtomicReference<XpathType>() 
 		linker.link(e.node, YangPackage.Literals.XPATH_NAME_TEST__REF) [

@@ -47,6 +47,8 @@ import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.xtext.CurrentTypeFinder
 
 import static extension io.typefox.yang.utils.YangNameUtils.*
+import io.typefox.yang.yang.XpathLocation
+import io.typefox.yang.yang.XpathStep
 
 class YangContentProposalProvider extends IdeContentProposalProvider {
 
@@ -156,34 +158,57 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 	@Inject XpathResolver xpathResolver
 
 	def List<IEObjectDescription> findPathes(EObject obj) {
-		return switch obj {
-			AbsolutePath:
-				#[Linker.ROOT]
+		switch obj {
+			AbsolutePath case obj.step===null:
+				return #[Linker.ROOT]
 			XpathExpression: {
 				val type = xpathResolver.getType(obj)
 				if (type instanceof NodeSetType) {
-					type.nodes
+					return type.nodes
 				} else {
-					#[]
+					if (obj instanceof XpathLocation) {
+						val p = findPathes(obj.target)
+						if (p !== null) {
+							return p
+						}
+					} 
+					return findPathes(obj.eContainer)
 				}
 			}
 			SchemaNode: {
-				#[new EObjectDescription(scopeContextProvider.findSchemaNodeName(obj), obj, emptyMap)]
+				return #[new EObjectDescription(scopeContextProvider.findSchemaNodeName(obj), obj, emptyMap)]
 			}
 			EObject: {
-				findPathes(obj.eContainer)
+				return findPathes(obj.eContainer)
 			}
 			default: {
-				#[]
+				return #[]
 			}
+		}
+	}
+	
+	def XpathResolver.Axis findAxis(EObject e) {
+		switch e {
+			XpathLocation case e.isIsDescendants : Axis.DESCENDANTS
+			AbsolutePath case e.isIsDescendants : Axis.DESCENDANTS
+			XpathStep case e.axis == 'ancestor' : Axis.ANCESTOR 
+			XpathStep case e.axis == 'ancestor-or-self' : Axis.ANCESTOR_OR_SELF 
+			XpathStep case e.axis == 'descendant' : Axis.DESCENDANTS
+			XpathStep case e.axis == 'descendant-or-self' : Axis.DESCENDANTS_OR_SELF
+			XpathStep case e.axis == 'following' : Axis.ANCESTOR
+			XpathStep case e.axis == 'preceding' : Axis.DESCENDANTS
+			XpathStep case e.axis == 'following-sibling' : Axis.SIBLINGS
+			XpathStep case e.axis == 'preceding-sibling' : Axis.SIBLINGS
+			default : Axis.CHILDREN
 		}
 	}
 
 	def computeXpathStep(CrossReference reference, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
 		val descs = findPathes(context.currentModel)
+		val axis = findAxis(context.currentModel)
 		val scopeContext = scopeContextProvider.findScopeContext(context.currentModel)
 		for (d : descs) {
-			val candidates = xpathResolver.findNodes(d.qualifiedName, null, Axis.CHILDREN, scopeContext.schemaNodeScope)
+			val candidates = xpathResolver.findNodes(d.qualifiedName, null, axis, scopeContext.schemaNodeScope)
 			for (candidate : candidates) {
 				val entry = this.proposalCreator.createProposal(candidate.qualifiedName.lastSegment, context)
 				if (entry !== null) {
@@ -194,6 +219,7 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 			}
 		}
 	}
+	
 
 	def computeRevisionProposals(CrossReference reference, ContentAssistContext context,
 		IIdeContentProposalAcceptor acceptor) {
