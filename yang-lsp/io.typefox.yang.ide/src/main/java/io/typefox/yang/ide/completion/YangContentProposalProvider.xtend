@@ -137,7 +137,11 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 					computeIdentifierRefProposals(reference, context, acceptor)
 				} else if (YangPackage.Literals.REVISION_DATE__DATE === ereference) {
 					computeRevisionProposals(reference, context, acceptor)
-				} else if (YangPackage.Literals.XPATH_NAME_TEST__REF === ereference) {
+				} else if (
+					YangPackage.Literals.XPATH_NAME_TEST__REF === ereference ||
+					YangPackage.Literals.CURRENT_REF__REF === ereference ||
+					YangPackage.Literals.PARENT_REF__REF === ereference
+				) {
 					computeXpathStep(reference, context, acceptor)
 				} else {
 					val scope = scopeProvider.getScope(currentModel, ereference)

@@ -80,6 +80,10 @@ class XpathResolver {
 		internalResolve(expression, initialContext, new Context(context.schemaNodeScope, context.moduleName, initialContext))
 	}
 	
+	protected def dispatch XpathType internalResolve(Void e, XpathType contextType, Context ctx) {
+		contextType
+	}
+	
 	protected def dispatch XpathType internalResolve(XpathExpression e, XpathType contextType, Context ctx) {
 		throw new IllegalStateException()
 	}
