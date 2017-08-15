@@ -23,6 +23,8 @@ import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.XpathExpression
+import io.typefox.yang.yang.XpathLocation
+import io.typefox.yang.yang.XpathStep
 import io.typefox.yang.yang.YangPackage
 import java.util.List
 import org.eclipse.emf.ecore.EClass
@@ -47,8 +49,6 @@ import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.xtext.CurrentTypeFinder
 
 import static extension io.typefox.yang.utils.YangNameUtils.*
-import io.typefox.yang.yang.XpathLocation
-import io.typefox.yang.yang.XpathStep
 
 class YangContentProposalProvider extends IdeContentProposalProvider {
 
@@ -157,29 +157,39 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 
 	@Inject XpathResolver xpathResolver
 
-	def List<IEObjectDescription> findPathes(EObject obj) {
+	def List<IEObjectDescription> findPathes(EObject obj, ContentAssistContext context) {
 		switch obj {
-			AbsolutePath case obj.step===null:
-				return #[Linker.ROOT]
+			XpathStep : {
+				switch expr : obj.eContainer {
+					AbsolutePath : return #[Linker.ROOT]
+					XpathLocation : return findPathes(expr.target, context)
+					default : return findPathes(expr.eContainer, context)
+				}
+			}
 			XpathExpression: {
 				val type = xpathResolver.getType(obj)
 				if (type instanceof NodeSetType) {
 					return type.nodes
 				} else {
 					if (obj instanceof XpathLocation) {
-						val p = findPathes(obj.target)
+						val p = findPathes(obj.target, context)
 						if (p !== null) {
 							return p
 						}
-					} 
-					return findPathes(obj.eContainer)
+					} else if (obj instanceof AbsolutePath) {
+						return #[Linker.ROOT]
+					}
+					return findPathes(obj.eContainer, context)
 				}
 			}
 			SchemaNode: {
+				if (context.prefix == '/') {
+					return #[Linker.ROOT]
+				}
 				return #[new EObjectDescription(scopeContextProvider.findSchemaNodeName(obj), obj, emptyMap)]
 			}
 			EObject: {
-				return findPathes(obj.eContainer)
+				return findPathes(obj.eContainer, context)
 			}
 			default: {
 				return #[]
@@ -187,25 +197,30 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 		}
 	}
 	
-	def XpathResolver.Axis findAxis(EObject e) {
-		switch e {
+	def XpathResolver.Axis findAxis(ContentAssistContext context) {
+		switch e : context.currentModel {
 			XpathLocation case e.isIsDescendants : Axis.DESCENDANTS
 			AbsolutePath case e.isIsDescendants : Axis.DESCENDANTS
-			XpathStep case e.axis == 'ancestor' : Axis.ANCESTOR 
-			XpathStep case e.axis == 'ancestor-or-self' : Axis.ANCESTOR_OR_SELF 
-			XpathStep case e.axis == 'descendant' : Axis.DESCENDANTS
-			XpathStep case e.axis == 'descendant-or-self' : Axis.DESCENDANTS_OR_SELF
-			XpathStep case e.axis == 'following' : Axis.ANCESTOR
-			XpathStep case e.axis == 'preceding' : Axis.DESCENDANTS
-			XpathStep case e.axis == 'following-sibling' : Axis.SIBLINGS
-			XpathStep case e.axis == 'preceding-sibling' : Axis.SIBLINGS
+			XpathStep : {
+				switch e.axis {
+					case 'ancestor' : return Axis.ANCESTOR 
+					case 'ancestor-or-self' : return Axis.ANCESTOR_OR_SELF
+					case 'descendant' :return  Axis.DESCENDANTS
+					case 'descendant-or-self' : return Axis.DESCENDANTS_OR_SELF
+					case 'following' : return Axis.ANCESTOR
+					case 'preceding' : return Axis.DESCENDANTS
+					case 'following-sibling' : return Axis.SIBLINGS
+					case 'preceding-sibling' : return Axis.SIBLINGS
+				}
+				return Axis.CHILDREN
+			}
 			default : Axis.CHILDREN
 		}
 	}
 
 	def computeXpathStep(CrossReference reference, ContentAssistContext context, IIdeContentProposalAcceptor acceptor) {
-		val descs = findPathes(context.currentModel)
-		val axis = findAxis(context.currentModel)
+		val descs = findPathes(context.currentModel, context)
+		val axis = findAxis(context)
 		val scopeContext = scopeContextProvider.findScopeContext(context.currentModel)
 		for (d : descs) {
 			val candidates = xpathResolver.findNodes(d.qualifiedName, null, axis, scopeContext.schemaNodeScope)

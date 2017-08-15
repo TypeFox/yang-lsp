@@ -23,13 +23,23 @@ import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.resource.impl.ChunkedResourceDescriptions
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
+import io.typefox.yang.settings.PreferenceValuesProvider
+import org.eclipse.xtext.preferences.PreferenceKey
 
 class CodeLensService implements ICodeLensService {
 	
+	public static val CODE_LENS_ENABLED = new PreferenceKey("code-lenses", "on")
+	
 	@Inject IReferenceFinder referenceFinder
 	@Inject DocumentExtensions documentExtensions
+	@Inject PreferenceValuesProvider preferenceProvider
 	
 	override computeCodeLenses(Document document, XtextResource resource, CodeLensParams params, CancelIndicator indicator) {
+		val enabled = preferenceProvider.getPreferenceValues(resource).getPreference(CODE_LENS_ENABLED)
+		if (!enabled.equals("on")) {
+			return emptyList
+		}
+		
 		val acceptor = new MyAcceptor(resource.URI)
 		 
 		referenceFinder.findAllReferences(resource, acceptor, new NullProgressMonitor() {

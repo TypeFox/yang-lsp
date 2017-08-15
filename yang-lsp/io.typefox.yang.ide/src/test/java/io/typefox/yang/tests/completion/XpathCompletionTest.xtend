@@ -158,6 +158,7 @@ class XpathCompletionTest extends AbstractYangLSPTest {
 		]
 	}
 	
+	
 	@Test def void testAxis_06() {
 		testXpath[
 			expression = '//'
@@ -168,6 +169,28 @@ class XpathCompletionTest extends AbstractYangLSPTest {
 				middle-leaf -> middle-leaf [[4, 8] .. [4, 8]]
 				outer -> outer [[4, 8] .. [4, 8]]
 				outer-leaf -> outer-leaf [[4, 8] .. [4, 8]]
+			'''
+		]
+	}
+	
+	@Test def void testAxis_07() {
+		testXpath[
+			expression = 'descendant::|inner'
+			expected = '''
+				inner -> inner [[4, 18] .. [4, 18]]
+				inner-leaf -> inner-leaf [[4, 18] .. [4, 18]]
+				middle -> middle [[4, 18] .. [4, 18]]
+				middle-leaf -> middle-leaf [[4, 18] .. [4, 18]]
+				outer-leaf -> outer-leaf [[4, 18] .. [4, 18]]
+			'''
+		]
+	}
+	
+	@Test def void testAxis_08() {
+		testXpath[
+			expression = '/|foo'
+			expected = '''
+				outer -> outer [[4, 7] .. [4, 7]]
 			'''
 		]
 	}
