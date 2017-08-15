@@ -12,27 +12,27 @@ If you don't want to see the code lenses you can turn it of with the following p
 
 ```json
 {
-  code-lens-enabled : off
+  "code-lens-enabled" : "off"
 }
 ```
 
 ## Validation Extension
 
-The settings is used to register an extension. Please find the details [here]().
+The settings is used to register an extension. Please find the details [here](Extensions.md).
 
 ## Diagnostics
 
 The user can change the severity of diagnostics, by setting the value of a diagnostic preference key to either
- - "error"
- - "warning"
- - "ignore"
+ - `"error"`
+ - `"warning"`
+ - `"ignore"`
 
 The settings contains a `diagnostics` section in which the serverioties for the below diagnostics can be adjusted.
 An example :
 ```json
 {
-  diagnostic : {
-    xpath-linking-error : error
+  "diagnostic" : {
+    "xpath-linking-error" : "error"
   }
 }
 ```
