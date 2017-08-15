@@ -8,7 +8,7 @@ A Language Server for YANG
 
 The YANG Language Server is currently being used in
  - [YANGSTER](https://github.com/yang-tools/yangster) based on [Theia](https://github.com/theia-ide/theia) (incl. Diagramming Support)
- - [Yang VsCode](https://marketplace.visualstudio.com/items?itemName=typefox.yang-vscode) [github](https://github.com/yang-tools/yang-vscode)
+ - [Yang VsCode](https://marketplace.visualstudio.com/items?itemName=typefox.yang-vscode) (repo on [github](https://github.com/yang-tools/yang-vscode))
  - [Yang Eclipse](https://github.com/yang-tools/yang-eclipse)
 
 ## Build
