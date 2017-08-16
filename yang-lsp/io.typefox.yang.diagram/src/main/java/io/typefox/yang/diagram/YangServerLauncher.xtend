@@ -104,7 +104,11 @@ class YangServerLauncher extends ServerLauncher {
 		
 		override protected append(LoggingEvent event) {
 			client.logMessage(new MessageParams => [
-				message = event.message.toString
+				message = event.message.toString 
+					+ if(event.throwableStrRep !== null && event.throwableStrRep.length > 0) 
+						': ' + event.throwableStrRep?.join('\n')
+					  else 
+					    ''
 				type = switch event.getLevel {
 					case Level.ERROR: MessageType.Error
 					case Level.INFO : MessageType.Info
