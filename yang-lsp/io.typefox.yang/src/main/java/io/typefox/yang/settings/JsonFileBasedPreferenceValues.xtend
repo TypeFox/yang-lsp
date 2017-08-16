@@ -55,6 +55,7 @@ class JsonFileBasedPreferenceValues extends MapBasedPreferenceValues {
 	def void read() {
 		clear()
 		val reader = new JsonReader(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(Files.readAllBytes(path)))))
+		reader.lenient = true
 		val object = Streams.parse(reader) as JsonObject
 		internalFillMap(null, object)
 	}
