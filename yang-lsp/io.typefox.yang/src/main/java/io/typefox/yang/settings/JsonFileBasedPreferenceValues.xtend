@@ -24,22 +24,24 @@ class JsonFileBasedPreferenceValues extends MapBasedPreferenceValues {
 	new(Path path, IPreferenceValues delegate) {
 		super(delegate, newHashMap)
 		this.path = path
-		checkUpToDate
 	}
 	
 	/**
 	 * reloads the preferences from disk if the file has changed.
+	 * @return whether
 	 */
-	public def void checkUpToDate() {
+	public def boolean checkIsUpToDate() {
+		var result = true
 		val d = this.delegate
 		if (d instanceof JsonFileBasedPreferenceValues) {
-			d.checkUpToDate
+			result = result && d.checkIsUpToDate
 		}
 		try {
 			val localLastMod = Files.getLastModifiedTime(path)
 			if (localLastMod != lastModification) {
 				lastModification = localLastMod
 				read()
+				return false
 			}
 		} catch (Exception e) {
 			if (!(e instanceof NoSuchFileException)) {
@@ -47,17 +49,25 @@ class JsonFileBasedPreferenceValues extends MapBasedPreferenceValues {
 			} else {
 				lastModification = null
 			}
-			clear()
-			return
+			if (!values.isEmpty) {
+				clear()
+				return false
+			}
 		}
+		return result
 	}
 	
 	def void read() {
 		clear()
-		val reader = new JsonReader(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(Files.readAllBytes(path)))))
+		val bytes = Files.readAllBytes(path)
+		val reader = new JsonReader(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytes))))
 		reader.lenient = true
-		val object = Streams.parse(reader) as JsonObject
-		internalFillMap(null, object)
+		val object = Streams.parse(reader)
+		if (object instanceof JsonObject) {		
+			internalFillMap(null, object)
+		} else {
+			LOG.error("The yang.settings file, did not contain a top level object.")
+		}
 	}
 	
 	private def void internalFillMap(String prefix, JsonObject object) {

@@ -12,6 +12,7 @@ import io.typefox.yang.ide.completion.YangContentProposalProvider
 import io.typefox.yang.ide.completion.YangCrossrefProposalProvider
 import io.typefox.yang.ide.contentassist.antlr.lexer.InternalYangLexer
 import io.typefox.yang.ide.contentassist.antlr.lexer.jflex.JFlexBasedInternalYangLexer
+import io.typefox.yang.ide.extensions.CommandService
 import io.typefox.yang.ide.symbols.YangDocumentSymbolService
 import java.util.List
 import org.eclipse.lsp4j.CodeLens
@@ -23,6 +24,7 @@ import org.eclipse.xtext.ide.server.Document
 import org.eclipse.xtext.ide.server.codeActions.ICodeActionService
 import org.eclipse.xtext.ide.server.codelens.ICodeLensResolver
 import org.eclipse.xtext.ide.server.codelens.ICodeLensService
+import org.eclipse.xtext.ide.server.commands.IExecutableCommandService
 import org.eclipse.xtext.ide.server.contentassist.ContentAssistService
 import org.eclipse.xtext.ide.server.symbol.DocumentSymbolService
 import org.eclipse.xtext.resource.XtextResource
@@ -71,6 +73,10 @@ class YangIdeModule extends AbstractYangIdeModule {
 
 	def Class<? extends ICodeActionService> bindICodeActionService() {
 		return CodeActionService;
+	}
+	
+	def Class<? extends IExecutableCommandService> bindIExecutableCommandService() {
+		return CommandService
 	}
 	
 	static class NoOpCodeLensResolver implements ICodeLensResolver {

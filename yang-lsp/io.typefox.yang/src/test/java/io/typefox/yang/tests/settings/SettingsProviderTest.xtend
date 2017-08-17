@@ -58,14 +58,14 @@ class SettingsProviderTest {
 		val tempRenamed = new File(root, "temp.yang.settings")
 		try {
 			workspaceSettings.renameTo(tempRenamed)
-			preferences.checkUpToDate
+			Assert.assertFalse(preferences.checkIsUpToDate)
 			Assert.assertEquals("error", preferences.getPreference(new PreferenceKey("diagnostics.foo", "x")))
 			Assert.assertEquals("x", preferences.getPreference(new PreferenceKey("diagnostics.bar", "x")))
 			Assert.assertEquals("error", preferences.getPreference(new PreferenceKey("diagnostics.baz", "x")))
 		} finally {
 			tempRenamed.renameTo(workspaceSettings)
 		}
-		preferences.checkUpToDate
+		Assert.assertFalse(preferences.checkIsUpToDate)
 		Assert.assertEquals("info", preferences.getPreference(new PreferenceKey("diagnostics.foo", "x")))
 		Assert.assertEquals("error", preferences.getPreference(new PreferenceKey("diagnostics.bar", "x")))
 		Assert.assertEquals("error", preferences.getPreference(new PreferenceKey("diagnostics.baz", "x")))

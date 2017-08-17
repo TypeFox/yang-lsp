@@ -11,12 +11,17 @@ import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import org.eclipse.xtext.preferences.PreferenceValuesByLanguage
 import org.eclipse.xtext.workspace.IProjectConfigProvider
 import org.eclipse.xtext.util.internal.Log
+import java.util.List
+import org.eclipse.xtext.util.IDisposable
+import javax.inject.Singleton
 
 @Log
+@Singleton
 class PreferenceValuesProvider implements IPreferenceValuesProvider {
 	
 	@Inject(optional=true) IProjectConfigProvider configProvider
 	@Inject LanguageInfo language
+	List<(IPreferenceValues, Resource)=>void> onChangeListeners = newArrayList
 	
 	override IPreferenceValues getPreferenceValues(Resource context) {
 		if (context === null) {
@@ -31,7 +36,11 @@ class PreferenceValuesProvider implements IPreferenceValuesProvider {
 					 createPreferenceValues(context)
 		valuesByLanguage.put(language.languageName, values)
 		if (values instanceof JsonFileBasedPreferenceValues) {
-			values.checkUpToDate
+			if (!values.checkIsUpToDate) {
+				for (listener : onChangeListeners) {
+					listener.apply(values, context)
+				}
+			}
 		} 
 		return values 
 	}
@@ -60,4 +69,10 @@ class PreferenceValuesProvider implements IPreferenceValuesProvider {
 	
 	static val Map<String,String> constantSettings = newHashMap()
 	
+	def IDisposable registerChangeListener((IPreferenceValues, Resource)=>void callback) {
+		this.onChangeListeners.add(callback)
+		return [
+			this.onChangeListeners.remove(callback)
+		]
+	} 
 }

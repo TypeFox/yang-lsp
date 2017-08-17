@@ -115,7 +115,7 @@ class YangServerLauncher extends ServerLauncher {
 					case Level.WARN : MessageType.Warning
 					default : MessageType.Log
 				}
-			])	
+			])
 		}
 		
 		override close() {
