@@ -81,7 +81,8 @@ Create (or open) the `yang.settings` file and add the plugin using the following
 ```json
 	"extension" : {
 		"classpath" : "extension.jar",
-		"validators" : "my.pack.MyExampleValidator"
+		"validators" : "my.pack.MyExampleValidator",
+		"commands" : "my.pack.MyCommand"
 	}
 ```
 
