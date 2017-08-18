@@ -16,7 +16,7 @@ If you don't want to see the code lenses you can turn it of with the following p
 }
 ```
 
-## Validation Extension
+## Extensions
 
 The settings is used to register an extension. Please find the details [here](Extensions.md).
 
