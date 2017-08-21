@@ -37,7 +37,7 @@ class YangNodeModelBasedRegionAccessBuilder extends NodeModelBasedRegionAccessBu
         newHidden.setPrevious(newSemantic)
         newSemantic.leading = lastHidden
         lastHidden.setNext(newSemantic)
-        eObjectTokens.getSemanticRegions().add(newSemantic);
+        eObjectTokens.addChild(newSemantic);
         newSemantic.setEObjectTokens(eObjectTokens);
         lastHidden = newHidden;
     }
