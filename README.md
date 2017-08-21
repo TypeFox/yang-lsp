@@ -2,7 +2,7 @@
 [![Build Status](https://travis-ci.org/yang-tools/yang-lsp.svg?branch=master)](https://travis-ci.org/yang-tools/yang-lsp)
 [![Build status](https://ci.appveyor.com/api/projects/status/96eo9k5yo0wtpj50/branch/master?svg=true)](https://ci.appveyor.com/project/kittaakos/yang-lsp/branch/master)
 
-A Language Server for YANG.
+A language server for YANG (see [Language Server Protocol](https://github.com/Microsoft/language-server-protocol)).
 
 ## Usage
 
