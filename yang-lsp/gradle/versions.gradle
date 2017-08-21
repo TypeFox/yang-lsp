@@ -1,0 +1,13 @@
+version = '0.1.0-SNAPSHOT'
+
+ext.versions = [
+    xtext: '2.13.0-SNAPSHOT',
+    lsp4j: '0.3.0-SNAPSHOT',
+    sprotty: '0.2.0-SNAPSHOT',
+    elk: '0.3.0-SNAPSHOT',
+    gson: '2.7',
+    junit: '4.12',
+    mwe2: '2.9.0.201605261059',
+    antlrgen: '[2.1.1,3)',
+    jflexgen: '0.1.0'
+]

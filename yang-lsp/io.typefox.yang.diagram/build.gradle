@@ -1,4 +1,7 @@
-apply plugin: 'application'
+apply from: "${rootDir}/gradle/distribution.gradle"
+
+ext.title = 'Yang Diagram Generator'
+description = 'Overview diagram generator for Yang based on sprotty'
 
 dependencies {
 	compile project(':io.typefox.yang.ide')
@@ -7,15 +10,15 @@ dependencies {
 	compile "io.typefox.sprotty:diagram-server:${versions.sprotty}"
 	compile "io.typefox.sprotty:diagram-layout-engine:${versions.sprotty}"
 	compile "io.typefox.sprotty:xtext-diagram:${versions.sprotty}"
-	compile "com.google.inject:guice:4.1.0"
-	testCompile "junit:junit:4.12"
+	
+	testCompile "junit:junit:${versions.junit}"
 	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
 }
 
+// Reuse the test infrastructure from the Yang base module
 sourceSets.test.compileClasspath += project(':io.typefox.yang').sourceSets.test.output
 sourceSets.test.runtimeClasspath += project(':io.typefox.yang').sourceSets.test.output
 
 mainClassName = 'io.typefox.yang.diagram.YangServerLauncher'
 applicationName = 'yang-language-server'
-applicationDefaultJvmArgs = []
-build.dependsOn(installDist)
+ext.applicationQualifier = 'diagram-extension'

@@ -1,42 +1,36 @@
 buildscript {
 	repositories.jcenter()
 	dependencies {
-		classpath 'org.xtext:xtext-gradle-plugin:1.0.17'
+		classpath 'org.xtext:xtext-gradle-plugin:1.0.19'
 	}
 }
 
-ext.versions = [
-    xtext: '2.13.0-SNAPSHOT',
-    lsp4j: '0.3.0-SNAPSHOT',
-    sprotty: '0.2.0-SNAPSHOT',
-    elk: '0.3.0-SNAPSHOT'
-]
+apply from: "${rootDir}/gradle/versions.gradle"
 
 subprojects {
 	repositories {
-		jcenter()
-		mavenLocal()
+		mavenCentral()
 		maven {
 			name 'sonatype-snapshots'
 			url 'https://oss.sonatype.org/content/repositories/snapshots'
 		}
 	}
 	
-	apply plugin: 'java'
+	group = 'io.typefox.yang'
+	version = rootProject.version
+	
 	apply plugin: 'org.xtext.xtend'
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
+	apply plugin: 'maven'
 
+	apply from: "${rootDir}/gradle/java-compiler-settings.gradle"
 	apply from: "${rootDir}/gradle/source-layout.gradle"
 	apply from: "${rootDir}/gradle/maven-deployment.gradle"
-	
-	group = 'io.typefox.yang'
-	version = '0.1.0-SNAPSHOT'
-	
-	sourceCompatibility = '1.8'
 }
 
-// Workaround for issue https://github.com/researchgate/gradle-release/issues/144
-task build {
-	dependsOn subprojects.findResults { it.tasks.findByName('build') }
+task clean(type: Delete) {
+	group 'Build'
+	description 'Deletes the local repositories'
+	delete 'build'
 }

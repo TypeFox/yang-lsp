@@ -1,0 +1,22 @@
+apply plugin: 'application'
+
+task copyDist(type: Copy) {
+	group = 'Distribution'
+	description = 'Copy the distribution archive to the root build directory'
+	dependsOn(distZip)
+	from distZip.outputs
+	into "${rootDir}/build"
+	eachFile {
+		if (project.hasProperty('applicationQualifier'))
+			name = "${project.applicationName}_${project.applicationQualifier}_${project.version}.zip"
+		else
+			name = "${project.applicationName}_${project.version}.zip"
+	}
+}
+
+build.dependsOn(installDist)
+
+applicationDistribution.from("${rootDir}/..") {
+	include "LICENSE"
+	include "README.md"
+}

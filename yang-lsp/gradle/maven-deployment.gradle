@@ -1,11 +1,70 @@
-//see https://docs.gradle.org/current/userguide/maven_plugin.html
-apply plugin: 'maven'
-
-uploadArchives {
-	repositories {
-		mavenDeployer {
-			repository(url: "file://${buildDir}/localRepo")
-			snapshotRepository(url: "file://${buildDir}/localRepo")
+// Configuration function for generated POMs
+def configurePom = { pom ->
+	pom.project {
+		if (project.hasProperty('title')) {
+			name = project.title
+			description = project.description
+		}
+		packaging 'jar'
+		url 'https://github.com/yang-tools/yang-lsp'
+		licenses {
+			license {
+				name 'Apache License 2.0'
+				url 'http://www.apache.org/licenses/LICENSE-2.0'
+			}
+		}
+		developers {
+			developer {
+				name 'Jan Bicker'
+				email 'jan.bicker@typefox.io'
+				organizationUrl 'http://typefox.io'
+			}
+			developer {
+				name 'Sven Efftinge'
+				email 'sven.efftinge@typefox.io'
+				organizationUrl 'http://typefox.io'
+			}
+			developer {
+				name 'Ákos Kitta'
+				email 'akos.kitta@typefox.io'
+				organizationUrl 'http://typefox.io'
+			}
+			developer {
+				name 'Jan Köhnlein'
+				email 'jan.koehnlein@typefox.io'
+				organizationUrl 'http://typefox.io'
+			}
+			developer {
+				name 'Miro Spönemann'
+				email 'miro.spoenemann@typefox.io'
+				organizationUrl 'http://typefox.io'
+			}
+			developer {
+				name 'Alex Tugarev'
+				email 'alex.tugarev@typefox.io'
+				organizationUrl 'http://typefox.io'
+			}
+		}
+		scm {
+			connection 'scm:git:git@github.com:yang-tools/yang-lsp.git'
+			developerConnection 'scm:git:git@github.com:yang-tools/yang-lsp.git'
+			url 'git@github.com:yang-tools/yang-lsp.git'
 		}
 	}
+}
+
+// We need to wait until the project's own build file has been executed
+// so we can use the title and description settings for setting up Maven publishing.
+afterEvaluate {
+	
+	task createLocalMavenRepo(type: Upload) {
+		group = 'Upload'
+		description = 'Create or update the local Maven repository'
+		configuration = configurations.archives
+		repositories.mavenDeployer {
+			repository(url: "file:" + file("${rootDir}/build/maven-repository"))
+			configurePom(pom)
+		}
+	}
+
 }
