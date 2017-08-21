@@ -15,10 +15,6 @@ cache:
   - $HOME/.gradle
   - $HOME/.m2/repository
 
-before_script:
-  - git clone https://github.com/TypeFox/xtext-jflex.git
-  - mvn -f ./xtext-jflex/jflex-fragment/pom.xml clean install
-
 script:
   - ./yang-lsp/gradlew -p yang-lsp build --refresh-dependencies --no-daemon
 
