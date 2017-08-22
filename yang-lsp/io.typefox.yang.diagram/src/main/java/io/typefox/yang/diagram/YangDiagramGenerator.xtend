@@ -7,7 +7,7 @@
 package io.typefox.yang.diagram
 
 import com.google.inject.Inject
-import io.typefox.sprotty.api.IDiagramServer.IDiagramState
+import io.typefox.sprotty.api.IDiagramState
 import io.typefox.sprotty.api.LayoutOptions
 import io.typefox.sprotty.api.SCompartment
 import io.typefox.sprotty.api.SEdge
