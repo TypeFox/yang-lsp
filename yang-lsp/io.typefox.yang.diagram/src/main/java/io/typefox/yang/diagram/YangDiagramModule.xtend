@@ -6,21 +6,13 @@
  */
 package io.typefox.yang.diagram
 
-import io.typefox.sprotty.server.xtext.DefaultDiagramModule
 import io.typefox.sprotty.server.xtext.IDiagramGenerator
-import org.eclipse.xtext.ide.server.occurrences.IDocumentHighlightService
+import io.typefox.sprotty.server.xtext.ide.IdeDiagramModule
+import io.typefox.sprotty.server.xtext.ide.IdeLanguageServerExtension
 
-class YangDiagramModule extends DefaultDiagramModule {
+class YangDiagramModule extends IdeDiagramModule {
 	
-	def Class<? extends IDocumentHighlightService> bindIDocumentHighlightService() {
-		YangHighlightService
-	}
-	
-	override bindILanguageServerExtension() {
-		YangLanguageServerExtension
-	}
-	
-	override bindIDiagramServerProvider() {
+	def Class<? extends IdeLanguageServerExtension> bindIdeLanguageServerExtension() {
 		YangLanguageServerExtension
 	}
 	
@@ -36,8 +28,8 @@ class YangDiagramModule extends DefaultDiagramModule {
 		YangPopupModelFactory
 	}
 	
-	override bindIDiagramSelectionListener() {
-		YangDiagramSelectionListener
+	override bindIDiagramExpansionListener() {
+		YangDiagramExpansionListener
 	}
 	
 }

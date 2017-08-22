@@ -7,6 +7,7 @@
 package io.typefox.yang.diagram
 
 import com.google.inject.Inject
+import io.typefox.sprotty.api.IDiagramServer.IDiagramState
 import io.typefox.sprotty.api.LayoutOptions
 import io.typefox.sprotty.api.SCompartment
 import io.typefox.sprotty.api.SEdge
@@ -16,6 +17,8 @@ import io.typefox.sprotty.api.SModelElement
 import io.typefox.sprotty.api.SModelRoot
 import io.typefox.sprotty.api.SNode
 import io.typefox.sprotty.server.xtext.IDiagramGenerator
+import io.typefox.sprotty.server.xtext.tracing.TraceRegionProvider
+import io.typefox.sprotty.server.xtext.tracing.Traceable
 import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.Action
 import io.typefox.yang.yang.Augment
@@ -86,8 +89,11 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	
 	@Inject extension TraceRegionProvider
 	
-	override generate(Resource resource, Map<String, String> options, CancelIndicator cancelIndicator) {
+	IDiagramState state
+	
+	override generate(Resource resource, IDiagramState state, CancelIndicator cancelIndicator) {
 		val content = resource.contents.head
+		this.state = state
 		if (content instanceof AbstractModule) {
 			LOG.info("Generating diagram for input: '" + resource.URI.lastSegment + "'")
 			return generateDiagram(content, cancelIndicator)
@@ -138,8 +144,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				}
 				elementIndex.put(statement, element)
 				rootChildren.add(element)
-				if(statement.eContainer !== null)
-					trace(element, statement)
+//				if(statement.eContainer !== null)
+//					trace(element, statement)
 			}
 		}
 		return rootChildren
@@ -156,14 +162,14 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		SModelElement modelParentElement) {
 		val prefix = moduleStmt.substatements.filter(Prefix).head
 		val moduleElement = createModule(moduleStmt.name, prefix.prefix)
-		initModule(moduleElement, findClass(moduleStmt), moduleStmt.name, moduleStmt)
+		initModule(moduleElement, moduleStmt.name, moduleStmt)
 	}
 
 	protected def dispatch SModelElement generateElement(Submodule submoduleStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
 		val moduleElement = createModule(submoduleStmt.name)
 		moduleElement.trace(submoduleStmt)
-		initModule(moduleElement, findClass(submoduleStmt), submoduleStmt.name, submoduleStmt)
+		initModule(moduleElement, submoduleStmt.name, submoduleStmt)
 	}
 
 	protected def dispatch SModelElement generateElement(Container containerStmt, SModelElement viewParentElement,
@@ -396,24 +402,21 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def dispatch SModelElement generateElement(Import importStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		val prefix = importStmt.substatements.filter(Prefix).head
-		val module = createModule(importStmt.module.name, prefix.prefix)
-
-		diagramRoot.children.add(module)
-		module.trace(importStmt)
+		val moduleElement = generateElement(importStmt.module, diagramRoot, modelParentElement)
+		diagramRoot.children.add(moduleElement)
+		
+		//		module.trace(importStmt)
 		postProcesses.add([
-			diagramRoot.children.add(createEdge(module, modelParentElement, IMPORT_EDGE_TYPE))
+			diagramRoot.children.add(createEdge(moduleElement, modelParentElement, IMPORT_EDGE_TYPE))
 		])
-
 		return null
 	}
 
 	protected def dispatch SModelElement generateElement(Include includeStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		val submodule = includeStmt.module
-		val module = createModule(submodule.name)
-		module.trace(includeStmt)
-		return module
+		val module = includeStmt.module
+		val moduleElement = createModule(module.name)
+		initModule(moduleElement, module.name, module)
 	}
 
 	protected def dispatch SModelElement generateElement(Leaf leafStmt, SModelElement viewParentElement,
@@ -431,24 +434,28 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		return null
 	}
 
-	protected def SNode initModule(SNode moduleElement, String tag, String name, Statement moduleStmt) {
-		// Module node
-		val moduleNode = configSElement(YangNode, moduleElement.id + '-node', 'class')
-		moduleNode.layout = 'vbox'
-		moduleNode.layoutOptions = new LayoutOptions [
-			paddingLeft = 0.0
-			paddingRight = 0.0
-			paddingTop = 0.0
-			paddingBottom = 0.0
-		]
-		moduleNode.cssClass = 'moduleNode'
-		moduleNode.source = moduleStmt
-
-		moduleNode.children.add(createClassHeader(moduleNode.id, findTag(moduleStmt), name))
-
-		moduleElement.children.add(moduleNode)
-		moduleElement.children.addAll(createChildElements(moduleNode, moduleElement, moduleStmt.substatements))
-
+	protected def SNode initModule(YangNode moduleElement, String name, Statement moduleStmt) {
+		if (state.expandedElements.contains(moduleElement.id)) {
+			// Module node
+			val moduleNode = configSElement(YangNode, moduleElement.id + '-node', 'class')
+			moduleNode.layout = 'vbox'
+			moduleNode.layoutOptions = new LayoutOptions [
+				paddingLeft = 0.0
+				paddingRight = 0.0
+				paddingTop = 0.0
+				paddingBottom = 0.0
+			]
+			moduleNode.cssClass = 'moduleNode'
+			moduleNode.source = moduleStmt
+	
+			moduleNode.children.add(createClassHeader(moduleNode.id, findTag(moduleStmt), name))
+	
+			moduleElement.children.add(moduleNode)
+			moduleElement.children.addAll(createChildElements(moduleNode, moduleElement, moduleStmt.substatements))
+			moduleElement.expanded = true			
+		} else {
+			moduleElement.expanded = false
+		}
 		return moduleElement
 	}
 
@@ -484,7 +491,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		return classHeader
 	}
 
-	protected def SNode createModule(String name) {
+	protected def YangNode createModule(String name) {
 		// Module
 		val moduleElement = configSElement(YangNode, name, 'module')
 		moduleElement.layout = 'vbox'
@@ -502,7 +509,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		return moduleElement
 	}
 
-	protected def SNode createModule(String name, String prefix) {
+	protected def YangNode createModule(String name, String prefix) {
 		createModule(prefix + ':' + name)
 	}
 

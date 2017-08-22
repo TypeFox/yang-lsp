@@ -9,6 +9,7 @@ apply from: "${rootDir}/gradle/versions.gradle"
 
 subprojects {
 	repositories {
+		mavenLocal()
 		mavenCentral()
 		maven {
 			name 'sonatype-snapshots'

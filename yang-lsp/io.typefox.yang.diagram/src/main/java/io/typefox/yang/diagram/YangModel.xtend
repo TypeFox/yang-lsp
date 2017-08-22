@@ -1,11 +1,12 @@
 package io.typefox.yang.diagram
 
+import io.typefox.sprotty.api.SCompartment
+import io.typefox.sprotty.api.SLabel
 import io.typefox.sprotty.api.SNode
+import io.typefox.sprotty.server.xtext.tracing.TextRegion
+import io.typefox.sprotty.server.xtext.tracing.Traceable
 import io.typefox.yang.yang.Statement
 import org.eclipse.xtend.lib.annotations.Accessors
-import io.typefox.sprotty.api.SCompartment
-import org.eclipse.xtend.lib.annotations.Data
-import io.typefox.sprotty.api.SLabel
 
 @Accessors
 class YangNodeClassified extends SNode implements Traceable {
@@ -17,6 +18,7 @@ class YangNodeClassified extends SNode implements Traceable {
 @Accessors
 class YangNode extends YangNodeClassified {
 	transient Statement source
+	Boolean expanded
 }
 
 @Accessors
@@ -30,15 +32,3 @@ class YangLabel extends SLabel implements Traceable {
 	TextRegion significantRegion
 }
 
-interface Traceable {
-	def TextRegion getTraceRegion()
-	def void setTraceRegion(TextRegion traceRegion)
-	def TextRegion getSignificantRegion()
-	def void setSignificantRegion(TextRegion traceRegion)
-}
-
-@Data
-class TextRegion {
-	int offset
-	int length
-}

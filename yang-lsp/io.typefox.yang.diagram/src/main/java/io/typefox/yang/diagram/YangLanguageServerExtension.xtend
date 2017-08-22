@@ -8,14 +8,11 @@ package io.typefox.yang.diagram
 
 import com.google.inject.Singleton
 import io.typefox.sprotty.api.IDiagramServer
-import io.typefox.sprotty.server.xtext.DiagramLanguageServerExtension
 import io.typefox.sprotty.server.xtext.LanguageAwareDiagramServer
-import org.eclipse.lsp4j.jsonrpc.Endpoint
-import org.eclipse.lsp4j.jsonrpc.services.ServiceEndpoints
-import org.eclipse.xtext.ide.server.ILanguageServerAccess
+import io.typefox.sprotty.server.xtext.ide.IdeLanguageServerExtension
 
 @Singleton
-class YangLanguageServerExtension extends DiagramLanguageServerExtension {
+class YangLanguageServerExtension extends IdeLanguageServerExtension {
 	
 	override protected initializeDiagramServer(IDiagramServer server) {
 		super.initializeDiagramServer(server)
@@ -27,25 +24,5 @@ class YangLanguageServerExtension extends DiagramLanguageServerExtension {
 	override didClose(String clientId) {
 		super.didClose(clientId)
 		LOG.info("Removed diagram server for " + clientId)
-	}
-
-	override findDiagramServersByUri(String uri) {
-		super.findDiagramServersByUri(uri)
-	}
-	
-	def ILanguageServerAccess getLanguageServerAccess() {
-		languageServerAccess
-	}
-	
-	TheiaDiagramClient _client
-	
-	override protected TheiaDiagramClient getClient() {
-		if (_client === null) {
-			val client = languageServerAccess.languageClient
-			if (client instanceof Endpoint) {
-				_client = ServiceEndpoints.toServiceObject(client, TheiaDiagramClient)
-			}
-		}
-		return _client
 	}
 }
