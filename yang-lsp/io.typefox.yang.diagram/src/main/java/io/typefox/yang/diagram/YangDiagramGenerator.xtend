@@ -91,6 +91,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	
 	IDiagramState state
 	
+	AbstractModule diagramModule
+	
 	override generate(Resource resource, IDiagramState state, CancelIndicator cancelIndicator) {
 		val content = resource.contents.head
 		this.state = state
@@ -102,6 +104,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	}
 
 	def SModelRoot generateDiagram(AbstractModule module, CancelIndicator cancelIndicator) {
+		diagramModule = module
 		elementIndex = new HashMap
 		postProcesses = new ArrayList
 		diagramRoot = new SGraph => [
@@ -120,7 +123,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		]
 
 		val rootChildren = createChildElements(diagramRoot, diagramRoot, #[module])
-		diagramRoot.children.addAll(rootChildren)
+		diagramRoot.children.addAll(rootChildren)		
 		postProcessing()
 		return diagramRoot
 	}
@@ -144,8 +147,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				}
 				elementIndex.put(statement, element)
 				rootChildren.add(element)
-//				if(statement.eContainer !== null)
-//					trace(element, statement)
+				if(statement.eContainer !== null && !element.type.endsWith('module'))
+					element.trace(statement)
 			}
 		}
 		return rootChildren
@@ -168,7 +171,6 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	protected def dispatch SModelElement generateElement(Submodule submoduleStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
 		val moduleElement = createModule(submoduleStmt.name)
-		moduleElement.trace(submoduleStmt)
 		initModule(moduleElement, submoduleStmt.name, submoduleStmt)
 	}
 
@@ -435,7 +437,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	}
 
 	protected def SNode initModule(YangNode moduleElement, String name, Statement moduleStmt) {
-		if (state.expandedElements.contains(moduleElement.id)) {
+		if ((state.currentModel.type == 'NONE' && moduleStmt == diagramModule) 
+			|| state.expandedElements.contains(moduleElement.id)) {
 			// Module node
 			val moduleNode = configSElement(YangNode, moduleElement.id + '-node', 'class')
 			moduleNode.layout = 'vbox'
@@ -452,7 +455,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	
 			moduleElement.children.add(moduleNode)
 			moduleElement.children.addAll(createChildElements(moduleNode, moduleElement, moduleStmt.substatements))
-			moduleElement.expanded = true			
+			moduleElement.expanded = true		
+			state.expandedElements.add(moduleElement.id)	
 		} else {
 			moduleElement.expanded = false
 		}
