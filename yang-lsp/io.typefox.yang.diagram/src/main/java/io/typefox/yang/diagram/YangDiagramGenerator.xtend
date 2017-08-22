@@ -294,11 +294,11 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				])
 				choiceNode.layoutOptions = new LayoutOptions [
 					HAlign = 'center'
-					paddingLeft = 25.0
-					paddingRight = 25.0
-					paddingTop = 20.0
-					paddingBottom = 20.0
-					paddingFactor = 3.0
+					paddingLeft = 5.0
+					paddingRight = 5.0
+					paddingTop = 5.0
+					paddingBottom = 5.0
+					paddingFactor = 2.0
 				]
 				return choiceNode
 			}
