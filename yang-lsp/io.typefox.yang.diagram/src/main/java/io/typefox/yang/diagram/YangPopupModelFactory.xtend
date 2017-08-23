@@ -1,11 +1,14 @@
 package io.typefox.yang.diagram
 
+import com.google.inject.Inject
 import io.typefox.sprotty.api.HtmlRoot
 import io.typefox.sprotty.api.IDiagramServer
 import io.typefox.sprotty.api.IPopupModelFactory
 import io.typefox.sprotty.api.PreRenderedElement
 import io.typefox.sprotty.api.RequestPopupModelAction
 import io.typefox.sprotty.api.SModelElement
+import io.typefox.sprotty.server.xtext.tracing.ITraceProvider
+import io.typefox.sprotty.server.xtext.tracing.Traceable
 import io.typefox.yang.yang.Description
 import io.typefox.yang.yang.Namespace
 import io.typefox.yang.yang.Prefix
@@ -15,11 +18,19 @@ import java.util.ArrayList
 
 class YangPopupModelFactory implements IPopupModelFactory {
 
+	@Inject extension ITraceProvider
+
 	override createPopupModel(SModelElement element, RequestPopupModelAction request, IDiagramServer server) {
-		if (element instanceof YangNode) {
-			val statement = element.source
-			if (statement !== null)
-				createPopup(statement, element, request)
+		if (element instanceof Traceable) {
+			val future = element.withSource(server) [ statement, context |
+				if (statement instanceof Statement) 
+					createPopup(statement, element, request)
+				else
+					null
+			]
+			future.get
+		} else {
+			null
 		}
 	}
 

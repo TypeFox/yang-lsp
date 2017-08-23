@@ -17,7 +17,7 @@ import io.typefox.sprotty.api.SModelElement
 import io.typefox.sprotty.api.SModelRoot
 import io.typefox.sprotty.api.SNode
 import io.typefox.sprotty.server.xtext.IDiagramGenerator
-import io.typefox.sprotty.server.xtext.tracing.TraceRegionProvider
+import io.typefox.sprotty.server.xtext.tracing.ITraceProvider
 import io.typefox.sprotty.server.xtext.tracing.Traceable
 import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.Action
@@ -87,7 +87,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	var SGraph diagramRoot
 	
-	@Inject extension TraceRegionProvider
+	@Inject ITraceProvider traceProvider
 	
 	IDiagramState state
 	
@@ -155,10 +155,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	}
 	
 	protected def void trace(SModelElement element, Statement statement) {
-		if (element instanceof Traceable) {
-			element.traceRegion = statement.traceRegion
-			element.significantRegion = statement.significantRegion
-		}
+		if (element instanceof Traceable) 
+			traceProvider.trace(element, statement)
 	}
 
 	protected def dispatch SModelElement generateElement(Module moduleStmt, SModelElement viewParentElement,
@@ -264,7 +262,6 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		SModelElement modelParentElement) {
 		if (modelParentElement instanceof SNode) {
 			val choiceNode = createNodeWithHeadingLabel(viewParentElement.id, choiceStmt.name, 'choice')
-			choiceNode.source = choiceStmt
 			val SEdge toChoiceEdge = createEdge(viewParentElement, choiceNode, DASHED_EDGE_TYPE)
 			modelParentElement.children.add(toChoiceEdge)
 			if (choiceNode !== null) {
@@ -273,7 +270,6 @@ class YangDiagramGenerator implements IDiagramGenerator {
 						if (it instanceof SchemaNode) {
 							val caseElement = createNodeWithHeadingLabel(choiceNode.id + "-" + it.name + "-case",
 								it.name, 'case')
-							caseElement.source = it
 							val caseCompartment = createClassMemberCompartment(caseElement.id)
 							caseElement.children.add(caseCompartment)
 							modelParentElement.children.add(caseElement)
@@ -449,7 +445,6 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				paddingBottom = 0.0
 			]
 			moduleNode.cssClass = 'moduleNode'
-			moduleNode.source = moduleStmt
 	
 			moduleNode.children.add(createClassHeader(moduleNode.id, findTag(moduleStmt), name))
 	
@@ -548,7 +543,6 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				paddingBottom = 0.0
 			]
 			classElement.cssClass = cssClass
-			classElement.source = statement
 
 			classElement.children.add(createClassHeader(classElement.id, findTag(statement), label))
 
