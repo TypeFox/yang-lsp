@@ -148,10 +148,11 @@ class YangDiagramGenerator implements IDiagramGenerator {
 					LOG.info(eid + " ALREADY EXISTS!!!")
 				}
 				elementIndex.put(statement, element)
-				if(!rootChildren.contains(element))
+				if(!rootChildren.contains(element)) {
 					rootChildren.add(element)
-				if(statement.eContainer !== null && !element.type.endsWith('module'))
-					element.trace(statement)
+					if(statement.eContainer !== null)
+						element.trace(statement)
+				}
 			}
 		}
 		return rootChildren
@@ -402,10 +403,10 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	protected def dispatch SModelElement generateElement(Import importStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
 		val moduleElement = createModule(importStmt.module)
-		if(!diagramRoot.children.contains(moduleElement))
+		if(!diagramRoot.children.contains(moduleElement)) {
 			diagramRoot.children.add(moduleElement)
-		
-		//		module.trace(importStmt)
+			moduleElement.trace(importStmt.module)
+		}
 		postProcesses.add([
 			diagramRoot.children.add(createEdge(moduleElement, modelParentElement, IMPORT_EDGE_TYPE))
 		])
