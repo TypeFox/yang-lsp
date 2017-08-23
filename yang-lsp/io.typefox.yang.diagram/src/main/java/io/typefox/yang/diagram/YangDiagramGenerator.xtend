@@ -93,6 +93,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	
 	AbstractModule diagramModule
 	
+	Map<String, YangNode> id2modules = newHashMap
+	
 	override generate(Resource resource, IDiagramState state, CancelIndicator cancelIndicator) {
 		val content = resource.contents.head
 		this.state = state
@@ -146,7 +148,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 					LOG.info(eid + " ALREADY EXISTS!!!")
 				}
 				elementIndex.put(statement, element)
-				rootChildren.add(element)
+				if(!rootChildren.contains(element))
+					rootChildren.add(element)
 				if(statement.eContainer !== null && !element.type.endsWith('module'))
 					element.trace(statement)
 			}
@@ -161,15 +164,12 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def dispatch SModelElement generateElement(Module moduleStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		val prefix = moduleStmt.substatements.filter(Prefix).head
-		val moduleElement = createModule(moduleStmt.name, prefix.prefix)
-		initModule(moduleElement, moduleStmt.name, moduleStmt)
+		return createModule(moduleStmt)
 	}
 
 	protected def dispatch SModelElement generateElement(Submodule submoduleStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		val moduleElement = createModule(submoduleStmt.name)
-		initModule(moduleElement, submoduleStmt.name, submoduleStmt)
+		createModule(submoduleStmt)
 	}
 
 	protected def dispatch SModelElement generateElement(Container containerStmt, SModelElement viewParentElement,
@@ -216,6 +216,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			postProcesses.add([
 				val identityElement = createClassElement(identityStmt, viewParentElement, modelParentElement, null)
 				modelParentElement.children.add(identityElement)
+				identityElement.trace(identityStmt)
 				val baseIdentityElement = elementIndex.get(base.reference)
 				if (baseIdentityElement !== null)
 					modelParentElement.children.add(
@@ -400,8 +401,9 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def dispatch SModelElement generateElement(Import importStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		val moduleElement = generateElement(importStmt.module, diagramRoot, modelParentElement)
-		diagramRoot.children.add(moduleElement)
+		val moduleElement = createModule(importStmt.module)
+		if(!diagramRoot.children.contains(moduleElement))
+			diagramRoot.children.add(moduleElement)
 		
 		//		module.trace(importStmt)
 		postProcesses.add([
@@ -412,9 +414,8 @@ class YangDiagramGenerator implements IDiagramGenerator {
 
 	protected def dispatch SModelElement generateElement(Include includeStmt, SModelElement viewParentElement,
 		SModelElement modelParentElement) {
-		val module = includeStmt.module
-		val moduleElement = createModule(module.name)
-		initModule(moduleElement, module.name, module)
+		if(!(includeStmt.eContainer instanceof Submodule)) 
+			createModule(includeStmt.module)
 	}
 
 	protected def dispatch SModelElement generateElement(Leaf leafStmt, SModelElement viewParentElement,
@@ -432,7 +433,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		return null
 	}
 
-	protected def SNode initModule(YangNode moduleElement, String name, Statement moduleStmt) {
+	protected def SNode initModule(YangNode moduleElement, AbstractModule moduleStmt) {
 		if ((state.currentModel.type == 'NONE' && moduleStmt == diagramModule) 
 			|| state.expandedElements.contains(moduleElement.id)) {
 			// Module node
@@ -446,7 +447,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			]
 			moduleNode.cssClass = 'moduleNode'
 	
-			moduleNode.children.add(createClassHeader(moduleNode.id, findTag(moduleStmt), name))
+			moduleNode.children.add(createClassHeader(moduleNode.id, findTag(moduleStmt), moduleStmt.name))
 	
 			moduleElement.children.add(moduleNode)
 			moduleElement.children.addAll(createChildElements(moduleNode, moduleElement, moduleStmt.substatements))
@@ -490,6 +491,18 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		return classHeader
 	}
 
+	protected def createModule(AbstractModule moduleStmt) {
+		val prefix = moduleStmt.substatements.filter(Prefix).head
+		val id = moduleStmt.name + if(prefix !== null) ':' + prefix.prefix else ''
+		val existingModule = id2modules.get(id)
+		if(existingModule !== null)
+			return existingModule
+		val moduleElement = createModule(id)
+		id2modules.put(id, moduleElement)
+		initModule(moduleElement, moduleStmt)
+		return moduleElement
+	}
+
 	protected def YangNode createModule(String name) {
 		// Module
 		val moduleElement = configSElement(YangNode, name, 'module')
@@ -506,10 +519,6 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		moduleLabel.text = name
 		moduleElement.children.add(moduleLabel)
 		return moduleElement
-	}
-
-	protected def YangNode createModule(String name, String prefix) {
-		createModule(prefix + ':' + name)
 	}
 
 	protected def SModelElement createClassMemberElement(SchemaNode statement, SModelElement viewParentElement,
