@@ -15,6 +15,7 @@ import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangVersion
 import java.util.ArrayList
+import io.typefox.sprotty.server.xtext.ILanguageAwareDiagramServer
 
 class YangPopupModelFactory implements IPopupModelFactory {
 
@@ -22,7 +23,7 @@ class YangPopupModelFactory implements IPopupModelFactory {
 
 	override createPopupModel(SModelElement element, RequestPopupModelAction request, IDiagramServer server) {
 		if (element instanceof Traceable) {
-			val future = element.withSource(server) [ statement, context |
+			val future = element.withSource(server as ILanguageAwareDiagramServer) [ statement, context |
 				if (statement instanceof Statement) 
 					createPopup(statement, element, request)
 				else
