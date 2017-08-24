@@ -71,6 +71,7 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.util.CancelIndicator
+import io.typefox.sprotty.api.SButton
 
 class YangDiagramGenerator implements IDiagramGenerator {
 	static val LOG = Logger.getLogger(YangDiagramGenerator)
@@ -505,7 +506,6 @@ class YangDiagramGenerator implements IDiagramGenerator {
 	}
 
 	protected def YangNode createModule(String name) {
-		// Module
 		val moduleElement = configSElement(YangNode, name, 'module')
 		moduleElement.layout = 'vbox'
 		moduleElement.layoutOptions = new LayoutOptions [
@@ -515,10 +515,14 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			paddingRight = 5.0
 		]
 
-		// Module label
+		val SCompartment moduleHeadingCompartment = configSElement(SCompartment, moduleElement.id + '-heading', 'comp')
+		moduleHeadingCompartment.layout = 'hbox'
+		moduleElement.children.add(moduleHeadingCompartment)
 		val SLabel moduleLabel = configSElement(SLabel, moduleElement.id + '-label', 'heading')
 		moduleLabel.text = name
-		moduleElement.children.add(moduleLabel)
+		moduleHeadingCompartment.children.add(moduleLabel)
+		val expandButton = configSElement(SButton, moduleElement.id + '-expand', 'expand')
+		moduleHeadingCompartment.children.add(expandButton) 
 		return moduleElement
 	}
 
@@ -697,6 +701,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			SLabel: 'label'
 			SCompartment: 'comp'
 			SEdge: 'edge'
+			SButton: 'button'
 			default: 'dontknow'
 		}
 	}
