@@ -31,7 +31,10 @@ class YangLayoutEngine extends ElkLayoutEngine {
 				.setProperty(CoreOptions.DIRECTION, Direction.DOWN)
 				.setProperty(CoreOptions.SPACING_NODE_NODE, 30.0)
 				.setProperty(LayeredOptions.SPACING_EDGE_NODE_BETWEEN_LAYERS, 30.0)
-				//.setProperty(CoreOptions.HIERARCHY_HANDLING, HierarchyHandling.INCLUDE_CHILDREN)
+				// TODO: enable when ELK is fixed:
+				// https://github.com/eclipse/elk/issues/226
+//				.setProperty(CoreOptions.HIERARCHY_HANDLING, HierarchyHandling.INCLUDE_CHILDREN)
+//				.setProperty(LayeredOptions.CROSSING_MINIMIZATION_GREEDY_SWITCH_TYPE, GreedySwitchType.OFF)
 			configurator.configureByType('node:module')
 				.setProperty(CoreOptions.DIRECTION, Direction.DOWN)
 				.setProperty(CoreOptions.SPACING_NODE_NODE, 100.0)
