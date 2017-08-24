@@ -151,8 +151,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 				elementIndex.put(statement, element)
 				if(!rootChildren.contains(element)) {
 					rootChildren.add(element)
-					if(statement.eContainer !== null)
-						element.trace(statement)
+					element.trace(statement)
 				}
 			}
 		}
