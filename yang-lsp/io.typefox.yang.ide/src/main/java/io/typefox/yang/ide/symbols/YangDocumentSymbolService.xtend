@@ -27,6 +27,7 @@ import org.eclipse.xtext.ide.server.DocumentExtensions
 import org.eclipse.xtext.ide.server.symbol.DocumentSymbolService
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.resource.EObjectAtOffsetHelper
+import org.eclipse.xtext.resource.ILocationInFileProvider
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.util.TextRegion
@@ -35,13 +36,14 @@ class YangDocumentSymbolService extends DocumentSymbolService {
 	
 	@Inject extension DocumentExtensions 
 	@Inject EObjectAtOffsetHelper helper
+	@Inject ILocationInFileProvider locationProvider
 	
 	override getDefinitions(XtextResource resource, int offset, IResourceAccess resourceAccess, CancelIndicator cancelIndicator) {
 		val node = helper.getCrossReferenceNode(resource, new TextRegion(offset,0))
 		if (node !== null) {
 			val element = helper.getCrossReferencedElement(node)
 			if (element !== null) {
-				return #[element.newLocation]
+				return #[element.symbolFullLocation]
 			}
 		}
 		return emptyList
@@ -88,7 +90,7 @@ class YangDocumentSymbolService extends DocumentSymbolService {
 		s.containerName = parent
 		s.kind = SymbolKind.Method
 		s.name = NodeModelUtils.findActualNodeFor(stmnt.path).text.trim ?: ""
-		s.location = stmnt.symbolLocation
+		s.location = stmnt.symbolFullLocation
 		
 		symbols.add(s)
 		return s.name
@@ -99,7 +101,7 @@ class YangDocumentSymbolService extends DocumentSymbolService {
 		s.containerName = parent
 		s.kind = stmnt.kind
 		s.name = stmnt.name ?: ""
-		s.location = stmnt.symbolLocation
+		s.location = stmnt.symbolFullLocation
 		
 		symbols.add(s)
 		return stmnt.name ?: parent
@@ -110,6 +112,12 @@ class YangDocumentSymbolService extends DocumentSymbolService {
 		for (child : stmnt.substatements) {
 			collectSymbols(child, name?:parent, symbols, indicator)
 		}
+	}
+	
+	protected def getSymbolFullLocation(EObject object) {
+		val resource = object.eResource
+		val fullRegion = locationProvider.getFullTextRegion(object)
+		resource.newLocation(fullRegion)
 	}
 	
 }
