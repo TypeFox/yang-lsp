@@ -37,38 +37,38 @@ class DocumentSymbolsTest extends AbstractYangLSPTest {
 			expectedSymbols = '''
 				symbol "x" {
 				    kind: 5
-				    location: MyModel.yang [[1, 10] .. [1, 11]]
+				    location: MyModel.yang [[1, 1] .. [3, 2]]
 				}
 				symbol "bla" {
 				    kind: 8
-				    location: MyModel.yang [[5, 11] .. [5, 14]]
+				    location: MyModel.yang [[5, 1] .. [10, 2]]
 				}
 				symbol "test" {
 				    kind: 8
-				    location: MyModel.yang [[6, 7] .. [6, 11]]
+				    location: MyModel.yang [[6, 2] .. [6, 28]]
 				    container: "bla"
 				}
 				symbol "bla2" {
 				    kind: 8
-				    location: MyModel.yang [[7, 12] .. [7, 16]]
+				    location: MyModel.yang [[7, 2] .. [9, 3]]
 				    container: "bla"
 				}
 				symbol "test2" {
 				    kind: 8
-				    location: MyModel.yang [[8, 8] .. [8, 13]]
+				    location: MyModel.yang [[8, 3] .. [8, 30]]
 				    container: "bla2"
 				}
 				symbol "myIdentity" {
 				    kind: 14
-				    location: MyModel.yang [[12, 10] .. [12, 20]]
+				    location: MyModel.yang [[12, 1] .. [12, 21]]
 				}
 				symbol "myType" {
 				    kind: 7
-				    location: MyModel.yang [[13, 9] .. [13, 15]]
+				    location: MyModel.yang [[13, 1] .. [15, 2]]
 				}
 				symbol "someFeature" {
 				    kind: 17
-				    location: MyModel.yang [[16, 9] .. [16, 20]]
+				    location: MyModel.yang [[16, 1] .. [16, 21]]
 				}
 			'''
 		]	

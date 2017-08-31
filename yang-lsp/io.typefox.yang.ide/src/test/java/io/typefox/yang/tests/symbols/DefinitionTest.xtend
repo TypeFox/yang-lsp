@@ -20,7 +20,7 @@ class DefinitionTest extends AbstractYangLSPTest {
 			line = 5
 			column = 7
 			expectedDefinitions = '''
-				MyModel.yang [[1, 9] .. [1, 15]]
+				MyModel.yang [[1, 1] .. [3, 2]]
 			'''
 		]
 	}
