@@ -12,6 +12,49 @@ class DocumentSymbolsTest extends AbstractYangLSPTest {
 	    ]
 	}
 	
+	@Test def void testInputOutput() {		
+		testDocumentSymbol[
+            model = '''
+					module foo {
+						rpc myAction {
+							input {
+								leaf x { type string; }
+							}
+							output {
+								leaf x { type string; }
+							}
+						}
+					}
+            '''
+            expectedSymbols = '''
+            		symbol "myAction" {
+            		    kind: 12
+            		    location: MyModel.yang [[1, 1] .. [8, 2]]
+            		}
+            		symbol "input" {
+            		    kind: 7
+            		    location: MyModel.yang [[2, 2] .. [4, 3]]
+            		    container: "myAction"
+            		}
+            		symbol "x" {
+            		    kind: 8
+            		    location: MyModel.yang [[3, 3] .. [3, 26]]
+            		    container: "input"
+            		}
+            		symbol "output" {
+            		    kind: 7
+            		    location: MyModel.yang [[5, 2] .. [7, 3]]
+            		    container: "myAction"
+            		}
+            		symbol "x" {
+            		    kind: 8
+            		    location: MyModel.yang [[6, 3] .. [6, 26]]
+            		    container: "output"
+            		}
+            '''
+	    ]
+	}
+	
 	@Test def void testDocumentSymbols() {
 		testDocumentSymbol[
 			model = '''

@@ -31,6 +31,7 @@ import org.eclipse.xtext.resource.ILocationInFileProvider
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.util.TextRegion
+import io.typefox.yang.utils.YangNameUtils
 
 class YangDocumentSymbolService extends DocumentSymbolService {
 	
@@ -89,7 +90,7 @@ class YangDocumentSymbolService extends DocumentSymbolService {
 		val s = new SymbolInformation
 		s.containerName = parent
 		s.kind = SymbolKind.Method
-		s.name = NodeModelUtils.findActualNodeFor(stmnt.path).text.trim ?: ""
+		s.name = NodeModelUtils.findActualNodeFor(stmnt.path).text.trim ?: YangNameUtils.getYangName(stmnt)
 		s.location = stmnt.symbolFullLocation
 		
 		symbols.add(s)
@@ -100,11 +101,11 @@ class YangDocumentSymbolService extends DocumentSymbolService {
 		val s = new SymbolInformation
 		s.containerName = parent
 		s.kind = stmnt.kind
-		s.name = stmnt.name ?: ""
+		s.name = stmnt.name ?: YangNameUtils.getYangName(stmnt)
 		s.location = stmnt.symbolFullLocation
 		
 		symbols.add(s)
-		return stmnt.name ?: parent
+		return s.name
 	}
 	
 	def void collectSymbols(Statement stmnt, String parent, ArrayList<SymbolInformation> symbols, CancelIndicator indicator) {
