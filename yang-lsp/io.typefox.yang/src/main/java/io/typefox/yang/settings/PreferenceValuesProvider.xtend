@@ -57,13 +57,15 @@ class PreferenceValuesProvider implements IPreferenceValuesProvider {
 		if (config === null) {
 			return result
 		}
-		// add workspace settings
-		val segmentsToRemove = if (config.path.lastSegment.isEmpty) 2 else 1 
-		val workspaceSettings = fs.getPath(config.path.trimSegments(segmentsToRemove).toFileString, "yang.settings")
-		result = new JsonFileBasedPreferenceValues(workspaceSettings, result)
-		// add project settings
-		val projectSettings = fs.getPath(config.path.toFileString, "yang.settings")
-		result = new JsonFileBasedPreferenceValues(projectSettings, result)
+		if (config.path !== null) {
+			// add workspace settings
+			val segmentsToRemove = if (config.path.lastSegment.isEmpty) 2 else 1 
+			val workspaceSettings = fs.getPath(config.path.trimSegments(segmentsToRemove).toFileString, "yang.settings")
+			result = new JsonFileBasedPreferenceValues(workspaceSettings, result)
+			// add project settings
+			val projectSettings = fs.getPath(config.path.toFileString, "yang.settings")
+			result = new JsonFileBasedPreferenceValues(projectSettings, result)
+		}
 		return result
 	}
 	
