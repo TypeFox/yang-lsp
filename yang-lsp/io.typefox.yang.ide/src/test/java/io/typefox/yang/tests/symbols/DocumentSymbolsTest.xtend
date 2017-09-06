@@ -28,7 +28,7 @@ class DocumentSymbolsTest extends AbstractYangLSPTest {
             '''
             expectedSymbols = '''
             		symbol "myAction" {
-            		    kind: 12
+            		    kind: 6
             		    location: MyModel.yang [[1, 1] .. [8, 2]]
             		}
             		symbol "input" {
@@ -42,7 +42,7 @@ class DocumentSymbolsTest extends AbstractYangLSPTest {
             		    container: "input"
             		}
             		symbol "output" {
-            		    kind: 7
+            		    kind: 9
             		    location: MyModel.yang [[5, 2] .. [7, 3]]
             		    container: "myAction"
             		}
@@ -106,7 +106,7 @@ class DocumentSymbolsTest extends AbstractYangLSPTest {
 				    location: MyModel.yang [[12, 1] .. [12, 21]]
 				}
 				symbol "myType" {
-				    kind: 7
+				    kind: 10
 				    location: MyModel.yang [[13, 1] .. [15, 2]]
 				}
 				symbol "someFeature" {

@@ -67,16 +67,16 @@ class YangDocumentSymbolService extends DocumentSymbolService {
 			Grouping : SymbolKind.Class
 			Identity : SymbolKind.Constant
 			Input : SymbolKind.Property
-			Output : SymbolKind.Property
+			Output : SymbolKind.Constructor
 			Notification : SymbolKind.Function
-			Rpc : SymbolKind.Function
-			Typedef : SymbolKind.Property
+			Rpc : SymbolKind.Method
+			Typedef : SymbolKind.Enum
 			
 			LeafList : SymbolKind.Array
 			List : SymbolKind.Array
 			
 			Choice : SymbolKind.Number
-			Case : SymbolKind.Number
+			Case : SymbolKind.String
 			
 			default : SymbolKind.Field
 		}
