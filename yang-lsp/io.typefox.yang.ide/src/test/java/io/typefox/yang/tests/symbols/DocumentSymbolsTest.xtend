@@ -37,7 +37,7 @@ class DocumentSymbolsTest extends AbstractYangLSPTest {
             		    container: "myAction"
             		}
             		symbol "x" {
-            		    kind: 8
+            		    kind: 13
             		    location: MyModel.yang [[3, 3] .. [3, 26]]
             		    container: "input"
             		}
@@ -47,7 +47,7 @@ class DocumentSymbolsTest extends AbstractYangLSPTest {
             		    container: "myAction"
             		}
             		symbol "x" {
-            		    kind: 8
+            		    kind: 13
             		    location: MyModel.yang [[6, 3] .. [6, 26]]
             		    container: "output"
             		}
@@ -83,21 +83,21 @@ class DocumentSymbolsTest extends AbstractYangLSPTest {
 				    location: MyModel.yang [[1, 1] .. [3, 2]]
 				}
 				symbol "bla" {
-				    kind: 8
+				    kind: 3
 				    location: MyModel.yang [[5, 1] .. [10, 2]]
 				}
 				symbol "test" {
-				    kind: 8
+				    kind: 13
 				    location: MyModel.yang [[6, 2] .. [6, 28]]
 				    container: "bla"
 				}
 				symbol "bla2" {
-				    kind: 8
+				    kind: 3
 				    location: MyModel.yang [[7, 2] .. [9, 3]]
 				    container: "bla"
 				}
 				symbol "test2" {
-				    kind: 8
+				    kind: 13
 				    location: MyModel.yang [[8, 3] .. [8, 30]]
 				    container: "bla2"
 				}

@@ -32,6 +32,8 @@ import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.util.TextRegion
 import io.typefox.yang.utils.YangNameUtils
+import io.typefox.yang.yang.Container
+import io.typefox.yang.yang.Leaf
 
 class YangDocumentSymbolService extends DocumentSymbolService {
 	
@@ -62,21 +64,21 @@ class YangDocumentSymbolService extends DocumentSymbolService {
 	
 	def getKind(SchemaNode node) {
 		switch node {
+			Case : SymbolKind.String
+			Choice : SymbolKind.Number
+			Container : SymbolKind.Namespace
 			Extension : SymbolKind.Module
 			Feature : SymbolKind.Boolean
 			Grouping : SymbolKind.Class
 			Identity : SymbolKind.Constant
 			Input : SymbolKind.Property
+			Leaf: SymbolKind.Variable
+			LeafList : SymbolKind.Array
+			List : SymbolKind.Array
 			Output : SymbolKind.Constructor
 			Notification : SymbolKind.Function
 			Rpc : SymbolKind.Method
 			Typedef : SymbolKind.Enum
-			
-			LeafList : SymbolKind.Array
-			List : SymbolKind.Array
-			
-			Choice : SymbolKind.Number
-			Case : SymbolKind.String
 			
 			default : SymbolKind.Field
 		}
