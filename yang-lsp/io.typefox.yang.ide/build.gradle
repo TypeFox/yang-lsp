@@ -1,5 +1,3 @@
-apply from: "${rootDir}/gradle/distribution.gradle"
-
 ext.title = 'Yang Language Server'
 description = 'Generic IDE services for Yang offered via the Language Server Protocol'
 
@@ -10,9 +8,6 @@ dependencies {
 	testCompile "junit:junit:${versions.junit}"
 	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
 }
-
-mainClassName = 'org.eclipse.xtext.ide.server.ServerLauncher'
-applicationName = 'yang-language-server'
 
 test {
     maxHeapSize '512m'

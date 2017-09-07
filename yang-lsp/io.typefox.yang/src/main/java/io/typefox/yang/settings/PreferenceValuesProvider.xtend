@@ -1,19 +1,21 @@
 package io.typefox.yang.settings
 
+import com.google.common.base.StandardSystemProperty
 import com.google.inject.Inject
-import java.nio.file.FileSystems
+import java.net.URI
+import java.nio.file.Paths
+import java.util.List
 import java.util.Map
+import javax.inject.Singleton
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.LanguageInfo
 import org.eclipse.xtext.preferences.IPreferenceValues
 import org.eclipse.xtext.preferences.IPreferenceValuesProvider
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import org.eclipse.xtext.preferences.PreferenceValuesByLanguage
-import org.eclipse.xtext.workspace.IProjectConfigProvider
-import org.eclipse.xtext.util.internal.Log
-import java.util.List
 import org.eclipse.xtext.util.IDisposable
-import javax.inject.Singleton
+import org.eclipse.xtext.util.internal.Log
+import org.eclipse.xtext.workspace.IProjectConfigProvider
 
 @Log
 @Singleton
@@ -47,8 +49,8 @@ class PreferenceValuesProvider implements IPreferenceValuesProvider {
 	
 	protected def IPreferenceValues createPreferenceValues(Resource resource) {
 		var result = new MapBasedPreferenceValues(constantSettings)
-		val fs = FileSystems.^default
-		val userSettings = fs.getPath("~/.yang/yang.settings")
+		val userHome = Paths.get(StandardSystemProperty.USER_HOME.value)
+		val userSettings = userHome.resolve(".yang").resolve("yang.settings")
 		result = new JsonFileBasedPreferenceValues(userSettings, result)
 		if (configProvider === null) {
 			return result
@@ -58,12 +60,16 @@ class PreferenceValuesProvider implements IPreferenceValuesProvider {
 			return result
 		}
 		if (config.path !== null) {
+			val segmentsToRemove = if (config.path.lastSegment.isEmpty) 1 else 0
+			
 			// add workspace settings
-			val segmentsToRemove = if (config.path.lastSegment.isEmpty) 2 else 1 
-			val workspaceSettings = fs.getPath(config.path.trimSegments(segmentsToRemove).toFileString, "yang.settings")
+			val workspaceDirectory = new URI(config.path.trimSegments(segmentsToRemove + 1).toString)
+			val workspaceSettings = Paths.get(workspaceDirectory).resolve("yang.settings")
 			result = new JsonFileBasedPreferenceValues(workspaceSettings, result)
+			
 			// add project settings
-			val projectSettings = fs.getPath(config.path.toFileString, "yang.settings")
+			val projectDirectory = new URI(config.path.trimSegments(segmentsToRemove).toString)
+			val projectSettings = Paths.get(projectDirectory).resolve("yang.settings")
 			result = new JsonFileBasedPreferenceValues(projectSettings, result)
 		}
 		return result

@@ -42,10 +42,12 @@ class YangResourceDescriptionManager extends DefaultResourceDescriptionManager {
 	
 		private def computeImportedModules(Resource resource) {
 			val result = newArrayList
-			val module = resource.contents.head as AbstractModule
-			for (imp : module.substatements.filter(AbstractImport)) {
-				val string = NodeModelUtils.findNodesForFeature(imp, YangPackage.Literals.ABSTRACT_IMPORT__MODULE).join('')[NodeModelUtils.getTokenText(it)]
-				result.add(QualifiedName.create(string))
+			val module = resource.contents.head
+			if (module instanceof AbstractModule) {
+				for (imp : module.substatements.filter(AbstractImport)) {
+					val string = NodeModelUtils.findNodesForFeature(imp, YangPackage.Literals.ABSTRACT_IMPORT__MODULE).join('')[NodeModelUtils.getTokenText(it)]
+					result.add(QualifiedName.create(string))
+				}
 			}
 			return result
 		}
