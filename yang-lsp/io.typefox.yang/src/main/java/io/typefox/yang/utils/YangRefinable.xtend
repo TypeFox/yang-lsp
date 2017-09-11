@@ -80,7 +80,7 @@ class YangRefinable {
 	val Supplier<String> maxSupplier;
 
 	/**
-	 * Use {@link YangTypeExtensions#getYangRange(Range)} instead.
+	 * Use {@link YangTypesExtensions#getYangRefinable(Refinable)} instead.
 	 */
 	static def create(Refinable refinable, YangRefinable parentRange) {
 		Preconditions.checkNotNull(parentRange, 'parentRange');
