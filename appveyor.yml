@@ -8,7 +8,7 @@ platform:
   - x64
 
 build_script:
-  - ./yang-lsp/gradlew.bat -p yang-lsp installDist --refresh-dependencies --no-daemon
+  - ./yang-lsp/gradlew.bat -p yang-lsp build --refresh-dependencies --no-daemon
 
 cache:
  - C:\Users\appveyor\.gradle
