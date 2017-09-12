@@ -32,6 +32,7 @@ SchemaNode :
 	Identity |
 	Notification  |
 	Rpc |
+	Action |
 	Input |
 	Output |
 	Typedef
@@ -51,7 +52,6 @@ DataSchemaNode :
 OtherStatement :
 	  AbstractModule
 	| AbstractImport
-	| Action
 	| Argument
 	| Augment
 	| Base

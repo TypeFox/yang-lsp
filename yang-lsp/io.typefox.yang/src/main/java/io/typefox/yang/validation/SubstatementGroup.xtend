@@ -202,7 +202,7 @@ class SubstatementGroup {
 
 		// YANG version aware cardinality issue.
 		if (constraint.version11 && !version11) {
-			val message = '''Statment '«clazz.yangName»' requires explicit YANG version «YangExtensions.YANG_1_1».''';
+			val message = '''Statement '«clazz.yangName»' requires explicit YANG version «YangExtensions.YANG_1_1».''';
 			acceptor.acceptError(message, statement, range.offset, range.length, SUBSTATEMENT_CARDINALITY);
 			return;
 		}

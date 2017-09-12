@@ -126,9 +126,7 @@
   <eClassifiers xsi:type="ecore:EClass" name="Rpc" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Input" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Output" eSuperTypes="#//SchemaNode"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Action" eSuperTypes="#//OtherStatement">
-    <eStructuralFeatures xsi:type="ecore:EAttribute" name="name" eType="ecore:EDataType http://www.eclipse.org/emf/2002/Ecore#//EString"/>
-  </eClassifiers>
+  <eClassifiers xsi:type="ecore:EClass" name="Action" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Notification" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Augment" eSuperTypes="#//OtherStatement">
     <eStructuralFeatures xsi:type="ecore:EReference" name="path" eType="#//SchemaNodeIdentifier"

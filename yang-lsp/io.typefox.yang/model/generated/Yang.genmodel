@@ -123,9 +123,7 @@
     <genClasses ecoreClass="Yang.ecore#//Rpc"/>
     <genClasses ecoreClass="Yang.ecore#//Input"/>
     <genClasses ecoreClass="Yang.ecore#//Output"/>
-    <genClasses ecoreClass="Yang.ecore#//Action">
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Action/name"/>
-    </genClasses>
+    <genClasses ecoreClass="Yang.ecore#//Action"/>
     <genClasses ecoreClass="Yang.ecore#//Notification"/>
     <genClasses ecoreClass="Yang.ecore#//Augment">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//Augment/path"/>

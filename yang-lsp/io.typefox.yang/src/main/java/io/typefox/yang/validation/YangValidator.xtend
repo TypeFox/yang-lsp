@@ -490,7 +490,7 @@ class YangValidator extends AbstractYangValidator {
 		// An action must not have any ancestor node that is a list node without a "key" statement.
 		// An action must not be defined within an rpc, another action, or a notification, i.e., an action node must 
 		// not have an rpc, action, or a notification node as one of its ancestors in the schema tree.
-		checkAncestors(ACTION__NAME);
+		checkAncestors(SCHEMA_NODE__NAME);
 	}
 
 	@Check
