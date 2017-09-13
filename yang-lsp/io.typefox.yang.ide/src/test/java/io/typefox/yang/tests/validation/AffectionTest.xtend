@@ -80,11 +80,7 @@ class AffectionTest extends AbstractYangLSPTest {
 	
 	protected def expectDiagnostics(String uri, String expected) {
 		var issues = diagnostics.get(uri)
-		Assert.assertEquals(expected, issues
-				?.sortBy[range.start.line]
-				?.sortBy[message]
-				?.join(',\n')[message+":"+range.start.line]
-		)
+		Assert.assertEquals(expected, issues.sortBy[range.start.line].sortBy[message].join(',\n')[message+":"+range.start.line])
 	}
 	
 	protected def void change(String uri, String content) {
