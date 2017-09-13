@@ -104,9 +104,7 @@ class LexerTest {
 		l.assertNextToken(RULE_STRING,'"holla"')
 		l.assertNextToken(RightSquareBracket,']')
 		l.assertNextToken(RULE_WS,' ')
-		l.assertNextToken(RULE_HIDDEN,"'
-	+ /* test */ 
-	")
+		l.assertNextToken(RULE_HIDDEN, "'" + System.lineSeparator + "\t+ /* test */ " + System.lineSeparator + "\t")
 		l.assertNextToken(RULE_HIDDEN,"'")
 		l.assertNextToken(And,'and')
 		l.assertNextToken(RULE_WS,' ')
@@ -152,9 +150,7 @@ class LexerTest {
 		l.assertNextToken(RULE_STRING,'\\\"holla\\\"')
 		l.assertNextToken(RightSquareBracket,']')
 		l.assertNextToken(RULE_WS,' ')
-		l.assertNextToken(RULE_HIDDEN,'"
-	+ /* test */ 
-	')
+		l.assertNextToken(RULE_HIDDEN, "\"" + System.lineSeparator + "\t+ /* test */ " + System.lineSeparator + "\t")
 		l.assertNextToken(RULE_HIDDEN,'"')
 		l.assertNextToken(And,'and')
 		l.assertNextToken(RULE_WS,' ')
