@@ -152,7 +152,7 @@ class YangTypesExtensions {
 	}
 
 	/**
-	 * {@code true if the type is an identity reference built-in type, otherwise {@code false}.
+	 * {@code true} if the type is an identity reference built-in type, otherwise {@code false}.
 	 */
 	def boolean isIdentityref(Type it) {
 		return identityrefBuiltin.get == typeRef.builtin;

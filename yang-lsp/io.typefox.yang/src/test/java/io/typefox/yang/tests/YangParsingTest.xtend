@@ -5,6 +5,7 @@ package io.typefox.yang.tests
 
 import com.google.inject.Inject
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Path
 import org.eclipse.xtext.diagnostics.Diagnostic
 import org.eclipse.xtext.testing.InjectWith
 import org.eclipse.xtext.testing.XtextRunner
@@ -15,7 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import static org.junit.Assert.*
-import io.typefox.yang.yang.Path
+import static extension org.eclipse.xtext.util.Strings.toPlatformLineSeparator
 
 @RunWith(XtextRunner)
 @InjectWith(YangInjectorProvider)
@@ -88,7 +89,7 @@ class YangParsingTest {
 		            ref SchemaNode ref ref: SchemaNode@(unresolved proxy __synthetic0.yang#|5)
 		        }
 		    }
-		}'''.toString, EmfFormatter.objToStr((model.substatements.head as Path).reference))
+		}'''.toString, EmfFormatter.objToStr((model.substatements.head as Path).reference).toPlatformLineSeparator)
 	}
 	
 	@Test def void testXpath_02() {
@@ -201,7 +202,7 @@ class YangParsingTest {
 		        }
 		    ]
 		    attr EString name 'example-system'
-		}'''.toString, EmfFormatter.objToStr(model))
+		}'''.toString, EmfFormatter.objToStr(model).toPlatformLineSeparator)
 	}
 	
 	@Test

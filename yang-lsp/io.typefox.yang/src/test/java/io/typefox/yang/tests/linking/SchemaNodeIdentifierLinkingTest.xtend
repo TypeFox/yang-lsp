@@ -41,7 +41,7 @@ class SchemaNodeIdentifierLinkingTest extends AbstractYangTest {
 		foo.c12
 		foo.c12.foo.c22
 		foo.c12.foo.c22.foo.c32
-		foo.c12.foo.lm1'''.toString, elements.join("\n"))
+		foo.c12.foo.lm1'''.toString, elements.join(System.lineSeparator))
 		this.validator.assertNoErrors(m1)
 	}
 

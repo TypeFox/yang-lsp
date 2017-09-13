@@ -104,9 +104,7 @@ class LexerTest {
 		l.assertNextToken(RULE_STRING,'"holla"')
 		l.assertNextToken(RightSquareBracket,']')
 		l.assertNextToken(RULE_WS,' ')
-		l.assertNextToken(RULE_HIDDEN,"'
-	+ /* test */ 
-	")
+		l.assertNextToken(RULE_HIDDEN, "'" + System.lineSeparator + "\t+ /* test */ " + System.lineSeparator + "\t")
 		l.assertNextToken(RULE_HIDDEN,"'")
 		l.assertNextToken(And,'and')
 		l.assertNextToken(RULE_WS,' ')
@@ -152,9 +150,7 @@ class LexerTest {
 		l.assertNextToken(RULE_STRING,'\\\"holla\\\"')
 		l.assertNextToken(RightSquareBracket,']')
 		l.assertNextToken(RULE_WS,' ')
-		l.assertNextToken(RULE_HIDDEN,'"
-	+ /* test */ 
-	')
+		l.assertNextToken(RULE_HIDDEN, "\"" + System.lineSeparator + "\t+ /* test */ " + System.lineSeparator + "\t")
 		l.assertNextToken(RULE_HIDDEN,'"')
 		l.assertNextToken(And,'and')
 		l.assertNextToken(RULE_WS,' ')
@@ -202,13 +198,13 @@ class LexerTest {
 		l.assertNextToken(RULE_STRING, '212-$556C')
 		l.assertNextToken(RULE_WS, ' ')
 		l.assertNextToken(LeftCurlyBracket, '{')
-		l.assertNextToken(RULE_WS, '\n  ')
+		l.assertNextToken(RULE_WS, System.lineSeparator + '  ')
 		l.assertNextToken(Path, 'path')
 		l.assertNextToken(RULE_WS, ' ')
 		l.assertNextToken(RULE_HIDDEN, '"')
 		l.assertNextToken(RULE_ID, 'module')
 		l.assertNextToken(RULE_HIDDEN, '"')
-		l.assertNextToken(RULE_WS, '\n')
+		l.assertNextToken(RULE_WS, System.lineSeparator)
 		l.assertNextToken(RightCurlyBracket, '}')
 	}
 	
@@ -338,7 +334,7 @@ class LexerTest {
 			            uses SET-VAL-TABLEMAP;
 			        }
 			*/''')
-		l.assertNextToken(RULE_WS, '\n')
+		l.assertNextToken(RULE_WS, System.lineSeparator)
 		l.assertNextToken(EOF,null)
 	}
 	

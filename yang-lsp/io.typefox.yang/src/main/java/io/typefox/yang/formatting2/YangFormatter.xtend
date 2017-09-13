@@ -592,7 +592,7 @@ class MultilineStringReplacer implements ITextReplacer {
         }
         
         def addStringValue(String text, int originalStartColumn) {
-            val parts = text.split("\n")
+            val parts = text.split(System.lineSeparator)
             if (parts.length === 1) {
                 last.append(text, Value)
             } else {
@@ -643,7 +643,7 @@ class MultilineStringReplacer implements ITextReplacer {
         }
     
         def addMultiLineComment(String text) {
-            var parts = text.split("\n")
+            var parts = text.split(System.lineSeparator)
             var first = true
             for (part : parts) {
                 if (first) {
@@ -672,13 +672,13 @@ class MultilineStringReplacer implements ITextReplacer {
                         addMultiLineComment(text)
                     }
                     if (SL_COMMENTRule == grammarElement) {
-                        val text = text.replace("\n", "")
+                        val text = text.replace(System.lineSeparator, "")
                         addSpace()
                         addSingleLineComment(text)
                         newLine()
                     }
                     if (WSRule == grammarElement) {
-                        if (text.contains("\n")) {
+                        if (text.contains(System.lineSeparator)) {
                             newLine()
                         } else {
                             addSpace()
@@ -702,7 +702,7 @@ class MultilineStringReplacer implements ITextReplacer {
         }
         
         override toString() {
-            val string = lines.join("\n")
+            val string = lines.join(System.lineSeparator)
             return string
         }
     }

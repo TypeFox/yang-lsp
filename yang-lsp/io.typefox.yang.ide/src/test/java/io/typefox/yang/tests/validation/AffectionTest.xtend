@@ -7,6 +7,8 @@ import org.eclipse.lsp4j.DidChangeTextDocumentParams
 import org.eclipse.lsp4j.VersionedTextDocumentIdentifier
 import org.eclipse.lsp4j.TextDocumentContentChangeEvent
 
+import static extension io.typefox.yang.utils.IterableExtensions2.nullToEmpty
+
 class AffectionTest extends AbstractYangLSPTest {
 	
 	@Test def void testReferencedModuleRenamed_01() {
@@ -79,7 +81,8 @@ class AffectionTest extends AbstractYangLSPTest {
 	}
 	
 	protected def expectDiagnostics(String uri, String expected) {
-		var issues = diagnostics.get(uri)
+		val diagnostics = diagnostics;
+		var issues = diagnostics.get(uri).nullToEmpty
 		Assert.assertEquals(expected, issues.sortBy[range.start.line].sortBy[message].join(',\n')[message+":"+range.start.line])
 	}
 	
