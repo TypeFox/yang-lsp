@@ -20,8 +20,8 @@ class YangResourceDescriptionManager extends DefaultResourceDescriptionManager {
 	override isAffected(Collection<Delta> deltas, IResourceDescription candidate, IResourceDescriptions context) {
 		val names = candidate.importedNames.toSet
 		for (d: deltas) {			
-			names.contains(QualifiedName.create(d.uri.trimFileExtension.lastSegment))
-			return true
+			if (names.contains(QualifiedName.create(d.uri.trimFileExtension.lastSegment)))
+				return true
 		}
 		return false
 	}
