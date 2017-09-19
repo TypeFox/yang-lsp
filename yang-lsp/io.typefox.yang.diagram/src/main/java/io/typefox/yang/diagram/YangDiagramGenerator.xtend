@@ -9,6 +9,7 @@ package io.typefox.yang.diagram
 import com.google.inject.Inject
 import io.typefox.sprotty.api.IDiagramState
 import io.typefox.sprotty.api.LayoutOptions
+import io.typefox.sprotty.api.SButton
 import io.typefox.sprotty.api.SCompartment
 import io.typefox.sprotty.api.SEdge
 import io.typefox.sprotty.api.SGraph
@@ -71,7 +72,6 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.util.CancelIndicator
-import io.typefox.sprotty.api.SButton
 
 class YangDiagramGenerator implements IDiagramGenerator {
 	static val LOG = Logger.getLogger(YangDiagramGenerator)
@@ -478,10 +478,26 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			paddingBottom = 8.0
 		]
 		classHeader.children = #[
-			new SLabel [ l |
-				l.type = "label:classTag"
-				l.id = classHeader.id + '-tag'
-				l.text = tag
+			new YangTag [ t |
+				t.id = classHeader.id + '-tag'
+				t.type = 'tag'
+				t.layout = 'stack'
+				t.layoutOptions = new LayoutOptions [
+					resizeContainer = false
+					HAlign = 'center'
+					VAlign = 'center'
+					paddingLeft = 0.0
+					paddingRight = 0.0
+					paddingTop = 0.0
+					paddingBottom = 0.0
+				] 
+				t.children = #[	
+					new SLabel [ l |
+						l.type = "label:tag"
+						l.id = classHeader.id + '-tag-text'
+						l.text = tag
+					]
+				]
 			],
 			new SLabel [ l |
 				l.type = "label:classHeader"
