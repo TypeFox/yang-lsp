@@ -158,6 +158,8 @@ class SubstatementGroup {
 				} else if (toInsertIndex + 1 < substatements.size) {
 					val insertBeforeStatement = substatements.get(toInsertIndex + 1);
 					val insertBeforeConstraint = constraintMapping.get(insertBeforeStatement.eClass);
+					if (insertBeforeConstraint === null)
+						return false
 					if (insertBeforeStatement.eClass !== UNKNOWN && constraint != insertBeforeConstraint) {
 						val insertBeforeOrdinal = orderedConstraint.get(insertBeforeConstraint);
 						if (ordinal.isGreater(insertBeforeOrdinal)) {
