@@ -29,6 +29,8 @@ import org.eclipse.xtext.ide.server.contentassist.ContentAssistService
 import org.eclipse.xtext.ide.server.symbol.DocumentSymbolService
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
+import org.eclipse.xtext.ide.refactoring.IRenameStrategy2
+import io.typefox.yang.ide.rename.YangRenameStrategy
 
 /**
  * Use this class to register ide components.
@@ -77,6 +79,10 @@ class YangIdeModule extends AbstractYangIdeModule {
 	
 	def Class<? extends IExecutableCommandService> bindIExecutableCommandService() {
 		return CommandService
+	}
+	
+	override Class<? extends IRenameStrategy2> bindIRenameStrategy2() {
+		return YangRenameStrategy
 	}
 	
 	static class NoOpCodeLensResolver implements ICodeLensResolver {
