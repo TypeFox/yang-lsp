@@ -5,7 +5,7 @@ import org.junit.Test
 
 class BugsTest extends AbstractYangTest {
 	/**
-	 * https://github.com/yang-tools/yang-lsp/issues/33
+	 * https://github.com/theia-ide/yang-lsp/issues/33
 	 */
 	@Test def void testIssue33() {
 		loadWithSyntaxErrors('''

@@ -234,7 +234,7 @@ class SubstatementGroup {
 			i--;
 		}
 
-		// GH-23 (https://github.com/yang-tools/yang-lsp/issues/23)
+		// GH-23 (https://github.com/theia-ide/yang-lsp/issues/23)
 		if (mostSevereErrorMessage !== null) {
 			val message = '''Substatement '«clazz.yangName»' must be declared before '«mostSevereErrorMessage»'.''';
 			acceptor.acceptError(message, statement, range.offset, range.length, SUBSTATEMENT_ORDERING);

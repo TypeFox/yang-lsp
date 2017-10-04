@@ -6,7 +6,7 @@ def configurePom = { pom ->
 			description = project.description
 		}
 		packaging 'jar'
-		url 'https://github.com/yang-tools/yang-lsp'
+		url 'https://github.com/theia-ide/yang-lsp'
 		licenses {
 			license {
 				name 'Apache License 2.0'
@@ -46,9 +46,9 @@ def configurePom = { pom ->
 			}
 		}
 		scm {
-			connection 'scm:git:git@github.com:yang-tools/yang-lsp.git'
-			developerConnection 'scm:git:git@github.com:yang-tools/yang-lsp.git'
-			url 'git@github.com:yang-tools/yang-lsp.git'
+			connection 'scm:git:git@github.com:theia-ide/yang-lsp.git'
+			developerConnection 'scm:git:git@github.com:theia-ide/yang-lsp.git'
+			url 'git@github.com:theia-ide/yang-lsp.git'
 		}
 	}
 }
