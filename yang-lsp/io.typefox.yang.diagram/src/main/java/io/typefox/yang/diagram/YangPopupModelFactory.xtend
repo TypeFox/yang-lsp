@@ -54,9 +54,9 @@ class YangPopupModelFactory implements IPopupModelFactory {
 						code = '''
 							<div class="infoBlock">
 								«FOR info : infos»
-									<div class="infoRow">
-										<div class="infoTitle">«info.key»:</div>
-										<div class="infoText">«info.value»</div>
+									<div class="sprotty-infoRow">
+										<div class="sprotty-infoTitle">«info.key»:</div>
+										<div class="sprotty-infoText">«info.value»</div>
 									</div>
 								«ENDFOR»
 							</div>
