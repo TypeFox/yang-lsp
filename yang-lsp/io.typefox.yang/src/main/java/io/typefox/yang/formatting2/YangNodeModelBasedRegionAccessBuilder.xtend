@@ -15,6 +15,10 @@ import org.eclipse.xtext.formatting2.regionaccess.internal.NodeRegion
 import org.eclipse.xtext.formatting2.regionaccess.internal.SemanticRegionMatcher
 import org.eclipse.xtext.nodemodel.ILeafNode
 import org.eclipse.xtext.nodemodel.INode
+import org.eclipse.emf.ecore.EStructuralFeature
+import org.eclipse.xtext.GrammarUtil
+import org.eclipse.xtext.Assignment
+import org.eclipse.xtext.formatting2.regionaccess.IEObjectRegion
 
 @FinalFieldsConstructor
 class YangNodeModelBasedRegionAccessBuilder extends NodeModelBasedRegionAccessBuilder {
@@ -117,7 +121,26 @@ package class HIDDENSemanticRegion extends NodeRegion implements ISemanticRegion
     }
 
     override getSemanticElement() {
-        return if (eObjectTokens !== null) eObjectTokens.getSemanticElement() else null
-    }
+		return if(eObjectTokens !== null) eObjectTokens.getSemanticElement() else null
+	}
+
+	override EStructuralFeature getContainingFeature() {
+		var Assignment assignment = GrammarUtil.containingAssignment(getGrammarElement())
+		if (assignment !== null) {
+			return getSemanticElement().eClass().getEStructuralFeature(assignment.getFeature())
+		}
+		return null
+	}
+
+	override IEObjectRegion getContainingRegion() {
+		return eObjectTokens
+	}
+
+	override getIndexInContainingFeature() {
+		// can't implement since opposite in 
+		// org.eclipse.xtext.formatting2.regionaccess.internal.AbstractEObjectRegion.initChildrenFeatureIndexes()
+		// is required
+		throw new UnsupportedOperationException("TODO: auto-generated method stub")
+	}
 
 }
