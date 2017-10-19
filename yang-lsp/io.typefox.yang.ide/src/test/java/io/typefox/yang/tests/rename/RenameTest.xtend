@@ -5,7 +5,6 @@ import org.eclipse.lsp4j.Position
 import org.eclipse.lsp4j.RenameParams
 import org.eclipse.lsp4j.TextDocumentIdentifier
 import org.junit.Test
-import org.junit.Ignore
 
 /**
  * @author koehnlein - Initial contribution and API
@@ -13,7 +12,6 @@ import org.junit.Ignore
 class RenameTest extends AbstractYangLSPTest {
 	
 	@Test
-	@Ignore('FIXME: Empty region returned')
 	def void testRenameInput() {
 		val model = '''
 			module inputaugment {
@@ -41,7 +39,6 @@ class RenameTest extends AbstractYangLSPTest {
 	}
 	
 	@Test
-	@Ignore('FIXME: ClassCastException thrown')
 	def void testRenameInputAugment() {
 		val model = '''
 			module inputaugment {
@@ -69,8 +66,8 @@ class RenameTest extends AbstractYangLSPTest {
         val workspaceEdit = languageServer.rename(params).get
         assertEquals('''
 			changes :
-			    inputaugment.yang : bar [[3, «refColumn»] .. [3, «refColumn + 5»]]
-			    inputaugment.yang : bar [[«line», «column»] .. [«line», «column + 5»]]
+			    inputaugment.yang : inputaugment:foo:inputaugment:input:inputaugment:param [[3, «refColumn»] .. [3, «refColumn + 5»]]
+			    bar [[«line», «column»] .. [«line», «column + 5»]]
 			documentChanges : 
 		     '''.toString, toExpectation(workspaceEdit))
 	}

@@ -29,7 +29,7 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 			if (value.contains(" ")) {
 				return '"'+value+'"' //TODO proper escaping
 			}
-			return  ""
+			return value
 		}
 		
 		static val char[] quotes = #['"','\'']
