@@ -16,6 +16,9 @@ node {
             }
         }
     }
-
+    if (env.BRANCH_NAME == 'master') {
+        build '../yangster/master', wait: false
+	build '../yang-eclipse/master', wait: false
+    }
     archive 'yang-lsp/build/**, '
 }
