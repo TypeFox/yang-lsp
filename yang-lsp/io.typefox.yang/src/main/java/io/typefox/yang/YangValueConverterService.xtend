@@ -7,6 +7,7 @@ import org.eclipse.xtext.conversion.ValueConverterException
 import org.eclipse.xtext.conversion.impl.AbstractDeclarativeValueConverterService
 import org.eclipse.xtext.nodemodel.INode
 import org.eclipse.xtext.AbstractRule
+import java.util.regex.Pattern
 
 class YangValueConverterService extends AbstractDeclarativeValueConverterService{
 	
@@ -22,14 +23,15 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 	public def IValueConverter<String> StringValue2() {
 		return stringValueConverter;
 	}
-	
+		
 	static class StringConverter implements IValueConverter<String>, IValueConverter.RuleSpecific {
 		
+		static Pattern ID_MATCH = Pattern.compile(".*[\\s'\";\\{\\}]+.*");
 		override toString(String value) throws ValueConverterException {
-			if (value.contains(" ")) {
-				return '"'+value+'"' //TODO proper escaping
+			if (ID_MATCH.matcher(value).matches) {
+				return "'"+value+"'"
 			}
-			return  ""
+			return value
 		}
 		
 		static val char[] quotes = #['"','\'']
