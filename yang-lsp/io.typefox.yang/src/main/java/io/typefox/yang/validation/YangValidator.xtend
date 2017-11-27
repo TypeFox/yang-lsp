@@ -448,6 +448,11 @@ class YangValidator extends AbstractYangValidator {
 						val fqn = qualifiedNameProvider.getFullyQualifiedName(target);
 						if (fqn !== null) {
 							val scope = scopeProvider.getScope(target, STATEMENT__SUBSTATEMENTS);
+							val mainModule = target.mainModule
+							if (mainModule === null) {
+								error('''The augment's target lacks a main module.''', it, AUGMENT__PATH, INVALID_AUGMENTATION);
+								return;
+							}
 							val inputOrOutputFqn = fqn.append(target.mainModule.name).append(lastSegment);
 							if (scope.getSingleElement(inputOrOutputFqn) !== null) {
 								return;
