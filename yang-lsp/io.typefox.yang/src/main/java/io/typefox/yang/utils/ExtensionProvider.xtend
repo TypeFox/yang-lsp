@@ -8,11 +8,13 @@ import org.eclipse.emf.ecore.resource.Resource
 import java.util.Map
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.util.internal.Log
+import com.google.inject.Injector
 
 @Log class ExtensionProvider {
 	
 	@Inject ExtensionClassPathProvider classPathProvider
 	@Inject PreferenceValuesProvider preferenceProvider
+	@Inject Injector injector
 	
 	Map<String, Entry> cache = newHashMap()
 	
@@ -34,6 +36,7 @@ import org.eclipse.xtext.util.internal.Log
 			if (!className.isNullOrEmpty) {
 				try {
 					val extensionClass = classLoader.loadClass(className)
+					injector.injectMembers(extensionClass)
 					result.add(extensionClass.newInstance)				
 				} catch (Exception e) {
 					LOG.error("Could not load extension class '"+className+"'", e)
