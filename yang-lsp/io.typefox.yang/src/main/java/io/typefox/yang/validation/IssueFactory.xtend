@@ -10,7 +10,7 @@ import org.eclipse.emf.ecore.util.EcoreUtil
 
 class IssueFactory {
 	
-	static def Issue createIssue(EObject obj, EStructuralFeature feature, String message, String code) {
+	static def Issue createIssue(EObject obj, EStructuralFeature feature, Severity severity, String message, String code) {
 		val nodes = NodeModelUtils.findNodesForFeature(obj, feature)
 		val lineAndOffset = NodeModelUtils.getLineAndColumn(nodes.head, nodes.head.offset)
 		val result = new IssueImpl
@@ -19,8 +19,12 @@ class IssueFactory {
 		result.lineNumber = lineAndOffset.line
 		result.column = lineAndOffset.column
 		result.length = nodes.map[length].reduce[p1, p2| p1 + p2]
-		result.severity = Severity.ERROR
+		result.severity = severity
 		result.uriToProblem = EcoreUtil.getURI(obj)
 		return result
+	}
+
+	static def Issue createIssue(EObject obj, EStructuralFeature feature, String message, String code) {
+		createIssue(obj, feature, Severity.ERROR, message, code)
 	}
 }
