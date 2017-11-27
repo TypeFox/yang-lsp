@@ -2,16 +2,17 @@ package io.typefox.yang.utils
 
 import com.google.inject.Singleton
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.BelongsTo
+import io.typefox.yang.yang.Import
+import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Statement
+import io.typefox.yang.yang.Submodule
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.emf.ecore.EObject
+import org.eclipse.xtext.EcoreUtil2
 
 import static extension org.eclipse.xtext.EcoreUtil2.getContainerOfType
-import io.typefox.yang.yang.Submodule
-import io.typefox.yang.yang.Module
-import io.typefox.yang.yang.BelongsTo
-import io.typefox.yang.yang.Prefix
-import io.typefox.yang.yang.Import
 
 /**
  * Convenient extension methods for the YANG language.
@@ -77,17 +78,16 @@ class YangExtensions {
 	 * Returns the main module this element belongs to
 	 * Returns the containing module, or the belongs-to module of this element is contained in a submodule.
 	 */	
-	def dispatch Module getMainModule(EObject obj) {
-		if(obj === null)
-			return null
-		else 
-			return obj.eContainer.mainModule
-	}
-	def dispatch Module getMainModule(Module obj) {
-		return obj
-	}
-	def dispatch Module getMainModule(Submodule obj) {
-		return obj.substatements.filter(BelongsTo).head?.module
+	def Module getMainModule(EObject obj) {
+		val module = EcoreUtil2.getContainerOfType(obj, AbstractModule) 
+		switch module {
+			Submodule: 
+				return module.substatements.filter(BelongsTo).head?.module
+			Module: 
+				return module
+			default:
+				return null 
+		}
 	}
 	
 	/**
