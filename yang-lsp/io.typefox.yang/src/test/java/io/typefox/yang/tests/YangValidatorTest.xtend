@@ -581,6 +581,40 @@ class YangValidatorTest extends AbstractYangTest {
 	}
 
 	@Test
+	def void checkPattern_04() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type string {
+			      pattern '[a-zA-Z0-9-]+';
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
+	}
+
+	@Test
+	def void checkPattern_05() {
+		val it = load('''
+			module foo {
+			  yang-version 1.1;
+			  namespace "urn:yang:types";
+			  prefix "yang";
+			  typedef my-base-type {
+			    type string {
+			      pattern '[a-zA-Z0-9-_]+';
+			    }
+			  }
+			}
+		''');
+		assertNoErrors;
+	}
+
+	@Test
 	def void checkEnumStatements() {
 		val it = load('''
 			module foo {

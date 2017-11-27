@@ -48,11 +48,11 @@ import io.typefox.yang.yang.Status
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.YangVersion
+import java.text.ParseException
 import java.util.Collection
+import java.util.regex.PatternSyntaxException
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EStructuralFeature
-import org.eclipse.emf.ecore.xml.type.internal.RegEx.ParseException
-import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.scoping.IScopeProvider
@@ -63,7 +63,6 @@ import static io.typefox.yang.utils.YangExtensions.*
 import static io.typefox.yang.validation.IssueCodes.*
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
-import static extension com.google.common.base.Strings.nullToEmpty
 import static extension io.typefox.yang.utils.IterableExtensions2.*
 import static extension io.typefox.yang.utils.YangDateUtils.*
 import static extension io.typefox.yang.utils.YangNameUtils.*
@@ -264,16 +263,14 @@ class YangValidator extends AbstractYangValidator {
 		if (eContainer instanceof Type) {
 			val type = eContainer as Type;
 			if (type.subtypeOfString) {
-				try {
-					new RegularExpression(regexp.nullToEmpty, 'X');
-				} catch (ParseException e) {
-					val message = if (regexp.nullOrEmpty) {
-							'Regular expression must be specified.'
-						} else {
-							'''Invalid regular expression pattern: "«regexp»".''';
-						}
-					error(message, it, PATTERN__REGEXP, TYPE_ERROR);
-				}
+				if(regexp.nullOrEmpty)
+					error('Regular expression must be specified.', it, PATTERN__REGEXP, TYPE_ERROR)
+				else 
+					try {
+						java.util.regex.Pattern.compile(regexp);
+					} catch (PatternSyntaxException e) {
+						error('''Invalid regular expression pattern: "«regexp»".''', it, PATTERN__REGEXP, TYPE_ERROR);
+					}
 			} else {
 				val message = '''Only string types can have a "pattern" statement.''';
 				error(message, type, TYPE__TYPE_REF, TYPE_ERROR);
@@ -295,7 +292,7 @@ class YangValidator extends AbstractYangValidator {
 		if (revision !== null) {
 			try {
 				revisionDateFormat.parse(revision);
-			} catch (java.text.ParseException e) {
+			} catch (ParseException e) {
 				val message = '''The revision date string should be in the following format: "YYYY-MM-DD".''';
 				warning(message, it, REVISION__REVISION, INVALID_REVISION_FORMAT);
 			}
