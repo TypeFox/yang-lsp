@@ -92,6 +92,7 @@ import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import static io.typefox.yang.formatting2.MultilineStringReplacer.Line.PartType.*
 
 import static extension com.google.common.base.Strings.*
+import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -455,16 +456,18 @@ class YangFormatter extends AbstractFormatter2 {
     // Tools
     
     protected def formatMultilineString(extension IFormattableDocument document, Statement s, Assignment a) {
-        val region = s.regionFor.assignment(a) as NodeSemanticRegion
-        var trailingLinesIndent = 0
-        if (preferences.getPreference(YangFormatter.FORCE_NEW_LINE)) {
-            region.prepend[newLine]
-        } else {
-            region.prepend[oneSpace]
-            val keyword = s.findFirstKeyword
-            trailingLinesIndent = keyword.length
+        val region = s.regionFor.assignment(a) as ISemanticRegion
+        if(region instanceof NodeSemanticRegion) {
+	        var trailingLinesIndent = 0
+	        if (preferences.getPreference(YangFormatter.FORCE_NEW_LINE)) {
+	            region.prepend[newLine]
+	        } else {
+	            region.prepend[oneSpace]
+	            val keyword = s.findFirstKeyword
+	            trailingLinesIndent = keyword.length
+	        }
+        		addReplacer(new MultilineStringReplacer(_yangGrammarAccess, region, trailingLinesIndent))
         }
-        addReplacer(new MultilineStringReplacer(_yangGrammarAccess, region, trailingLinesIndent))
     }
     
     protected def String findFirstKeyword(Statement statement) {
