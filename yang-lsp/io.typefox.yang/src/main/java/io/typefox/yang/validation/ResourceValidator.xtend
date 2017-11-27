@@ -16,7 +16,9 @@ import org.eclipse.xtext.validation.Issue
 import org.eclipse.xtext.validation.Issue.IssueImpl
 import org.eclipse.xtext.validation.IssueSeveritiesProvider
 import org.eclipse.xtext.validation.ResourceValidatorImpl
+import org.eclipse.xtext.util.internal.Log
 
+@Log
 class ResourceValidator extends ResourceValidatorImpl {
 	
 	@Inject ScopeContextProvider ctxProvider
@@ -51,7 +53,7 @@ class ResourceValidator extends ResourceValidatorImpl {
 					validator.validate(resource.contents.head as AbstractModule, wrappedAcceptor, monitor)
 				} catch (Exception e) {
 					operationCanceledManager.propagateIfCancelException(e)
-					// ignore
+					LOG.error('Error running validator extension', e)
 				}
 			}
 		}
