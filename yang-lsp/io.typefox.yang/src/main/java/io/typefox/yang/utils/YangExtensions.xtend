@@ -78,7 +78,10 @@ class YangExtensions {
 	 * Returns the containing module, or the belongs-to module of this element is contained in a submodule.
 	 */	
 	def dispatch Module getMainModule(EObject obj) {
-		return obj.eContainer.mainModule
+		if(obj === null)
+			return null
+		else 
+			return obj.eContainer.mainModule
 	}
 	def dispatch Module getMainModule(Module obj) {
 		return obj
