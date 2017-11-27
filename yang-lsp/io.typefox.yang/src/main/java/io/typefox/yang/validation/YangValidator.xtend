@@ -67,6 +67,8 @@ import static extension com.google.common.base.Strings.nullToEmpty
 import static extension io.typefox.yang.utils.IterableExtensions2.*
 import static extension io.typefox.yang.utils.YangDateUtils.*
 import static extension io.typefox.yang.utils.YangNameUtils.*
+import io.typefox.yang.yang.Submodule
+import io.typefox.yang.yang.BelongsTo
 
 /**
  * This class contains custom validation rules for the YANG language. 
@@ -121,27 +123,49 @@ class YangValidator extends AbstractYangValidator {
 	}
 
 	@Check
-	def void checkVersionConsistency(AbstractModule it) {
+	def void checkVersionConsistency(AbstractModule baseModule) {
 		// https://tools.ietf.org/html/rfc7950#section-12
 		// A YANG version 1.1 module must not include a YANG version 1 submodule, and a YANG version 1 module must not include a YANG version 1.1 submodule.
-		val moduleVersion = yangVersion;
-		substatementsOfType(Include).map[module].filterNull.filter[eResource !== null && !eIsProxy].filter [
-			yangVersion != moduleVersion
-		].forEach [
-			val message = '''Cannot include a version «yangVersion» submodule in a version «moduleVersion» module.''';
-			error(message, it, ABSTRACT_IMPORT__MODULE, BAD_INCLUDE_YANG_VERSION);
-		];
+		val baseModuleVersion = baseModule.yangVersion;
+		baseModule.substatementsOfType(Include)
+			.filter[module?.eResource !== null && !module.eIsProxy]
+			.forEach [ submoduleStatement |
+				val submoduleVersion = submoduleStatement.module.yangVersion
+				if(submoduleVersion != baseModuleVersion) {
+					val message = '''Cannot include a version «submoduleVersion» submodule in a version «baseModuleVersion» module.''';
+					error(message, submoduleStatement, ABSTRACT_IMPORT__MODULE, BAD_INCLUDE_YANG_VERSION);				
+				}
+			];
 
 		// A YANG version 1 module or submodule must not import a YANG version 1.1 module by revision.	
-		if (moduleVersion == YANG_1) {
-			substatementsOfType(Import).map[module].filterNull.filter[eResource !== null && !eIsProxy].filter [
-				yangVersion != moduleVersion
-			].forEach [
-				val message = '''Cannot import a version «yangVersion» submodule in a version «moduleVersion» module.''';
-				error(message, it, ABSTRACT_IMPORT__MODULE, BAD_IMPORT_YANG_VERSION);
-			];
+		if (baseModuleVersion == YANG_1) {
+			baseModule.substatementsOfType(Import)
+				.filter[module?.eResource !== null && !module.eIsProxy]
+				.forEach [ importStatement |
+					val importedModuleVersion = importStatement.module.yangVersion
+					if(baseModuleVersion != importedModuleVersion) {
+						val message = '''Cannot import a version «importedModuleVersion» module in a version «baseModuleVersion» module.''';
+						error(message, importStatement, ABSTRACT_IMPORT__MODULE, BAD_IMPORT_YANG_VERSION);
+					}
+				];
 		}
 	}
+	
+	@Check
+	def void checkVersionConsistency(Submodule subModule) {
+		val submoduleVersion = subModule.yangVersion
+		subModule
+			.substatementsOfType(BelongsTo)
+			.filter[module?.eResource !== null && !module.eIsProxy]
+			.forEach [ belongsTo | 
+				val baseModuleVersion = belongsTo.module.yangVersion
+				if(submoduleVersion != baseModuleVersion) {
+					val message = '''A version «submoduleVersion» submodule cannot be included in a version «baseModuleVersion» module.''';
+					error(message, belongsTo, BELONGS_TO__MODULE, BAD_INCLUDE_YANG_VERSION);				
+				}
+			]
+	}
+	
 
 	@Check
 	def void checkSubstatements(Statement it) {
