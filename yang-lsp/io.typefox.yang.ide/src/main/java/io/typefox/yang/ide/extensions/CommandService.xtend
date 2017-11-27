@@ -18,7 +18,7 @@ import java.util.concurrent.Executors
 
 @Log class CommandService implements IExecutableCommandService {
 	
-	static val KEY = new PreferenceKey("extensions.commands", "")
+	static val KEY = new PreferenceKey("extension.commands", "")
 	
 	@Inject ExtensionProvider extensionProvider
 	
