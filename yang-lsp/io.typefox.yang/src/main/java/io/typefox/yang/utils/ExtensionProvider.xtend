@@ -1,14 +1,14 @@
 package io.typefox.yang.utils
 
-import org.eclipse.xtext.preferences.PreferenceKey
-import java.util.List
 import com.google.inject.Inject
-import io.typefox.yang.settings.PreferenceValuesProvider
-import org.eclipse.emf.ecore.resource.Resource
-import java.util.Map
-import org.eclipse.xtend.lib.annotations.Data
-import org.eclipse.xtext.util.internal.Log
 import com.google.inject.Injector
+import io.typefox.yang.settings.PreferenceValuesProvider
+import java.util.List
+import java.util.Map
+import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.xtend.lib.annotations.Data
+import org.eclipse.xtext.preferences.PreferenceKey
+import org.eclipse.xtext.util.internal.Log
 
 @Log class ExtensionProvider {
 	
@@ -36,8 +36,9 @@ import com.google.inject.Injector
 			if (!className.isNullOrEmpty) {
 				try {
 					val extensionClass = classLoader.loadClass(className)
-					injector.injectMembers(extensionClass)
-					result.add(extensionClass.newInstance)				
+					val extensionInstance = extensionClass.newInstance
+					injector.injectMembers(extensionInstance)
+					result.add(extensionInstance)				
 				} catch (Exception e) {
 					LOG.error("Could not load extension class '"+className+"'", e)
 				}
