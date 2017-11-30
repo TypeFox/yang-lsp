@@ -36,6 +36,6 @@ The yang-lsp is the base of multiple binaries
 | [yangster](https://github.com/theia-ide/yangster)  | Theia Browser | Docker image | Docker Hub | [Docker Hub](https://hub.docker.com/r/typefox/yangster/builds) | GitHub hook / Jenkins pipeline| 
 |                                                    | Theia          | Theia extension| npm |  [Jenkins](http://services.typefox.io/open-source/jenkins/job/yangster/) | `yarn run publish` | 
 | [yangster-electron](https://github.com/theia-ide/yangster-electron) | Theia Electron | executables | ? | ? | ? |
-| [yang-eclipse](https://github.com/theia-ide/yang-eclipse) | Eclipse | p2 update site | Eclipse Marketplace | [Jenkins](http://services.typefox.io/open-source/jenkins/job/yang-eclipse/) | GitHub hook / Jenkins pipeline |
+| [yang-eclipse](https://github.com/theia-ide/yang-eclipse) | Eclipse | p2 update site | Eclipse Marketplace | [Jenkins](http://services.typefox.io/open-source/jenkins/job/yang-eclipse/) | GitHub hook / Jenkins pipeline |
 | [yang-vscode](https://github.com/theia-ide/yang-vscode) | VSCode | VSCode extension | VSCode Marketplace | - | `vsce` |
 
