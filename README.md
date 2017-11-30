@@ -23,3 +23,19 @@ The YANG Language Server is currently being used in
     git clone https://github.com/theia-ide/yang-lsp.git \
     && cd yang-lsp/yang-lsp \
     && ./gradlew build
+
+
+# Release Engineering
+
+The yang-lsp is the base of multiple binaries 
+
+
+| Repository | Client | Binary | Bin Repo | CI  | Publishing |
+| ---------- | ------ | ------ | -------- | --- | ---------- |
+| [yang-lsp](https://github.com/theia-ide/yangs-lsp) | LSP           | JAR + script | -          | [Docker Hub](https://hub.docker.com/r/typefox/yang-lsp/builds) | Jenkins   | 
+| [yangster](https://github.com/theia-ide/yangster)  | Theia Browser | Docker image | Docker Hub | [Docker Hub](https://hub.docker.com/r/typefox/yangster/builds) | automatic | 
+|                                                    | Theia          | Theia extension| npm |  [Jenkins](http://services.typefox.io/open-source/jenkins/job/yangster/) | `yarn run publish` | 
+| [yangster-electron](https://github.com/theia-ide/yangster-electron) | Theia Electron | executables | ? | ? | ? |
+| [yang-eclipse](https://github.com/theia-ide/yang-eclipse) | Eclipse | p2 update site | Eclipse Marketplace | [Jenkins](http://services.typefox.io/open-source/jenkins/job/yang-eclipse/) | Jenkins result linked |
+| [yang-vscode](https://github.com/theia-ide/yang-vscode) | VSCode | VSCode extension | VSCode Marketplace | - | `vsce` |
+
