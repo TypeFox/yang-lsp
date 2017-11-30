@@ -49,10 +49,9 @@ import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.YangVersion
 import java.util.Collection
+import org.apache.xerces.impl.xpath.regex.RegularExpression
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.EStructuralFeature
-import org.eclipse.emf.ecore.xml.type.internal.RegEx.ParseException
-import org.eclipse.emf.ecore.xml.type.internal.RegEx.RegularExpression
 import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.scoping.IScopeProvider
@@ -69,6 +68,7 @@ import static extension io.typefox.yang.utils.YangDateUtils.*
 import static extension io.typefox.yang.utils.YangNameUtils.*
 import io.typefox.yang.yang.Submodule
 import io.typefox.yang.yang.BelongsTo
+import org.apache.xerces.impl.xpath.regex.ParseException
 
 /**
  * This class contains custom validation rules for the YANG language. 

@@ -10,6 +10,7 @@ configurations {
 dependencies {
 	compile "org.eclipse.xtext:org.eclipse.xtext:${versions.xtext}"
 	compile "com.google.code.gson:gson:${versions.gson}"
+	compile "xerces:xercesImpl:${versions.xerces}"
 	
 	testCompile "junit:junit:${versions.junit}"
 	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
