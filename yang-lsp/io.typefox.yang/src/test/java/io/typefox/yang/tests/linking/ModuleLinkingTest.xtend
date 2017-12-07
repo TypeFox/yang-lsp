@@ -10,6 +10,9 @@ import io.typefox.yang.yang.Uses
 import org.junit.Test
 
 import static org.junit.Assert.*
+import io.typefox.yang.yang.Revision
+import io.typefox.yang.yang.RevisionDate
+import org.eclipse.xtext.diagnostics.Diagnostic
 
 class ModuleLinkingTest extends AbstractYangTest {
 	
@@ -134,39 +137,6 @@ class ModuleLinkingTest extends AbstractYangTest {
 		assertSame(m1.root.substatementsOfType(Grouping).head, uses.grouping.node)
 	}
 	
-	@Test def void testModuleImportWithRevision_01() {
-		load('''
-			module a {
-				revision 2008-01-02 { }
-				grouping a {
-					leaf eh {  }
-				}
-			}
-		''')
-		load('''
-			module a {
-				revision 2008-01-01 { }
-				grouping a {
-					leaf eh {  }
-				}
-			}
-		''')
-		val m2 = load('''
-			module b {
-				import a {
-					prefix p;
-				}
-			
-				container bee {
-					uses p:a;
-				}
-			}
-		''')
-		val imp = m2.root.substatementsOfType(Import).head
-		assertWarning(imp, IssueCodes.MISSING_REVISION)
-		assertFalse(m2.root.substatementsOfType(Import).head.module.eIsProxy)
-	}
-	
 	@Test def void testModuleBelongsToAnotherOne() {
 		load('''
 			module a {
@@ -183,40 +153,6 @@ class ModuleLinkingTest extends AbstractYangTest {
 			}
 		''')
 		assertError(m1.root.substatements.head, IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)
-	}
-	
-	@Test def void testModuleImportWithRevision_02() {
-		load('''
-			module a {
-				revision 2008-01-02 { }
-				grouping a {
-					leaf eh {  }
-				}
-			}
-		''')
-		load('''
-			module a {
-				revision 2008-01-01 { }
-				grouping a {
-					leaf eh {  }
-				}
-			}
-		''')
-		val m2 = load('''
-			module b {
-				import a {
-					prefix p;
-					revision-date 2008-01-03;
-				}
-			
-				container bee {
-					uses p:a;
-				}
-			}
-		''')
-		// no matching revision => should link to any
-		// TODO error validation on unmatched revision
-		assertFalse(m2.root.substatementsOfType(Import).head.module.eIsProxy)
 	}
 	
 	@Test def void testSubModuleExport() {
@@ -309,6 +245,141 @@ class ModuleLinkingTest extends AbstractYangTest {
 		''')
 		assertSame(m2.root, m.root.substatementsOfType(Import).get(0).module)
 		assertSame(m3.root, m.root.substatementsOfType(Import).get(1).module)
+	}
+	
+	@Test def void testImportNoRevision() {
+		val foo = load('''
+			module foo {
+			    namespace foo;
+			    prefix foo;
+				revision 2002-02-02;
+				revision 2001-01-01;
+			}
+		''')
+		val bar = load('''
+			module bar {
+				namespace bar;
+				prefix bar;
+				import foo {
+					prefix foo;
+			    }
+			}
+		''')
+		validator.validate(foo)
+		assertNoErrors(foo.root)
+		validator.validate(bar)
+		assertNoErrors(bar.root)
+	}
+	
+	@Test def void testImportMaxRevision() {
+		val foo = load('''
+			module foo {
+			    namespace foo;
+			    prefix foo;
+				revision 2002-02-02;
+				revision 2001-01-01;
+			}
+		''')
+		val bar = load('''
+			module bar {
+				namespace bar;
+				prefix bar;
+				import foo {
+					prefix foo;
+					revision-date 2002-02-02;
+			    }
+			}
+		''')
+		validator.validate(foo)
+		assertNoErrors(foo.root)
+		validator.validate(bar)
+		assertNoErrors(bar.root)
+		assertEquals(foo.allContents.filter(Revision).head, bar.allContents.filter(RevisionDate).head.date)
+	}
+	
+	@Test def void testImportOlderRevision() {
+		val foo = load('''
+			module foo {
+			    namespace foo;
+			    prefix foo;
+				revision 2002-02-02;
+				revision 2001-01-01;
+			}
+		''')
+		val bar = load('''
+			module bar {
+				namespace bar;
+				prefix bar;
+				import foo {
+					prefix foo;
+					revision-date 2001-01-01;
+			    }
+			}
+		''')
+		validator.validate(foo)
+		assertNoErrors(foo.root)
+		validator.validate(bar)
+		assertNoErrors(bar.root)
+		assertEquals(foo.allContents.filter(Revision).last, bar.allContents.filter(RevisionDate).head.date)
+	}
+	
+	@Test def void testImportNonExistingRevision() {
+		val foo = load('''
+			module foo {
+			    namespace foo;
+			    prefix foo;
+				revision 2002-02-02;
+				revision 2001-01-01;
+			}
+		''')
+		val bar = load('''
+			module bar {
+				namespace bar;
+				prefix bar;
+				import foo {
+					prefix foo;
+					revision-date 2003-03-03;
+			    }
+			}
+		''')
+		validator.validate(foo)
+		assertNoErrors(foo.root)
+		validator.validate(bar)
+		assertError(bar.allContents.filter(RevisionDate).head, Diagnostic.LINKING_DIAGNOSTIC)
+		assertEquals(foo.root, bar.allContents.filter(Import).head.module)
+	}
+	
+	@Test def void testDuplicateRevision() {
+		val foo = load('''
+			module foo {
+			    namespace foo;
+			    prefix foo;
+				revision 2002-02-02;
+				revision 2001-01-01;
+			}
+		''')
+		load('''
+			module foo {
+			    namespace foo;
+			    prefix foo;
+				revision 2002-02-02;
+			}
+		''')
+		val bar = load('''
+			module bar {
+				namespace bar;
+				prefix bar;
+				import foo {
+					prefix foo;
+					revision-date 2002-02-02;
+			    }
+			}
+		''')
+		validator.validate(foo)
+		assertNoErrors(foo.root)
+		validator.validate(bar)
+		assertError(bar.allContents.filter(Import).head, IssueCodes.AMBIGUOUS_IMPORT)
+		assertEquals(foo.root.name, bar.allContents.filter(Import).head.module.name)
 	}
 	
 	

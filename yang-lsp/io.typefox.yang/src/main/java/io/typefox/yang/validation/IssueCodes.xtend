@@ -38,8 +38,8 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	''');
 	public static val MISSING_PREFIX = 'missing-prefix'.error('''
 	''');
-	public static val MISSING_REVISION = 'missing-revision'.warn('''
-		Diagnostic that indicates a module is available in multiple revisions when no revision is provided on an import.
+	public static val AMBIGUOUS_IMPORT = 'ambiguous-import'.error('''
+		Diagnostic that indicates a module import is ambiguous.
 	''');
 	public static val IMPORT_NOT_A_MODULE = 'import-not-a-module'.error('''
 		Diagnostic indicating that an `import` statement is not pointing to a module.
