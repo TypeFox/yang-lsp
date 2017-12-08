@@ -1,6 +1,6 @@
 package io.typefox.yang.scoping
 
-import com.google.common.collect.HashMultimap
+import com.google.common.collect.LinkedHashMultimap
 import com.google.inject.Inject
 import io.typefox.yang.scoping.xpath.XpathResolver
 import io.typefox.yang.utils.YangExtensions
@@ -399,7 +399,7 @@ class ScopeContextProvider {
 		val importedRevisionStatement = element.substatements.filter(RevisionDate).head
 		val importedModule = linker.<AbstractModule>link(element, ABSTRACT_IMPORT__MODULE) [ name |
 			val candidates = ctx.moduleScope.getElements(name)
-			val revisionToModule = HashMultimap.create
+			val revisionToModule = LinkedHashMultimap.create
 			for (candidate : candidates) {
 				val revisions = candidate.getUserData(ResourceDescriptionStrategy.REVISION)
 				if (revisions === null) {
