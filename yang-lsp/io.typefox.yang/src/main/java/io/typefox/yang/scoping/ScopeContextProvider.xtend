@@ -1,6 +1,8 @@
 package io.typefox.yang.scoping
 
+import com.google.common.collect.LinkedHashMultimap
 import com.google.inject.Inject
+import io.typefox.yang.scoping.xpath.XpathResolver
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.yang.AbstractImport
@@ -24,9 +26,12 @@ import io.typefox.yang.yang.Include
 import io.typefox.yang.yang.Input
 import io.typefox.yang.yang.KeyReference
 import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.Must
 import io.typefox.yang.yang.Output
+import io.typefox.yang.yang.Path
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Refine
+import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.RevisionDate
 import io.typefox.yang.yang.Rpc
 import io.typefox.yang.yang.SchemaNode
@@ -38,25 +43,21 @@ import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.Unique
 import io.typefox.yang.yang.Unknown
 import io.typefox.yang.yang.Uses
+import io.typefox.yang.yang.When
 import io.typefox.yang.yang.YangPackage
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.naming.QualifiedName
+import org.eclipse.xtext.resource.EObjectDescription
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.impl.SelectableBasedScope
 import org.eclipse.xtext.util.internal.EmfAdaptable
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
-import io.typefox.yang.yang.Revision
-import org.eclipse.xtext.resource.EObjectDescription
-import org.eclipse.emf.ecore.util.EcoreUtil
-import io.typefox.yang.scoping.xpath.XpathResolver
-import io.typefox.yang.yang.When
-import io.typefox.yang.yang.Must
-import io.typefox.yang.yang.Path
 
 /**
  * Links the imported modules and included submodules, as well as computing the IScopeContext for them. 
@@ -395,32 +396,42 @@ class ScopeContextProvider {
 	}
 	
 	protected dispatch def void computeScope(AbstractImport element, QualifiedName currentPrefix, IScopeContext ctx, boolean isConfig) {
-		val rev = element.substatements.filter(RevisionDate).head
+		val importedRevisionStatement = element.substatements.filter(RevisionDate).head
 		val importedModule = linker.<AbstractModule>link(element, ABSTRACT_IMPORT__MODULE) [ name |
 			val candidates = ctx.moduleScope.getElements(name)
-			if (rev !== null) {
-				for (it : candidates) {
-					val resolved = EcoreUtil.resolve(EObjectOrProxy, element) as AbstractModule
-					val revision = linker.<Revision>link(rev, REVISION_DATE__DATE) [ revisionName |
-						val revisions = resolved.substatements.filter(Revision)
-						if (revisions.isEmpty) {
-							return null
-						}
-						val bestRevision = revisions.maxBy[revision]
-						if (bestRevision.revision != revisionName.toString) {
-							return null
-						}
-						return new EObjectDescription(QualifiedName.create(bestRevision.revision), bestRevision, emptyMap)
+			val revisionToModule = LinkedHashMultimap.create
+			for (candidate : candidates) {
+				val revisions = candidate.getUserData(ResourceDescriptionStrategy.REVISION)
+				if (revisions === null) {
+					revisionToModule.put("", candidate)
+				} else {
+					revisions.split(',').forEach [
+						revisionToModule.put(it, candidate)
 					]
-					if (revision !== null && !revision.eIsProxy) {
-						return it
-					}
 				}
 			}
-			val iter = candidates.iterator
+			if (revisionToModule.empty)
+				return null
+			val matches = newArrayList
+			if (importedRevisionStatement !== null) {
+				linker.<Revision>link(importedRevisionStatement, REVISION_DATE__DATE) [ revisionName |
+					matches += revisionToModule.get(revisionName.toString)
+					if (matches.isEmpty) {
+						// date will not be linked, that's enough as an error message
+						return null
+					}
+					val importedModule = EcoreUtil.resolve(matches.head.EObjectOrProxy, element) as AbstractModule
+					val revisionToBeLinked = importedModule.substatements.filter(Revision).findFirst[revision == revisionName.toString]
+					return EObjectDescription.create(revisionName, revisionToBeLinked)
+				]
+			} 
+			if (matches.empty) {
+				matches += revisionToModule.get(revisionToModule.keys.max)
+			}
+			val iter = matches.iterator
 			val result = if (iter.hasNext) iter.next
 			if (iter.hasNext) {
-				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, '''Multiple revisions are available [«candidates.join(', ')[name.toString]»]''', IssueCodes.MISSING_REVISION)
+				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, '''Multiple modules '«name»' with matching revision are available [«matches.join(', ')[name.toString]»]''', IssueCodes.AMBIGUOUS_IMPORT)
 			}
 			return result
 		]

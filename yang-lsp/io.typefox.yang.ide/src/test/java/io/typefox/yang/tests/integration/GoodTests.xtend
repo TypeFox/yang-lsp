@@ -16,6 +16,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
+import org.eclipse.lsp4j.DiagnosticSeverity
 
 @Log
 @FinalFieldsConstructor
@@ -67,8 +68,10 @@ class GoodTests {
 		val lines = Files.readAllLines(new File(URI.createURI(uri).toFileString).toPath)
 		for (issueNo : 0..<issues.size) {
 			val issue = issues.get(issueNo)
-			inserts += new Insert(toOffset(issue.range.start, lines),"[")
-			inserts += new Insert(toOffset(issue.range.end, lines),"]("+issue.message+")")
+			if(issue.severity === DiagnosticSeverity.Error ) {
+				inserts += new Insert(toOffset(issue.range.start, lines),"[")
+				inserts += new Insert(toOffset(issue.range.end, lines),"]("+issue.message+")")
+			}
 		}
 		val sorted = inserts.sortBy[offset]
 		val original = lines.join("\n")
