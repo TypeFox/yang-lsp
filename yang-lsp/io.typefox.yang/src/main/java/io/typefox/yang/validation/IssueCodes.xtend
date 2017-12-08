@@ -38,7 +38,7 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	''');
 	public static val MISSING_PREFIX = 'missing-prefix'.error('''
 	''');
-	public static val AMBIGUOUS_IMPORT = 'ambiguous-import'.error('''
+	public static val AMBIGUOUS_IMPORT = 'ambiguous-import'.warn('''
 		Diagnostic that indicates a module import is ambiguous.
 	''');
 	public static val IMPORT_NOT_A_MODULE = 'import-not-a-module'.error('''

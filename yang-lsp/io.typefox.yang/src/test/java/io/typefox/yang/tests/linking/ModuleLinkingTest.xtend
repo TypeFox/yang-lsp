@@ -378,7 +378,7 @@ class ModuleLinkingTest extends AbstractYangTest {
 		validator.validate(foo)
 		assertNoErrors(foo.root)
 		validator.validate(bar)
-		assertError(bar.allContents.filter(Import).head, IssueCodes.AMBIGUOUS_IMPORT)
+		assertWarning(bar.allContents.filter(Import).head, IssueCodes.AMBIGUOUS_IMPORT)
 		assertEquals(foo.root.name, bar.allContents.filter(Import).head.module.name)
 	}
 	
