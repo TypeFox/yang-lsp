@@ -415,7 +415,7 @@ class ScopeContextProvider {
 			val matches = newArrayList
 			if (importedRevisionStatement !== null) {
 				linker.<Revision>link(importedRevisionStatement, REVISION_DATE__DATE) [ revisionName |
-					matches += revisionToModule.get(revisionName.toString)
+					matches += revisionToModule.get(revisionName.toString).sortBy[EObjectURI.toString]
 					if (matches.isEmpty) {
 						// date will not be linked, that's enough as an error message
 						return null
