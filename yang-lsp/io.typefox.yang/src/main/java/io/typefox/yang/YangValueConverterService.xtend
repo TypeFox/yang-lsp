@@ -9,7 +9,7 @@ import org.eclipse.xtext.nodemodel.INode
 import org.eclipse.xtext.AbstractRule
 import java.util.regex.Pattern
 
-class YangValueConverterService extends AbstractDeclarativeValueConverterService{
+class YangValueConverterService extends AbstractDeclarativeValueConverterService {
 	
 	@Inject
 	private StringConverter stringValueConverter;
@@ -23,7 +23,7 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 	public def IValueConverter<String> StringValue2() {
 		return stringValueConverter;
 	}
-		
+	
 	static class StringConverter implements IValueConverter<String>, IValueConverter.RuleSpecific {
 		
 		static Pattern ID_MATCH = Pattern.compile(".*[\\s'\";\\{\\}]+.*");
@@ -54,6 +54,42 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 				}
 			}
 			return result.toString
+		}
+		
+		AbstractRule rule
+		
+		override setRule(AbstractRule rule) throws IllegalArgumentException {
+			this.rule = rule
+		}
+		
+	}	
+	
+	@Inject
+	private StringConverter numberValueConverter;
+	
+	@ValueConverter(rule = "io.typefox.yang.Yang.NUMBER")
+	public def IValueConverter<String> NUMBERValue() {
+		return numberValueConverter;
+	}
+	
+	@ValueConverter(rule = "NUMBER")
+	public def IValueConverter<String> NUMBERValue2() {
+		return numberValueConverter;
+	}
+	
+	static class NumberConverter implements IValueConverter<String>, IValueConverter.RuleSpecific {
+		
+		override toString(String value) throws ValueConverterException {
+			return value
+		}
+		
+		override toValue(String string, INode node) throws ValueConverterException {
+			try {
+				Double.parseDouble(string);
+			} catch (NumberFormatException e) {
+				throw new ValueConverterException("Couldn't convert '" + string + "' to an double value.", node, e);
+			}
+			return string
 		}
 		
 		AbstractRule rule
