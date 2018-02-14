@@ -19,6 +19,7 @@ class YangScopeProvider implements IScopeProvider {
 	override getScope(EObject context, EReference reference) {
 		val ctx = findScopeInAdapters(context, reference)
 		switch reference.EReferenceType {
+			case YangPackage.Literals.MODULE, 
 			case YangPackage.Literals.ABSTRACT_MODULE : {
 				return ctx.moduleScope
 			}
@@ -37,13 +38,11 @@ class YangScopeProvider implements IScopeProvider {
 			case YangPackage.Literals.EXTENSION : {
 				return ctx.extensionScope
 			}
-			default : {
-				return ctx.schemaNodeScope
-			}
 		}
+		return ctx.schemaNodeScope
 	}
 	
-	protected def IScopeContext findScopeInAdapters(EObject object, EReference reference) {
+	public def IScopeContext findScopeInAdapters(EObject object, EReference reference) {
 		return provider.findScopeContext(object)
 	}
 	

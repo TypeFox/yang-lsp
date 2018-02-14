@@ -1,13 +1,14 @@
 package io.typefox.yang
 
 import com.google.inject.Inject
+import org.eclipse.xtext.AbstractRule
 import org.eclipse.xtext.conversion.IValueConverter
 import org.eclipse.xtext.conversion.ValueConverter
 import org.eclipse.xtext.conversion.ValueConverterException
 import org.eclipse.xtext.conversion.impl.AbstractDeclarativeValueConverterService
 import org.eclipse.xtext.nodemodel.INode
-import org.eclipse.xtext.AbstractRule
-import java.util.regex.Pattern
+
+import static extension io.typefox.yang.utils.YangStringUtils.*
 
 class YangValueConverterService extends AbstractDeclarativeValueConverterService {
 	
@@ -26,12 +27,8 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 	
 	static class StringConverter implements IValueConverter<String>, IValueConverter.RuleSpecific {
 		
-		static Pattern ID_MATCH = Pattern.compile(".*[\\s'\";\\{\\}]+.*");
 		override toString(String value) throws ValueConverterException {
-			if (ID_MATCH.matcher(value).matches) {
-				return "'"+value+"'"
-			}
-			return value
+			return value.addQuotesIfNecessary
 		}
 		
 		static val char[] quotes = #['"','\'']
@@ -65,7 +62,7 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 	}	
 	
 	@Inject
-	private StringConverter numberValueConverter;
+	private NumberConverter numberValueConverter;
 	
 	@ValueConverter(rule = "io.typefox.yang.Yang.NUMBER")
 	public def IValueConverter<String> NUMBERValue() {
@@ -89,6 +86,37 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 			} catch (NumberFormatException e) {
 				throw new ValueConverterException("Couldn't convert '" + string + "' to an double value.", node, e);
 			}
+			return string
+		}
+		
+		AbstractRule rule
+		
+		override setRule(AbstractRule rule) throws IllegalArgumentException {
+			this.rule = rule
+		}
+		
+	}
+	
+	@Inject
+	private SimpleStringConverter simpleStringConverter;
+	
+	@ValueConverter(rule = "io.typefox.yang.Yang.STRING")
+	public def IValueConverter<String> STRINGValue() {
+		return simpleStringConverter;
+	}
+	
+	@ValueConverter(rule = "STRING")
+	public def IValueConverter<String> STRINGValue2() {
+		return simpleStringConverter;
+	}
+	
+	static class SimpleStringConverter implements IValueConverter<String>, IValueConverter.RuleSpecific {
+		
+		override toString(String value) throws ValueConverterException {
+			return value
+		}
+		
+		override toValue(String string, INode node) throws ValueConverterException {
 			return string
 		}
 		
