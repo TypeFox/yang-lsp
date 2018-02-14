@@ -98,6 +98,9 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 
 	override protected _createProposals(Keyword keyword, ContentAssistContext context,
 		IIdeContentProposalAcceptor acceptor) {
+		if (keyword === grammarAccess.xpathExpressionAccess.lessThanSignLessThanSignLessThanSignLessThanSignKeyword_0_1
+			|| keyword === grammarAccess.xpathExpressionAccess.greaterThanSignGreaterThanSignGreaterThanSignGreaterThanSignKeyword_0_3)
+			return;
 		if (keyword === grammarAccess.importAccess.importKeyword_0 && filterKeyword(keyword, context)) {
 			val module = EcoreUtil2.getContainerOfType(context.currentModel, AbstractModule)
 			val scopeCtx = scopeContextProvider.getScopeContext(module)
