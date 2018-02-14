@@ -401,13 +401,11 @@ class ScopeContextProvider {
 			val candidates = ctx.moduleScope.getElements(name)
 			val revisionToModule = LinkedHashMultimap.create
 			for (candidate : candidates) {
-				val revisions = candidate.getUserData(ResourceDescriptionStrategy.REVISION)
-				if (revisions === null) {
+				val revision = candidate.getUserData(ResourceDescriptionStrategy.REVISION)
+				if (revision === null) {
 					revisionToModule.put("", candidate)
 				} else {
-					revisions.split(',').forEach [
-						revisionToModule.put(it, candidate)
-					]
+					revisionToModule.put(revision, candidate)
 				}
 			}
 			if (revisionToModule.empty)
@@ -415,7 +413,7 @@ class ScopeContextProvider {
 			val matches = newArrayList
 			if (importedRevisionStatement !== null) {
 				linker.<Revision>link(importedRevisionStatement, REVISION_DATE__DATE) [ revisionName |
-					matches += revisionToModule.get(revisionName.toString).sortBy[EObjectURI.toString]
+					matches += revisionToModule.get(revisionName.toString).sortBy[EObjectURI.trimFragment.toString]
 					if (matches.isEmpty) {
 						// date will not be linked, that's enough as an error message
 						return null
