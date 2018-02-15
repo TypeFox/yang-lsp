@@ -93,6 +93,9 @@ import static io.typefox.yang.formatting2.MultilineStringReplacer.Line.PartType.
 
 import static extension com.google.common.base.Strings.*
 import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
+import io.typefox.yang.yang.Key
+import io.typefox.yang.yang.IfFeature
+import io.typefox.yang.yang.Unknown
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -452,6 +455,31 @@ class YangFormatter extends AbstractFormatter2 {
         }
         formatStatement(u)
     }
+
+    def dispatch void format(Key k, extension IFormattableDocument it) {
+    		k.references.last.semanticRegions.forEach[append[noSpace]]
+    		formatStatement(k)	
+    }
+    
+    def dispatch void format(IfFeature i, extension IFormattableDocument it) {
+    		formatStatement(i)
+    }
+
+    def dispatch void format(Unknown u, extension IFormattableDocument it) {
+    		val lastRegion = if(u.name !== null)
+    			u.regionFor.assignment(unknownAccess.nameAssignment_1)
+    		else
+    			u.regionFor.assignment(unknownAccess.extensionAssignment_0)
+   		if(lastRegion !== null) {
+   			val nextSemanticRegion = lastRegion.nextSemanticRegion
+	        if (HIDDENRule == nextSemanticRegion.grammarElement) {
+	            nextSemanticRegion.prepend[noSpace].append[oneSpace]
+	        } else {
+	            lastRegion.append[oneSpace]
+	        }
+        }
+        formatStatement(u)
+    }
     
     // Tools
     
@@ -499,9 +527,7 @@ class YangFormatter extends AbstractFormatter2 {
         }
         val nodeRegions = id.allSemanticRegions.toList
         nodeRegions.head.prepend[oneSpace]
-        if (nodeRegions.length > 1) {
-            nodeRegions.tail.take(nodeRegions.length - 2).forEach[surround[noSpace]]
-        }
+        nodeRegions.tail.forEach[prepend[noSpace]]
         val nextSemanticRegion = nodeRegions.last.nextSemanticRegion
         if (HIDDENRule == nextSemanticRegion.grammarElement) {
             nextSemanticRegion.prepend[noSpace].append[oneSpace]

@@ -237,9 +237,9 @@ class ModuleLinkingTest extends AbstractYangTest {
 		''')
 		val m3 = load('''
 			module xt10 {
-				revision 2009-01-01 {
-				}
 				revision 2009-02-01 {
+				}
+				revision 2009-01-01 {
 				}
 			}
 		''')
@@ -297,7 +297,7 @@ class ModuleLinkingTest extends AbstractYangTest {
 		assertEquals(foo.allContents.filter(Revision).head, bar.allContents.filter(RevisionDate).head.date)
 	}
 	
-	@Test def void testImportOlderRevision() {
+	@Test def void testImportShadwedRevision() {
 		val foo = load('''
 			module foo {
 			    namespace foo;
@@ -319,8 +319,7 @@ class ModuleLinkingTest extends AbstractYangTest {
 		validator.validate(foo)
 		assertNoErrors(foo.root)
 		validator.validate(bar)
-		assertNoErrors(bar.root)
-		assertEquals(foo.allContents.filter(Revision).last, bar.allContents.filter(RevisionDate).head.date)
+		assertError(bar.allContents.filter(RevisionDate).head, Diagnostic.LINKING_DIAGNOSTIC)
 	}
 	
 	@Test def void testImportNonExistingRevision() {

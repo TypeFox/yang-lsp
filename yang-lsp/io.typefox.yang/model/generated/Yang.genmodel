@@ -230,6 +230,9 @@
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Min"/>
     <genClasses ecoreClass="Yang.ecore#//Max"/>
+    <genClasses ecoreClass="Yang.ecore#//UnparsedXpath">
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//UnparsedXpath/text"/>
+    </genClasses>
     <genClasses ecoreClass="Yang.ecore#//XpathOrOperation">
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathOrOperation/left"/>
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathOrOperation/operator"/>

@@ -54,7 +54,6 @@ import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.EObjectDescription
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider
 import org.eclipse.xtext.scoping.IScope
-import org.eclipse.xtext.scoping.impl.SelectableBasedScope
 import org.eclipse.xtext.util.internal.EmfAdaptable
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
@@ -119,7 +118,7 @@ class ScopeContextProvider {
 	
 	private def IScope getModuleScope(Resource resource) {
 		val index = indexProvider.getResourceDescriptions(resource)
-		return SelectableBasedScope.createScope(IScope.NULLSCOPE, index, YangPackage.Literals.ABSTRACT_MODULE, false)
+		return new YangModuleScope(IScope.NULLSCOPE, index)
 	}
 	
 	private def dispatch Module getBelongingModule(Module module, IScope moduleScope) {
@@ -130,6 +129,9 @@ class ScopeContextProvider {
 		if (belongsTo === null) {
 			return null
 		}
+		val belongingModule = belongsTo.eGet(YangPackage.Literals.BELONGS_TO__MODULE, false) as Module
+		if (belongingModule !== null && !belongingModule.eIsProxy)
+			return belongingModule
 		return linker.link(belongsTo, BELONGS_TO__MODULE) [ name |
 			val candidates = moduleScope.getElements(name)
 			return candidates.head
@@ -401,13 +403,11 @@ class ScopeContextProvider {
 			val candidates = ctx.moduleScope.getElements(name)
 			val revisionToModule = LinkedHashMultimap.create
 			for (candidate : candidates) {
-				val revisions = candidate.getUserData(ResourceDescriptionStrategy.REVISION)
-				if (revisions === null) {
+				val revision = candidate.getUserData(ResourceDescriptionStrategy.REVISION)
+				if (revision === null) {
 					revisionToModule.put("", candidate)
 				} else {
-					revisions.split(',').forEach [
-						revisionToModule.put(it, candidate)
-					]
+					revisionToModule.put(revision, candidate)
 				}
 			}
 			if (revisionToModule.empty)
@@ -415,7 +415,7 @@ class ScopeContextProvider {
 			val matches = newArrayList
 			if (importedRevisionStatement !== null) {
 				linker.<Revision>link(importedRevisionStatement, REVISION_DATE__DATE) [ revisionName |
-					matches += revisionToModule.get(revisionName.toString).sortBy[EObjectURI.toString]
+					matches += revisionToModule.get(revisionName.toString).sortBy[EObjectURI.trimFragment.toString]
 					if (matches.isEmpty) {
 						// date will not be linked, that's enough as an error message
 						return null

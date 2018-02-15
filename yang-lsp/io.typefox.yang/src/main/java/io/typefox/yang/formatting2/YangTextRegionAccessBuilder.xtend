@@ -3,11 +3,14 @@ package io.typefox.yang.formatting2
 import com.google.inject.Inject
 import io.typefox.yang.services.YangGrammarAccess
 import org.eclipse.emf.ecore.EObject
+import org.eclipse.xtext.Keyword
 import org.eclipse.xtext.formatting2.regionaccess.TextRegionAccessBuilder
 import org.eclipse.xtext.formatting2.regionaccess.internal.NodeModelBasedRegionAccessBuilder
 import org.eclipse.xtext.formatting2.regionaccess.internal.TextRegionAccessBuildingSequencer
+import org.eclipse.xtext.nodemodel.ILeafNode
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.serializer.ISerializationContext
+import org.eclipse.xtext.serializer.acceptor.ISequenceAcceptor
 
 class YangTextRegionAccessBuilder extends TextRegionAccessBuilder {
     
@@ -23,9 +26,9 @@ class YangTextRegionAccessBuilder extends TextRegionAccessBuilder {
         return this;
     }
     
-    override forSequence(ISerializationContext ctx, EObject root) {
-        return this.fromSequencer = new TextRegionAccessBuildingSequencer().withRoot(ctx, root);
-    }
+	override ISequenceAcceptor forSequence(ISerializationContext ctx, EObject root) {
+		return this.fromSequencer = new YangTextRegionAccessBuildingSequencer().withRoot(ctx, root);
+	}
 
     override create() {
         if (fromNodeModel !== null)
@@ -35,4 +38,12 @@ class YangTextRegionAccessBuilder extends TextRegionAccessBuilder {
         throw new IllegalStateException();
     }
 
+	static class YangTextRegionAccessBuildingSequencer extends TextRegionAccessBuildingSequencer {
+	
+		override acceptUnassignedKeyword(Keyword keyword, String token, ILeafNode node) {
+			if (keyword.value == '<<<<' || keyword.value == '>>>>')
+				return;
+			super.acceptUnassignedKeyword(keyword, token, node)
+		} 
+	}
 }
