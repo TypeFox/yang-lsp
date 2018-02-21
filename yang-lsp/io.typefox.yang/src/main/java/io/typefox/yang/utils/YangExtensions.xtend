@@ -105,4 +105,13 @@ class YangExtensions {
 	def dispatch String getPrefix(Import it) {
 		substatements.filter(Prefix).head?.prefix
 	}
+	
+	def String getRevisionFromFileName(AbstractModule module) {
+		val rawFileName = module.eResource.getURI().trimFileExtension.lastSegment
+		val index = rawFileName.indexOf('@')
+		if(index > -1) 
+			rawFileName.substring(index + 1)
+		else
+			null
+	}
 }

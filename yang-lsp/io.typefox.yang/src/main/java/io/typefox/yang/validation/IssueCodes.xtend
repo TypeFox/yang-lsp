@@ -59,6 +59,10 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 		Issue code that applies on a revision if that is not in a reverse chronological order.
 	''');
 
+	public static val REVISION_MISMATCH = 'revision-mismatch'.warn('''
+		Issue code that applies when the leading revision does not match the revision in the file name.
+	''');
+
 	public static val BAD_TYPE_NAME = 'bad-type-name'.error('''
 		Issue code when the name of a type does not conform with the existing constraints.
 		For instance; the name contains any invalid characters, or equals to any YANG built-in type name.

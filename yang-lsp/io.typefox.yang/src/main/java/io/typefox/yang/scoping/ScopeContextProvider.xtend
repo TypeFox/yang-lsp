@@ -420,7 +420,11 @@ class ScopeContextProvider {
 					}
 					val importedModule = EcoreUtil.resolve(matches.head.EObjectOrProxy, element) as AbstractModule
 					val revisionToBeLinked = importedModule.substatements.filter(Revision).findFirst[revision == revisionName.toString]
-					return EObjectDescription.create(revisionName, revisionToBeLinked)
+					if (revisionToBeLinked === null)
+						// revision is from filename, so nothing to link here
+						return Linker.ROOT 
+					else
+						return EObjectDescription.create(revisionName, revisionToBeLinked)
 				]
 			} 
 			if (matches.empty) {

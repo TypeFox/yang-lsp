@@ -24,10 +24,10 @@ class ResourceDescriptionStrategy extends DefaultResourceDescriptionStrategy {
 	override createEObjectDescriptions(EObject m, IAcceptor<IEObjectDescription> acceptor) {
 		if (m instanceof AbstractModule) {
 			var data = emptyMap
-			val leadingRevision = m.substatementsOfType(Revision).head
+			val leadingRevision = m.substatementsOfType(Revision).head?.revision ?: m.revisionFromFileName
 			if (leadingRevision !== null) {
 				data = #{
-					REVISION -> leadingRevision.revision
+					REVISION -> leadingRevision
 				}
 			}
 			val proxy = YangFactory.eINSTANCE.createAbstractModule()

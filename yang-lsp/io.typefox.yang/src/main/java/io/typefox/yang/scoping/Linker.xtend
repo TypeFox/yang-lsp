@@ -24,7 +24,7 @@ class Linker {
 
 	def <T> T link(EObject element, EReference reference, (QualifiedName)=>IEObjectDescription resolver) {
 		val proxy = element.eGet(reference, false) as EObject
-		if (proxy !== null && !proxy.eIsProxy)
+		if (proxy !== null && (!proxy.eIsProxy || LinkingErrorMessageProvider.isOK(proxy)))
 			return proxy as T
 		val qname = getLinkingName(element, reference)
 		if (qname !== null) {
