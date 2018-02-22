@@ -1,0 +1,4 @@
+module revision {
+	prefix revision;
+	namespace revision;
+}

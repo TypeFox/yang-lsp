@@ -340,6 +340,26 @@ class YangValidator extends AbstractYangValidator {
 	}
 
 	@Check
+	def checkRevisionInFileName(AbstractModule it) {
+		val revisionFile = revisionFromFileName
+		if (revisionFile !== null) {
+			try {
+				revisionDateFormat.parse(revisionFile);
+				val revisionStatement = substatementsOfType(Revision).head;
+				if(revisionStatement !== null 
+					&& revisionStatement.revision !== null 
+					&& revisionStatement.revision != revisionFile) {
+					val message = '''The revision date in the file name does not match.''';
+					warning(message, revisionStatement, REVISION__REVISION, REVISION_MISMATCH);						
+				}
+			} catch (java.text.ParseException e) {
+				val message = '''The revision date in the file name should be in the following format: "YYYY-MM-DD".''';
+				warning(message, it, ABSTRACT_MODULE__NAME, INVALID_REVISION_FORMAT);
+			}
+		}
+	}
+
+	@Check
 	def checkTypedef(Typedef it) {
 		// The [1..*] type cardinality is checked by other rules.
 		// Also, the type name uniqueness is checked in the scoping. 

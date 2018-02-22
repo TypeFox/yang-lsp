@@ -19,16 +19,18 @@ class LinkingErrorMessageProvider extends LinkingDiagnosticMessageProvider {
 		}
 	}
 	
+	static def boolean isOK(EObject obj) {
+		ItsOK.findInEmfObject(obj) !== null
+	}
+	
 	@EmfAdaptable static class ItsOK {
 	}
 	
 	@Inject IssueSeveritiesProvider severitiesProvider
 	
 	override getUnresolvedProxyMessage(ILinkingDiagnosticContext context) {
-		val adapter = ItsOK.findInEmfObject(context.context)
-		if (adapter !== null) {
+		if(isOK(context.context))
 			return null
-		}
 		if (context.context instanceof XpathNameTest || context.context instanceof CurrentRef || context.context instanceof ParentRef) {
 			val severities = severitiesProvider.getIssueSeverities(context.context.eResource)
 			val severity = severities.getSeverity(IssueCodes.XPATH_LINK_ERROR)

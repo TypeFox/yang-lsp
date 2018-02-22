@@ -1,0 +1,11 @@
+module revision2 {
+    yang-version 1.1;
+    namespace urn:ietf:params:xml:ns:yang:revision2;
+    prefix revision2;
+    
+    import revision {
+		revision-date '2000-01-01';
+		prefix revision;
+	}
+
+}

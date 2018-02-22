@@ -1,0 +1,17 @@
+submodule t-cli-extensions {
+
+  belongs-to t-common {
+    prefix t;
+  }
+
+  include t-meta-extensions {
+  }
+
+
+  extension ext {
+    t:use-in "leaf";
+    t:use-in "list";
+    t:use-in "leaf-list";
+  }
+
+}

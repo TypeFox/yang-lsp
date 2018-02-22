@@ -124,14 +124,12 @@ class ScopeContextProvider {
 	private def dispatch Module getBelongingModule(Module module, IScope moduleScope) {
 		return module
 	}
+	
 	private def dispatch Module getBelongingModule(Submodule submodule, IScope moduleScope) {
 		val belongsTo = submodule.substatements.filter(BelongsTo).head
 		if (belongsTo === null) {
 			return null
 		}
-		val belongingModule = belongsTo.eGet(YangPackage.Literals.BELONGS_TO__MODULE, false) as Module
-		if (belongingModule !== null && !belongingModule.eIsProxy)
-			return belongingModule
 		return linker.link(belongsTo, BELONGS_TO__MODULE) [ name |
 			val candidates = moduleScope.getElements(name)
 			return candidates.head
@@ -422,7 +420,11 @@ class ScopeContextProvider {
 					}
 					val importedModule = EcoreUtil.resolve(matches.head.EObjectOrProxy, element) as AbstractModule
 					val revisionToBeLinked = importedModule.substatements.filter(Revision).findFirst[revision == revisionName.toString]
-					return EObjectDescription.create(revisionName, revisionToBeLinked)
+					if (revisionToBeLinked === null)
+						// revision is from filename, so nothing to link here
+						return Linker.ROOT 
+					else
+						return EObjectDescription.create(revisionName, revisionToBeLinked)
 				]
 			} 
 			if (matches.empty) {
