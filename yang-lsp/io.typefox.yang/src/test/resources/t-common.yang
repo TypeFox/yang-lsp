@@ -1,0 +1,11 @@
+module t-common {
+  namespace "http://yangster.org";
+  prefix t;
+
+  include t-meta-extensions {
+  }
+
+  include t-cli-extensions {
+  }
+
+}

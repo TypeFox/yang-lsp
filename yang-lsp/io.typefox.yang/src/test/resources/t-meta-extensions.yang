@@ -1,0 +1,9 @@
+submodule t-meta-extensions {
+
+  belongs-to t-common {
+    prefix t;
+  }
+
+  extension use-in {
+  }
+}
