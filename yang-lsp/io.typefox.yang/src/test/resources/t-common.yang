@@ -8,4 +8,52 @@ module t-common {
   include t-cli-extensions {
   }
 
+  extension suppress-echo {
+    argument value {
+      t:arg-type {
+        type string;
+      }
+    }
+    t:use-in "typedef";
+    t:use-in "leaf";
+    t:use-in "leaf-list";
+  }
+
+  extension callpoint {
+    argument id {
+      t:arg-type {
+        type string;
+      }
+    }
+    t:substatement "t:set-hook";
+  }
+
+  extension set-hook {
+    argument value {
+      t:arg-type {
+        type enumeration {
+          enum subtree;
+          enum object;
+          enum node;
+        }
+      }
+    }
+  }
+  
+  extension meta-data {
+    argument value {
+      t:arg-type {
+        type string;
+      }
+    }
+    t:substatement "tailf:meta-value";
+  }
+
+  extension meta-value {
+    argument value {
+      t:arg-type {
+        type string;
+      }
+    }
+  }
 }

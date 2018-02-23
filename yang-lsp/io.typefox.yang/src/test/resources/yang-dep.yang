@@ -1,0 +1,9 @@
+module yang-dep {
+  yang-version 1.1;
+  namespace "http://yangster.org";
+  prefix ydep;
+
+  extension e1 {
+  }
+
+}
