@@ -43,7 +43,7 @@ public class ModuleSerializeTest {
 
 	@Inject
 	protected IResourceDescription.Manager manager;
-
+	
 	protected var XtextResourceSet resourceSet;
 
 	private var FileLoader loader
@@ -93,6 +93,7 @@ public class ModuleSerializeTest {
 	@Test
 	def void testSerializeUpdatedModule() {
 		val targetModule = loadModuleFile("yangster-test.yang")
+		
 		var ii = targetModule.substatements.indexOf(targetModule.substatements.filter(Import).head)
 		val tImport = YangFactory.eINSTANCE.create(YangPackage.eINSTANCE.import) as Import
 		tImport.module = tCommon
@@ -206,7 +207,8 @@ public class ModuleSerializeTest {
 	}
 	
 	private def assertSerialized(CharSequence expected, AbstractModule targetModule) {
-		val actual = (targetModule.eResource as XtextResource).serializer.serialize(targetModule)
+		val resource = targetModule.eResource as XtextResource
+		val actual = resource.serializer.serialize(targetModule)
 		assertEquals(expected.toString.trim.replaceAll('\\s+', ' '), actual.trim.replaceAll('\\s+', ' '))
 	}
 }

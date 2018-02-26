@@ -55,6 +55,7 @@ import org.eclipse.xtext.resource.EObjectDescription
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.util.internal.EmfAdaptable
+import static extension org.eclipse.xtext.EcoreUtil2.* 
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
@@ -74,6 +75,14 @@ class ScopeContextProvider {
 	private static class Adapter {
 		IScopeContext scopeContext
 		QualifiedName nodePath
+	}
+	
+	def removeScopeContexts(Resource resource) {
+		resource.resourceSet.resources.forEach [
+			allContents.forEach[
+				Adapter.removeFromEmfObject(it)
+			]
+		]
 	}
 	
 	def IScopeContext findScopeContext(EObject node) {
@@ -551,7 +560,11 @@ class ScopeContextProvider {
 			}
 			var secondSeg = qn.lastSegment
 			return prefix.append(firstSeg).append(secondSeg)
-		}
+		} else if (!identifier.schemaNode.eIsProxy()) {
+			val moduleName = identifier.schemaNode.getContainerOfType(AbstractModule)?.name
+			if(moduleName !== null && identifier.schemaNode.name !== null)
+				return prefix.append(moduleName).append(identifier.schemaNode.name)
+		} 
 		return prefix
 	}
 	

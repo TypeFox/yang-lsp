@@ -19,7 +19,7 @@ class Linker {
 	@Inject LinkingHelper linkingHelper
 	@Inject LazyURIEncoder lazyURIEncoder
 	@Inject IQualifiedNameConverter qualifiedNameConverter
-	
+
 	public static IEObjectDescription ROOT = new EObjectDescription(QualifiedName.EMPTY, null, null);
 
 	def <T> T link(EObject element, EReference reference, (QualifiedName)=>IEObjectDescription resolver) {
@@ -56,7 +56,9 @@ class Linker {
 				}
 			} else {
 				val symbol = NodeModelUtils.findNodesForFeature(element, reference).map[leafNodes.filter[!isHidden].map[getText].join("")].join("")
-				return qualifiedNameConverter.toQualifiedName(symbol)
+				if (!symbol.empty) {
+					return qualifiedNameConverter.toQualifiedName(symbol)
+				} 
 			}
 		}
 		return null
