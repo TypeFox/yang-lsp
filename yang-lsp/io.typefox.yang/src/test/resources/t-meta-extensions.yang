@@ -6,4 +6,19 @@ submodule t-meta-extensions {
 
   extension use-in {
   }
+  
+  extension arg-type {
+    t:use-in "argument";
+    t:substatement "type";
+  }
+
+  extension substatement {
+    argument name {
+      t:arg-type {
+        type string;
+      }
+    }
+    t:use-in "extension";
+  }
+  
 }

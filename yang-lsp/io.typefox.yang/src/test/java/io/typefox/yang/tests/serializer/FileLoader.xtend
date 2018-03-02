@@ -12,6 +12,7 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.xtext.resource.IResourceDescription
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsData
+import org.eclipse.emf.ecore.util.EcoreUtil
 
 /**
  * ModuleLoader only focus on loading URI/File into ResourceSet,
@@ -28,6 +29,7 @@ class FileLoader {
 		
 		moduleSearchDirs.prepareXtextResources
 		installIndex(manager)
+        EcoreUtil.resolveAll(xtextResourceSet)
 	}
 	
 	def get(File file) {

@@ -36,6 +36,7 @@ import org.eclipse.xtext.workspace.ProjectConfigProvider
 import org.eclipse.xtext.scoping.IScopeProvider
 import org.eclipse.xtext.serializer.tokens.SerializerScopeProviderBinding
 import io.typefox.yang.scoping.YangSerializerScopeProvider
+import io.typefox.yang.resource.YangSerializer
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
@@ -111,6 +112,10 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 	
 	override configureSerializerIScopeProvider(Binder binder) {
 		binder.bind(IScopeProvider).annotatedWith(SerializerScopeProviderBinding).to(YangSerializerScopeProvider)
+	}
+	
+	override bindISerializer() {
+		YangSerializer
 	}
 	
 }

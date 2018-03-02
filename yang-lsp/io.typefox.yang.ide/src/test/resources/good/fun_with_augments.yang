@@ -1,0 +1,25 @@
+module fun_with_augments {
+    yang-version 1.1;
+    namespace urn:ietf:params:xml:ns:yang:fun_with_augments;
+    prefix fun_with_augments;
+
+	container foo {}
+	container bar {}
+	
+	augment /foo {
+		list list {
+			key l;
+			leaf l {
+				type string;
+			}
+		}
+	}
+	augment /bar {
+		list list {
+			key l;
+			leaf l {
+				type string;
+			}
+		}
+	}
+}

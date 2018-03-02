@@ -1,18 +1,20 @@
 package io.typefox.yang.tests.integration
 
+import com.google.inject.Injector
 import io.typefox.yang.YangStandaloneSetup
 import io.typefox.yang.yang.XpathExpression
 import io.typefox.yang.yang.YangFactory
 import java.io.ByteArrayOutputStream
 import java.io.File
 import java.util.Collection
+import java.util.Set
 import org.eclipse.emf.common.util.URI
-import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
-import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.nodemodel.INode
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
+import org.eclipse.xtext.resource.IResourceDescriptions
+import org.eclipse.xtext.resource.IResourceDescriptionsProvider
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.junit.Assert
@@ -21,6 +23,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 import org.junit.runners.Parameterized
 import org.junit.runners.Parameterized.Parameters
+
 import static extension io.typefox.yang.utils.YangStringUtils.*
 
 @FinalFieldsConstructor
@@ -38,16 +41,18 @@ class SerializationIntegrationTest {
 		return params
 	}
 	
-	static ResourceSet rs
+	static Injector injector
+	static IResourceDescriptions descriptions
 	
 	@BeforeClass
 	static def void beforeClass() {
-		val injector = new YangStandaloneSetup().createInjectorAndDoEMFRegistration
-		rs = injector.getInstance(XtextResourceSet)
+		injector = new YangStandaloneSetup().createInjectorAndDoEMFRegistration
+		val rs = injector.getInstance(XtextResourceSet)
 		scanRecursively(new File("./src/test/resources")) [
 			rs.getResource(URI.createFileURI(absolutePath), true)
 		]
-		EcoreUtil2.resolveAll(rs)
+		EcoreUtil.resolveAll(rs)
+		descriptions = injector.getInstance(IResourceDescriptionsProvider).getResourceDescriptions(rs)
 	}
 	
 	static def void scanRecursively(File file, (File)=>void acceptor) {
@@ -65,9 +70,7 @@ class SerializationIntegrationTest {
 	val File file
 	
 	@Test def void testSerializing() {
-		val resource = rs.getResource(URI.createFileURI(this.file.absolutePath), true) as XtextResource
-		EcoreUtil.resolveAll(resource)
-		Assert.assertTrue(resource.errors.empty)
+		val resource = loadResources(URI.createFileURI(this.file.absolutePath))
 		replaceXpathExpressions(resource)
 		removeNodeModel(resource)
 		val s0 = new ByteArrayOutputStream()
@@ -124,5 +127,30 @@ class SerializationIntegrationTest {
 				return s
 		}
 		return s.addQuotesIfNecessary
+	}
+	
+	private def loadResources(URI uri) {
+		val uris = newHashSet
+		uri.addReferencedURIs(uris)
+		val newRs = injector.getInstance(XtextResourceSet)
+		uris.forEach [
+			newRs.getResource(it, true)
+		] 
+		EcoreUtil.resolveAll(newRs)
+		val xtextResource = newRs.getResource(uri, false) as XtextResource
+		if (!xtextResource.errors.empty) {
+			System.err.println(xtextResource.parseResult.rootNode.text)
+			Assert.fail(xtextResource.errors.map[message].join('\n'))
+		}
+
+		return xtextResource
+	}
+	
+	private def void addReferencedURIs(URI uri, Set<URI> uris) {
+		if (uris.add(uri)) {
+			descriptions.getResourceDescription(uri).referenceDescriptions.forEach [
+				targetEObjectUri.trimFragment.addReferencedURIs(uris)
+			]
+		}
 	}
 }
