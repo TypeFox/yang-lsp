@@ -18,6 +18,8 @@ import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.IScopeProvider
 import org.eclipse.xtext.scoping.Scopes
 import io.typefox.yang.yang.SchemaNodeIdentifier
+import io.typefox.yang.yang.Rpc
+import io.typefox.yang.yang.Action
 
 class YangSerializerScopeProvider implements IScopeProvider {
 
@@ -29,9 +31,17 @@ class YangSerializerScopeProvider implements IScopeProvider {
 		if (YangPackage.Literals.SCHEMA_NODE.isSuperTypeOf(reference.EReferenceType)) {
 			val module = context.eResource.contents.head
 			if (module instanceof AbstractModule) {
-				// we allow the default input/outputs only in the second segment of an identifier
-				val isFirstIdentifierSegment = (context.eContainer instanceof SchemaNodeIdentifier)
-				return new NameConvertingScope(module, delegateScope, isFirstIdentifierSegment, yangExtensions)
+				// if actions (resp. rpcs) don't define inputs (resp. outputs), the implicit default input
+				// referred to by /<action>/input is linked against the action itself. That means, the scope 
+				// knows upto three names for the action, leading to ambiguities when serializing. 
+				// We must filter <action>.input when serializing the action and <action> when serializing
+				// the default input. 
+				val allowDefaultInputOutput =
+					if(context instanceof SchemaNodeIdentifier) 
+						context.target?.schemaNode instanceof Rpc || context.target?.schemaNode instanceof Action
+					else 
+						false
+				return new NameConvertingScope(module, delegateScope, allowDefaultInputOutput, yangExtensions)
 			}
 		}
 		if (reference.EReferenceType === YangPackage.Literals.REVISION) {
@@ -52,7 +62,7 @@ class YangSerializerScopeProvider implements IScopeProvider {
 	static class NameConvertingScope implements IScope {
 		val AbstractModule module
 		val IScope delegate
-		val boolean isFirstIdentifierSegment
+		val boolean allowDefaultInputOutput
 		val extension YangExtensions
 
 		override getAllElements() {
@@ -87,7 +97,7 @@ class YangSerializerScopeProvider implements IScopeProvider {
 				// filter default inputs/outputs
 				val lastSegment = original.qualifiedName.lastSegment
 				val isInputOrOutput = (lastSegment == 'input' || lastSegment == 'output')
-				if(isFirstIdentifierSegment == isInputOrOutput) 
+				if(allowDefaultInputOutput !== isInputOrOutput) 
 					return null					
 			}
 			if (original.qualifiedName.segmentCount < 2)
@@ -116,5 +126,4 @@ class YangSerializerScopeProvider implements IScopeProvider {
 			new AliasedEObjectDescription(QualifiedName.create(prefix, original.qualifiedName.lastSegment), original)
 		}
 	}
-
 }

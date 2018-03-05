@@ -1,0 +1,24 @@
+module yangster-test {
+	yang-version 1.1;
+	namespace urn:rdns:org:yangster:model:yangster-test;
+	prefix ytest;
+	
+	import yang-dep {
+		prefix ydep;
+	}
+
+	organization 'Yangster Inc.';
+	contact yangster;
+	description 'This is a serialize test';
+	
+	// TODO: This is a test
+	container c1 {
+		ydep:e1;
+		leaf l1 {
+			type string;
+		}
+	}
+	
+	container c2 {
+	}
+}

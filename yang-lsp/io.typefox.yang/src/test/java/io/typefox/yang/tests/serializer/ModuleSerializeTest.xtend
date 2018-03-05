@@ -57,6 +57,13 @@ public class ModuleSerializeTest {
 	}
 
 	@Test
+	def void testSerializeDeviationAction() {
+		val targetModule = loadModuleFile("yangster-action-test.yang")
+		val resource = targetModule.eResource as XtextResource
+		resource.serializer.serialize(targetModule)
+	}
+
+	@Test
 	def void testSerializeNewModule() {
 		val targetModule = YangFactory.eINSTANCE.createModule
 
