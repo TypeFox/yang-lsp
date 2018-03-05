@@ -1,0 +1,22 @@
+module yangster-action-test {
+    yang-version 1.1;
+    namespace urn:rdns:org:yangster:model:yangster-action-test;
+    prefix yatest;
+    
+    import yang-dep {
+        prefix ydep;
+    }
+
+    organization 'Yangster Inc.';
+    contact yangster;
+    description 'This is a serialize test';
+    
+	deviation /ydep:ai {
+		deviate not-supported;
+	}
+
+	deviation /ydep:aio {
+		deviate not-supported;
+	}
+
+}
