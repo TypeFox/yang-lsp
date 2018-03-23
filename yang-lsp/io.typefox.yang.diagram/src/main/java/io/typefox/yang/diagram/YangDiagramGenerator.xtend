@@ -70,6 +70,7 @@ import java.util.Map
 import org.apache.log4j.Logger
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.util.CancelIndicator
 
@@ -187,13 +188,15 @@ class YangDiagramGenerator implements IDiagramGenerator {
 		SModelElement modelParentElement) {
 		if (modelParentElement instanceof SCompartment) {
 			val keyReferences = keyStmt.references
-			postProcesses.add([
-				(keyReferences).forEach [ keyReference |
-					val leafElement = elementIndex.get(keyReference.node) as SLabel
-					val label = leafElement.text
-					leafElement.text = '* ' + label
-				]
-			])
+			keyReferences.forEach [ keyReference |
+				if (EcoreUtil.isAncestor(keyStmt.eContainer, keyReference.node)) {					
+					postProcesses.add([
+						val leafElement = elementIndex.get(keyReference.node) as SLabel
+						val label = leafElement.text
+						leafElement.text = '* ' + label
+					])
+				}
+			]
 		}
 		return null
 	}
