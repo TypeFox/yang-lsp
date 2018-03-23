@@ -234,7 +234,7 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			val node = NodeModelUtils.getNode(schemaNodeIdentifier)
 			val path = node.leafNodes.filter[!hidden].map[text].join
 			val targetNode = schemaNodeIdentifier.schemaNode
-			val augmentElementId = viewParentElement.id + '-' + targetNode.name + '-augmentation'
+			val augmentElementId = viewParentElement.id + '-' + path + '-augmentation'
 			var SModelElement augmentElement = null
 			var sameAugmentTarget = elementIndex.values.findFirst [ element |
 				element.id == augmentElementId
