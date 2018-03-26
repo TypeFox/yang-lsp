@@ -31,6 +31,8 @@ import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.ide.refactoring.IRenameStrategy2
 import io.typefox.yang.ide.rename.YangRenameStrategy
+import org.eclipse.xtext.ide.server.formatting.FormattingService
+import io.typefox.yang.ide.formatting.YangFormattingService
 
 /**
  * Use this class to register ide components.
@@ -96,5 +98,9 @@ class YangIdeModule extends AbstractYangIdeModule {
 			return codeLens
 		}
 
+	}
+	
+	def Class<? extends FormattingService> bindFormattingService() {
+		YangFormattingService
 	}
 }
