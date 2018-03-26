@@ -61,11 +61,11 @@ package class ExtendedNodeHiddenRegion extends NodeHiddenRegion {
         super(access)
     }
 
-    override public setPrevious(ISemanticRegion previous) {
+    override setPrevious(ISemanticRegion previous) {
         super.setPrevious(previous)
     }
 
-    override public setNext(ISemanticRegion next) {
+    override setNext(ISemanticRegion next) {
         super.setNext(next)
     }
 }
