@@ -58,7 +58,7 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 		YangResource
 	}
 
-	def Class<? extends ConfigurableIssueCodesProvider> bindConfigurableIssueCodesProvider() {
+	override Class<? extends ConfigurableIssueCodesProvider> bindConfigurableIssueCodesProvider() {
 		IssueCodes
 	}
 
