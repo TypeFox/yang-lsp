@@ -9,9 +9,11 @@ import io.typefox.yang.formatting2.YangIndentationInformation
 import io.typefox.yang.formatting2.YangTextRegionAccessBuilder
 import io.typefox.yang.resource.YangCrossReferenceSerializer
 import io.typefox.yang.resource.YangResource
+import io.typefox.yang.resource.YangSerializer
 import io.typefox.yang.scoping.QualifiedNameConverter
 import io.typefox.yang.scoping.ResourceDescriptionStrategy
 import io.typefox.yang.scoping.YangResourceDescriptionManager
+import io.typefox.yang.scoping.YangSerializerScopeProvider
 import io.typefox.yang.settings.PreferenceValuesProvider
 import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.validation.LinkingErrorMessageProvider
@@ -26,17 +28,15 @@ import org.eclipse.xtext.naming.IQualifiedNameConverter
 import org.eclipse.xtext.preferences.IPreferenceValuesProvider
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy
 import org.eclipse.xtext.resource.impl.DefaultResourceDescriptionManager
+import org.eclipse.xtext.scoping.IScopeProvider
 import org.eclipse.xtext.serializer.tokens.CrossReferenceSerializer
+import org.eclipse.xtext.serializer.tokens.SerializerScopeProviderBinding
 import org.eclipse.xtext.util.ExceptionAcceptor
-import org.eclipse.xtext.validation.ConfigurableIssueCodesProvider
 import org.eclipse.xtext.validation.IssueSeveritiesProvider
 import org.eclipse.xtext.validation.ResourceValidatorImpl
 import org.eclipse.xtext.workspace.IProjectConfigProvider
 import org.eclipse.xtext.workspace.ProjectConfigProvider
-import org.eclipse.xtext.scoping.IScopeProvider
-import org.eclipse.xtext.serializer.tokens.SerializerScopeProviderBinding
-import io.typefox.yang.scoping.YangSerializerScopeProvider
-import io.typefox.yang.resource.YangSerializer
+import org.eclipse.xtext.validation.ConfigurableIssueCodesProvider
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
@@ -58,7 +58,7 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 		YangResource
 	}
 
-	def Class<? extends ConfigurableIssueCodesProvider> bindConfigurableIssueCodes() {
+	def Class<? extends ConfigurableIssueCodesProvider> bindConfigurableIssueCodesProvider() {
 		IssueCodes
 	}
 
