@@ -3,11 +3,10 @@ package io.typefox.yang.validation
 import com.google.common.collect.ImmutableMap
 import com.google.inject.Singleton
 import java.util.Map
-import org.eclipse.xtext.preferences.PreferenceKey
-import org.eclipse.xtext.validation.ConfigurableIssueCodesProvider
-import org.eclipse.xtext.validation.SeverityConverter
 import org.eclipse.xtend.lib.annotations.Data
-import io.typefox.yang.validation.IssueCodes.DocumentedPreferenceKey
+import org.eclipse.xtext.preferences.PreferenceKey
+import org.eclipse.xtext.validation.SeverityConverter
+import org.eclipse.xtext.validation.ConfigurableIssueCodesProvider
 
 @Singleton
 class IssueCodes extends ConfigurableIssueCodesProvider {

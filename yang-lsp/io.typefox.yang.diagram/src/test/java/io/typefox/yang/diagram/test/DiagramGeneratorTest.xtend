@@ -19,7 +19,7 @@ class DiagramGeneratorTest extends AbstractYangTest {
 	
 	protected def assertGeneratedTo(Resource source, CharSequence target) {
 		val diagram = generator.generate(source, new TestDiagramState(source), CancelIndicator.NullImpl)
-		Assert.assertEquals(target.toString.trim, diagram.toString)
+		Assert.assertEquals(target.toString.replace('\r','').trim, diagram.toString)
 	}
 
 	@Test 
