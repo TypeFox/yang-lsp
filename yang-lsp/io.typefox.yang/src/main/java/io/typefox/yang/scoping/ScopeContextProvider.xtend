@@ -373,7 +373,8 @@ class ScopeContextProvider {
 			newPath = getQualifiedName(node, nodePath, ctx)
 			if (newPath != nodePath 
 				&& !(node instanceof Grouping)
-				&& !(node instanceof Augment)) {
+				&& !(node instanceof Augment)
+				&& !(node instanceof Deviation)) {
 				node.addToNodeScope(newPath, ctx, newIsConfig)
 			}
 		}
@@ -542,6 +543,13 @@ class ScopeContextProvider {
 			return p
 		}
 		return internalGetQualifiedName(node.path, p, ctx)
+	}
+	
+	private def dispatch QualifiedName getQualifiedName(Deviation node, QualifiedName p, IScopeContext ctx) {
+		if (node.reference === null) {
+			return p
+		}
+		return internalGetQualifiedName(node.reference, p, ctx)
 	}
 	
 	private def QualifiedName internalGetQualifiedName(SchemaNodeIdentifier identifier, QualifiedName p, IScopeContext ctx) {
