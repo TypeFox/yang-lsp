@@ -182,8 +182,8 @@ class SubstatementRuleProvider {
 		.any(TYPEDEF)
 		.any(GROUPING)
 		.with(DATA_RULE)
-		.optional(YANG_1_1, ACTION)
-		.optional(YANG_1_1, NOTIFICATION);
+		.any(YANG_1_1, ACTION)
+		.any(YANG_1_1, NOTIFICATION);
 
 	static val CONTAINER_RULE = newRule()
 		.optional(WHEN)
@@ -382,7 +382,7 @@ class SubstatementRuleProvider {
 		.optional(UNITS)
 		.any(MUST)
 		.any(UNIQUE)
-		.optional(DEFAULT)
+		.any(DEFAULT)
 		.optional(CONFIG)
 		.optional(MANDATORY)
 		.optional(MIN_ELEMENTS)
