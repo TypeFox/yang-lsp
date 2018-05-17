@@ -4,7 +4,9 @@ import com.google.inject.Inject
 import io.typefox.yang.scoping.IScopeContext
 import io.typefox.yang.scoping.Linker
 import io.typefox.yang.scoping.ScopeContext.MapScope
+import io.typefox.yang.scoping.ScopeContextProvider
 import io.typefox.yang.scoping.Validator
+import io.typefox.yang.scoping.xpath.XpathResolver.TypeAdapter
 import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.validation.LinkingErrorMessageProvider
 import io.typefox.yang.yang.AbbrevAttributeStep
@@ -43,7 +45,6 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.util.internal.EmfAdaptable
-import io.typefox.yang.scoping.xpath.XpathResolver.TypeAdapter
 import org.eclipse.xtext.util.internal.Log
 
 @Log
@@ -51,6 +52,9 @@ class XpathResolver {
 	
 	@Inject Validator validator
 	@Inject Linker linker
+	@Inject ScopeContextProvider scopeContextProvider
+	
+	static val ASTERISK = QualifiedName.create('*')
 	
 	@Data static class Context {
 		MapScope nodeScope
@@ -315,7 +319,7 @@ class XpathResolver {
 		}
 		if (e.node instanceof XpathNodeType) {
 			// it must be axis::node()
-			return computeType(contextType, '*', mode, ctx)
+			return computeType(contextType, ASTERISK, mode, ctx)
 		}
 		if (contextType === Types.ANY) {
 			if (e.node !== null)
@@ -327,11 +331,23 @@ class XpathResolver {
 		}
 		val ref = new AtomicReference<XpathType>() 
 		linker.link(e.node, YangPackage.Literals.XPATH_NAME_TEST__REF) [
-			val type = computeType(contextType, lastSegment, mode, ctx)
+			val type = computeType(contextType, resolveModelPrefix(e), mode, ctx)
 			ref.set(type)
 			return type.EObjectDescription
 		]
 		return ref.get ?: Types.ANY 
+	}
+	
+	private def QualifiedName resolveModelPrefix(QualifiedName linkName, EObject element) {
+		if (linkName.segmentCount > 1) {
+			val scopeContext = scopeContextProvider.findScopeContext(element)
+			if (scopeContext !== null) {
+				val moduleName = scopeContext.importedModules.get(linkName.firstSegment)?.moduleName
+				if (moduleName !== null)
+					return QualifiedName.create(moduleName).append(linkName.skipFirst(1))					
+			}
+		}
+		return linkName
 	}
 	
 	static enum Axis {
@@ -344,7 +360,7 @@ class XpathResolver {
 		DESCENDANTS_OR_SELF
 	}
 	
-	protected def XpathType computeType(XpathType type, String name, Axis mode, Context ctx) {
+	protected def XpathType computeType(XpathType type, QualifiedName name, Axis mode, Context ctx) {
 		if (type instanceof NodeSetType) {
 			// handle root
 			if (type.nodes.empty) {
@@ -374,7 +390,7 @@ class XpathResolver {
 		}
 	}
 	
-	public def List<IEObjectDescription> findNodes(QualifiedName prefix, String name, Axis mode, MapScope nodeScope) {
+	public def List<IEObjectDescription> findNodes(QualifiedName prefix, QualifiedName name, Axis mode, MapScope nodeScope) {
 		if (mode === Axis.SIBLINGS) {
 			return findNodes(prefix.skipLast, name, Axis.CHILDREN, nodeScope)
 		} else if (mode === Axis.DESCENDANTS_OR_SELF) {
@@ -385,7 +401,7 @@ class XpathResolver {
 			val result = newArrayList()
 			var parent = prefix
 			while (parent.segmentCount >= 2) {
-				if (name === null || name == '*' || parent.lastSegment == name) {
+				if (name === null || name == ASTERISK || parent.endsWith(name)) {
 					val p = nodeScope.getSingleElement(parent)
 					if (p !== null && isInstanceNode(p)) {
 						result.add(p)
@@ -411,7 +427,7 @@ class XpathResolver {
 		} else {
 			val elements = nodeScope.allElements.filter [
 				if (qualifiedName.startsWith(prefix) && qualifiedName.segmentCount > prefix.segmentCount) {
-					if (name === null || name == '*' || qualifiedName.lastSegment == name) {
+					if (name === null || name == ASTERISK || qualifiedName.endsWith(name)) {
 						if (mode === Axis.DESCENDANTS) {
 							return true
 						} else {
@@ -432,6 +448,14 @@ class XpathResolver {
 			].toList
 			return elements
 		}
+	}
+	
+	private def endsWith(QualifiedName parent, QualifiedName child) {
+		val offset = parent.segmentCount - child.segmentCount
+		if(offset >= 0) 
+			return parent.skipFirst(offset) == child
+		else
+			return false
 	}
 	
 	protected def boolean isInstanceNode(IEObjectDescription description) {

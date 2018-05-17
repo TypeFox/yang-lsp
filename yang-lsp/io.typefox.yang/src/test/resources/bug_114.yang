@@ -1,6 +1,6 @@
 module bug_114 {
     prefix bug_114;
-    namespace bug_114
+    namespace bug_114;
     list l1 {
         leaf lf1 {
             type string;

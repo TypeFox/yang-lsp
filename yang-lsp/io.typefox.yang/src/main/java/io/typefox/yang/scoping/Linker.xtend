@@ -13,6 +13,7 @@ import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.resource.EObjectDescription
 import org.eclipse.xtext.resource.IEObjectDescription
+import io.typefox.yang.yang.impl.XpathNameTestImpl
 
 class Linker {
 
@@ -49,7 +50,12 @@ class Linker {
 					lazyURIEncoder.isCrossLinkFragment(element.eResource, uri.fragment)) {
 					val node = lazyURIEncoder.getNode(element, uri.fragment)
 					val symbol = linkingHelper.getCrossRefNodeAsString(node, true)
-					return qualifiedNameConverter.toQualifiedName(symbol)
+					val simpleName = qualifiedNameConverter.toQualifiedName(symbol);
+					if (element instanceof XpathNameTestImpl) {
+						if(element.prefix !== null) 
+							return qualifiedNameConverter.toQualifiedName(element.prefix).append(simpleName)		
+					}
+					return simpleName;
 				} else {
 					// regular proxy let's resolve here
 					element.eGet(reference, true)
