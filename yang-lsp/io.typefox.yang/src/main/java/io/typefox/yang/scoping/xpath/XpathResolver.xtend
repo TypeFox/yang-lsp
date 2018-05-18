@@ -6,7 +6,6 @@ import io.typefox.yang.scoping.Linker
 import io.typefox.yang.scoping.ScopeContext.MapScope
 import io.typefox.yang.scoping.ScopeContextProvider
 import io.typefox.yang.scoping.Validator
-import io.typefox.yang.scoping.xpath.XpathResolver.TypeAdapter
 import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.validation.LinkingErrorMessageProvider
 import io.typefox.yang.yang.AbbrevAttributeStep
@@ -46,6 +45,7 @@ import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.util.internal.EmfAdaptable
 import org.eclipse.xtext.util.internal.Log
+import io.typefox.yang.utils.YangExtensions
 
 @Log
 class XpathResolver {
@@ -53,6 +53,7 @@ class XpathResolver {
 	@Inject Validator validator
 	@Inject Linker linker
 	@Inject ScopeContextProvider scopeContextProvider
+	@Inject extension YangExtensions 
 	
 	static val ASTERISK = QualifiedName.create('*')
 	
@@ -331,20 +332,23 @@ class XpathResolver {
 		}
 		val ref = new AtomicReference<XpathType>() 
 		linker.link(e.node, YangPackage.Literals.XPATH_NAME_TEST__REF) [
-			val type = computeType(contextType, resolveModelPrefix(e), mode, ctx)
+			val type = computeType(contextType, resolveModulePrefix(e), mode, ctx)
 			ref.set(type)
 			return type.EObjectDescription
 		]
 		return ref.get ?: Types.ANY 
 	}
 	
-	private def QualifiedName resolveModelPrefix(QualifiedName linkName, EObject element) {
+	private def QualifiedName resolveModulePrefix(QualifiedName linkName, EObject element) {
 		if (linkName.segmentCount > 1) {
 			val scopeContext = scopeContextProvider.findScopeContext(element)
 			if (scopeContext !== null) {
 				val moduleName = scopeContext.importedModules.get(linkName.firstSegment)?.moduleName
+					?: if (linkName.firstSegment == element?.mainModule?.prefix) {
+						scopeContext.moduleName
+					}
 				if (moduleName !== null)
-					return QualifiedName.create(moduleName).append(linkName.skipFirst(1))					
+					return QualifiedName.create(moduleName).append(linkName.skipFirst(1))	
 			}
 		}
 		return linkName
