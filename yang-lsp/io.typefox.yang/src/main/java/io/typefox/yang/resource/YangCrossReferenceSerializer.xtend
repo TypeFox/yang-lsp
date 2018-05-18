@@ -14,6 +14,8 @@ import io.typefox.yang.yang.AbstractImport
 import io.typefox.yang.utils.YangExtensions
 import com.google.inject.Inject
 import io.typefox.yang.yang.Revision
+import io.typefox.yang.yang.impl.XpathNodeTestImpl
+import io.typefox.yang.yang.impl.XpathNameTestImpl
 
 class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 	
@@ -33,7 +35,13 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 			return '..'
 		if (semanticObject instanceof CurrentRef)
 			return '.'
-		super.getCrossReferenceNameFromScope(semanticObject, crossref, target, scope, errors)
+		val nameFromSuper = super.getCrossReferenceNameFromScope(semanticObject, crossref, target, scope, errors)
+		if (semanticObject instanceof XpathNameTestImpl) {
+			if (nameFromSuper.startsWith(semanticObject.prefix + ':')) {
+				return nameFromSuper.substring(semanticObject.prefix.length + 1)
+			}
+		}
+		return nameFromSuper
 	}
 	
 }
