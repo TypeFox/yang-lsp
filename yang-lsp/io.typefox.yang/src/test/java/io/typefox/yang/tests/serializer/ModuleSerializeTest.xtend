@@ -23,6 +23,7 @@ import java.io.File
 import java.util.Arrays
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EClass
+import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtext.resource.IResourceDescription
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.XtextResourceSet
@@ -55,6 +56,51 @@ public class ModuleSerializeTest {
 		loader = new FileLoader(resourceSet, Arrays.asList(new File("src/test/resources/").absolutePath), manager)
 		tCommon = loadModuleFile("t-common.yang") as Module
 	}
+
+	@Test 
+	def void testSerializeOriginalXPath() {
+		val targetModule = loadModuleFile("xpath-serialize.yang")
+		assertSerialized('''
+			module xpath-serialize {
+				namespace xpath;
+				prefix xs;
+				yang-version 1.1;
+				import yangster-test {
+					prefix ytest;
+				}
+				container cb {
+				    list lb {
+				        leaf lfb {
+				            type leafref {
+				                path /ytest:c1/ytest:l1;
+				            }
+				        }
+				    }
+				}
+			}
+		''', targetModule)
+		EcoreUtil.resolveAll(targetModule)
+		assertSerialized('''
+			module xpath-serialize {
+				namespace xpath;
+				prefix xs;
+				yang-version 1.1;
+				import yangster-test {
+					prefix ytest;
+				}
+				container cb {
+				    list lb {
+				        leaf lfb {
+				            type leafref {
+				                path /ytest:c1/ytest:l1;
+				            }
+				        }
+				    }
+				}
+			}
+		''', targetModule)
+	}
+	
 
 	@Test
 	def void testSerializeDeviationAction() {

@@ -13,7 +13,6 @@ import org.junit.Ignore
 class RenameTest extends AbstractYangLSPTest {
 	
 	@Test
-	@Ignore('FIXME: Empty region returned')
 	def void testRenameInput() {
 		val model = '''
 			module inputaugment {

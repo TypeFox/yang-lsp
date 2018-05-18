@@ -1,0 +1,17 @@
+module xpath-serialize {
+	namespace xpath;
+	prefix xs;
+	yang-version 1.1;
+	import yangster-test {
+		prefix ytest;
+	}
+	container cb {
+	    list lb {
+	        leaf lfb {
+	            type leafref {
+	                path "/ytest:c1/ytest:l1";
+	            }
+	        }
+	    }
+	}
+}
