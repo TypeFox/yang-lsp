@@ -24,6 +24,7 @@ import java.util.Arrays
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.util.EcoreUtil
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.resource.IResourceDescription
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.XtextResourceSet
@@ -37,7 +38,7 @@ import static org.junit.Assert.*
 
 @RunWith(XtextRunner)
 @InjectWith(YangInjectorProvider)
-public class ModuleSerializeTest {
+class ModuleSerializeTest {
 
 	@Inject
 	protected Provider<XtextResourceSet> resourceSetProvider
@@ -72,7 +73,7 @@ public class ModuleSerializeTest {
 				    list lb {
 				        leaf lfb {
 				            type leafref {
-				                path /ytest:c1/ytest:l1;
+				                path "/ytest:c1/ytest:l1";
 				            }
 				        }
 				    }
@@ -92,7 +93,7 @@ public class ModuleSerializeTest {
 				    list lb {
 				        leaf lfb {
 				            type leafref {
-				                path /ytest:c1/ytest:l1;
+				                path "/ytest:c1/ytest:l1";
 				            }
 				        }
 				    }
