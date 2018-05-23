@@ -37,6 +37,8 @@ import org.eclipse.xtext.validation.ResourceValidatorImpl
 import org.eclipse.xtext.workspace.IProjectConfigProvider
 import org.eclipse.xtext.workspace.ProjectConfigProvider
 import org.eclipse.xtext.validation.ConfigurableIssueCodesProvider
+import org.eclipse.xtext.parsetree.reconstr.impl.TokenUtil
+import io.typefox.yang.resource.YangTokenUtil
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
@@ -118,4 +120,7 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 		YangSerializer
 	}
 	
+	def Class<? extends TokenUtil> bindTokenUtil() {
+		YangTokenUtil
+	}
 }

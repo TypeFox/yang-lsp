@@ -11,6 +11,7 @@ import org.eclipse.xtext.nodemodel.ILeafNode
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.serializer.ISerializationContext
 import org.eclipse.xtext.serializer.acceptor.ISequenceAcceptor
+import org.eclipse.xtext.AbstractRule
 
 class YangTextRegionAccessBuilder extends TextRegionAccessBuilder {
     
@@ -19,7 +20,6 @@ class YangTextRegionAccessBuilder extends TextRegionAccessBuilder {
     TextRegionAccessBuildingSequencer fromSequencer
 
     NodeModelBasedRegionAccessBuilder fromNodeModel
-    
 
     override forNodeModel(XtextResource resource) {
         fromNodeModel = new YangNodeModelBasedRegionAccessBuilder(grammarAccess).withResource(resource);
@@ -39,7 +39,16 @@ class YangTextRegionAccessBuilder extends TextRegionAccessBuilder {
     }
 
 	static class YangTextRegionAccessBuildingSequencer extends TextRegionAccessBuildingSequencer {
-	
+
+		override acceptWhitespace(AbstractRule rule, String token, ILeafNode node) {
+			if (token == '"' || token == "'") {
+				acceptSemantic(rule, token)
+				super.acceptWhitespace(rule, '', node)
+			} else {
+				super.acceptWhitespace(rule, token, node)				
+			} 
+		}
+
 		override acceptUnassignedKeyword(Keyword keyword, String token, ILeafNode node) {
 			if (keyword.value == '<<<<' || keyword.value == '>>>>')
 				return;
