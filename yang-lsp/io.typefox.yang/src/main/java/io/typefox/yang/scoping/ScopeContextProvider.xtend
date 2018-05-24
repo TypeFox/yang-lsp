@@ -58,6 +58,9 @@ import org.eclipse.xtext.util.internal.EmfAdaptable
 import static extension org.eclipse.xtext.EcoreUtil2.* 
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
+import io.typefox.yang.utils.YangPathProvider
+import io.typefox.yang.scoping.YangSerializerScopeProvider.NameConvertingScope
+import org.eclipse.xtext.resource.impl.ResourceDescriptionsData
 
 /**
  * Links the imported modules and included submodules, as well as computing the IScopeContext for them. 
@@ -69,6 +72,7 @@ class ScopeContextProvider {
 	@Inject ResourceDescriptionsProvider indexProvider
 	@Inject extension YangExtensions
 	@Inject XpathResolver xpathResolver
+	@Inject YangPathProvider yangPathProvider
 	
 	@EmfAdaptable
 	@Data
@@ -127,7 +131,8 @@ class ScopeContextProvider {
 	
 	private def IScope getModuleScope(Resource resource) {
 		val index = indexProvider.getResourceDescriptions(resource)
-		return new YangModuleScope(IScope.NULLSCOPE, index)
+		val yangPathModuleScope = new YangModuleScope(IScope.NULLSCOPE, new ResourceDescriptionsData(yangPathProvider.getYangPath(resource)))
+		return new YangModuleScope(yangPathModuleScope, index)
 	}
 	
 	private def dispatch Module getBelongingModule(Module module, IScope moduleScope) {
