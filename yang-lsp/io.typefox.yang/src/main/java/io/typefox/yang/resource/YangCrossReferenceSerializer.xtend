@@ -1,21 +1,21 @@
 package io.typefox.yang.resource
 
-import org.eclipse.xtext.serializer.tokens.CrossReferenceSerializer
+import com.google.inject.Inject
+import io.typefox.yang.utils.YangExtensions
+import io.typefox.yang.yang.AbstractImport
+import io.typefox.yang.yang.CurrentRef
+import io.typefox.yang.yang.ParentRef
+import io.typefox.yang.yang.Revision
+import io.typefox.yang.yang.RevisionDate
+import io.typefox.yang.yang.impl.XpathNameTestImpl
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.CrossReference
+import org.eclipse.xtext.nodemodel.INode
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.serializer.diagnostic.ISerializationDiagnostic.Acceptor
-import io.typefox.yang.yang.ParentRef
-import io.typefox.yang.yang.CurrentRef
-import org.eclipse.xtext.nodemodel.INode
-import io.typefox.yang.yang.RevisionDate
+import org.eclipse.xtext.serializer.tokens.CrossReferenceSerializer
+
 import static extension org.eclipse.xtext.EcoreUtil2.*
-import io.typefox.yang.yang.AbstractImport
-import io.typefox.yang.utils.YangExtensions
-import com.google.inject.Inject
-import io.typefox.yang.yang.Revision
-import io.typefox.yang.yang.impl.XpathNodeTestImpl
-import io.typefox.yang.yang.impl.XpathNameTestImpl
 
 class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 	

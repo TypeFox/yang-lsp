@@ -26,13 +26,13 @@ abstract class YangDateUtils {
 	/**
 	 * The thread safe date format for the revision date.
 	 */
-	private static val REVISION_DATE_FORMAT = new DateFormatThreadLocal(REVISION_FORMAT);
+	static val REVISION_DATE_FORMAT = new DateFormatThreadLocal(REVISION_FORMAT);
 
 	/**
 	 * Null-safe revision comparator that does not compare the revisions at all if 
 	 * the dates cannot be interpreted and/or parsed.
 	 */
-	private static val REVISION_DATE_COMPARATOR = new Comparator<Revision> {
+	static val REVISION_DATE_COMPARATOR = new Comparator<Revision> {
 
 		override compare(Revision left, Revision right) {
 			val leftTime = left.timeSafe;

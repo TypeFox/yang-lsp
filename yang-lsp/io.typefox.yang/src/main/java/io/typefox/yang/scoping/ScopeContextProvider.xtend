@@ -4,6 +4,7 @@ import com.google.common.collect.LinkedHashMultimap
 import com.google.inject.Inject
 import io.typefox.yang.scoping.xpath.XpathResolver
 import io.typefox.yang.utils.YangExtensions
+import io.typefox.yang.utils.YangPathProvider
 import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.yang.AbstractImport
 import io.typefox.yang.yang.AbstractModule
@@ -52,15 +53,14 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.EObjectDescription
+import org.eclipse.xtext.resource.impl.ResourceDescriptionsData
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.util.internal.EmfAdaptable
-import static extension org.eclipse.xtext.EcoreUtil2.* 
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
-import io.typefox.yang.utils.YangPathProvider
-import io.typefox.yang.scoping.YangSerializerScopeProvider.NameConvertingScope
-import org.eclipse.xtext.resource.impl.ResourceDescriptionsData
+
+import static extension org.eclipse.xtext.EcoreUtil2.*
 
 /**
  * Links the imported modules and included submodules, as well as computing the IScopeContext for them. 
@@ -399,7 +399,7 @@ class ScopeContextProvider {
 		}
 	}
 	
-	private static val NO_CONFIG_USER_DATA = 'NO_CONFIG'
+	static val NO_CONFIG_USER_DATA = 'NO_CONFIG'
 	
 	private def void addToNodeScope(EObject node, QualifiedName name, IScopeContext ctx, boolean isConfig) {
 		ctx.onComputeNodeScope [
@@ -462,7 +462,7 @@ class ScopeContextProvider {
 			val module = findContainingModule(element)
 			val belongingModule = importedModule.getBelongingModule(ctx.moduleScope)
 			if (belongingModule !== null && belongingModule !== module) {
-				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, '''The imported submodule '«importedModule.name»' belongs to the differet module '«belongingModule.name»'.''', IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)			
+				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, '''The imported submodule '«importedModule.name»' belongs to the different module '«belongingModule.name»'.''', IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)			
 			} else {	
 				ctx.moduleBelongingSubModules.add(getScopeContext(importedModule))
 			}

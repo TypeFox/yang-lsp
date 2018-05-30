@@ -24,7 +24,6 @@ import java.util.Arrays
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.util.EcoreUtil
-import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.resource.IResourceDescription
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.XtextResourceSet
@@ -48,8 +47,8 @@ class ModuleSerializeTest {
 	
 	protected var XtextResourceSet resourceSet;
 
-	private var FileLoader loader
-	private var Module tCommon;
+	var FileLoader loader
+	var Module tCommon;
 
 	@Before
 	def void beforeTest() {

@@ -10,6 +10,7 @@ import io.typefox.yang.formatting2.YangTextRegionAccessBuilder
 import io.typefox.yang.resource.YangCrossReferenceSerializer
 import io.typefox.yang.resource.YangResource
 import io.typefox.yang.resource.YangSerializer
+import io.typefox.yang.resource.YangTokenUtil
 import io.typefox.yang.scoping.QualifiedNameConverter
 import io.typefox.yang.scoping.ResourceDescriptionStrategy
 import io.typefox.yang.scoping.YangResourceDescriptionManager
@@ -25,6 +26,7 @@ import org.eclipse.xtext.formatting2.FormatterRequest
 import org.eclipse.xtext.formatting2.regionaccess.TextRegionAccessBuilder
 import org.eclipse.xtext.linking.impl.LinkingDiagnosticMessageProvider
 import org.eclipse.xtext.naming.IQualifiedNameConverter
+import org.eclipse.xtext.parsetree.reconstr.impl.TokenUtil
 import org.eclipse.xtext.preferences.IPreferenceValuesProvider
 import org.eclipse.xtext.resource.IDefaultResourceDescriptionStrategy
 import org.eclipse.xtext.resource.impl.DefaultResourceDescriptionManager
@@ -32,13 +34,11 @@ import org.eclipse.xtext.scoping.IScopeProvider
 import org.eclipse.xtext.serializer.tokens.CrossReferenceSerializer
 import org.eclipse.xtext.serializer.tokens.SerializerScopeProviderBinding
 import org.eclipse.xtext.util.ExceptionAcceptor
+import org.eclipse.xtext.validation.ConfigurableIssueCodesProvider
 import org.eclipse.xtext.validation.IssueSeveritiesProvider
 import org.eclipse.xtext.validation.ResourceValidatorImpl
 import org.eclipse.xtext.workspace.IProjectConfigProvider
 import org.eclipse.xtext.workspace.ProjectConfigProvider
-import org.eclipse.xtext.validation.ConfigurableIssueCodesProvider
-import org.eclipse.xtext.parsetree.reconstr.impl.TokenUtil
-import io.typefox.yang.resource.YangTokenUtil
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
@@ -123,4 +123,5 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 	def Class<? extends TokenUtil> bindTokenUtil() {
 		YangTokenUtil
 	}
+	
 }
