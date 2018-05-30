@@ -14,6 +14,7 @@ import io.typefox.sprotty.server.json.ActionTypeAdapter
 import io.typefox.yang.YangRuntimeModule
 import io.typefox.yang.ide.YangIdeModule
 import io.typefox.yang.ide.YangIdeSetup
+import io.typefox.yang.ide.server.YangProjectManager
 import java.util.concurrent.Executors
 import java.util.function.Consumer
 import java.util.function.Function
@@ -32,6 +33,7 @@ import org.eclipse.lsp4j.services.LanguageClient
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.ide.server.LanguageServerImpl
 import org.eclipse.xtext.ide.server.LaunchArgs
+import org.eclipse.xtext.ide.server.ProjectManager
 import org.eclipse.xtext.ide.server.ServerLauncher
 import org.eclipse.xtext.ide.server.ServerModule
 import org.eclipse.xtext.resource.IResourceServiceProvider
@@ -55,6 +57,7 @@ class YangServerLauncher extends ServerLauncher {
 		launch(ServerLauncher.name, args, Modules2.mixin(new ServerModule, [
 			bind(ServerLauncher).to(YangServerLauncher)
 			bind(IResourceServiceProvider.Registry).toProvider(IResourceServiceProvider.Registry.RegistryProvider)
+			bind(ProjectManager).to(YangProjectManager)
 		]))
 	}
 
