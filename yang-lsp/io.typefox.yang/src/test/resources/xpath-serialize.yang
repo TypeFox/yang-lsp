@@ -12,6 +12,11 @@ module xpath-serialize {
 	                path "/ytest:c1/ytest:l1";
 	            }
 	        }
+	        leaf lfb2 { 
+	        	type leafref { 
+	        		path "/ytest:c1" + "/ytest:l1";
+	        	}
+	        }
 	    }
 	}
 }
