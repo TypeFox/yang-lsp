@@ -30,7 +30,7 @@ class JsonFileBasedPreferenceValues extends MapBasedPreferenceValues {
 	 * reloads the preferences from disk if the file has changed.
 	 * @return whether
 	 */
-	public def boolean checkIsUpToDate() {
+	def boolean checkIsUpToDate() {
 		var result = true
 		val d = this.delegate
 		if (d instanceof JsonFileBasedPreferenceValues) {
@@ -45,7 +45,7 @@ class JsonFileBasedPreferenceValues extends MapBasedPreferenceValues {
 			}
 		} catch (Exception e) {
 			if (!(e instanceof NoSuchFileException)) {
-				LOG.error("Error reading settings '"+path+"' : "+e.message)
+				LOG.error("Error reading settings '" + path + "' : " + e.message)
 			} else {
 				lastModification = null
 			}
