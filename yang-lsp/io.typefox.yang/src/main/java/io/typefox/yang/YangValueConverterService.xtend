@@ -9,19 +9,19 @@ import org.eclipse.xtext.conversion.impl.AbstractDeclarativeValueConverterServic
 import org.eclipse.xtext.nodemodel.INode
 
 import static extension io.typefox.yang.utils.YangStringUtils.*
+import org.eclipse.xtend.lib.annotations.Accessors
 
 class YangValueConverterService extends AbstractDeclarativeValueConverterService {
 	
-	@Inject
-	private StringConverter stringValueConverter;
+	@Inject StringConverter stringValueConverter;
 	
-	@ValueConverter(rule = "io.typefox.yang.Yang.StringValue")
-	public def IValueConverter<String> StringValue() {
+	@ValueConverter(rule="io.typefox.yang.Yang.StringValue")
+	def IValueConverter<String> StringValue() {
 		return stringValueConverter;
 	}
 	
-	@ValueConverter(rule = "StringValue")
-	public def IValueConverter<String> StringValue2() {
+	@ValueConverter(rule="StringValue")
+	def IValueConverter<String> StringValue2() {
 		return stringValueConverter;
 	}
 	
@@ -53,24 +53,18 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 			return result.toString
 		}
 		
-		AbstractRule rule
-		
-		override setRule(AbstractRule rule) throws IllegalArgumentException {
-			this.rule = rule
-		}
-		
+		@Accessors AbstractRule rule
 	}	
 	
-	@Inject
-	private NumberConverter numberValueConverter;
+	@Inject NumberConverter numberValueConverter;
 	
-	@ValueConverter(rule = "io.typefox.yang.Yang.NUMBER")
-	public def IValueConverter<String> NUMBERValue() {
+	@ValueConverter(rule="io.typefox.yang.Yang.NUMBER")
+	def IValueConverter<String> NUMBERValue() {
 		return numberValueConverter;
 	}
 	
-	@ValueConverter(rule = "NUMBER")
-	public def IValueConverter<String> NUMBERValue2() {
+	@ValueConverter(rule="NUMBER")
+	def IValueConverter<String> NUMBERValue2() {
 		return numberValueConverter;
 	}
 	
@@ -89,24 +83,18 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 			return string
 		}
 		
-		AbstractRule rule
-		
-		override setRule(AbstractRule rule) throws IllegalArgumentException {
-			this.rule = rule
-		}
-		
+		@Accessors AbstractRule rule
 	}
 	
-	@Inject
-	private SimpleStringConverter simpleStringConverter;
+	@Inject SimpleStringConverter simpleStringConverter;
 	
-	@ValueConverter(rule = "io.typefox.yang.Yang.STRING")
-	public def IValueConverter<String> STRINGValue() {
+	@ValueConverter(rule="io.typefox.yang.Yang.STRING")
+	def IValueConverter<String> STRINGValue() {
 		return simpleStringConverter;
 	}
 	
-	@ValueConverter(rule = "STRING")
-	public def IValueConverter<String> STRINGValue2() {
+	@ValueConverter(rule="STRING")
+	def IValueConverter<String> STRINGValue2() {
 		return simpleStringConverter;
 	}
 	
@@ -120,11 +108,6 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 			return string
 		}
 		
-		AbstractRule rule
-		
-		override setRule(AbstractRule rule) throws IllegalArgumentException {
-			this.rule = rule
-		}
-		
+		@Accessors AbstractRule rule
 	}
 }

@@ -28,9 +28,11 @@ import io.typefox.yang.yang.Feature
 import io.typefox.yang.yang.FractionDigits
 import io.typefox.yang.yang.Grouping
 import io.typefox.yang.yang.Identity
+import io.typefox.yang.yang.IfFeature
 import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Include
 import io.typefox.yang.yang.Input
+import io.typefox.yang.yang.Key
 import io.typefox.yang.yang.Leaf
 import io.typefox.yang.yang.LeafList
 import io.typefox.yang.yang.Length
@@ -65,10 +67,12 @@ import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.Unique
 import io.typefox.yang.yang.Units
+import io.typefox.yang.yang.Unknown
 import io.typefox.yang.yang.Uses
 import io.typefox.yang.yang.Value
 import io.typefox.yang.yang.When
 import io.typefox.yang.yang.XpathExpression
+import io.typefox.yang.yang.XpathLocation
 import io.typefox.yang.yang.YangVersion
 import io.typefox.yang.yang.YinElement
 import java.util.List
@@ -82,6 +86,7 @@ import org.eclipse.xtext.formatting2.FormatterRequest
 import org.eclipse.xtext.formatting2.IFormattableDocument
 import org.eclipse.xtext.formatting2.ITextReplacer
 import org.eclipse.xtext.formatting2.ITextReplacerContext
+import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
 import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
 import org.eclipse.xtext.formatting2.regionaccess.internal.NodeSemanticRegion
 import org.eclipse.xtext.nodemodel.ILeafNode
@@ -92,16 +97,6 @@ import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import static io.typefox.yang.formatting2.MultilineStringReplacer.Line.PartType.*
 
 import static extension com.google.common.base.Strings.*
-import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
-import io.typefox.yang.yang.Key
-import io.typefox.yang.yang.IfFeature
-import io.typefox.yang.yang.Unknown
-import org.eclipse.xtext.formatting2.regionaccess.internal.TextRegions
-import org.eclipse.xtext.formatting2.regionaccess.ITextReplacement
-import com.google.common.collect.Lists
-import org.eclipse.xtext.formatting2.regionaccess.IHiddenRegion
-import org.eclipse.xtext.formatting2.regionaccess.IHiddenRegionPart
-import io.typefox.yang.yang.XpathLocation
 
 class YangFormatter extends AbstractFormatter2 {
     

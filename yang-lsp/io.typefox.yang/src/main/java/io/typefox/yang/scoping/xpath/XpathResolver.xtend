@@ -67,7 +67,8 @@ class XpathResolver {
 		XpathType type
 	}
 	
-	public def XpathType getType(XpathExpression expr) {
+
+	def XpathType getType(XpathExpression expr) {
 		return TypeAdapter.findInEmfObject(expr)?.type
 	}
 	
@@ -394,7 +395,7 @@ class XpathResolver {
 		}
 	}
 	
-	public def List<IEObjectDescription> findNodes(QualifiedName prefix, QualifiedName name, Axis mode, MapScope nodeScope) {
+	def List<IEObjectDescription> findNodes(QualifiedName prefix, QualifiedName name, Axis mode, MapScope nodeScope) {
 		if (mode === Axis.SIBLINGS) {
 			return findNodes(prefix.skipLast, name, Axis.CHILDREN, nodeScope)
 		} else if (mode === Axis.DESCENDANTS_OR_SELF) {

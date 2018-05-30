@@ -16,8 +16,6 @@ import org.eclipse.xtext.resource.IResourceDescription
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.util.internal.Log
 
-import static extension org.eclipse.emf.ecore.util.EcoreUtil.*
-
 @Log
 @Singleton
 class YangPathProvider {

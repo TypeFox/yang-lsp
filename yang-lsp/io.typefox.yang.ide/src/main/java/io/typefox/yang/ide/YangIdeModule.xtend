@@ -13,6 +13,8 @@ import io.typefox.yang.ide.completion.YangCrossrefProposalProvider
 import io.typefox.yang.ide.contentassist.antlr.lexer.InternalYangLexer
 import io.typefox.yang.ide.contentassist.antlr.lexer.jflex.JFlexBasedInternalYangLexer
 import io.typefox.yang.ide.extensions.CommandService
+import io.typefox.yang.ide.formatting.YangFormattingService
+import io.typefox.yang.ide.rename.YangRenameStrategy
 import io.typefox.yang.ide.symbols.YangDocumentSymbolService
 import java.util.List
 import org.eclipse.lsp4j.CodeLens
@@ -20,19 +22,17 @@ import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalAcceptor
 import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalCreator
 import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider
 import org.eclipse.xtext.ide.editor.contentassist.IdeCrossrefProposalProvider
+import org.eclipse.xtext.ide.refactoring.IRenameStrategy2
 import org.eclipse.xtext.ide.server.Document
 import org.eclipse.xtext.ide.server.codeActions.ICodeActionService
 import org.eclipse.xtext.ide.server.codelens.ICodeLensResolver
 import org.eclipse.xtext.ide.server.codelens.ICodeLensService
 import org.eclipse.xtext.ide.server.commands.IExecutableCommandService
 import org.eclipse.xtext.ide.server.contentassist.ContentAssistService
+import org.eclipse.xtext.ide.server.formatting.FormattingService
 import org.eclipse.xtext.ide.server.symbol.DocumentSymbolService
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
-import org.eclipse.xtext.ide.refactoring.IRenameStrategy2
-import io.typefox.yang.ide.rename.YangRenameStrategy
-import org.eclipse.xtext.ide.server.formatting.FormattingService
-import io.typefox.yang.ide.formatting.YangFormattingService
 
 /**
  * Use this class to register ide components.

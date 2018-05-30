@@ -42,7 +42,7 @@ class YangScopeProvider implements IScopeProvider {
 		return ctx.schemaNodeScope
 	}
 	
-	public def IScopeContext findScopeInAdapters(EObject object, EReference reference) {
+	def IScopeContext findScopeInAdapters(EObject object, EReference reference) {
 		return provider.findScopeContext(object)
 	}
 	

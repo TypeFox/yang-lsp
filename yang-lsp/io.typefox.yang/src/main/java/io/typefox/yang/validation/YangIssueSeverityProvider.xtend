@@ -12,8 +12,8 @@ import org.eclipse.xtext.validation.SeverityConverter
 
 @Log class YangIssueSeverityProvider extends IssueSeveritiesProvider {
 
-	@Inject private ConfigurableIssueCodesProvider issueCodesProvider;
-	@Inject private SeverityConverter severityConverter;
+	@Inject ConfigurableIssueCodesProvider issueCodesProvider
+	@Inject SeverityConverter severityConverter
 
 	override getIssueSeverities(Resource context) {
 		val preferenceValues = getValuesProvider().getPreferenceValues(context);
