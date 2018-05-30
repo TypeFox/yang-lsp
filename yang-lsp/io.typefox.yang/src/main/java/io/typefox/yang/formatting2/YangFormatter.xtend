@@ -96,6 +96,12 @@ import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
 import io.typefox.yang.yang.Key
 import io.typefox.yang.yang.IfFeature
 import io.typefox.yang.yang.Unknown
+import org.eclipse.xtext.formatting2.regionaccess.internal.TextRegions
+import org.eclipse.xtext.formatting2.regionaccess.ITextReplacement
+import com.google.common.collect.Lists
+import org.eclipse.xtext.formatting2.regionaccess.IHiddenRegion
+import org.eclipse.xtext.formatting2.regionaccess.IHiddenRegionPart
+import io.typefox.yang.yang.XpathLocation
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -527,7 +533,9 @@ class YangFormatter extends AbstractFormatter2 {
         }
         val nodeRegions = id.allSemanticRegions.toList
         nodeRegions.head.prepend[oneSpace]
-        nodeRegions.tail.forEach[prepend[noSpace]]
+        nodeRegions
+        	.tail
+        	.forEach[prepend[noSpace]]
         val nextSemanticRegion = nodeRegions.last.nextSemanticRegion
         if (HIDDENRule == nextSemanticRegion.grammarElement) {
             nextSemanticRegion.prepend[noSpace].append[oneSpace]
@@ -539,6 +547,10 @@ class YangFormatter extends AbstractFormatter2 {
     protected def formatXpath(extension IFormattableDocument document, XpathExpression expression) {
         val nodeRegions = expression.allSemanticRegions.toList
         nodeRegions.head.prepend[oneSpace]
+        nodeRegions
+        	.tail
+        	.filter[grammarElement == HIDDENRule && semanticElement instanceof XpathLocation]
+        	.forEach[prepend[noSpace]]
         val nextSemanticRegion = nodeRegions.last.nextSemanticRegion
         if (HIDDENRule == nextSemanticRegion.grammarElement) {
             nextSemanticRegion.prepend[noSpace].append[oneSpace]

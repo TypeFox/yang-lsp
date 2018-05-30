@@ -12,6 +12,7 @@ import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.serializer.ISerializationContext
 import org.eclipse.xtext.serializer.acceptor.ISequenceAcceptor
 import org.eclipse.xtext.AbstractRule
+import io.typefox.yang.resource.YangTokenUtil
 
 class YangTextRegionAccessBuilder extends TextRegionAccessBuilder {
     
@@ -41,7 +42,7 @@ class YangTextRegionAccessBuilder extends TextRegionAccessBuilder {
 	static class YangTextRegionAccessBuildingSequencer extends TextRegionAccessBuildingSequencer {
 
 		override acceptWhitespace(AbstractRule rule, String token, ILeafNode node) {
-			if (token == '"' || token == "'") {
+			if (YangTokenUtil.HIDDEN_QUOTES_PATTERN.matcher(token).matches) {
 				acceptSemantic(rule, token)
 				super.acceptWhitespace(rule, '', node)
 			} else {
