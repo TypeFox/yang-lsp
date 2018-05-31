@@ -80,6 +80,16 @@ class ModuleSerializeTest {
 				        		path "/ytest:c1" + "/ytest:l1";
 				        	}
 				        }
+				        leaf lfb3 { 
+				        	type leafref { 
+				        		path "/ytest:c1/" + "ytest:l1";
+				        	}
+				        }
+				        leaf lfb4 { 
+				        	type leafref { 
+				        		path "/ytest:" + "c1/ytest" + ":l1";
+				        	}
+				        }
 				    }
 				}
 			}
@@ -103,6 +113,16 @@ class ModuleSerializeTest {
 				        leaf lfb2 { 
 				        	type leafref { 
 				        		path "/ytest:c1" + "/ytest:l1";
+				        	}
+				        }
+				        leaf lfb3 { 
+				        	type leafref { 
+				        		path "/ytest:c1/" + "ytest:l1";
+				        	}
+				        }
+				        leaf lfb4 { 
+				        	type leafref { 
+				        		path "/ytest:" + "c1/ytest" + ":l1";
 				        	}
 				        }
 				    }
