@@ -6,6 +6,7 @@ A setting file has the name `yang.settings` and can be located
  - in the user's directory under `~/.yang/yang.settings`.
  
 The file syntax is a JSON.
+
 ## Disable Code Lens
 
 If you don't want to see the code lenses you can turn it of with the following property:
@@ -15,6 +16,30 @@ If you don't want to see the code lenses you can turn it of with the following p
   "code-lens-enabled" : "off"
 }
 ```
+
+## Excluded Paths
+
+Many IDEs and tools copy YANG files into another folder within the same project. As the YANG LSP treats all files within a project the same, this usually infers issues about duplicate elements. To avoid that, you can exclude several directories in the project setting `excludePaths`, e.g.
+
+```json
+{
+   "excludePaths": "build:bin"
+}
+```
+
+exludes the default output folder of Maven/Gradle and Eclipse JDT. The path elements are project relative directory names. You can specify multiple elements separated with a colon. The file separator is always `/` independent from the OS.
+
+## YANG Libraries
+
+Often you don't specify a self contained set of YANG models but rely on existing standard libs instead, e.g. from the IETF. Thes don't necessarily reside in your workspace. To specify such libraries, use `yangPath`
+
+```json
+{
+  "yangPath": "/my/home/yang/libs/rift.zip"
+}
+```
+
+You can specify individual files, directories (contents will be added recursively) or ZIP files. The file name format is OS specific, and so is the path separator (`;` on Windows, `:` elsewhere).
 
 ## Extensions
 
