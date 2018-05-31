@@ -97,6 +97,7 @@ import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import static io.typefox.yang.formatting2.MultilineStringReplacer.Line.PartType.*
 
 import static extension com.google.common.base.Strings.*
+import io.typefox.yang.yang.XpathNameTest
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -544,7 +545,7 @@ class YangFormatter extends AbstractFormatter2 {
         nodeRegions.head.prepend[oneSpace]
         nodeRegions
         	.tail
-        	.filter[grammarElement == HIDDENRule && semanticElement instanceof XpathLocation]
+        	.filter[grammarElement == HIDDENRule && (semanticElement instanceof XpathLocation || semanticElement instanceof XpathNameTest)]
         	.forEach[prepend[noSpace]]
         val nextSemanticRegion = nodeRegions.last.nextSemanticRegion
         if (HIDDENRule == nextSemanticRegion.grammarElement) {
