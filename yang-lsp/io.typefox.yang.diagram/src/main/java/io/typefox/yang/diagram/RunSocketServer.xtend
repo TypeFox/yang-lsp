@@ -28,6 +28,8 @@ import org.eclipse.xtext.ide.server.LanguageServerImpl
 import org.eclipse.xtext.ide.server.ServerModule
 import org.eclipse.xtext.resource.IResourceServiceProvider
 import org.eclipse.xtext.util.Modules2
+import org.eclipse.xtext.ide.server.ProjectManager
+import io.typefox.yang.ide.server.YangProjectManager
 
 class RunSocketServer {
 	
@@ -47,6 +49,7 @@ class RunSocketServer {
 		
 		val injector = Guice.createInjector(Modules2.mixin(new ServerModule, [
 			bind(IResourceServiceProvider.Registry).toProvider(IResourceServiceProvider.Registry.RegistryProvider)
+			bind(ProjectManager).to(YangProjectManager)
 		]))
 		val serverSocket = AsynchronousServerSocketChannel.open.bind(new InetSocketAddress("localhost", 5007))
 		val threadPool = Executors.newCachedThreadPool()

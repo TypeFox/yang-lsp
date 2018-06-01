@@ -240,7 +240,7 @@ class YangValidator extends AbstractYangValidator {
 			enums.forEach [
 				val message = if (name.length === 0) {
 						'''The name must not be zero-length.'''
-					} else if (name != WHITESPACE.or(BREAKING_WHITESPACE).trimFrom(name)) {
+					} else if (name != whitespace.or(breakingWhitespace).trimFrom(name)) {
 						'''The name must not have any leading or trailing whitespace characters.'''
 					} else {
 						null;

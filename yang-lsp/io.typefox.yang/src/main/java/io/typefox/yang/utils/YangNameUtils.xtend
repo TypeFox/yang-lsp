@@ -69,7 +69,7 @@ abstract class YangNameUtils {
 	 * hyphen. Trailing and leading whitespace characters will not be replaces but just trimmed. 
 	 */	
 	static def String escapeModuleName(String it) {
-		return WHITESPACE.or(BREAKING_WHITESPACE).or(INVISIBLE).trimAndCollapseFrom(trim, '-');
+		return whitespace.or(breakingWhitespace).or(invisible).trimAndCollapseFrom(trim, '-');
 	}
 
 	private new() {

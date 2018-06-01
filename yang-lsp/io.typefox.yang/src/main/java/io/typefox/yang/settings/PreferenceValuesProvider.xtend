@@ -29,14 +29,15 @@ class PreferenceValuesProvider implements IPreferenceValuesProvider {
 		if (context === null) {
 			return new MapBasedPreferenceValues(emptyMap) 
 		}
-		val valuesByLanguage = PreferenceValuesByLanguage.findInEmfObject(context.getResourceSet()) 
+		val valuesByLanguage = PreferenceValuesByLanguage.findInEmfObject(context.resourceSet) 
 			?: (new PreferenceValuesByLanguage() => [
 				attachToEmfObject(context.resourceSet)	
 			])
-		 
+		
 		var values = valuesByLanguage.get(language.getLanguageName()) ?:
-					 createPreferenceValues(context)
+					 createPreferenceValues(configProvider?.getProjectConfig(context.resourceSet)?.path)
 		valuesByLanguage.put(language.languageName, values)
+
 		if (values instanceof JsonFileBasedPreferenceValues) {
 			if (!values.checkIsUpToDate) {
 				for (listener : onChangeListeners) {
@@ -46,36 +47,30 @@ class PreferenceValuesProvider implements IPreferenceValuesProvider {
 		} 
 		return values 
 	}
-	
-	protected def IPreferenceValues createPreferenceValues(Resource resource) {
+
+	static def IPreferenceValues createPreferenceValues(org.eclipse.emf.common.util.URI projectURI) {
 		var result = new MapBasedPreferenceValues(constantSettings)
 		val userHome = Paths.get(StandardSystemProperty.USER_HOME.value)
 		val userSettings = userHome.resolve(".yang").resolve("yang.settings")
 		result = new JsonFileBasedPreferenceValues(userSettings, result)
-		if (configProvider === null) {
+		if (projectURI === null) {
 			return result
 		}
-		val config = configProvider.getProjectConfig(resource.resourceSet)
-		if (config === null) {
-			return result
-		}
-		if (config.path !== null) {
-			val segmentsToRemove = if (config.path.lastSegment.isEmpty) 1 else 0
-			
-			// add workspace settings
-			val workspaceDirectory = new URI(config.path.trimSegments(segmentsToRemove + 1).toString)
-			val workspaceSettings = Paths.get(workspaceDirectory).resolve("yang.settings")
-			result = new JsonFileBasedPreferenceValues(workspaceSettings, result)
-			
-			// add project settings
-			val projectDirectory = new URI(config.path.trimSegments(segmentsToRemove).toString)
-			val projectSettings = Paths.get(projectDirectory).resolve("yang.settings")
-			result = new JsonFileBasedPreferenceValues(projectSettings, result)
-		}
+		val segmentsToRemove = if (projectURI.lastSegment.isEmpty) 1 else 0
+		
+		// add workspace settings
+		val workspaceDirectory = new URI(projectURI.trimSegments(segmentsToRemove + 1).toString)
+		val workspaceSettings = Paths.get(workspaceDirectory).resolve("yang.settings")
+		result = new JsonFileBasedPreferenceValues(workspaceSettings, result)
+		
+		// add project settings
+		val projectDirectory = new URI(projectURI.trimSegments(segmentsToRemove).toString)
+		val projectSettings = Paths.get(projectDirectory).resolve("yang.settings")
+		result = new JsonFileBasedPreferenceValues(projectSettings, result)
 		return result
 	}
 	
-	static val Map<String,String> constantSettings = newHashMap()
+	public static val Map<String,String> constantSettings = newHashMap()
 	
 	def IDisposable registerChangeListener((IPreferenceValues, Resource)=>void callback) {
 		this.onChangeListeners.add(callback)
