@@ -1,6 +1,9 @@
 package io.typefox.yang.scoping
 
 import com.google.common.collect.Iterables
+import com.google.inject.Provider
+import io.typefox.yang.scoping.ScopeContext.LazyScope
+import io.typefox.yang.scoping.ScopeContext.MapScope
 import java.util.LinkedHashSet
 import java.util.List
 import java.util.Map
@@ -9,17 +12,14 @@ import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtend.lib.annotations.Accessors
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtend.lib.annotations.Delegate
+import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.EObjectDescription
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.resource.impl.AliasedEObjectDescription
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.impl.MapBasedScope
-import io.typefox.yang.scoping.ScopeContext.MapScope
-import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.eclipse.xtext.util.internal.Log
-import com.google.inject.Provider
-import io.typefox.yang.scoping.ScopeContext.LazyScope
 
 interface IScopeContext {
 	
@@ -87,8 +87,13 @@ class LocalNodeScopeContext extends LocalScopeContext {
 	
 	override getSchemaNodeScope() {
 		if (schemaNodeScope === null) {
-			this.schemaNodeScope = new MapScope
-			parent.schemaNodeScope // initialize
+			val lazyParent = new LazyScope[parent.schemaNodeScope]
+			this.schemaNodeScope = new MapScope(lazyParent) {
+				override allowShadowParent() {
+					 true
+				}
+			}
+			lazyParent.scope
 		}
 		return schemaNodeScope
 	}
@@ -252,7 +257,8 @@ class ScopeContext implements IScopeContext {
 		}
 		
 		def boolean tryAddLocal(QualifiedName name, EObject element, Map<String,String> userData) {
-			val existingLocal = this.elements.put(name, new EObjectDescription(name, element, userData))
+			val description = new EObjectDescription(name, element, userData)
+			val existingLocal = this.elements.put(name, description)
 			if (existingLocal !== null) {
 				// put it back if it was existing locally
 				this.elements.put(name, existingLocal)
@@ -260,13 +266,17 @@ class ScopeContext implements IScopeContext {
 			}
 			// now check parents
 			val existing = parent.getSingleElement(name)
-			if (existing !== null) {
+			if (existing !== null && !allowShadowParent) {
 				return false
 			} else {
 				return true
 			}
 		}
 		
+		def boolean allowShadowParent() {
+			return false
+		}
+				
 		def IScope getLocalOnly() {
 			return new MapScope(IScope.NULLSCOPE, elements)
 		}
