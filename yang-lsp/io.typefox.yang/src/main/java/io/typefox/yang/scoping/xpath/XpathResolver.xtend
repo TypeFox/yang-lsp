@@ -3,16 +3,20 @@ package io.typefox.yang.scoping.xpath
 import com.google.inject.Inject
 import io.typefox.yang.scoping.IScopeContext
 import io.typefox.yang.scoping.Linker
+import io.typefox.yang.scoping.LocalScopeContext
 import io.typefox.yang.scoping.ScopeContext.MapScope
 import io.typefox.yang.scoping.ScopeContextProvider
 import io.typefox.yang.scoping.Validator
+import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.validation.LinkingErrorMessageProvider
 import io.typefox.yang.yang.AbbrevAttributeStep
 import io.typefox.yang.yang.AbsolutePath
+import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.Case
 import io.typefox.yang.yang.Choice
 import io.typefox.yang.yang.CurrentRef
+import io.typefox.yang.yang.Grouping
 import io.typefox.yang.yang.Leaf
 import io.typefox.yang.yang.ParentRef
 import io.typefox.yang.yang.Path
@@ -45,7 +49,7 @@ import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.util.internal.EmfAdaptable
 import org.eclipse.xtext.util.internal.Log
-import io.typefox.yang.utils.YangExtensions
+import io.typefox.yang.scoping.ScopeContext
 
 @Log
 class XpathResolver {
@@ -80,10 +84,36 @@ class XpathResolver {
 		return type	
 	}
 	
+	private def boolean isDefinedInGrouping(EObject object) {
+		var c = object.eContainer
+		while ((c !== null) && !(c instanceof AbstractModule)) {
+			if(c instanceof Grouping) return true
+			c = c.eContainer
+		}
+		false
+	}
+
+	private def IScopeContext backtrackTopScopeContext(LocalScopeContext localScopeContext) {
+		val parentScopeContext = localScopeContext.parent
+		if(parentScopeContext instanceof ScopeContext) {
+			parentScopeContext
+		} else if (parentScopeContext instanceof LocalScopeContext) {
+			parentScopeContext.backtrackTopScopeContext
+		}
+		// ???GroupingInliningScopeContext???
+	}
+
 	def XpathType doResolve(XpathExpression expression, QualifiedName contextNode, IScopeContext context) {
 		val element = context.schemaNodeScope.getSingleElement(contextNode)
 		val initialContext = Types.nodeSet(element)
-		internalResolve(expression, initialContext, new Context(context.schemaNodeScope, context.moduleName, initialContext))
+		// if element is defined in a group, context should be consider differently
+		val targetScope = 
+			if (expression.isDefinedInGrouping && context instanceof LocalScopeContext) {
+				(context as LocalScopeContext).backtrackTopScopeContext.schemaNodeScope 
+			} 
+			else 
+				context.schemaNodeScope
+		internalResolve(expression, initialContext, new Context(targetScope, context.moduleName, initialContext))
 	}
 	
 	protected def dispatch XpathType internalResolve(Void e, XpathType contextType, Context ctx) {
