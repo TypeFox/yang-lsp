@@ -56,6 +56,27 @@ class ModuleSerializeTest {
 		loader = new FileLoader(resourceSet, Arrays.asList(new File("src/test/resources/").absolutePath), manager)
 		tCommon = loadModuleFile("t-common.yang") as Module
 	}
+	
+	@Test
+	def void testTestgrp3() {
+		val targetModule = loadModuleFile("testgrp3.yang")
+		assertSerialized('''
+			module testgrp {
+			    namespace "http://netconfcentral.org/ns/testgrp";
+			    prefix "tgrp";
+			    revision 2010-05-27 {
+			        description "Initial revision.";
+			    }
+			    grouping testgrp {
+			      list a {
+			        key g1;
+			        leaf g1 { type string; }
+			        leaf g2 { type string; }
+			      }
+			   }
+			}
+		''', targetModule)
+	}
 
 	@Test 
 	def void testSerializeOriginalXPath() {
