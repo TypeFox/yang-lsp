@@ -377,6 +377,7 @@ class ScopeContextProvider {
 			newIsConfig = this.handleConfig(node, isConfig)
 			newPath = getQualifiedName(node, nodePath, ctx)
 			if (newPath != nodePath 
+				&& !(node instanceof Refine)
 				&& !(node instanceof Grouping)
 				&& !(node instanceof Augment)
 				&& !(node instanceof Deviation)) {
@@ -555,6 +556,13 @@ class ScopeContextProvider {
 			return p
 		}
 		return internalGetQualifiedName(node.reference, p, ctx)
+	}
+	
+	private def dispatch QualifiedName getQualifiedName(Refine node, QualifiedName p, IScopeContext ctx) {
+		if (node.node === null) {
+			return p
+		}
+		return internalGetQualifiedName(node.node, p, ctx)
 	}
 	
 	private def QualifiedName internalGetQualifiedName(SchemaNodeIdentifier identifier, QualifiedName p, IScopeContext ctx) {
