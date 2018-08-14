@@ -7,7 +7,6 @@ import io.typefox.jflex.*
 var rootPath = ".."
 
 Workflow {
-	
 	component = XtextGenerator {
 		configuration = {
 			project = StandardProjectConfig {
@@ -32,21 +31,24 @@ Workflow {
 			fileExtensions = "yang"
 
 			serializer = {
-                generateStub = false
-            }
-            parserGenerator = {
-                combinedGrammar = false
-                debugGrammar = true
-            }
-            fragment = JFlexFragment {
-            		fullFlexFile = "./src/main/java/io/typefox/yang/parser/antlr/lexer/jflex/YangFlexer.flex"
-            }
-            generator = {
-                generateStub = false
-            }
-            formatter = {
-                generateStub = true
-            }
+				generateStub = false
+			}
+			parserGenerator = {
+				combinedGrammar = false
+				debugGrammar = true
+			}
+			fragment = JFlexFragment {
+				fullFlexFile = "./src/main/java/io/typefox/yang/parser/antlr/lexer/jflex/YangFlexer.flex"
+			}
+			generator = {
+				generateStub = false
+			}
+			formatter = {
+				generateStub = true
+			}
+			validator = {
+				generateDeprecationValidation = true
+			}
 		}
 	}
 }
