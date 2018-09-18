@@ -10,6 +10,7 @@ import org.eclipse.xtext.ide.server.Document
 import org.eclipse.xtext.ide.server.codeActions.ICodeActionService
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
+import org.eclipse.lsp4j.jsonrpc.messages.Either
 
 class CodeActionService implements ICodeActionService {
 	
@@ -25,7 +26,7 @@ class CodeActionService implements ICodeActionService {
 				])			
 			}
 		}
-		return result
+		return result.map[Either.forLeft(it)]
 	}
 	
 	private def Command createFix(String title, URI uri, TextEdit... edits) {

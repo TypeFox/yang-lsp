@@ -334,7 +334,10 @@ class YangTypesExtensions {
 				refinements.push(refinement);
 			}
 			val parentRange = refinements.peek;
-			refinements.add(YangRefinable.create(currentType.refinement, parentRange));
+			val candidate = currentType.refinement;
+			if (candidate !== null) {
+				refinements.add(YangRefinable.create(candidate, parentRange));
+			}
 		}
 
 		return refinements.pop;

@@ -17,7 +17,7 @@ class CodeActionTest extends AbstractYangLSPTest {
 		testCodeAction [
 			model = doc.contents
 			assertCodeActions = [
-				val we = head.arguments.head as WorkspaceEdit
+				val we = head.getLeft.arguments.head as WorkspaceEdit
 				Assert.assertEquals('''
 					module foo {
 						yang-version 1.1;
@@ -36,7 +36,7 @@ class CodeActionTest extends AbstractYangLSPTest {
 		testCodeAction [
 			model = doc.contents
 			assertCodeActions = [
-				val we = head.arguments.head as WorkspaceEdit
+				val we = head.getLeft.arguments.head as WorkspaceEdit
 				Assert.assertEquals('''
 					module foo {
 						yang-version 1.1;

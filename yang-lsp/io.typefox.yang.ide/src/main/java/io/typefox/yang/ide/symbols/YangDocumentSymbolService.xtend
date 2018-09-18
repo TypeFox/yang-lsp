@@ -1,15 +1,18 @@
 package io.typefox.yang.ide.symbols
 
 import com.google.inject.Inject
+import io.typefox.yang.utils.YangNameUtils
 import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Case
 import io.typefox.yang.yang.Choice
+import io.typefox.yang.yang.Container
 import io.typefox.yang.yang.Extension
 import io.typefox.yang.yang.Feature
 import io.typefox.yang.yang.Grouping
 import io.typefox.yang.yang.Identity
 import io.typefox.yang.yang.Input
+import io.typefox.yang.yang.Leaf
 import io.typefox.yang.yang.LeafList
 import io.typefox.yang.yang.List
 import io.typefox.yang.yang.Notification
@@ -22,6 +25,7 @@ import java.util.ArrayList
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.lsp4j.SymbolInformation
 import org.eclipse.lsp4j.SymbolKind
+import org.eclipse.lsp4j.jsonrpc.messages.Either
 import org.eclipse.xtext.findReferences.IReferenceFinder.IResourceAccess
 import org.eclipse.xtext.ide.server.DocumentExtensions
 import org.eclipse.xtext.ide.server.symbol.DocumentSymbolService
@@ -31,9 +35,6 @@ import org.eclipse.xtext.resource.ILocationInFileProvider
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.util.TextRegion
-import io.typefox.yang.utils.YangNameUtils
-import io.typefox.yang.yang.Container
-import io.typefox.yang.yang.Leaf
 
 class YangDocumentSymbolService extends DocumentSymbolService {
 	
@@ -55,11 +56,10 @@ class YangDocumentSymbolService extends DocumentSymbolService {
 	override getSymbols(XtextResource resource, CancelIndicator cancelIndicator) {
 		val result = newArrayList
 		val module = resource.contents.head
-		if (!(module instanceof AbstractModule)) {
-			return result
+		if (module instanceof AbstractModule) {
+			collectSymbols(module, null, result, cancelIndicator)
 		}
-		collectSymbols(module as AbstractModule, null, result, cancelIndicator)
-		return result
+		return result.map[Either.forLeft(it)]
 	}
 	
 	def getKind(SchemaNode node) {

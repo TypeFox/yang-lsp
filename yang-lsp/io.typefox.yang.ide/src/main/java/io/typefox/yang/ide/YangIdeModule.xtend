@@ -12,6 +12,7 @@ import io.typefox.yang.ide.completion.YangContentProposalProvider
 import io.typefox.yang.ide.completion.YangCrossrefProposalProvider
 import io.typefox.yang.ide.contentassist.antlr.lexer.InternalYangLexer
 import io.typefox.yang.ide.contentassist.antlr.lexer.jflex.JFlexBasedInternalYangLexer
+import io.typefox.yang.ide.editor.syntaxcoloring.YangSemanticHighlightingCalculator
 import io.typefox.yang.ide.extensions.CommandService
 import io.typefox.yang.ide.formatting.YangFormattingService
 import io.typefox.yang.ide.rename.YangRenameStrategy
@@ -22,6 +23,7 @@ import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalAcceptor
 import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalCreator
 import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalProvider
 import org.eclipse.xtext.ide.editor.contentassist.IdeCrossrefProposalProvider
+import org.eclipse.xtext.ide.editor.syntaxcoloring.ISemanticHighlightingCalculator
 import org.eclipse.xtext.ide.refactoring.IRenameStrategy2
 import org.eclipse.xtext.ide.server.Document
 import org.eclipse.xtext.ide.server.codeActions.ICodeActionService
@@ -30,6 +32,7 @@ import org.eclipse.xtext.ide.server.codelens.ICodeLensService
 import org.eclipse.xtext.ide.server.commands.IExecutableCommandService
 import org.eclipse.xtext.ide.server.contentassist.ContentAssistService
 import org.eclipse.xtext.ide.server.formatting.FormattingService
+import org.eclipse.xtext.ide.server.semanticHighlight.ISemanticHighlightingStyleToTokenMapper
 import org.eclipse.xtext.ide.server.symbol.DocumentSymbolService
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
@@ -78,15 +81,15 @@ class YangIdeModule extends AbstractYangIdeModule {
 	def Class<? extends ICodeActionService> bindICodeActionService() {
 		return CodeActionService;
 	}
-	
+
 	def Class<? extends IExecutableCommandService> bindIExecutableCommandService() {
 		return CommandService
 	}
-	
+
 	override Class<? extends IRenameStrategy2> bindIRenameStrategy2() {
 		return YangRenameStrategy
 	}
-	
+
 	static class NoOpCodeLensResolver implements ICodeLensResolver {
 
 		override resolveCodeLens(Document document, XtextResource resource, CodeLens codeLens,
@@ -99,8 +102,17 @@ class YangIdeModule extends AbstractYangIdeModule {
 		}
 
 	}
-	
+
 	def Class<? extends FormattingService> bindFormattingService() {
 		YangFormattingService
 	}
+
+	def Class<? extends ISemanticHighlightingCalculator> bindISemanticHighlightingCalculator() {
+		return YangSemanticHighlightingCalculator;
+	}
+
+	def Class<? extends ISemanticHighlightingStyleToTokenMapper> bindISemanticHighlightingStyleToTokenMapper() {
+		return YangSemanticHighlightingCalculator;
+	}
+
 }
