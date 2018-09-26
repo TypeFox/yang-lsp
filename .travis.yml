@@ -1,3 +1,5 @@
+# https://github.com/travis-ci/travis-ci/issues/10055
+sudo: true
 language: java
 
 jdk:
