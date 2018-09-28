@@ -73,6 +73,7 @@ import io.typefox.yang.yang.Value
 import io.typefox.yang.yang.When
 import io.typefox.yang.yang.XpathExpression
 import io.typefox.yang.yang.XpathLocation
+import io.typefox.yang.yang.XpathNameTest
 import io.typefox.yang.yang.YangVersion
 import io.typefox.yang.yang.YinElement
 import java.util.List
@@ -86,7 +87,6 @@ import org.eclipse.xtext.formatting2.FormatterRequest
 import org.eclipse.xtext.formatting2.IFormattableDocument
 import org.eclipse.xtext.formatting2.ITextReplacer
 import org.eclipse.xtext.formatting2.ITextReplacerContext
-import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
 import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
 import org.eclipse.xtext.formatting2.regionaccess.internal.NodeSemanticRegion
 import org.eclipse.xtext.nodemodel.ILeafNode
@@ -97,7 +97,6 @@ import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import static io.typefox.yang.formatting2.MultilineStringReplacer.Line.PartType.*
 
 import static extension com.google.common.base.Strings.*
-import io.typefox.yang.yang.XpathNameTest
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -486,7 +485,7 @@ class YangFormatter extends AbstractFormatter2 {
     // Tools
     
     protected def formatMultilineString(extension IFormattableDocument document, Statement s, Assignment a) {
-        val region = s.regionFor.assignment(a) as ISemanticRegion
+        val region = s.regionFor.assignment(a)
         if(region instanceof NodeSemanticRegion) {
 	        var trailingLinesIndent = 0
 	        if (preferences.getPreference(YangFormatter.FORCE_NEW_LINE)) {

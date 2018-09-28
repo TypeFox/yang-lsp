@@ -77,9 +77,6 @@ class YangSemanticHighlightingCalculator extends DefaultSemanticHighlightingCalc
 	@Inject
 	extension YangReferenceFinder;
 
-	/**
-	 * @noimplement
-	 */
 	static interface Styles {
 		/*1a*/ val NORMAL_DATA_NODE_STYLE = 'yang-normal-data-node';
 		/*1b*/ val ALTERNATIVE_DATA_NODE_STYLE = 'yang-alternative-data-node';
@@ -94,9 +91,6 @@ class YangSemanticHighlightingCalculator extends DefaultSemanticHighlightingCalc
 		/*6c*/ val KEY_STYLE = 'yang-key-statement,';
 	}
 
-	/**
-	 * @noimplement
-	 */
 	static interface Scopes {
 		val NORMAL_DATA_NODE_SCOPES = #['keyword.control'].yang;
 		val ALTERNATIVE_DATA_NODE_SCOPES = #['beginning.punctuation.definition.list.markdown'].yang;

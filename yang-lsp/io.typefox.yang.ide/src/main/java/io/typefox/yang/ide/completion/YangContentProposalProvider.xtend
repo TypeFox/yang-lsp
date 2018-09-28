@@ -161,6 +161,9 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 	@Inject XpathResolver xpathResolver
 
 	def List<IEObjectDescription> findPathes(EObject obj, ContentAssistContext context) {
+		if (obj === null) {
+			return emptyList
+		}
 		switch obj {
 			XpathStep : {
 				switch expr : obj.eContainer {
@@ -191,11 +194,8 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 				}
 				return #[new EObjectDescription(scopeContextProvider.findSchemaNodeName(obj), obj, emptyMap)]
 			}
-			EObject: {
-				return findPathes(obj.eContainer, context)
-			}
 			default: {
-				return #[]
+				return findPathes(obj.eContainer, context)
 			}
 		}
 	}
