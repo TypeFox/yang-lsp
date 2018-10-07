@@ -1,7 +1,7 @@
 buildscript {
 	repositories.jcenter()
 	dependencies {
-		classpath 'org.xtext:xtext-gradle-plugin:1.0.19'
+		classpath 'org.xtext:xtext-gradle-plugin:2.0.1'
 	}
 }
 
