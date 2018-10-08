@@ -73,6 +73,7 @@ import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.util.CancelIndicator
+import io.typefox.yang.yang.TypeReference
 
 class YangDiagramGenerator implements IDiagramGenerator {
 	static val LOG = Logger.getLogger(YangDiagramGenerator)
@@ -550,10 +551,19 @@ class YangDiagramGenerator implements IDiagramGenerator {
 			val YangLabel memberElement = configSElement(YangLabel, viewParentElement.id + '-' + statement.name, 'text')
 			val Type type = statement.substatements.filter(Type).head
 			val String nameAddition = if(statement instanceof LeafList) '[]' else ''
-			memberElement.text = statement.name + nameAddition + ': ' + type.typeRef.builtin
+			memberElement.text = statement.name + nameAddition + ': ' + type.typeRef.name
 			memberElement.trace(statement)
 			return memberElement
 		}
+	}
+	
+	protected def getName(TypeReference typeRef) {
+		if (typeRef.builtin !== null) {
+			typeRef.builtin
+		} else {
+			typeRef.type.name
+		}
+		
 	}
 
 	protected def SModelElement createClassElement(SchemaNode statement, SModelElement viewParentElement,
