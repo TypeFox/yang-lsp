@@ -19,6 +19,10 @@ class YangContentAssistService extends ContentAssistService {
 		if (item.kind === CompletionItemKind.Snippet) {
 			item.insertTextFormat = InsertTextFormat.Snippet;
 		}
+		// Workaround for https://github.com/eclipse/lsp4j/issues/262
+		if (!item.documentation.isLeft && !item.documentation.isRight) {
+			item.documentation = ''
+		}
 		return item;
 	}
 	
