@@ -57,7 +57,7 @@ class SerializationIntegrationTest {
 	
 	static def void scanRecursively(File file, (File)=>void acceptor) {
 		if (file.isDirectory) {
-			for (f : file.listFiles) {			
+			for (f : file.listFiles) {
 				scanRecursively(f, acceptor)
 			}
 		} else {

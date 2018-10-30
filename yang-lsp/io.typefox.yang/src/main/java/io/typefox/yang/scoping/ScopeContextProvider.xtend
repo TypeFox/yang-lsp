@@ -446,7 +446,19 @@ class ScopeContextProvider {
 			}
 		]
 	}
-	
+
+	protected dispatch def void computeScope(BelongsTo element, QualifiedName currentPrefix, IScopeContext ctx, boolean isConfig) {
+		if (element.module !== null && element.module.eIsProxy) {
+			val prefix = element.substatements.filter(Prefix).head?.prefix
+			if (prefix !== null) {
+				ctx.moduleBelongingSubModules.add(getScopeContext(element.module))
+			} else {
+				validator.addIssue(element, BELONGS_TO__MODULE, "The 'prefix' statement is mandatory.", IssueCodes.MISSING_PREFIX)
+			}
+		}
+		handleGeneric(element, currentPrefix, ctx, isConfig);
+	}
+
 	protected dispatch def void computeScope(AbstractImport element, QualifiedName currentPrefix, IScopeContext ctx, boolean isConfig) {
 		val importedRevisionStatement = element.substatements.filter(RevisionDate).head
 		val importedModule = linker.<AbstractModule>link(element, ABSTRACT_IMPORT__MODULE) [ name |
@@ -626,4 +638,3 @@ class ScopeContextProvider {
 	}
 	
 }
-															

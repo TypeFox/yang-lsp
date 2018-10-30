@@ -98,7 +98,7 @@ class YangSerializerScopeProvider implements IScopeProvider {
 				val lastSegment = original.qualifiedName.lastSegment
 				val isInputOrOutput = (lastSegment == 'input' || lastSegment == 'output')
 				if(allowDefaultInputOutput !== isInputOrOutput) 
-					return null					
+					return null
 			}
 			if (original.qualifiedName.segmentCount < 2)
 				return original
