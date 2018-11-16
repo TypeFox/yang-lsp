@@ -581,7 +581,7 @@ class ScopeContextProvider {
 			}
 			var secondSeg = qn.lastSegment
 			return prefix.append(firstSeg).append(secondSeg)
-		} else if (!identifier.schemaNode.eIsProxy()) {
+		} else if (identifier.schemaNode !== null && !identifier.schemaNode.eIsProxy()) {
 			val moduleName = identifier.schemaNode.getContainerOfType(AbstractModule)?.name
 			if(moduleName !== null && identifier.schemaNode.name !== null)
 				return prefix.append(moduleName).append(identifier.schemaNode.name)

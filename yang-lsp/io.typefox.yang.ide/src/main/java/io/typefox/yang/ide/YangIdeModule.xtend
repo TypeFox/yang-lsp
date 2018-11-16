@@ -16,7 +16,10 @@ import io.typefox.yang.ide.editor.syntaxcoloring.YangSemanticHighlightingCalcula
 import io.typefox.yang.ide.extensions.CommandService
 import io.typefox.yang.ide.formatting.YangFormattingService
 import io.typefox.yang.ide.rename.YangRenameStrategy
+import io.typefox.yang.ide.symbols.YangDocumentSymbolKindProvider
+import io.typefox.yang.ide.symbols.YangDocumentSymbolNameProvider
 import io.typefox.yang.ide.symbols.YangDocumentSymbolService
+import io.typefox.yang.ide.symbols.YangHierarchicalDocumentSymbolService
 import java.util.List
 import org.eclipse.lsp4j.CodeLens
 import org.eclipse.xtext.ide.editor.contentassist.IdeContentProposalAcceptor
@@ -33,7 +36,10 @@ import org.eclipse.xtext.ide.server.commands.IExecutableCommandService
 import org.eclipse.xtext.ide.server.contentassist.ContentAssistService
 import org.eclipse.xtext.ide.server.formatting.FormattingService
 import org.eclipse.xtext.ide.server.semanticHighlight.ISemanticHighlightingStyleToTokenMapper
+import org.eclipse.xtext.ide.server.symbol.DocumentSymbolMapper.DocumentSymbolKindProvider
+import org.eclipse.xtext.ide.server.symbol.DocumentSymbolMapper.DocumentSymbolNameProvider
 import org.eclipse.xtext.ide.server.symbol.DocumentSymbolService
+import org.eclipse.xtext.ide.server.symbol.HierarchicalDocumentSymbolService
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.CancelIndicator
 
@@ -113,6 +119,18 @@ class YangIdeModule extends AbstractYangIdeModule {
 
 	def Class<? extends ISemanticHighlightingStyleToTokenMapper> bindISemanticHighlightingStyleToTokenMapper() {
 		return YangSemanticHighlightingCalculator;
+	}
+
+	def Class<? extends HierarchicalDocumentSymbolService> bindHierarchicalDocumentSymbolService() {
+		return YangHierarchicalDocumentSymbolService;
+	}
+
+	def Class<? extends DocumentSymbolKindProvider> bindDocumentSymbolKindProvider() {
+		return YangDocumentSymbolKindProvider;
+	}
+
+	def Class<? extends DocumentSymbolNameProvider> bindDocumentSymbolNameProvider() {
+		return YangDocumentSymbolNameProvider;
 	}
 
 }
