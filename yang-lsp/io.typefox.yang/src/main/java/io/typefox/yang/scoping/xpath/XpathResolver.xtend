@@ -375,13 +375,13 @@ class XpathResolver {
 				}
 				return Types.nodeSet(nodes)
 			}
-			val result = newArrayList()
+			val result = newLinkedHashSet()
 			for (n : type.nodes) {
 				val nodes = findNodes(n.qualifiedName, name, mode, ctx.nodeScope)
 				result.addAll(nodes)
 			}
 			if (!result.empty) {
-				return Types.nodeSet(result)
+				return Types.nodeSet(result.toList)
 			}
 		}
 		return Types.ANY
@@ -450,7 +450,7 @@ class XpathResolver {
 					}
 				}
 				return false
-			].toList
+			].toSet.toList
 			return elements
 		}
 	}
