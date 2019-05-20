@@ -2,6 +2,10 @@ package io.typefox.yang.tests.linking
 
 import io.typefox.yang.tests.AbstractYangTest
 import org.junit.Test
+import org.eclipse.xtext.EcoreUtil2
+import io.typefox.yang.yang.Uses
+
+import static io.typefox.yang.validation.IssueCodes.*
 
 class GroupingLinkingTest extends AbstractYangTest {
 	
@@ -77,5 +81,25 @@ class GroupingLinkingTest extends AbstractYangTest {
 			}
 		''')
 		assertNoErrors(m.root)
+	}
+	
+	@Test def void testUsesGrpSelf() {
+		val it = load('''
+			module yt6 {
+			
+			    namespace "urn:ietf:params:xml:ns:yang:yt6";
+			    prefix "yt6";
+			
+				grouping AA {
+					leaf a {
+						type string;
+					}
+				    list b {
+				        uses AA;
+				    }
+				}
+			}
+		''')
+		assertError(EcoreUtil2.getAllContentsOfType(root, Uses).head, GROUPING_REFERENCE_TO_ITSELF)
 	}
 }
