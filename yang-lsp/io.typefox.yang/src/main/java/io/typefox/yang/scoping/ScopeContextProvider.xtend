@@ -253,12 +253,31 @@ class ScopeContextProvider {
 	}
 	private def dispatch void inlineGrouping(Typedef statement, QualifiedName name, GroupingInliningScopeContext context, boolean isConfig) {
 	}
+	
 	private def dispatch void inlineGrouping(Uses statement, QualifiedName name, GroupingInliningScopeContext context, boolean isConfig) {
 		if (statement.grouping !== null) {
+			if(statement.isUsesGroupingSelf) {
+				validator.addIssue(statement, SCHEMA_NODE__NAME, '''Grouping '«statement.grouping.node.name»' reference to itself.''', IssueCodes.GROUPING_REFERENCE_TO_ITSELF)
+				return
+			}
 			for (subStmnt : statement.grouping.node.substatements) {
 				inlineGrouping(subStmnt, name, context, isConfig)
 			}
 		}
+	}
+	
+	private def boolean isUsesGroupingSelf(Uses uses) {
+		val refGrping = uses.grouping.node
+		var container = uses.eContainer
+		while (container !== null && !(container instanceof AbstractModule)) {
+			if(container === refGrping) return true
+			if(container instanceof Augment) {
+				container = container.path?.schemaNode
+			} else {
+				container = container?.eContainer
+			}
+		} 
+		return false
 	}
 	
 	private def dispatch void inlineGrouping(SchemaNode statement, QualifiedName name, GroupingInliningScopeContext context, boolean isConfig) {

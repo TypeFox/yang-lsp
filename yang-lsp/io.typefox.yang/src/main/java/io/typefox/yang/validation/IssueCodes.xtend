@@ -148,6 +148,9 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 		Diagnostic for unresolvable Xpath expressions.
 	''')
 	
+	public static val GROUPING_REFERENCE_TO_ITSELF = 'grouping-reference-to-itself'.error('''
+		Issues code indicate that a grouping reference to itself.
+	''')
 	
 	static val Map<String, PreferenceKey> CODES = BUILDER.build
 
