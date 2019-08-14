@@ -1,10 +1,10 @@
 # Settings
 
 The yang-lsp allos the user to configure various settings, though setting files.
-A setting file has the name `yang.settings` and can be located 
+A setting file has the name `yang.settings` and can be located
  - at the root of a project
  - in the user's directory under `~/.yang/yang.settings`.
- 
+
 The file syntax is a JSON.
 
 ## Disable Code Lens
@@ -19,11 +19,11 @@ If you don't want to see the code lenses you can turn it of with the following p
 
 ## Excluded Paths
 
-Many IDEs and tools copy YANG files into another folder within the same project. As the YANG LSP treats all files within a project the same, this usually infers issues about duplicate elements. To avoid that, you can exclude several directories in the project setting `excludePaths`, e.g.
+Many IDEs and tools copy YANG files into another folder within the same project. As the YANG LSP treats all files within a project the same, this usually infers issues about duplicate elements. To avoid that, you can exclude several directories in the project setting `excludePath`, e.g.
 
 ```json
 {
-   "excludePaths": "build:bin"
+   "excludePath": "build:bin"
 }
 ```
 
