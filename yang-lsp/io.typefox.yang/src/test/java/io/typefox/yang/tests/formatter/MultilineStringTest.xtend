@@ -344,4 +344,36 @@ class MultilineStringTest extends AbstractYangTest {
         ]
     }
     
+    @Test
+    def void testIssue153() {
+    	assertFormattedWithoutSerialization[
+            expectation = '''
+              module foo {
+                  namespace "http://example.com/foo/20181116";
+                  prefix "foo";
+              
+                  leaf bar {
+                      type boolean;
+                      description
+                        "Lorem ipsum dolor sit amet, consectetur adipiscing elit, "
+                      + "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua";
+                  }
+              }
+            '''
+            toBeFormatted = '''
+                module foo {
+                    namespace "http://example.com/foo/20181116";
+                    prefix "foo";
+                
+                    leaf bar {
+                        type boolean;
+                        description
+                          "Lorem ipsum dolor sit amet, consectetur adipiscing elit, " +
+                          "sed do eiusmod tempor incididunt ut labore et dolore magna aliqua";
+                    }
+                }
+            '''
+        ]
+    }
+    
 }
