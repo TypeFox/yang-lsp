@@ -93,6 +93,7 @@ import org.eclipse.xtext.nodemodel.ILeafNode
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.preferences.BooleanKey
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
+import org.eclipse.xtext.util.Wrapper
 
 import static io.typefox.yang.formatting2.MultilineStringReplacer.Line.PartType.*
 
@@ -458,20 +459,20 @@ class YangFormatter extends AbstractFormatter2 {
     }
 
     def dispatch void format(Key k, extension IFormattableDocument it) {
-    		k.references.last.semanticRegions.forEach[append[noSpace]]
-    		formatStatement(k)	
+		k.references.last.semanticRegions.forEach[append[noSpace]]
+		formatStatement(k)	
     }
     
     def dispatch void format(IfFeature i, extension IFormattableDocument it) {
-    		formatStatement(i)
+		formatStatement(i)
     }
 
     def dispatch void format(Unknown u, extension IFormattableDocument it) {
-    		val lastRegion = if(u.name !== null)
-    			u.regionFor.assignment(unknownAccess.nameAssignment_1)
-    		else
-    			u.regionFor.assignment(unknownAccess.extensionAssignment_0)
-   		if(lastRegion !== null) {
+		val lastRegion = if(u.name !== null)
+			u.regionFor.assignment(unknownAccess.nameAssignment_1)
+		else
+			u.regionFor.assignment(unknownAccess.extensionAssignment_0)
+   		if (lastRegion !== null) {
    			val nextSemanticRegion = lastRegion.nextSemanticRegion
 	        if (HIDDENRule == nextSemanticRegion.grammarElement) {
 	            nextSemanticRegion.prepend[noSpace].append[oneSpace]
@@ -486,7 +487,7 @@ class YangFormatter extends AbstractFormatter2 {
     
     protected def formatMultilineString(extension IFormattableDocument document, Statement s, Assignment a) {
         val region = s.regionFor.assignment(a)
-        if(region instanceof NodeSemanticRegion) {
+        if (region instanceof NodeSemanticRegion) {
 	        var trailingLinesIndent = 0
 	        if (preferences.getPreference(YangFormatter.FORCE_NEW_LINE)) {
 	            region.prepend[newLine]
@@ -495,7 +496,7 @@ class YangFormatter extends AbstractFormatter2 {
 	            val keyword = s.findFirstKeyword
 	            trailingLinesIndent = keyword.length
 	        }
-        		addReplacer(new MultilineStringReplacer(_yangGrammarAccess, region, trailingLinesIndent))
+    		addReplacer(new MultilineStringReplacer(_yangGrammarAccess, region, trailingLinesIndent))
         }
     }
     
@@ -569,7 +570,7 @@ class YangFormatter extends AbstractFormatter2 {
 
 @FinalFieldsConstructor
 class MultilineStringReplacer implements ITextReplacer {
-    val YangGrammarAccess grammerAccess
+    val YangGrammarAccess grammarAccess
     val NodeSemanticRegion region
     val int trailingLinesIndent
 
@@ -596,7 +597,7 @@ class MultilineStringReplacer implements ITextReplacer {
         
         val leafNodes = region.node.leafNodes.toList
         
-        val model = new LinesModel(grammerAccess, firstLineIndentation, trailingLinesIndentation)
+        val model = new LinesModel(grammarAccess, firstLineIndentation, trailingLinesIndentation)
         model.build(leafNodes)
         val newText = model.toString()
         
@@ -702,28 +703,27 @@ class MultilineStringReplacer implements ITextReplacer {
         def build(List<ILeafNode> leafNodes) {
             for (it : leafNodes) {
                 if (isHidden) {
-                    val grammarElement = grammarElement
-                    if (ML_COMMENTRule == grammarElement) {
-                        addSpace()
-                        addMultiLineComment(text)
-                    }
-                    if (SL_COMMENTRule == grammarElement) {
-                        val text = text.replace(System.lineSeparator, "")
-                        addSpace()
-                        addSingleLineComment(text)
-                        newLine()
-                    }
-                    if (WSRule == grammarElement) {
-                        if (text.contains(System.lineSeparator)) {
-                            newLine()
-                        } else {
-                            addSpace()
-                        }
-                    }
-                    if (HIDDENRule == grammarElement) {
-                        if (text.contains("+")) {
-                            addPlus()
-                        }
+                    switch grammarElement {
+	                    case ML_COMMENTRule: {
+	                        addSpace()
+	                        addMultiLineComment(text)
+	                    }
+	                    case SL_COMMENTRule: {
+	                        val text = text.replace(System.lineSeparator, "")
+	                        addSpace()
+	                        addSingleLineComment(text)
+	                        newLine()
+	                    }
+	                    case WSRule: {
+	                        if (text.contains(System.lineSeparator))
+	                            newLine()
+	                        else
+	                            addSpace()
+	                    }
+	                    case HIDDENRule: {
+	                        if (text.contains("+"))
+	                            addPlus()
+	                    }
                     }
                 } else {
                     val originalStartColumn = NodeModelUtils.getLineAndColumn(it, offset).column
@@ -731,9 +731,14 @@ class MultilineStringReplacer implements ITextReplacer {
                 }
             }
             lines.head.prepend(firstLineIndentation, Hidden)
+            val previousLine = new Wrapper(lines.head)
             lines.tail.forEach[
                 val lineTypePrefix = prefix
+                // https://github.com/theia-ide/yang-lsp/issues/153
+                if (previousLine.get.last == '+' && lineTypePrefix.startsWith('+'))
+                	previousLine.get.removeLast()
                 prepend(trailingLinesIndentation + lineTypePrefix, Hidden)
+                previousLine.set(it)
             ]
         }
         
@@ -758,12 +763,21 @@ class MultilineStringReplacer implements ITextReplacer {
             return null
         }
         
-        def prepend(String string, PartType type) {
+        def void removeLast() {
+        	parts.removeLast()
+        	types.removeLast()
+        	while (!parts.empty && parts.last == ' ') {
+        		parts.removeLast()
+        		types.removeLast()
+        	}
+        }
+        
+        def void prepend(String string, PartType type) {
             parts.add(0, string)
             types.add(0, type)
         }
     
-        def append(String string, PartType type) {
+        def void append(String string, PartType type) {
             parts += string
             types += type
         }
