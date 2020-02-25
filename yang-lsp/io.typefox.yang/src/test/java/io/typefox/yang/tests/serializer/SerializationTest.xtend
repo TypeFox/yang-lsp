@@ -15,7 +15,6 @@ import io.typefox.yang.yang.YangVersion
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.xtext.resource.XtextResource
-import org.eclipse.xtext.serializer.ISerializer
 import org.junit.Test
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
@@ -51,7 +50,7 @@ class SerializationTest extends AbstractYangTest {
 		s.substatements.clear
 		s.substatements.add(node)
 		
-		var ISerializer serializer = resource.getSerializer();
+		val serialized = resource.serializer.serialize(resource.contents.head)
 		assertEquals('''
 			module bar {
 			    yang-version 1.1;
@@ -61,7 +60,7 @@ class SerializationTest extends AbstractYangTest {
 			        leaf 'my-leaf;TEST';
 			    }
 			}
-		'''.toString, serializer.serialize(resource.contents.head));
+		'''.toString, serialized)
 	}
 	
 	@Test
@@ -75,9 +74,9 @@ class SerializationTest extends AbstractYangTest {
 		targetModule.create(YangPackage.eINSTANCE.contact, Contact).contact = "bar"
 		targetModule.create(YangPackage.eINSTANCE.description, Description).description = "This is a serialize test"
 		
-		var XtextResource moduleResource = resourceSet.createResource(URI.createFileURI("serialize-test.yang")) as XtextResource
+		val moduleResource = resourceSet.createResource(URI.createFileURI("serialize-test.yang")) as XtextResource
 		moduleResource.contents.add(targetModule)
-		var ISerializer serializer = moduleResource.getSerializer();
+		val serialized = moduleResource.serializer.serialize(targetModule)
 		assertEquals('''
 			module serialize-test {
 			    yang-version 1.1;
@@ -86,10 +85,84 @@ class SerializationTest extends AbstractYangTest {
 			    organization foo;
 			    contact bar;
 			    description 'This is a serialize test';
-			}'''.toString, serializer.serialize(targetModule));
+			}'''.toString, serialized)
 	}
 	
-	private def <T> create(Statement it, EClass substmtEClass, Class<T> clazz) {
+	@Test
+	def void testIssue164a() {
+		val resource = load('''
+			module serialize-test {
+			    grouping foo;
+			    feature bar;
+			    feature baz;
+			    uses "foo" {
+			        if-feature "bar or baz";
+			    }
+			}
+		''') as XtextResource
+		
+		val serialized = resource.serializer.serialize(resource.contents.head)
+		assertEquals('''
+			module serialize-test {
+			    grouping foo;
+			    feature bar;
+			    feature baz;
+			    uses "foo" {
+			        if-feature "bar or baz";
+			    }
+			}
+			'''.toString, serialized)
+	}
+	
+	@Test
+	def void testIssue164b() {
+		val resource = load('''
+			module serialize-test {
+				identity symmetric-key-format {
+				    base " key-format-base";
+				    description "Base key-format identity for symmetric keys.";
+				}
+			}
+		''') as XtextResource
+		
+		val serialized = resource.serializer.serialize(resource.contents.head)
+		assertEquals('''
+			module serialize-test {
+				identity symmetric-key-format {
+				    base " key-format-base";
+				    description "Base key-format identity for symmetric keys.";
+				}
+			}
+			'''.toString, serialized)
+	}
+	
+	@Test
+	def void testIssue166() {
+		val resource = load('''
+			module serialize-test {
+			    container second-tag {
+			        must
+			            '../outer-tag/tag-type = "dot1q-types:s-vlan" and ' +
+			            'tag-type = "dot1q-types:c-vlan"' {
+			        }
+			    }
+			}
+		''') as XtextResource
+		
+		val serialized = resource.serializer.serialize(resource.contents.head)
+		assertEquals('''
+			module serialize-test {
+			    container second-tag {
+			        must
+			            '../outer-tag/tag-type = "dot1q-types:s-vlan" and ' +
+			            'tag-type = "dot1q-types:c-vlan"' {
+			        }
+			    }
+			}
+			'''.toString, serialized)
+	}
+	
+	private def <T extends Statement> create(Statement it, EClass substmtEClass, Class<T> clazz) {
 		val Statement stmt = YangFactory.eINSTANCE.create(substmtEClass) as Statement
 		it.substatements.add(stmt)
 		stmt as T
