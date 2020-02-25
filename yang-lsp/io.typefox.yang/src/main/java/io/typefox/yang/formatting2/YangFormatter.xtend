@@ -76,6 +76,7 @@ import io.typefox.yang.yang.XpathLocation
 import io.typefox.yang.yang.XpathNameTest
 import io.typefox.yang.yang.YangVersion
 import io.typefox.yang.yang.YinElement
+import java.util.ArrayList
 import java.util.List
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.eclipse.xtext.Assignment
@@ -87,8 +88,13 @@ import org.eclipse.xtext.formatting2.FormatterRequest
 import org.eclipse.xtext.formatting2.IFormattableDocument
 import org.eclipse.xtext.formatting2.ITextReplacer
 import org.eclipse.xtext.formatting2.ITextReplacerContext
+import org.eclipse.xtext.formatting2.regionaccess.IHiddenRegion
+import org.eclipse.xtext.formatting2.regionaccess.IHiddenRegionPart
+import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
+import org.eclipse.xtext.formatting2.regionaccess.ITextReplacement
 import org.eclipse.xtext.formatting2.regionaccess.ITextSegment
 import org.eclipse.xtext.formatting2.regionaccess.internal.NodeSemanticRegion
+import org.eclipse.xtext.formatting2.regionaccess.internal.TextRegions
 import org.eclipse.xtext.nodemodel.ILeafNode
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.preferences.BooleanKey
@@ -121,22 +127,22 @@ class YangFormatter extends AbstractFormatter2 {
     // Rules
 
     def dispatch void format(Module m, extension IFormattableDocument it) {
-        m.regionFor.assignment(moduleAccess.nameAssignment_1).surround[oneSpace]
+        m.regionFor.assignment(moduleAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(m)
     }
 
     def dispatch void format(YangVersion v, extension IFormattableDocument it) {
-        v.regionFor.assignment(yangVersionAccess.yangVersionAssignment_1).surround[oneSpace]
+        v.regionFor.assignment(yangVersionAccess.yangVersionAssignment_1).surroundSpace(it)
         formatStatement(v)
     }
     
     def dispatch void format(Namespace ns, extension IFormattableDocument it) {
-        ns.regionFor.assignment(namespaceAccess.uriAssignment_1).surround[oneSpace]
+        ns.regionFor.assignment(namespaceAccess.uriAssignment_1).surroundSpace(it)
         formatStatement(ns)
     }
     
     def dispatch void format(Prefix p, extension IFormattableDocument it) {
-        p.regionFor.assignment(prefixAccess.prefixAssignment_1).surround[oneSpace]
+        p.regionFor.assignment(prefixAccess.prefixAssignment_1).surroundSpace(it)
         formatStatement(p)
     }
     
@@ -181,31 +187,31 @@ class YangFormatter extends AbstractFormatter2 {
     }
     
     def dispatch void format(Revision r, extension IFormattableDocument it) {
-        r.regionFor.assignment(revisionAccess.revisionAssignment_1).surround[oneSpace]
+        r.regionFor.assignment(revisionAccess.revisionAssignment_1).surroundSpace(it)
         formatStatement(r)
     }
     
     def dispatch void format(Typedef t, extension IFormattableDocument it) {
-        t.regionFor.assignment(typedefAccess.nameAssignment_1).surround[oneSpace]
+        t.regionFor.assignment(typedefAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(t)
     }
     
     def dispatch void format(Type t, extension IFormattableDocument it) {
         val typeRef = t.typeRef
         if (typeRef !== null) {
-            typeRef.regionFor.assignment(typeReferenceAccess.typeAssignment_1).surround[oneSpace]
-            typeRef.regionFor.crossRef(typeReferenceAccess.typeTypedefCrossReference_1_0).surround[oneSpace]
+            typeRef.regionFor.assignment(typeReferenceAccess.typeAssignment_1).surroundSpace(it)
+            typeRef.regionFor.crossRef(typeReferenceAccess.typeTypedefCrossReference_1_0).surroundSpace(it)
         }
         formatStatement(t)
     }
     
     def dispatch void format(Enum e, extension IFormattableDocument it) {
-        e.regionFor.assignment(enumAccess.nameAssignment_1).surround[oneSpace]
+        e.regionFor.assignment(enumAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(e)
     }
     
     def dispatch void format(Value v, extension IFormattableDocument it) {
-        v.regionFor.assignment(valueAccess.ordinalAssignment_1).surround[oneSpace]
+        v.regionFor.assignment(valueAccess.ordinalAssignment_1).surroundSpace(it)
         formatStatement(v)
     }
     
@@ -220,17 +226,17 @@ class YangFormatter extends AbstractFormatter2 {
     }
     
     def dispatch void format(Grouping g, extension IFormattableDocument it) {
-        g.regionFor.assignment(groupingAccess.nameAssignment_1).surround[oneSpace]
+        g.regionFor.assignment(groupingAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(g)
     }
     
     def dispatch void format(Leaf l, extension IFormattableDocument it) {
-        l.regionFor.assignment(leafAccess.nameAssignment_1).surround[oneSpace]
+        l.regionFor.assignment(leafAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(l)
     }
 
     def dispatch void format(LeafList l, extension IFormattableDocument it) {
-        l.regionFor.assignment(leafListAccess.nameAssignment_1).surround[oneSpace]
+        l.regionFor.assignment(leafListAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(l)
     }
     
@@ -251,13 +257,13 @@ class YangFormatter extends AbstractFormatter2 {
     
     def dispatch void format(Uses u, extension IFormattableDocument it) {
         if (u.grouping !== null) {
-            u.grouping.regionFor.crossRef(groupingRefAccess.nodeGroupingCrossReference_0).surround[oneSpace]
+            u.grouping.regionFor.crossRef(groupingRefAccess.nodeGroupingCrossReference_0).surroundSpace(it)
         }
         formatStatement(u)
     }
     
     def dispatch void format(Container c, extension IFormattableDocument it) {
-        c.regionFor.assignment(containerAccess.nameAssignment_1).surround[oneSpace]
+        c.regionFor.assignment(containerAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(c)
     }
     
@@ -267,47 +273,47 @@ class YangFormatter extends AbstractFormatter2 {
     }
     
     def dispatch void format(Mandatory m, extension IFormattableDocument it) {
-        m.regionFor.assignment(mandatoryAccess.isMandatoryAssignment_1).surround[oneSpace]
+        m.regionFor.assignment(mandatoryAccess.isMandatoryAssignment_1).surroundSpace(it)
         formatStatement(m)
     }
     
     def dispatch void format(MinElements m, extension IFormattableDocument it) {
-        m.regionFor.assignment(minElementsAccess.minElementsAssignment_1).surround[oneSpace]
+        m.regionFor.assignment(minElementsAccess.minElementsAssignment_1).surroundSpace(it)
         formatStatement(m)
     }
     
     def dispatch void format(MaxElements m, extension IFormattableDocument it) {
-        m.regionFor.assignment(maxElementsAccess.maxElementsAssignment_1).surround[oneSpace]
+        m.regionFor.assignment(maxElementsAccess.maxElementsAssignment_1).surroundSpace(it)
         formatStatement(m)
     }
     
     def dispatch void format(OrderedBy o, extension IFormattableDocument it) {
-        o.regionFor.assignment(orderedByAccess.orderedByAssignment_1).surround[oneSpace]
+        o.regionFor.assignment(orderedByAccess.orderedByAssignment_1).surroundSpace(it)
         formatStatement(o)
     }
     
     def dispatch void format(io.typefox.yang.yang.List l, extension IFormattableDocument it) {
-        l.regionFor.assignment(listAccess.nameAssignment_1).surround[oneSpace]
+        l.regionFor.assignment(listAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(l)
     }
     
     def dispatch void format(Choice c, extension IFormattableDocument it) {
-        c.regionFor.assignment(choiceAccess.nameAssignment_1).surround[oneSpace]
+        c.regionFor.assignment(choiceAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(c)
     }
     
     def dispatch void format(Case c, extension IFormattableDocument it) {
-        c.regionFor.assignment(caseAccess.nameAssignment_1).surround[oneSpace]
+        c.regionFor.assignment(caseAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(c)
     }
     
     def dispatch void format(Anydata a, extension IFormattableDocument it) {
-        a.regionFor.assignment(anydataAccess.nameAssignment_1).surround[oneSpace]
+        a.regionFor.assignment(anydataAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(a)
     }
     
     def dispatch void format(Anyxml a, extension IFormattableDocument it) {
-        a.regionFor.assignment(anyxmlAccess.nameAssignment_1).surround[oneSpace]
+        a.regionFor.assignment(anyxmlAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(a)
     }
     
@@ -317,62 +323,62 @@ class YangFormatter extends AbstractFormatter2 {
     }
     
     def dispatch void format(Rpc r, extension IFormattableDocument it) {
-        r.regionFor.assignment(rpcAccess.nameAssignment_1).surround[oneSpace]
+        r.regionFor.assignment(rpcAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(r)
     }
     
     def dispatch void format(Input i, extension IFormattableDocument it) {
-        i.regionFor.assignment(inputAccess.nameAssignment_2).surround[oneSpace]
+        i.regionFor.assignment(inputAccess.nameAssignment_2).surroundSpace(it)
         formatStatement(i)
     }
     
     def dispatch void format(Output o, extension IFormattableDocument it) {
-        o.regionFor.assignment(outputAccess.nameAssignment_2).surround[oneSpace]
+        o.regionFor.assignment(outputAccess.nameAssignment_2).surroundSpace(it)
         formatStatement(o)
     }
     
     def dispatch void format(Action a, extension IFormattableDocument it) {
-        a.regionFor.assignment(actionAccess.nameAssignment_1).surround[oneSpace]
+        a.regionFor.assignment(actionAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(a)
     }
         
     def dispatch void format(Notification n, extension IFormattableDocument it) {
-        n.regionFor.assignment(notificationAccess.nameAssignment_1).surround[oneSpace]
+        n.regionFor.assignment(notificationAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(n)
     }
     
     def dispatch void format(Identity i, extension IFormattableDocument it) {
-        i.regionFor.assignment(identityAccess.nameAssignment_1).surround[oneSpace]
+        i.regionFor.assignment(identityAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(i)
     }
     
     def dispatch void format(Base b, extension IFormattableDocument it) {
-        b.regionFor.assignment(baseAccess.referenceAssignment_1).surround[oneSpace]
+        b.regionFor.assignment(baseAccess.referenceAssignment_1).surroundSpace(it)
         formatStatement(b)
     }
     
     def dispatch void format(Extension e, extension IFormattableDocument it) {
-        e.regionFor.assignment(extensionAccess.nameAssignment_1).surround[oneSpace]
+        e.regionFor.assignment(extensionAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(e)
     }
     
     def dispatch void format(Argument a, extension IFormattableDocument it) {
-        a.regionFor.assignment(argumentAccess.nameAssignment_1).surround[oneSpace]
+        a.regionFor.assignment(argumentAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(a)
     }
     
     def dispatch void format(YinElement y, extension IFormattableDocument it) {
-        y.regionFor.assignment(yinElementAccess.isYinElementAssignment_1).surround[oneSpace]
+        y.regionFor.assignment(yinElementAccess.isYinElementAssignment_1).surroundSpace(it)
         formatStatement(y)
     }
     
     def dispatch void format(Feature f, extension IFormattableDocument it) {
-        f.regionFor.assignment(featureAccess.nameAssignment_1).surround[oneSpace]
+        f.regionFor.assignment(featureAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(f)
     }
     
     def dispatch void format(Deviate d, extension IFormattableDocument it) {
-        d.regionFor.assignment(deviateAccess.argumentAssignment_1).surround[oneSpace]
+        d.regionFor.assignment(deviateAccess.argumentAssignment_1).surroundSpace(it)
         formatStatement(d)
     }
     
@@ -382,72 +388,72 @@ class YangFormatter extends AbstractFormatter2 {
     }
     
     def dispatch void format(Config c, extension IFormattableDocument it) {
-        c.regionFor.assignment(configAccess.isConfigAssignment_1).surround[oneSpace]
+        c.regionFor.assignment(configAccess.isConfigAssignment_1).surroundSpace(it)
         formatStatement(c)
     }
     
     def dispatch void format(Status s, extension IFormattableDocument it) {
-        s.regionFor.assignment(statusAccess.argumentAssignment_1).surround[oneSpace]
+        s.regionFor.assignment(statusAccess.argumentAssignment_1).surroundSpace(it)
         formatStatement(s)
     }
     
     def dispatch void format(FractionDigits s, extension IFormattableDocument it) {
-        s.regionFor.assignment(fractionDigitsAccess.rangeAssignment_1).surround[oneSpace]
+        s.regionFor.assignment(fractionDigitsAccess.rangeAssignment_1).surroundSpace(it)
         formatStatement(s)
     }
     
     def dispatch void format(Modifier s, extension IFormattableDocument it) {
-        s.regionFor.assignment(modifierAccess.modifierAssignment_1).surround[oneSpace]
+        s.regionFor.assignment(modifierAccess.modifierAssignment_1).surroundSpace(it)
         formatStatement(s)
     }
     
     def dispatch void format(Bit s, extension IFormattableDocument it) {
-        s.regionFor.assignment(bitAccess.nameAssignment_1).surround[oneSpace]
+        s.regionFor.assignment(bitAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(s)
     }
     
     def dispatch void format(Position s, extension IFormattableDocument it) {
-        s.regionFor.assignment(positionAccess.ordinalAssignment_1).surround[oneSpace]
+        s.regionFor.assignment(positionAccess.ordinalAssignment_1).surroundSpace(it)
         formatStatement(s)
     }
     
     def dispatch void format(RequireInstance s, extension IFormattableDocument it) {
-        s.regionFor.assignment(requireInstanceAccess.isRequireInstanceAssignment_1).surround[oneSpace]
+        s.regionFor.assignment(requireInstanceAccess.isRequireInstanceAssignment_1).surroundSpace(it)
         formatStatement(s)
     }
     
     def dispatch void format(Import s, extension IFormattableDocument it) {
-        s.regionFor.assignment(importAccess.moduleAssignment_1).surround[oneSpace]
+        s.regionFor.assignment(importAccess.moduleAssignment_1).surroundSpace(it)
         formatStatement(s)
     }
 
     def dispatch void format(RevisionDate s, extension IFormattableDocument it) {
-        s.regionFor.assignment(revisionDateAccess.dateAssignment_1).surround[oneSpace]
+        s.regionFor.assignment(revisionDateAccess.dateAssignment_1).surroundSpace(it)
         formatStatement(s)
     }
     
     def dispatch void format(Include s, extension IFormattableDocument it) {
-        s.regionFor.assignment(includeAccess.moduleAssignment_1).surround[oneSpace]
+        s.regionFor.assignment(includeAccess.moduleAssignment_1).surroundSpace(it)
         formatStatement(s)
     }
     
     def dispatch void format(Submodule s, extension IFormattableDocument it) {
-        s.regionFor.assignment(submoduleAccess.nameAssignment_1).surround[oneSpace]
+        s.regionFor.assignment(submoduleAccess.nameAssignment_1).surroundSpace(it)
         formatStatement(s)
     }
     
     def dispatch void format(BelongsTo s, extension IFormattableDocument it) {
-        s.regionFor.assignment(belongsToAccess.moduleAssignment_1).surround[oneSpace]
+        s.regionFor.assignment(belongsToAccess.moduleAssignment_1).surroundSpace(it)
         formatStatement(s)
     }
     
     def dispatch void format(Units s, extension IFormattableDocument it) {
-        s.regionFor.assignment(unitsAccess.definitionAssignment_1).surround[oneSpace]
+        s.regionFor.assignment(unitsAccess.definitionAssignment_1).surroundSpace(it)
         formatStatement(s)
     }
     
     def dispatch void format(Default s, extension IFormattableDocument it) {
-        s.regionFor.assignment(defaultAccess.defaultStringValueAssignment_1).surround[oneSpace]
+        s.regionFor.assignment(defaultAccess.defaultStringValueAssignment_1).surroundSpace(it)
         formatStatement(s)
     }
     
@@ -565,6 +571,83 @@ class YangFormatter extends AbstractFormatter2 {
             nodeRegions.last.append[oneSpace]
         }
     }
+    
+    protected def surroundSpace(ISemanticRegion token, IFormattableDocument doc) {
+    	if (token !== null) {
+			var previous = token.actualPreviousRegion
+			var next = token.actualNextRegion
+			doc.set(previous, next, [oneSpace]);
+		}
+		return token;
+    }
+    
+    private def getActualPreviousRegion(ISemanticRegion token) {
+    	val hidden = token.previousHiddenRegion
+    	val previous = hidden?.previousSemanticRegion
+		if (previous !== null && previous.grammarElement == HIDDENRule) {
+			return previous.previousHiddenRegion
+		}
+		return hidden
+    }
+    
+    private def getActualNextRegion(ISemanticRegion token) {
+    	val hidden = token.nextHiddenRegion
+    	val next = hidden?.nextSemanticRegion
+		if (next !== null && next.grammarElement == HIDDENRule) {
+			return next.nextHiddenRegion
+		}
+		return hidden
+    }
+
+	override protected postProcess(IFormattableDocument document, List<ITextReplacement> replacements) {
+		val expected = newArrayList
+		var current = textRegionAccess.regionForRootEObject.previousHiddenRegion
+		while (current !== null) {
+			if (current.isUndefined && isInRequestedRange(current.offset, current.endOffset)
+					&& !isNextToHidden(current))
+				expected.addAll(current.mergedSpaces)
+			current = current.nextHiddenRegion
+		}
+		if (expected.isEmpty)
+			return replacements
+		val missing = TextRegions.difference(expected, replacements)
+		if (missing.isEmpty)
+			return replacements
+		val result = new ArrayList(replacements)
+		for (seg : missing) {
+			val h =
+				if (seg instanceof IHiddenRegion)
+					seg
+				else if (seg instanceof IHiddenRegionPart)
+					seg.hiddenRegion
+			if (h !== null && (h.nextSemanticRegion === null || h.previousSemanticRegion === null))
+				result.add(seg.replaceWith(''))
+			else
+				result.add(seg.replaceWith(' '))
+		}
+		return result
+	}
+
+	private def isInRequestedRange(int offset, int endOffset) {
+		val regions = request.regions
+		if (regions.isEmpty)
+			return true
+		for (region : regions) {
+			if (region.offset <= offset && region.offset + region.length >= endOffset)
+				return true
+		}
+		return false
+	}
+	
+	private def isNextToHidden(IHiddenRegion region) {
+		val previous = region.previousSemanticRegion
+		if (previous !== null && previous.grammarElement == HIDDENRule)
+			return true
+		val next = region.nextSemanticRegion
+		if (next !== null && next.grammarElement == HIDDENRule)
+			return true
+		return false
+	}
     
 }
 

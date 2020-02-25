@@ -397,20 +397,20 @@ class ExampleTest extends AbstractYangTest {
                 }
             
                 identity des {
-                    base " ex:crypto-alg ";
+                    base "ex:crypto-alg";
                     description
                       "DES crypto algorithm";
                 }
             
                 identity des3 {
-                    base " ex:crypto-alg ";
+                    base "ex:crypto-alg";
                     description
                       "Triple DES crypto algorithm";
                 }
             
                 leaf crypto {
                     type identityref {
-                        base " ex:crypto-alg ";
+                        base "ex:crypto-alg";
                     }
                 }
             
