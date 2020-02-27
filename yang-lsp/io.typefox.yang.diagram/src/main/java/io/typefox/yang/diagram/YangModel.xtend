@@ -1,32 +1,20 @@
+/*
+ * Copyright (C) 2017-2020 TypeFox and others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ */
 package io.typefox.yang.diagram
 
-import io.typefox.sprotty.api.SCompartment
-import io.typefox.sprotty.api.SLabel
-import io.typefox.sprotty.api.SNode
-import io.typefox.sprotty.server.xtext.tracing.Traceable
+import org.eclipse.sprotty.Layouting
+import org.eclipse.sprotty.SNode
+import org.eclipse.sprotty.SShapeElement
 import org.eclipse.xtend.lib.annotations.Accessors
-import io.typefox.sprotty.api.SShapeElement
-import io.typefox.sprotty.api.Layouting
 
 @Accessors
-class YangNodeClassified extends SNode implements Traceable {
-	String cssClass
-	String trace
-}
-
-@Accessors
-class YangNode extends YangNodeClassified {
+class YangNode extends SNode {
 	Boolean expanded
-}
-
-@Accessors
-class YangHeaderNode extends SCompartment {
-	String cssClass
-}
-
-@Accessors
-class YangLabel extends SLabel implements Traceable {
-	String trace
 }
 
 @Accessors 

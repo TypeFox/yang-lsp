@@ -1,3 +1,10 @@
+/*
+ * Copyright (C) 2017-2020 TypeFox and others.
+ * 
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ */
 package io.typefox.yang.diagram.test
 
 import com.google.inject.Guice
@@ -12,6 +19,9 @@ import java.util.Collection
 import java.util.Set
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.util.EcoreUtil
+import org.eclipse.sprotty.util.IdCache
+import org.eclipse.sprotty.xtext.IDiagramGenerator
+import org.eclipse.sprotty.xtext.ls.IssueProvider
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.eclipse.xtext.resource.IResourceDescriptions
 import org.eclipse.xtext.resource.IResourceDescriptionsProvider
@@ -77,7 +87,9 @@ class DiagramIntegrationTest {
 	@Test def void testDiagram() {
 		val resource = loadResources(URI.createFileURI(this.file.absolutePath))
 		val generator = injector.getInstance(YangDiagramGenerator)
-		generator.generate(resource, new TestDiagramState(resource), CancelIndicator.NullImpl);
+		val context = new IDiagramGenerator.Context(resource, new TestDiagramState(resource),
+				new IdCache, new IssueProvider(emptyList), CancelIndicator.NullImpl)
+		generator.generate(context)
 	}
 	
 	
