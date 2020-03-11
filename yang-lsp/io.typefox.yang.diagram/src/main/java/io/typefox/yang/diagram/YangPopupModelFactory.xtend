@@ -1,38 +1,38 @@
+/*
+ * Copyright (C) 2017-2020 TypeFox and others.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
+ */
 package io.typefox.yang.diagram
 
 import com.google.inject.Inject
-import io.typefox.sprotty.api.HtmlRoot
-import io.typefox.sprotty.api.IDiagramServer
-import io.typefox.sprotty.api.IPopupModelFactory
-import io.typefox.sprotty.api.PreRenderedElement
-import io.typefox.sprotty.api.RequestPopupModelAction
-import io.typefox.sprotty.api.SModelElement
-import io.typefox.sprotty.server.xtext.tracing.ITraceProvider
-import io.typefox.sprotty.server.xtext.tracing.Traceable
 import io.typefox.yang.yang.Description
 import io.typefox.yang.yang.Namespace
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.YangVersion
 import java.util.ArrayList
-import io.typefox.sprotty.server.xtext.ILanguageAwareDiagramServer
+import org.eclipse.sprotty.HtmlRoot
+import org.eclipse.sprotty.IDiagramServer
+import org.eclipse.sprotty.IPopupModelFactory
+import org.eclipse.sprotty.PreRenderedElement
+import org.eclipse.sprotty.RequestPopupModelAction
+import org.eclipse.sprotty.SModelElement
+import org.eclipse.sprotty.xtext.ILanguageAwareDiagramServer
+import org.eclipse.sprotty.xtext.tracing.ITraceProvider
 
 class YangPopupModelFactory implements IPopupModelFactory {
 
 	@Inject extension ITraceProvider
 
 	override createPopupModel(SModelElement element, RequestPopupModelAction request, IDiagramServer server) {
-		if (element instanceof Traceable) {
-			val future = element.withSource(server as ILanguageAwareDiagramServer) [ statement, context |
-				if (statement instanceof Statement) 
-					createPopup(statement, element, request)
-				else
-					null
-			]
-			future.get
-		} else {
-			null
-		}
+		val future = element.withSource(server as ILanguageAwareDiagramServer) [ statement, context |
+			if (statement instanceof Statement) 
+				createPopup(statement, element, request)
+		]
+		future.get
 	}
 
 	protected def createPopup(Statement stmt, SModelElement element, RequestPopupModelAction request) {

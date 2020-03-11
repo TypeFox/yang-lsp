@@ -1,40 +1,42 @@
 /*
- * Copyright (C) 2017 TypeFox and others.
+ * Copyright (C) 2017-2020 TypeFox and others.
  * 
- * Licensed under the Apache License, Version 2.0 (the "License"); you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at http://www.apache.org/licenses/LICENSE-2.0
+ * Licensed under the Apache License, Version 2.0 (the "License"); you may not
+ * use this file except in compliance with the License. You may obtain a copy
+ * of the License at http://www.apache.org/licenses/LICENSE-2.0
  */
 package io.typefox.yang.diagram
 
-import io.typefox.sprotty.api.SGraph
-import io.typefox.sprotty.api.SModelRoot
-import io.typefox.sprotty.layout.ElkLayoutEngine
-import io.typefox.sprotty.layout.SprottyLayoutConfigurator
 import java.io.ByteArrayOutputStream
 import org.apache.log4j.Logger
+import org.eclipse.elk.alg.layered.options.GreedySwitchType
 import org.eclipse.elk.alg.layered.options.LayeredOptions
 import org.eclipse.elk.core.math.ElkPadding
 import org.eclipse.elk.core.options.CoreOptions
 import org.eclipse.elk.core.options.Direction
+import org.eclipse.elk.core.options.HierarchyHandling
 import org.eclipse.elk.graph.ElkNode
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.resource.impl.ResourceSetImpl
+import org.eclipse.sprotty.Action
+import org.eclipse.sprotty.SGraph
+import org.eclipse.sprotty.SModelRoot
+import org.eclipse.sprotty.layout.ElkLayoutEngine
+import org.eclipse.sprotty.layout.SprottyLayoutConfigurator
 
 class YangLayoutEngine extends ElkLayoutEngine {
 	
 	static val LOG = Logger.getLogger(YangLayoutEngine)
 	
-	override layout(SModelRoot root) {
+	override layout(SModelRoot root, Action cause) {
 		if (root instanceof SGraph) {
 			val configurator = new SprottyLayoutConfigurator
 			configurator.configureByType('graph')
 				.setProperty(CoreOptions.DIRECTION, Direction.DOWN)
 				.setProperty(CoreOptions.SPACING_NODE_NODE, 30.0)
 				.setProperty(LayeredOptions.SPACING_EDGE_NODE_BETWEEN_LAYERS, 30.0)
-				// TODO: enable when ELK is fixed:
-				// https://github.com/eclipse/elk/issues/226
-//				.setProperty(CoreOptions.HIERARCHY_HANDLING, HierarchyHandling.INCLUDE_CHILDREN)
-//				.setProperty(LayeredOptions.CROSSING_MINIMIZATION_GREEDY_SWITCH_TYPE, GreedySwitchType.OFF)
+				.setProperty(CoreOptions.HIERARCHY_HANDLING, HierarchyHandling.INCLUDE_CHILDREN)
+				.setProperty(LayeredOptions.CROSSING_MINIMIZATION_GREEDY_SWITCH_TYPE, GreedySwitchType.OFF)
 			configurator.configureByType('node:module')
 				.setProperty(CoreOptions.DIRECTION, Direction.DOWN)
 				.setProperty(CoreOptions.SPACING_NODE_NODE, 100.0)
@@ -43,7 +45,7 @@ class YangLayoutEngine extends ElkLayoutEngine {
 				.setProperty(LayeredOptions.SPACING_EDGE_NODE_BETWEEN_LAYERS, 30.0)
 				.setProperty(LayeredOptions.SPACING_NODE_NODE_BETWEEN_LAYERS, 100.0)
 				.setProperty(CoreOptions.PADDING, new ElkPadding(50))
-			layout(root, configurator)
+			layout(root, configurator, cause)
 		}
 	}
 	
