@@ -6,6 +6,7 @@ import io.typefox.yang.scoping.Linker
 import io.typefox.yang.scoping.ScopeContext.MapScope
 import io.typefox.yang.scoping.ScopeContextProvider
 import io.typefox.yang.scoping.Validator
+import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.validation.IssueCodes
 import io.typefox.yang.validation.LinkingErrorMessageProvider
 import io.typefox.yang.yang.AbbrevAttributeStep
@@ -13,7 +14,9 @@ import io.typefox.yang.yang.AbsolutePath
 import io.typefox.yang.yang.Case
 import io.typefox.yang.yang.Choice
 import io.typefox.yang.yang.CurrentRef
+import io.typefox.yang.yang.Input
 import io.typefox.yang.yang.Leaf
+import io.typefox.yang.yang.Output
 import io.typefox.yang.yang.ParentRef
 import io.typefox.yang.yang.Path
 import io.typefox.yang.yang.ProcessingInstruction
@@ -45,7 +48,6 @@ import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.util.internal.EmfAdaptable
 import org.eclipse.xtext.util.internal.Log
-import io.typefox.yang.utils.YangExtensions
 
 @Log
 class XpathResolver {
@@ -465,7 +467,7 @@ class XpathResolver {
 	
 	protected def boolean isInstanceNode(IEObjectDescription description) {
 		switch (description.EObjectOrProxy) {
-			Choice, Case : false
+			Choice, Case, Input, Output : false
 			default : true 
 		}
 	}
