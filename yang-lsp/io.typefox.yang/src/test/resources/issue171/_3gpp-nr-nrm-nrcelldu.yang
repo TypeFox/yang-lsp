@@ -1,0 +1,46 @@
+module _3gpp-nr-nrm-nrcelldu {
+    yang-version 1.1;
+    namespace "urn:3gpp:sa5:_3gpp-nr-nrm-nrcelldu";
+    prefix "nrcelldu3gpp";
+
+    import _3gpp-common-managed-function {
+        prefix mf3gpp;
+    }
+    import _3gpp-common-managed-element {
+        prefix me3gpp;
+    }
+    import _3gpp-nr-nrm-gnbdufunction {
+        prefix gnbdu3gpp;
+    }
+
+    revision 2019-09-03;
+
+    grouping NRCellDUGrp {
+        uses mf3gpp:ManagedFunctionGrp;
+
+        leaf cellLocalId {
+            mandatory true;
+            type int32 {
+                range "0..16383";
+            }
+        }
+
+        leaf nRPCI {
+            mandatory true;
+            type int32 {
+                range "0..1007";
+            }
+        }
+    }
+
+    augment "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction" {
+        list NRCellDU {
+            key id;
+            leaf id {type string;}
+            container attributes {
+                uses NRCellDUGrp;
+            }
+        }
+    }
+}
+

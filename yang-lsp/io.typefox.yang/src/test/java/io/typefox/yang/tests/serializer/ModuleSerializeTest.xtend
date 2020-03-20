@@ -62,11 +62,14 @@ class ModuleSerializeTest {
 		val targetModule = loadModuleFile("testgrp3.yang")
 		assertSerialized('''
 			module testgrp {
+			
 			    namespace "http://netconfcentral.org/ns/testgrp";
 			    prefix "tgrp";
+			
 			    revision 2010-05-27 {
 			        description "Initial revision.";
 			    }
+			
 			    grouping testgrp {
 			      list a {
 			        key g1;
@@ -75,7 +78,7 @@ class ModuleSerializeTest {
 			      }
 			   }
 			}
-		''', targetModule)
+		''', targetModule, false)
 	}
 
 	@Test 
@@ -114,7 +117,7 @@ class ModuleSerializeTest {
 				    }
 				}
 			}
-		''', targetModule)
+		''', targetModule, false)
 		EcoreUtil.resolveAll(targetModule)
 		assertSerialized('''
 			module xpath-serialize {
@@ -149,7 +152,7 @@ class ModuleSerializeTest {
 				    }
 				}
 			}
-		''', targetModule)
+		''', targetModule, false)
 	}
 	
 
@@ -181,17 +184,17 @@ class ModuleSerializeTest {
 		moduleResource.contents.add(targetModule)
 		assertSerialized('''
 			module serialize-test {
-				yang-version 1.1;
-				namespace urn:rdns:org:yangster:model:serialize-test;
-				prefix y;
-				organization 'Yangster Inc.';
-				contact yangster;
-				description 'This is a serialize test';
-				import t-common {
-					prefix t;
-				}
+			    yang-version 1.1;
+			    namespace urn:rdns:org:yangster:model:serialize-test;
+			    prefix y;
+			    organization 'Yangster Inc.';
+			    contact yangster;
+			    description 'This is a serialize test';
+			    import t-common {
+			        prefix t;
+			    }
 			}
-		''', targetModule)
+		''', targetModule, false)
 	}
 
 	@Test
@@ -215,16 +218,16 @@ class ModuleSerializeTest {
 		c2.substatements.add(createTailfCallpointProperty("is-system-created-cb"))
 		assertSerialized('''
 			module yangster-test {
-			    yang-version 1.1;
+				yang-version 1.1;
 				namespace urn:rdns:org:yangster:model:yangster-test;
 				prefix ytest;
 				
 				import yang-dep {
 					prefix ydep;
 				}
-				import t-common {
-					prefix t;
-				}
+			    import t-common {
+			        prefix t;
+			    }
 			
 				organization 'Yangster Inc.';
 				contact yangster;
@@ -236,22 +239,54 @@ class ModuleSerializeTest {
 					leaf l1 {
 						type string;
 					t:meta-data static-data {
-							t:meta-value true;
-						}
-						t:callpoint static-data-cb {
-							t:set-hook node;
-						}
-					}
-					t:suppress-echo true;
-				}
+			                t:meta-value true;
+			            }
+			            t:callpoint static-data-cb {
+			                t:set-hook node;
+			            }
+			        }
+			        t:suppress-echo true;
+			    }
 				
 				container c2 {
 				t:callpoint is-system-created-cb {
-						t:set-hook node;
-					}
-				}
+			            t:set-hook node;
+			        }
+			    }
 			}
-		''', targetModule)
+		''', targetModule, true)
+	}
+	
+	@Test
+	def void testIssue171() {
+		val targetModule = loadModuleFile("issue171/ericsson-mf-vdu-deviations.yang")
+		assertSerialized('''
+			module ericsson-mf-vdu-deviations {
+			  yang-version 1.1;
+			  namespace urn:rdns:com:ericsson:oammodel:ericsson-mf-vdu-deviations;
+			  prefix mf3gppdeviations;
+			
+			  import _3gpp-common-managed-element { prefix me3gpp; }
+			  import _3gpp-nr-nrm-gnbdufunction { prefix gnbdu3gpp; }
+			  import _3gpp-nr-nrm-nrcelldu { prefix nrcelldu3gpp; }
+			
+			  revision 2020-02-14;
+			
+			  deviation /me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/gnbdu3gpp:attributes/gnbdu3gpp:peeParametersList {
+			    deviate not-supported;
+			  }
+			  deviation /me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/nrcelldu3gpp:NRCellDU/nrcelldu3gpp:attributes/nrcelldu3gpp:peeParametersList {
+			    deviate not-supported;
+			  }
+			
+			  deviation /me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/gnbdu3gpp:attributes/gnbdu3gpp:priorityLabel {
+			    deviate not-supported;
+			  }
+			  deviation /me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/nrcelldu3gpp:NRCellDU/nrcelldu3gpp:attributes/nrcelldu3gpp:priorityLabel {
+			    deviate not-supported;
+			  }
+			}
+		''', targetModule, false)
 	}
 
 	private def Unknown createTailfSuppressEchoProperty() {
@@ -301,7 +336,10 @@ class ModuleSerializeTest {
 	}
 	private def AbstractModule loadModuleFile(String moduleFileName) {
 		var File moduleFile = new File("src/test/resources/" + moduleFileName)
-		loader.get(moduleFile)
+		val result = loader.get(moduleFile)
+		if (result === null)
+			throw new RuntimeException("File not found: " + moduleFileName)
+		return result
 	}
 
 	private def <T> create(Statement it, EClass substmtEClass, Class<T> clazz) {
@@ -310,9 +348,12 @@ class ModuleSerializeTest {
 		stmt as T
 	}
 	
-	private def assertSerialized(CharSequence expected, AbstractModule targetModule) {
+	private def assertSerialized(CharSequence expected, AbstractModule targetModule, boolean ignoreWhitespace) {
 		val resource = targetModule.eResource as XtextResource
 		val actual = resource.serializer.serialize(targetModule)
-		assertEquals(expected.toString.trim.replaceAll('\\s+', ' '), actual.trim.replaceAll('\\s+', ' '))
+		if (ignoreWhitespace)
+			assertEquals(expected.toString.trim.replaceAll('\\s+', ' '), actual.trim.replaceAll('\\s+', ' '))
+		else
+			assertEquals(expected.toString.trim, actual.trim)
 	}
 }

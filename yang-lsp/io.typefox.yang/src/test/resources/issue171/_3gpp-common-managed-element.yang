@@ -1,0 +1,34 @@
+module _3gpp-common-managed-element {
+    yang-version 1.1;
+    namespace urn:3gpp:sa5:_3gpp-common-managed-element;
+    prefix "me3gpp";
+
+    revision 2019-06-17;
+
+    grouping ManagedElement_Grp {
+        leaf userLabel {
+            type string;
+        }
+    }
+
+    grouping ManagedElementGrp {
+
+        uses ManagedElement_Grp;
+    
+        leaf vendorName {
+            config false;
+            type string;
+        }
+    }
+
+    list ManagedElement {
+        key id;
+        leaf id {
+            type string;
+        }
+        container attributes {
+            uses ManagedElementGrp;
+        }
+    }
+}
+
