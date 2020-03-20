@@ -67,4 +67,55 @@ class Bug163Test extends AbstractYangTest {
 		]
 	}
 	
+	@Test 
+	def void testPathLink2() {
+		val r = '''
+			module m1 {
+				prefix c;
+				namespace c;
+			
+			    grouping gy-failure-profile-type {
+			        leaf name {
+			            type string;
+			        }
+			    }
+			    grouping gy-profile-type {
+			        leaf name {
+			            type string;
+			        }
+			        leaf failure-profile {
+			            type leafref {
+			                path "../../gy-failure-profile/name";  
+			            }
+			        }
+			    }
+			
+			    grouping pgw-type {
+			        container credit-control {
+			            list gy-failure-profile {
+			                key "name";
+			                uses gy-failure-profile-type;
+			            }
+			
+			            list gy-profile {
+			                key "name";
+			                uses gy-profile-type;
+			            }
+			        }
+			    }
+			
+			    container epg {
+			        container pgw {
+			            uses pgw-type;
+			        }
+			    }
+			}
+		'''.load()
+		r.assertNoErrors()
+		r.allContents.filter(XpathNameTest).forEach [
+			val exprNode = getContainerOfType(XpathExpression).node
+			assertFalse('''Unresolved reference: «exprNode.text» (line «exprNode.startLine»)''', ref.eIsProxy)
+		]
+	}
+	
 }

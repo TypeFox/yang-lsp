@@ -84,7 +84,16 @@ class XpathResolver {
 	
 	def XpathType doResolve(XpathExpression expression, QualifiedName contextNode, IScopeContext context) {
 		val element = context.schemaNodeScope.getSingleElement(contextNode)
-		val initialContext = Types.nodeSet(element)
+		val initialContext =
+			if (element === null) {
+				Types.nodeSet(emptyList)
+			} else {
+				val allDescriptions = context.schemaNodeScope.getElements(element.EObjectOrProxy).toList
+				if (allDescriptions.empty)
+					Types.nodeSet(element)
+				else
+					Types.nodeSet(allDescriptions)
+			}
 		internalResolve(expression, initialContext, new Context(context.schemaNodeScope, context.moduleName, initialContext))
 	}
 	
