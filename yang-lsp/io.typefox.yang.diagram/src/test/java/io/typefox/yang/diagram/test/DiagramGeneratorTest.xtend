@@ -219,7 +219,6 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          )
 			        ],
 			        YangNode [
-			          cssClass = "moduleNode"
 			          layout = "vbox"
 			          selected = false
 			          layoutOptions = LayoutOptions [
@@ -230,8 +229,11 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          ]
 			          type = "node:class"
 			          id = "mytest:myt-node"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "moduleNode"
+			          )
 			          children = ArrayList (
-			            YangHeaderNode [
+			            SCompartment [
 			              layout = "hbox"
 			              layoutOptions = LayoutOptions [
 			                paddingLeft = 8.0
@@ -291,11 +293,13 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          children = ArrayList ()
 			        ],
 			        YangNode [
-			          cssClass = "uses"
 			          layout = "vbox"
 			          selected = false
 			          type = "node:pill"
 			          id = "mytest:myt-node-/myt:testcontainer/myt:innerTestContainer-augmentation-uses mytest2Group-pill"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "uses"
+			          )
 			          children = ArrayList (
 			            SCompartment [
 			              layout = "vbox"
@@ -346,7 +350,6 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          children = ArrayList ()
 			        ],
 			        YangNode [
-			          cssClass = "container"
 			          layout = "vbox"
 			          selected = false
 			          layoutOptions = LayoutOptions [
@@ -357,8 +360,11 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          ]
 			          type = "node:class"
 			          id = "mytest:myt-node-container-testcontainer-container-innerTestContainer-list-innerTestList-container-listContainer"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "container"
+			          )
 			          children = ArrayList (
-			            YangHeaderNode [
+			            SCompartment [
 			              layout = "hbox"
 			              layoutOptions = LayoutOptions [
 			                paddingLeft = 8.0
@@ -433,7 +439,6 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          children = ArrayList ()
 			        ],
 			        YangNode [
-			          cssClass = "list"
 			          layout = "vbox"
 			          selected = false
 			          layoutOptions = LayoutOptions [
@@ -444,8 +449,11 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          ]
 			          type = "node:class"
 			          id = "mytest:myt-node-container-testcontainer-container-innerTestContainer-list-innerTestList"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "list"
+			          )
 			          children = ArrayList (
-			            YangHeaderNode [
+			            SCompartment [
 			              layout = "hbox"
 			              layoutOptions = LayoutOptions [
 			                paddingLeft = 8.0
@@ -520,7 +528,6 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          children = ArrayList ()
 			        ],
 			        YangNode [
-			          cssClass = "container"
 			          layout = "vbox"
 			          selected = false
 			          layoutOptions = LayoutOptions [
@@ -531,8 +538,11 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          ]
 			          type = "node:class"
 			          id = "mytest:myt-node-container-testcontainer-container-innerTestContainer"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "container"
+			          )
 			          children = ArrayList (
-			            YangHeaderNode [
+			            SCompartment [
 			              layout = "hbox"
 			              layoutOptions = LayoutOptions [
 			                paddingLeft = 8.0
@@ -623,11 +633,13 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          children = ArrayList ()
 			        ],
 			        YangNode [
-			          cssClass = "uses"
 			          layout = "vbox"
 			          selected = false
 			          type = "node:pill"
 			          id = "mytest:myt-node-container-groupingTest-uses anotherGroup-pill"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "uses"
+			          )
 			          children = ArrayList (
 			            SCompartment [
 			              layout = "vbox"
@@ -670,11 +682,13 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          children = ArrayList ()
 			        ],
 			        YangNode [
-			          cssClass = "uses"
 			          layout = "vbox"
 			          selected = false
 			          type = "node:pill"
 			          id = "mytest:myt-node-container-externalGroupingTest-uses mytest2Group-pill"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "uses"
+			          )
 			          children = ArrayList (
 			            SCompartment [
 			              layout = "vbox"
@@ -709,7 +723,6 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          children = ArrayList ()
 			        ],
 			        YangNode [
-			          cssClass = "grouping"
 			          layout = "vbox"
 			          selected = false
 			          layoutOptions = LayoutOptions [
@@ -720,8 +733,11 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          ]
 			          type = "node:class"
 			          id = "mytest:myt-node-grouping-endpoint"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "grouping"
+			          )
 			          children = ArrayList (
-			            YangHeaderNode [
+			            SCompartment [
 			              layout = "hbox"
 			              layoutOptions = LayoutOptions [
 			                paddingLeft = 8.0
@@ -796,7 +812,6 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          trace = "synthetic:///__synthetic1.yang?9:4-17:6#//@substatements.4"
 			        ],
 			        YangNode [
-			          cssClass = "grouping"
 			          layout = "vbox"
 			          selected = false
 			          layoutOptions = LayoutOptions [
@@ -807,8 +822,11 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          ]
 			          type = "node:class"
 			          id = "mytest:myt-node-grouping-anotherGroup"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "grouping"
+			          )
 			          children = ArrayList (
-			            YangHeaderNode [
+			            SCompartment [
 			              layout = "hbox"
 			              layoutOptions = LayoutOptions [
 			                paddingLeft = 8.0
@@ -875,7 +893,6 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          trace = "synthetic:///__synthetic1.yang?19:5-24:6#//@substatements.5"
 			        ],
 			        YangNode [
-			          cssClass = "augment"
 			          layout = "vbox"
 			          selected = false
 			          layoutOptions = LayoutOptions [
@@ -886,8 +903,11 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          ]
 			          type = "node:class"
 			          id = "mytest:myt-node-/myt:testcontainer-augmentation"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "augment"
+			          )
 			          children = ArrayList (
-			            YangHeaderNode [
+			            SCompartment [
 			              layout = "hbox"
 			              layoutOptions = LayoutOptions [
 			                paddingLeft = 8.0
@@ -954,7 +974,6 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          trace = "synthetic:///__synthetic1.yang?26:5-30:6#//@substatements.6"
 			        ],
 			        YangNode [
-			          cssClass = "augment"
 			          layout = "vbox"
 			          selected = false
 			          layoutOptions = LayoutOptions [
@@ -965,8 +984,11 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          ]
 			          type = "node:class"
 			          id = "mytest:myt-node-/myt:testcontainer/myt:innerTestContainer-augmentation"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "augment"
+			          )
 			          children = ArrayList (
-			            YangHeaderNode [
+			            SCompartment [
 			              layout = "hbox"
 			              layoutOptions = LayoutOptions [
 			                paddingLeft = 8.0
@@ -1024,7 +1046,6 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          trace = "synthetic:///__synthetic1.yang?32:5-34:6#//@substatements.7"
 			        ],
 			        YangNode [
-			          cssClass = "augment"
 			          layout = "vbox"
 			          selected = false
 			          layoutOptions = LayoutOptions [
@@ -1035,8 +1056,11 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          ]
 			          type = "node:class"
 			          id = "mytest:myt-node-/myt2:bla-augmentation"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "augment"
+			          )
 			          children = ArrayList (
-			            YangHeaderNode [
+			            SCompartment [
 			              layout = "hbox"
 			              layoutOptions = LayoutOptions [
 			                paddingLeft = 8.0
@@ -1103,7 +1127,6 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          trace = "synthetic:///__synthetic1.yang?36:5-40:6#//@substatements.8"
 			        ],
 			        YangNode [
-			          cssClass = "container"
 			          layout = "vbox"
 			          selected = false
 			          layoutOptions = LayoutOptions [
@@ -1114,8 +1137,11 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          ]
 			          type = "node:class"
 			          id = "mytest:myt-node-container-testcontainer"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "container"
+			          )
 			          children = ArrayList (
-			            YangHeaderNode [
+			            SCompartment [
 			              layout = "hbox"
 			              layoutOptions = LayoutOptions [
 			                paddingLeft = 8.0
@@ -1182,7 +1208,6 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          trace = "synthetic:///__synthetic1.yang?42:5-66:5#//@substatements.9"
 			        ],
 			        YangNode [
-			          cssClass = "container"
 			          layout = "vbox"
 			          selected = false
 			          layoutOptions = LayoutOptions [
@@ -1193,8 +1218,11 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          ]
 			          type = "node:class"
 			          id = "mytest:myt-node-container-groupingTest"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "container"
+			          )
 			          children = ArrayList (
-			            YangHeaderNode [
+			            SCompartment [
 			              layout = "hbox"
 			              layoutOptions = LayoutOptions [
 			                paddingLeft = 8.0
@@ -1252,7 +1280,6 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          trace = "synthetic:///__synthetic1.yang?68:4-70:5#//@substatements.10"
 			        ],
 			        YangNode [
-			          cssClass = "container"
 			          layout = "vbox"
 			          selected = false
 			          layoutOptions = LayoutOptions [
@@ -1263,8 +1290,11 @@ class DiagramGeneratorTest extends AbstractYangTest {
 			          ]
 			          type = "node:class"
 			          id = "mytest:myt-node-container-externalGroupingTest"
+			          cssClasses = UnmodifiableRandomAccessList (
+			            "container"
+			          )
 			          children = ArrayList (
-			            YangHeaderNode [
+			            SCompartment [
 			              layout = "hbox"
 			              layoutOptions = LayoutOptions [
 			                paddingLeft = 8.0
