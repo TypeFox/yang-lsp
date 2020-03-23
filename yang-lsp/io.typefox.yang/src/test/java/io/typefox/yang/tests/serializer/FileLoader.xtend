@@ -2,17 +2,16 @@ package io.typefox.yang.tests.serializer
 
 import io.typefox.yang.yang.AbstractModule
 import java.io.File
-import java.io.FileFilter
 import java.util.Collections
 import java.util.List
 import org.eclipse.core.runtime.Assert
 import org.eclipse.emf.common.CommonPlugin
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtext.resource.IResourceDescription
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsData
-import org.eclipse.emf.ecore.util.EcoreUtil
 
 /**
  * ModuleLoader only focus on loading URI/File into ResourceSet,
@@ -33,18 +32,14 @@ class FileLoader {
 	}
 	
 	def get(File file) {
-		var Resource resource = xtextResourceSet.resources.findFirst[ r |
+		val resource = xtextResourceSet.resources.findFirst[ r |
 			var rURI = r.URI
 			if (!rURI.isFile) {
 				rURI = CommonPlugin.resolve(r.URI)
 			}
 			file.absolutePath.equals(rURI.toFileString)
 		]
-		if (resource !== null) {
-			return resource.getContents().get(0) as AbstractModule
-		}
-
-		return null
+		return resource?.contents?.head as AbstractModule
 	}
 	
 	private def void prepareXtextResources(List<String> moduleSearchDirs) {
@@ -53,32 +48,28 @@ class FileLoader {
 	
 	private def void handleDependenciesPath(String pathString) {
         var File dependenciesPathFile = new File(pathString);
-        if(dependenciesPathFile.isFile()) {
+        if (dependenciesPathFile.isFile && dependenciesPathFile.name.endsWith('.yang')) {
             getOrCreateResource(URI.createFileURI(pathString));
         }
         
-        if(dependenciesPathFile.isDirectory()) {
+        if (dependenciesPathFile.isDirectory) {
             recursivelyIntoDirectory(dependenciesPathFile);
         }
     }
 
     private def void recursivelyIntoDirectory(File dependenciesPathFile) {
-        var File[] yangFiles = dependenciesPathFile.listFiles(new FileFilter() {
-            override boolean accept(File pathname) {
-                return pathname.getName().endsWith(".yang");
-            }
-        })
-        if(yangFiles === null) {
-            return;
+        var File[] yangFiles = dependenciesPathFile.listFiles
+        if (yangFiles === null) {
+            return
         }
-        for(File yangFile : yangFiles) {
-            handleDependenciesPath(yangFile.getAbsolutePath());
+        for (yangFile : yangFiles) {
+            handleDependenciesPath(yangFile.absolutePath)
         }
     }
     
     private def void getOrCreateResource(URI uri) {
         var targetResource = xtextResourceSet.getResource(uri, true);
-        if(targetResource === null) {
+        if (targetResource === null) {
             xtextResourceSet.createResource(uri);
         }
     }

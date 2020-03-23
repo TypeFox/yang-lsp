@@ -1,0 +1,58 @@
+module _3gpp-nr-nrm-gnbdufunction {
+    yang-version 1.1;
+    namespace "urn:3gpp:sa5:_3gpp-nr-nrm-gnbdufunction";
+    prefix "gnbdu3gpp";
+
+    import _3gpp-common-managed-function {
+        prefix mf3gpp;
+    }
+    import _3gpp-common-managed-element {
+        prefix me3gpp;
+    }
+
+    revision 2019-08-17;
+
+    grouping GNBDUFunctionGrp {
+        uses mf3gpp:ManagedFunctionGrp;
+
+        leaf gNBId {
+            type int64 {
+                range "0..4294967295";
+            }
+            mandatory true;
+        }
+
+        leaf gNBIdLength {
+            type int32 {
+                range "22..32";
+            }
+            mandatory true;
+        }
+
+        leaf gNBDUId {
+            type int64 {
+                range "0..68719476735";
+            }
+            mandatory true;
+        }
+
+        leaf gNBDUName {
+            type string {
+                length "1..150";
+            }
+            mandatory true;
+        }
+    }
+
+    augment "/me3gpp:ManagedElement" {
+
+        list GNBDUFunction {
+            key id;
+            leaf id {type string;}
+            container attributes {
+                uses GNBDUFunctionGrp;
+            }
+        }
+    }
+}
+

@@ -1,0 +1,25 @@
+module ericsson-mf-vdu-deviations {
+  yang-version 1.1;
+  namespace urn:rdns:com:ericsson:oammodel:ericsson-mf-vdu-deviations;
+  prefix mf3gppdeviations;
+
+  import _3gpp-common-managed-element { prefix me3gpp; }
+  import _3gpp-nr-nrm-gnbdufunction { prefix gnbdu3gpp; }
+  import _3gpp-nr-nrm-nrcelldu { prefix nrcelldu3gpp; }
+
+  revision 2020-02-14;
+
+  deviation /me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/gnbdu3gpp:attributes/gnbdu3gpp:peeParametersList {
+    deviate not-supported;
+  }
+  deviation /me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/nrcelldu3gpp:NRCellDU/nrcelldu3gpp:attributes/nrcelldu3gpp:peeParametersList {
+    deviate not-supported;
+  }
+
+  deviation /me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/gnbdu3gpp:attributes/gnbdu3gpp:priorityLabel {
+    deviate not-supported;
+  }
+  deviation /me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/nrcelldu3gpp:NRCellDU/nrcelldu3gpp:attributes/nrcelldu3gpp:priorityLabel {
+    deviate not-supported;
+  }
+}
