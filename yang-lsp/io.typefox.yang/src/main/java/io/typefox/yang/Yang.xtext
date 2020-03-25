@@ -16,7 +16,7 @@ fragment StatementEnd returns Statement:
 ;
 
 Statement:
-	  SchemaNode | 
+	  SchemaNode |
 	  OtherStatement
 ;
 
@@ -507,7 +507,7 @@ GroupingRef:
 
 XpathExpression returns XpathExpression:
 	{ UnparsedXpath } '<<<<' text=STRING '>>>>'
-	| ParsedXpathExpression; 
+	| ParsedXpathExpression;
 
 ParsedXpathExpression returns XpathExpression:  
 	XpathOrExpr
@@ -608,8 +608,33 @@ XpathAxisName:
 ;
 
 XpathIDOrKw :
-	ID | 'div' | 'and'| 'or' | 'mod' | XpathAxisName | XpathNodeType | '*'
+	ID | 'div' | 'and' | 'or' | 'mod' | XpathAxisName | XpathNodeType | '*'
 ;
+
+
+// Dummy rules for type hierarchy
+
+XpathBinaryOperation:
+	XpathOrOperation | XpathAndOperation | XpathEqualityOperation | XpathRelationalOperation | XpathAdditiveOperation | XpathMultiplicativeOperation;
+
+XpathOrOperation:
+	left=XpathExpression '#dummy#' operator='or' right=XpathExpression;
+
+XpathAndOperation:
+	left=XpathExpression '#dummy#' operator='and' right=XpathExpression;
+
+XpathEqualityOperation:
+	left=XpathExpression '#dummy#' operator=('='|'!=') right=XpathExpression;
+
+XpathRelationalOperation:
+	left=XpathExpression '#dummy#' operator=('<'|'>'|'<='|'>=') right=XpathExpression;
+
+XpathAdditiveOperation:
+	left=XpathExpression '#dummy#' operator=('+'|'-') right=XpathExpression;
+
+XpathMultiplicativeOperation:
+	left=XpathExpression '#dummy#' operator=('*'|'div'|'mod') right=XpathExpression;
+
 
 /////////////////////////////////
 /////////////////////////////////

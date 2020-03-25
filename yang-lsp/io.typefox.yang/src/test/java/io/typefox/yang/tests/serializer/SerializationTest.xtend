@@ -14,6 +14,7 @@ import io.typefox.yang.yang.YangPackage
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EClass
+import org.eclipse.xtext.resource.SaveOptions
 import org.eclipse.xtext.resource.XtextResource
 import org.junit.Test
 
@@ -137,7 +138,7 @@ class SerializationTest extends AbstractYangTest {
 	}
 	
 	@Test
-	def void testIssue166() {
+	def void testIssue166a() {
 		val resource = load('''
 			module serialize-test {
 			    container second-tag {
@@ -156,6 +157,97 @@ class SerializationTest extends AbstractYangTest {
 			        must
 			            '../outer-tag/tag-type = "dot1q-types:s-vlan" and ' +
 			            'tag-type = "dot1q-types:c-vlan"' {
+			        }
+			    }
+			}
+			'''.toString, serialized)
+	}
+	
+	@Test
+	def void testIssue166b() {
+		val resource = load('''
+			module spaceremoved {
+			  yang-version 1.1;
+			  namespace "urn:ietf:params:xml:ns:yang:spaceremoved";
+			  prefix removespace;
+			
+			  revision 2020-03-24 {
+			    description "expose space remove problem";
+			  }
+			
+			  container outer-tag {
+			    must
+			      'tag-type = "s-vlan" or ' +
+			      'tag-type = "c-vlan"' {
+			
+			      error-message
+			          "Only C-VLAN and S-VLAN tags can be matched";
+			    }
+			    uses dot1q-tag-classifier-grouping;  
+			  }
+			
+			  container second-tag {
+			    must
+			      '../outer-tag/tag-type = "s-vlan" and ' +
+			      'tag-type = "c-vlan"' {
+			
+			      error-message
+			        "When matching two tags, the outermost tag must be
+			          specified and of S-VLAN type and the second outermost
+			          tag must be of C-VLAN tag type";
+			    }
+			    uses dot1q-tag-classifier-grouping;	 		  
+			  }
+			
+			  grouping dot1q-tag-classifier-grouping {
+			    leaf tag-type {
+			      type string;
+			      description
+			        "VLAN type";
+			    }
+			  }
+			}
+		''') as XtextResource
+		
+		val saveOptions = SaveOptions.newBuilder.format.options
+		val serialized = resource.serializer.serialize(resource.contents.head, saveOptions)
+		assertEquals('''
+			module spaceremoved {
+			    yang-version 1.1;
+			    namespace "urn:ietf:params:xml:ns:yang:spaceremoved";
+			    prefix removespace;
+			
+			    revision 2020-03-24 {
+			        description "expose space remove problem";
+			    }
+			
+			    container outer-tag {
+			        must 'tag-type = "s-vlan" or ' +
+			      'tag-type = "c-vlan"' {
+			
+			            error-message
+			          "Only C-VLAN and S-VLAN tags can be matched";
+			        }
+			        uses dot1q-tag-classifier-grouping;
+			    }
+			
+			    container second-tag {
+			        must '../outer-tag/tag-type = "s-vlan" and ' +
+			      'tag-type = "c-vlan"' {
+			
+			            error-message
+			        "When matching two tags, the outermost tag must be
+			          specified and of S-VLAN type and the second outermost
+			          tag must be of C-VLAN tag type";
+			        }
+			        uses dot1q-tag-classifier-grouping;
+			    }
+			
+			    grouping dot1q-tag-classifier-grouping {
+			        leaf tag-type {
+			            type string;
+			            description
+			        "VLAN type";
 			        }
 			    }
 			}

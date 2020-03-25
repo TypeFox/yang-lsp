@@ -71,6 +71,7 @@ import io.typefox.yang.yang.Unknown
 import io.typefox.yang.yang.Uses
 import io.typefox.yang.yang.Value
 import io.typefox.yang.yang.When
+import io.typefox.yang.yang.XpathBinaryOperation
 import io.typefox.yang.yang.XpathExpression
 import io.typefox.yang.yang.XpathLocation
 import io.typefox.yang.yang.XpathNameTest
@@ -539,16 +540,25 @@ class YangFormatter extends AbstractFormatter2 {
     protected def formatXpath(extension IFormattableDocument document, XpathExpression expression) {
         val nodeRegions = expression.allSemanticRegions.toList
         nodeRegions.head.prepend[oneSpace]
-        nodeRegions
-        	.tail
-        	.filter[grammarElement == HIDDENRule && (semanticElement instanceof XpathLocation || semanticElement instanceof XpathNameTest)]
-        	.forEach[prepend[noSpace]]
+        nodeRegions.tail.forEach[formatXpathRegion(document)]
         val nextSemanticRegion = nodeRegions.last.nextSemanticRegion
         if (HIDDENRule == nextSemanticRegion.grammarElement) {
             nextSemanticRegion.prepend[noSpace].append[oneSpace]
         } else {
             nodeRegions.last.append[oneSpace]
         }
+    }
+    
+    private def formatXpathRegion(ISemanticRegion region, extension IFormattableDocument document) {
+    	if (region.grammarElement == HIDDENRule) {
+    		val semantic = region.semanticElement
+    		if (semantic instanceof XpathLocation || semantic instanceof XpathNameTest) {
+    			val previousSemantic = region.previousSemanticRegion.semanticElement
+    			if (!(previousSemantic instanceof XpathBinaryOperation)) {
+    				region.prepend[noSpace]
+				}
+			}
+    	}
     }
     
     protected def formatRefinement(extension IFormattableDocument document, Expression expression) {
