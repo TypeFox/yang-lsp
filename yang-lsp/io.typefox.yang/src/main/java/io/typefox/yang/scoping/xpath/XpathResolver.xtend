@@ -1,5 +1,6 @@
 package io.typefox.yang.scoping.xpath
 
+import com.google.common.collect.AbstractIterator
 import com.google.inject.Inject
 import io.typefox.yang.scoping.IScopeContext
 import io.typefox.yang.scoping.Linker
@@ -21,6 +22,7 @@ import io.typefox.yang.yang.ParentRef
 import io.typefox.yang.yang.Path
 import io.typefox.yang.yang.ProcessingInstruction
 import io.typefox.yang.yang.RelativePath
+import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.Type
 import io.typefox.yang.yang.XpathAdditiveOperation
 import io.typefox.yang.yang.XpathAndOperation
@@ -414,32 +416,15 @@ class XpathResolver {
 		} else if (mode == Axis.ANCESTOR) {
 			return findNodes(prefix.skipLast, name, Axis.ANCESTOR_OR_SELF, nodeScope)
 		} else if (mode == Axis.ANCESTOR_OR_SELF) {
-			val result = newArrayList()
-			var parent = prefix
-			while (parent.segmentCount >= 2) {
-				if (name === null || name == ASTERISK || parent.endsWith(name)) {
-					val p = nodeScope.getSingleElement(parent)
-					if (p !== null && isInstanceNode(p)) {
-						result.add(p)
-					}
-				}
-				parent = parent.skipLast
-			}
-			return result
+			return getNodeHierarchy(prefix, nodeScope, false)
+					.filter[name === null || name == ASTERISK || qualifiedName.endsWith(name)]
+					.toList
 		} else if (mode == Axis.PARENT) {
-			var parent = prefix
-			while (parent.segmentCount >= 2) {
-				parent = parent.skipLast
-				val p = nodeScope.getSingleElement(parent)
-				if (p !== null) {
-					if (isInstanceNode(p)) {						
-						return #[p]
-					}
-				} else {	
-					return #[Linker.ROOT]
-				}
-			}
-			return #[Linker.ROOT]
+			val parent = getNodeHierarchy(prefix.skipLast, nodeScope, true).head
+			if (parent !== null)						
+				return #[parent]
+			else
+				return #[Linker.ROOT]
 		} else {
 			val elements = nodeScope.allElements.filter [
 				if (qualifiedName.startsWith(prefix) && qualifiedName.segmentCount > prefix.segmentCount) {
@@ -447,16 +432,10 @@ class XpathResolver {
 						if (mode === Axis.DESCENDANTS) {
 							return true
 						} else {
-							// check all intermediate nodes, whether they are schema only nodes
-							var parent = qualifiedName.skipLast
-							while (parent.segmentCount > prefix.segmentCount) {
-								val p = nodeScope.getSingleElement(parent)
-								if (p !== null && isInstanceNode(p)) {
-									return false
-								}
-								parent = parent.skipLast
-							}
-							return true
+							// Check whether all intermediate nodes are schema-only nodes
+							val parents = getNodeHierarchy(qualifiedName.skipLast, nodeScope, false)
+									.filter[qualifiedName.segmentCount > prefix.segmentCount]
+							return parents.isEmpty
 						}
 					}
 				}
@@ -468,16 +447,51 @@ class XpathResolver {
 	
 	private def endsWith(QualifiedName parent, QualifiedName child) {
 		val offset = parent.segmentCount - child.segmentCount
-		if(offset >= 0) 
+		if (offset >= 0) 
 			return parent.skipFirst(offset) == child
 		else
 			return false
 	}
 	
+	/**
+	 * Returns all instance nodes starting at the given qualified name and following
+	 * the hierarchy of parents. Used to avoid duplicate scope lookups.
+	 */
+	protected def Iterable<IEObjectDescription> getNodeHierarchy(
+			QualifiedName startQName, MapScope nodeScope, boolean stopAtNull) {
+		[
+			new AbstractIterator<IEObjectDescription> {
+				QualifiedName qname = startQName
+				IEObjectDescription descr
+				override protected computeNext() {
+					while (qname.segmentCount >= 2) {
+						// Look up node description in scope, if not already done before (see below)
+						val nextDescr = descr ?: nodeScope.getSingleElement(qname)
+						qname = qname.skipLast
+						descr = null
+						if (nextDescr === null && stopAtNull)
+							return endOfData
+						var isInstance = nextDescr.isInstanceNode
+						if (isInstance && nextDescr.EObjectOrProxy instanceof SchemaNode && qname.segmentCount >= 2) {
+							// If the direct parent of a SchemaNode is a Choice, an implicit Case with the same name is inserted.
+							// In this case we skip the implicit Case (and the containing Choice).
+							descr = nodeScope.getSingleElement(qname)
+							if (descr !== null && descr.EObjectOrProxy instanceof Choice)
+								isInstance = false
+						}
+						if (isInstance)
+							return nextDescr
+					}
+					return endOfData
+				}
+			}
+		]
+	}
+	
 	protected def boolean isInstanceNode(IEObjectDescription description) {
-		switch (description.EObjectOrProxy) {
-			Choice, Case, Input, Output : false
-			default : true 
+		switch node: description.EObjectOrProxy {
+			Choice, Case, Input, Output: false
+			default: node !== null
 		}
 	}
 	

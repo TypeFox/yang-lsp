@@ -67,7 +67,7 @@ class Bug163Test extends AbstractYangTest {
 		]
 	}
 	
-	@Test 
+	@Test
 	def void testPathLink2() {
 		val r = '''
 			module m1 {
@@ -107,6 +107,65 @@ class Bug163Test extends AbstractYangTest {
 			    container epg {
 			        container pgw {
 			            uses pgw-type;
+			        }
+			    }
+			}
+		'''.load()
+		r.assertNoErrors()
+		r.allContents.filter(XpathNameTest).forEach [
+			val exprNode = getContainerOfType(XpathExpression).node
+			assertFalse('''Unresolved reference: «exprNode.text» (line «exprNode.startLine»)''', ref.eIsProxy)
+		]
+	}
+	
+	@Test
+	def void testPathLink3() {
+		val r = '''
+			module m1 {
+				prefix c;
+				namespace c;
+			
+			    container packet-detection {
+			        description
+			            "Configuration for packet detection";
+			        uses applist;
+			        uses filterlist;
+			    }
+			
+			    grouping applist {
+			        container application-list {
+			          description
+			            "Configuration for packet inspection";
+			    	  config false;
+			          list application {
+			            choice app-matching-conditions-start-menu {
+			              list and {
+			                leaf-list filter {
+			                  description
+			                    "Matching Condition Filter identifier to match";
+			                  type leafref {
+			                    path "../../../../filter-list/filter/name";
+			                  }
+			                }
+			              }
+			            }
+			          }
+			        }
+			    }
+			
+			    grouping filterlist {
+			        container filter-list {
+			          description
+			            "Configuration for packet inspection";
+			          list filter {
+			            key "name";
+			            leaf name {
+			              description
+			                "Filter identifier";
+			              type string;
+			              mandatory true;
+			            }
+			          }
 			        }
 			    }
 			}
