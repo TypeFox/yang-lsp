@@ -21,7 +21,7 @@ class Linker {
 	@Inject LazyURIEncoder lazyURIEncoder
 	@Inject IQualifiedNameConverter qualifiedNameConverter
 
-	public static IEObjectDescription ROOT = new EObjectDescription(QualifiedName.EMPTY, null, null);
+	public static final IEObjectDescription ROOT = new EObjectDescription(QualifiedName.EMPTY, null, null)
 
 	def <T> T link(EObject element, EReference reference, (QualifiedName)=>IEObjectDescription resolver) {
 		val proxy = element.eGet(reference, false) as EObject

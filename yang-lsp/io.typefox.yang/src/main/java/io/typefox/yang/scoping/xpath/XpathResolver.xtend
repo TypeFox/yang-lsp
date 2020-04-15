@@ -59,7 +59,7 @@ class XpathResolver {
 	@Inject ScopeContextProvider scopeContextProvider
 	@Inject extension YangExtensions 
 	
-	static val ASTERISK = QualifiedName.create('*')
+	public static val ASTERISK = QualifiedName.create('*')
 	
 	@Data static class Context {
 		MapScope nodeScope
@@ -293,8 +293,8 @@ class XpathResolver {
 			if (contextType instanceof NodeSetType) {
 				if (!(e.node instanceof XpathNodeType)) {
 					val ref = new AtomicReference<XpathType>()
-					linker.link(e.node, YangPackage.Literals.XPATH_NAME_TEST__REF) [
-						if (it.lastSegment == '*') {
+					linker.link(e.node, YangPackage.Literals.XPATH_NAME_TEST__REF) [ nodeName |
+						if (nodeName.endsWith(ASTERISK)) {
 							ref.set(contextType)
 							return contextType.EObjectDescription
 						} else {

@@ -90,6 +90,54 @@ class SerializationTest extends AbstractYangTest {
 	}
 	
 	@Test
+	def void testIssue160() {
+		val resource = load('''
+			module xpath-asterisk {
+			  namespace xa;
+			  prefix xa;
+			  container routings {
+			    list routing {
+			    	key "name";
+			        leaf name {
+			            type string;
+			        }
+			        list api {
+			       	  key "name";
+			          leaf name {
+			       	    type string;
+			       	    must "count(/xa:routings/xa:routing[*]/xa:api[xa:name = current()]) = 1";
+			          }
+			       }
+			    }
+			  }
+			}
+		''') as XtextResource
+		
+		val serialized = resource.serializer.serialize(resource.contents.head)
+		assertEquals('''
+			module xpath-asterisk {
+			  namespace xa;
+			  prefix xa;
+			  container routings {
+			    list routing {
+			    	key "name";
+			        leaf name {
+			            type string;
+			        }
+			        list api {
+			       	  key "name";
+			          leaf name {
+			       	    type string;
+			       	    must "count(/xa:routings/xa:routing[*]/xa:api[xa:name = current()]) = 1";
+			          }
+			       }
+			    }
+			  }
+			}
+			'''.toString, serialized)
+	}
+	
+	@Test
 	def void testIssue164a() {
 		val resource = load('''
 			module serialize-test {
