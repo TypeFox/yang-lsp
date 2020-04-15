@@ -102,13 +102,13 @@ class LocalNodeScopeContext extends LocalScopeContext {
 @Log
 class ScopeContext implements IScopeContext {
 
-	@Accessors(PUBLIC_GETTER) IScope moduleScope
+	@Accessors(PUBLIC_GETTER) final IScope moduleScope
 	
-	@Accessors(PUBLIC_GETTER) MapScope groupingScope = new MapScope(new LazyScope[computeParentDefinitionScope[getGroupingScope]])
-	@Accessors(PUBLIC_GETTER) MapScope typeScope = new MapScope(new LazyScope[computeParentDefinitionScope[getTypeScope]])
-	@Accessors(PUBLIC_GETTER) MapScope identityScope = new MapScope(new LazyScope[computeParentDefinitionScope[getIdentityScope]])
-	@Accessors(PUBLIC_GETTER) MapScope featureScope = new MapScope(new LazyScope[computeParentDefinitionScope[getFeatureScope]])
-	@Accessors(PUBLIC_GETTER) MapScope extensionScope = new MapScope(new LazyScope[computeParentDefinitionScope[getExtensionScope]])
+	@Accessors(PUBLIC_GETTER) final MapScope groupingScope = new MapScope(new LazyScope[computeParentDefinitionScope[getGroupingScope]])
+	@Accessors(PUBLIC_GETTER) final MapScope typeScope = new MapScope(new LazyScope[computeParentDefinitionScope[getTypeScope]])
+	@Accessors(PUBLIC_GETTER) final MapScope identityScope = new MapScope(new LazyScope[computeParentDefinitionScope[getIdentityScope]])
+	@Accessors(PUBLIC_GETTER) final MapScope featureScope = new MapScope(new LazyScope[computeParentDefinitionScope[getFeatureScope]])
+	@Accessors(PUBLIC_GETTER) final MapScope extensionScope = new MapScope(new LazyScope[computeParentDefinitionScope[getExtensionScope]])
 	MapScope schemaNodeScope
 	
 	List<Runnable> resolveDefinitions = newArrayList
@@ -116,9 +116,8 @@ class ScopeContext implements IScopeContext {
 	List<Runnable> afterAll = newArrayList
 							  
 	@Accessors(PUBLIC_GETTER) Map<String, IScopeContext> importedModules = newHashMap
-	
-	@Accessors String localPrefix = null
-	@Accessors String moduleName = null
+	@Accessors final String localPrefix
+	@Accessors final String moduleName
 	/**
 	 * the scopes from other files belonging to the same module
 	 */
