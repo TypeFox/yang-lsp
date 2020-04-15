@@ -1,6 +1,7 @@
 package io.typefox.yang.resource
 
 import com.google.inject.Inject
+import io.typefox.yang.scoping.xpath.XpathResolver
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.yang.AbstractImport
 import io.typefox.yang.yang.CurrentRef
@@ -23,6 +24,8 @@ import org.eclipse.xtext.scoping.IScopeProvider
 import org.eclipse.xtext.serializer.diagnostic.ISerializationDiagnostic.Acceptor
 import org.eclipse.xtext.serializer.tokens.CrossReferenceSerializer
 import org.eclipse.xtext.serializer.tokens.SerializerScopeProviderBinding
+
+import static io.typefox.yang.yang.YangPackage.Literals.*
 
 import static extension org.eclipse.xtext.EcoreUtil2.*
 
@@ -67,6 +70,9 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 		if (resolvedTarget !== null && node !== null) {
 			val text = linkingHelper.getCrossRefNodeAsString(node, true)
 			val qn = qualifiedNameConverter.toQualifiedName(text)
+			if (ref == XPATH_NAME_TEST__REF && qn == XpathResolver.ASTERISK) {
+				return text
+			}
 			val targetURI = EcoreUtil2.getPlatformResourceOrNormalizedURI(resolvedTarget)
 			for (desc : scope.getElements(qn)) {
 				if (targetURI == desc.EObjectURI)

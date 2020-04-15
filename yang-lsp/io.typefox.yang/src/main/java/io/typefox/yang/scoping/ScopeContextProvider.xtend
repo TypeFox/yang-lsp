@@ -198,8 +198,7 @@ class ScopeContextProvider {
 		}
 		val pref = identifier.internalGetQualifiedName(prefix, context)
 		linker.link(identifier, YangPackage.Literals.SCHEMA_NODE_IDENTIFIER__SCHEMA_NODE) [
-			val result = context.schemaNodeScope.getSingleElement(pref)
-			return result
+			context.schemaNodeScope.getSingleElement(pref)
 		]
 		return pref
 	}
