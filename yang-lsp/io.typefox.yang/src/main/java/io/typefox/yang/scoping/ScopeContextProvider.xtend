@@ -219,8 +219,8 @@ class ScopeContextProvider {
 	protected dispatch def void computeScope(Uses node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		handleGeneric(node, nodePath, ctx, isConfig)
 		ctx.onComputeNodeScope [
-			val inliningCtx = new GroupingInliningScopeContext(ctx)
 			if (node.grouping?.node !== null) {
+				val inliningCtx = new GroupingInliningScopeContext(ctx)
 				for (child : node.grouping.node.substatements) {
 					inlineGrouping(child, nodePath, inliningCtx, isConfig)
 				}
@@ -256,12 +256,15 @@ class ScopeContextProvider {
 	
 	private def dispatch void inlineGrouping(Uses statement, QualifiedName name, GroupingInliningScopeContext context, boolean isConfig) {
 		if (statement.grouping !== null) {
-			if(statement.isUsesGroupingSelf) {
+			if (statement.isUsesGroupingSelf) {
 				validator.addIssue(statement, SCHEMA_NODE__NAME, '''Grouping '«statement.grouping.node.name»' reference to itself.''', IssueCodes.GROUPING_REFERENCE_TO_ITSELF)
 				return
 			}
 			for (subStmnt : statement.grouping.node.substatements) {
 				inlineGrouping(subStmnt, name, context, isConfig)
+			}
+			for (subStmnt : statement.substatements.filter(Augment)) {
+				_inlineGrouping(subStmnt, name, context, isConfig)
 			}
 		}
 	}
@@ -270,23 +273,30 @@ class ScopeContextProvider {
 		val refGrping = uses.grouping.node
 		var container = uses.eContainer
 		while (container !== null && !(container instanceof AbstractModule)) {
-			if(container === refGrping) return true
-			if(container instanceof Augment) {
-				container = container.path?.schemaNode
+			if (container === refGrping) return true
+			if (container instanceof Augment) {
+				container = container.path?.eGet(SCHEMA_NODE_IDENTIFIER__SCHEMA_NODE, false) as EObject
 			} else {
 				container = container?.eContainer
 			}
-		} 
+		}
 		return false
 	}
 	
 	private def dispatch void inlineGrouping(SchemaNode statement, QualifiedName name, GroupingInliningScopeContext context, boolean isConfig) {
 		val newPath = getQualifiedName(statement, name, context)
 		var newIsConfig = handleConfig(statement, isConfig) 
-		if (newPath != name 
-			&& !(statement instanceof Augment)) {
+		if (newPath != name) {
 			statement.addToNodeScope(newPath, context, newIsConfig)
 		}
+		for (subStmnt : statement.substatements) {
+			inlineGrouping(subStmnt, newPath, context, newIsConfig)
+		}
+	}
+	
+	private def dispatch void inlineGrouping(Augment statement, QualifiedName name, GroupingInliningScopeContext context, boolean isConfig) {
+		val newPath = _getQualifiedName(statement, name, context)
+		var newIsConfig = handleConfig(statement, isConfig) 
 		for (subStmnt : statement.substatements) {
 			inlineGrouping(subStmnt, newPath, context, newIsConfig)
 		}
