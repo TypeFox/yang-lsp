@@ -62,12 +62,37 @@ interface IScopeContext {
 	override MapScope getExtensionScope() {new MapScope }
 }
 
+@FinalFieldsConstructor
+class ForwardingScopeContext implements IScopeContext {
+	@Delegate val IScopeContext parent
+	val Provider<IScopeContext> forward
+	IScopeContext resolvedForward
+	
+	private def resolve() {
+		if (resolvedForward === null) {
+			resolvedForward = forward.get ?: parent
+		}
+		return resolvedForward
+	}
+	
+	override IScope getModuleScope() { resolve.moduleScope }
+	override String getLocalPrefix() { resolve.localPrefix }
+	override String getModuleName() { resolve.moduleName }
+	
+	override MapScope getGroupingScope() { resolve.groupingScope }
+	override MapScope getTypeScope() { resolve.typeScope }
+	override MapScope getIdentityScope() { resolve.identityScope }
+	override MapScope getFeatureScope() { resolve.featureScope }
+	override MapScope getExtensionScope() { resolve.extensionScope }
+	override MapScope getSchemaNodeScope() { resolve.schemaNodeScope }
+}
+
 @FinalFieldsConstructor 
 @Accessors(PUBLIC_GETTER) class LocalScopeContext implements IScopeContext {
 	@Delegate val IScopeContext parent
 	
-	MapScope groupingScope = new MapScope(new LazyScope[getParent.getGroupingScope])
-	MapScope typeScope = new MapScope(new LazyScope[getParent.getTypeScope])
+	val MapScope groupingScope = new MapScope(new LazyScope[getParent.getGroupingScope])
+	val MapScope typeScope = new MapScope(new LazyScope[getParent.getTypeScope])
 	
 	override getGroupingScope() {
 		return groupingScope
