@@ -361,11 +361,11 @@ IfFeature:
 ;
 
 IfFeatureOrExpression returns Expression:
-	IfFeatureAndExpression ({BinaryOperator.left=current} operator='or' right=IfFeatureAndExpression)*
+	IfFeatureAndExpression ({BinaryOperation.left=current} operator='or' right=IfFeatureAndExpression)*
 ;
 
 IfFeatureAndExpression returns Expression:
-	IfFeatureExpression ({BinaryOperator.left=current} operator='and' right=IfFeatureExpression)*
+	IfFeatureExpression ({BinaryOperation.left=current} operator='and' right=IfFeatureExpression)*
 ;
 
 IfFeatureExpression returns Expression:

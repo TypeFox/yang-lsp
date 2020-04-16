@@ -239,10 +239,10 @@
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//XpathMultiplicativeOperation/operator"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//XpathMultiplicativeOperation/right"/>
     </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//BinaryOperator">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//BinaryOperator/left"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//BinaryOperator/operator"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//BinaryOperator/right"/>
+    <genClasses ecoreClass="Yang.ecore#//BinaryOperation">
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//BinaryOperation/left"/>
+      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//BinaryOperation/operator"/>
+      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//BinaryOperation/right"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//FeatureReference">
       <genFeatures notify="false" createChild="false" propertySortChoices="true" ecoreFeature="ecore:EReference Yang.ecore#//FeatureReference/feature"/>
@@ -250,11 +250,6 @@
     <genClasses ecoreClass="Yang.ecore#//UnaryOperation">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//UnaryOperation/operator"/>
       <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//UnaryOperation/target"/>
-    </genClasses>
-    <genClasses ecoreClass="Yang.ecore#//BinaryOperation">
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//BinaryOperation/left"/>
-      <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//BinaryOperation/operator"/>
-      <genFeatures property="None" children="true" createChild="true" ecoreFeature="ecore:EReference Yang.ecore#//BinaryOperation/right"/>
     </genClasses>
     <genClasses ecoreClass="Yang.ecore#//Literal">
       <genFeatures createChild="false" ecoreFeature="ecore:EAttribute Yang.ecore#//Literal/value"/>
