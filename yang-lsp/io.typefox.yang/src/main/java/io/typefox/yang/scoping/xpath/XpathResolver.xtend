@@ -489,7 +489,7 @@ class XpathResolver {
 	}
 	
 	protected def boolean isInstanceNode(IEObjectDescription description) {
-		switch node: description.EObjectOrProxy {
+		switch node: description?.EObjectOrProxy {
 			Choice, Case, Input, Output: false
 			default: node !== null
 		}

@@ -420,7 +420,15 @@ class ScopeContextProvider {
 				new Adapter(scope, newPath).attachToEmfObject(node)
 				scope
 			}
-			default : 
+			Deviation: {
+				// The substatements of a deviation are resolved in the context of the referenced node
+				new ForwardingScopeContext(ctx) [
+					val refNode = node.reference?.schemaNode
+					if (refNode !== null)
+						Adapter.findInEmfObject(refNode)?.scopeContext
+				]
+			}
+			default:
 				ctx
 		}
 		for (child : node.eContents) {
