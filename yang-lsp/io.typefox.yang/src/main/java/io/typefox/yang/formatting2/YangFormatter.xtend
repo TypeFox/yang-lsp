@@ -9,6 +9,7 @@ import io.typefox.yang.yang.Argument
 import io.typefox.yang.yang.Augment
 import io.typefox.yang.yang.Base
 import io.typefox.yang.yang.BelongsTo
+import io.typefox.yang.yang.BinaryOperation
 import io.typefox.yang.yang.Bit
 import io.typefox.yang.yang.Case
 import io.typefox.yang.yang.Choice
@@ -95,6 +96,8 @@ import org.eclipse.xtext.formatting2.regionaccess.internal.TextRegions
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.preferences.BooleanKey
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
+
+import static io.typefox.yang.yang.YangPackage.Literals.*
 
 class YangFormatter extends AbstractFormatter2 {
     
@@ -207,12 +210,16 @@ class YangFormatter extends AbstractFormatter2 {
     }
     
     def dispatch void format(Length l, extension IFormattableDocument it) {
-        formatRefinement(l.expression)
+    	val exp = l.expression
+    	exp.allSemanticRegions.surroundSpace(it)
+        formatRefinement(exp, exp.previousHiddenRegion.isNextToHidden || exp.nextHiddenRegion.isNextToHidden)
         formatStatement(l)
     }
     
     def dispatch void format(Range r, extension IFormattableDocument it) {
-        formatRefinement(r.expression)
+    	val exp = r.expression
+    	exp.allSemanticRegions.surroundSpace(it)
+        formatRefinement(exp, exp.previousHiddenRegion.isNextToHidden || exp.nextHiddenRegion.isNextToHidden)
         formatStatement(r)
     }
     
@@ -561,14 +568,32 @@ class YangFormatter extends AbstractFormatter2 {
     	}
     }
     
-    protected def formatRefinement(extension IFormattableDocument document, Expression expression) {
-        val nodeRegions = expression.allSemanticRegions.toList
+    protected def void formatRefinement(extension IFormattableDocument it, Expression expression, boolean isInHidden) {
+        if (expression instanceof BinaryOperation) {
+    		expression.regionFor.feature(BINARY_OPERATION__OPERATOR).prepend[
+    			if (isInHidden && expression.left.nextHiddenRegion.length > 0)
+    				oneSpace
+    			else
+    				noSpace
+    		].append[
+    			if (isInHidden && expression.right.previousHiddenRegion.length > 0)
+    				oneSpace
+    			else
+    				noSpace
+    		]
+    		formatRefinement(expression.left, isInHidden)
+    		formatRefinement(expression.right, isInHidden)
+        }
+    }
+    
+    protected def surroundSpace(Iterable<ISemanticRegion> nodeRegions, extension IFormattableDocument doc) {
         nodeRegions.head.prepend[oneSpace]
-        val nextSemanticRegion = nodeRegions.last.nextSemanticRegion
+        val lastRegion = nodeRegions.last
+        val nextSemanticRegion = lastRegion.nextSemanticRegion
         if (HIDDENRule == nextSemanticRegion.grammarElement) {
             nextSemanticRegion.prepend[noSpace].append[oneSpace]
         } else {
-            nodeRegions.last.append[oneSpace]
+            lastRegion.append[oneSpace]
         }
     }
     
