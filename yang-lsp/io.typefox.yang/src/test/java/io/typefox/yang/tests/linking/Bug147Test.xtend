@@ -56,7 +56,6 @@ class Bug147Test extends AbstractYangTest {
 			    contact yangster;
 			    description 'This is a serialize test';
 
-			    // TODO: This is a test
 			    container c1 {
 			        ydep:e1;
 			        leaf l1 {
@@ -74,7 +73,6 @@ class Bug147Test extends AbstractYangTest {
 			    belongs-to yangster-test {
 			        prefix ytest;
 			    }
-«««			    import yangster-test { prefix ytest; }
 			    augment /ytest:c1 { }
 			}
 		'''.load.assertNoErrors;

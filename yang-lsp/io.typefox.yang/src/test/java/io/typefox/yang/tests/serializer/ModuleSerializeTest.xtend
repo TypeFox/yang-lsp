@@ -201,21 +201,22 @@ class ModuleSerializeTest {
 	def void testSerializeUpdatedModule() {
 		val targetModule = loadModuleFile("yangster-test.yang")
 		
-		var ii = targetModule.substatements.indexOf(targetModule.substatements.filter(Import).head)
+		val ii = targetModule.substatements.indexOf(targetModule.substatements.filter(Import).head)
 		val tImport = YangFactory.eINSTANCE.create(YangPackage.eINSTANCE.import) as Import
 		tImport.module = tCommon
 		tImport.create(YangPackage.eINSTANCE.prefix, Prefix).prefix = "t"
 		targetModule.substatements.add(ii + 1, tImport)
 
-		var c1 = targetModule.substatements.filter(Container).filter[name.equals('c1')].head
+		val c1 = targetModule.substatements.filter(Container).filter[name.equals('c1')].head
 		c1.substatements.add(createTailfSuppressEchoProperty)
 
-		var l1 = c1.substatements.filter(Leaf).filter[name.equals('l1')].head
+		val l1 = c1.substatements.filter(Leaf).filter[name.equals('l1')].head
 		l1.substatements.add(createTailfMetaDataProperty("static-data", "true"))
 		l1.substatements.add(createTailfCallpointProperty("static-data-cb"))
 
-		var c2 = targetModule.substatements.filter(Container).filter[name.equals('c2')].head
+		val c2 = targetModule.substatements.filter(Container).filter[name.equals('c2')].head
 		c2.substatements.add(createTailfCallpointProperty("is-system-created-cb"))
+		
 		assertSerialized('''
 			module yangster-test {
 				yang-version 1.1;

@@ -2,6 +2,7 @@ package io.typefox.yang.scoping
 
 import com.google.common.collect.LinkedHashMultimap
 import com.google.inject.Inject
+import io.typefox.yang.scoping.ScopeContext.MapScope
 import io.typefox.yang.scoping.xpath.XpathResolver
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.utils.YangPathProvider
@@ -30,7 +31,6 @@ import io.typefox.yang.yang.Module
 import io.typefox.yang.yang.Must
 import io.typefox.yang.yang.Output
 import io.typefox.yang.yang.Path
-import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Refine
 import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.RevisionDate
@@ -48,6 +48,7 @@ import io.typefox.yang.yang.When
 import io.typefox.yang.yang.YangPackage
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
+import org.eclipse.emf.ecore.resource.ResourceSet
 import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.EcoreUtil2
@@ -66,13 +67,6 @@ import static extension org.eclipse.xtext.EcoreUtil2.*
  * Links the imported modules and included submodules, as well as computing the IScopeContext for them. 
  */
 class ScopeContextProvider {
-
-	@Inject Validator validator
-	@Inject Linker linker
-	@Inject ResourceDescriptionsProvider indexProvider
-	@Inject extension YangExtensions
-	@Inject XpathResolver xpathResolver
-	@Inject YangPathProvider yangPathProvider
 	
 	@EmfAdaptable
 	@Data
@@ -81,13 +75,24 @@ class ScopeContextProvider {
 		QualifiedName nodePath
 	}
 	
-	def removeScopeContexts(Resource resource) {
-		resource.resourceSet.resources.forEach [
-			allContents.forEach[
-				Adapter.removeFromEmfObject(it)
-			]
+	static def removeFromResourceSet(ResourceSet resourceSet) {
+		resourceSet.resources.forEach [
+			removeFromResource(it)
 		]
 	}
+	
+	static def removeFromResource(Resource resource) {
+		resource.allContents.forEach[
+			Adapter.removeFromEmfObject(it)
+		]
+	}
+
+	@Inject Validator validator
+	@Inject Linker linker
+	@Inject ResourceDescriptionsProvider indexProvider
+	@Inject extension YangExtensions
+	@Inject XpathResolver xpathResolver
+	@Inject YangPathProvider yangPathProvider
 	
 	def IScopeContext findScopeContext(EObject node) {
 		val module = EcoreUtil2.getContainerOfType(node, AbstractModule)
@@ -119,9 +124,9 @@ class ScopeContextProvider {
 		}
 		val moduleScope = module.eResource.moduleScope
 		val result = new ScopeContext(
-			moduleScope, 
-			module.prefix, 
-			module.getBelongingModule(moduleScope)?.name ?: module.name
+			moduleScope,
+			module.prefix,
+			module.getModuleName(moduleScope)
 		)
 		new Adapter(result, QualifiedName.EMPTY).attachToEmfObject(module)
 		
@@ -135,18 +140,22 @@ class ScopeContextProvider {
 		return new YangModuleScope(yangPathModuleScope, index)
 	}
 	
-	private def dispatch Module getBelongingModule(Module module, IScope moduleScope) {
-		return module
+	private def String getModuleName(AbstractModule module, IScope moduleScope) {
+		if (module instanceof Submodule) {
+			val superModule = getBelongingModule(module, moduleScope)
+			if (superModule !== null && !superModule.eIsProxy)
+				return superModule.name
+		}
+		return module.name
 	}
 	
-	private def dispatch Module getBelongingModule(Submodule submodule, IScope moduleScope) {
+	private def Module getBelongingModule(Submodule submodule, IScope moduleScope) {
 		val belongsTo = submodule.substatements.filter(BelongsTo).head
 		if (belongsTo === null) {
 			return null
 		}
-		return linker.link(belongsTo, BELONGS_TO__MODULE) [ name |
-			val candidates = moduleScope.getElements(name)
-			return candidates.head
+		return linker.<Module>link(belongsTo, BELONGS_TO__MODULE) [ name |
+			moduleScope.getSingleElement(name)
 		]
 	}
 	
@@ -164,7 +173,7 @@ class ScopeContextProvider {
 			Feature : ctx.featureScope -> 'A feature'
 		}
 		if (scopeAndName !== null) {
-			if (!scopeAndName.key.tryAddLocal(n, node)) {
+			if (scopeAndName.key.tryAddLocal(n, node) != MapScope.AddResult.OK) {
 				validator.addIssue(node, SCHEMA_NODE__NAME, '''«scopeAndName.value» with the name '«n»' already exists.''', IssueCodes.DUPLICATE_NAME)
 			}
 		}
@@ -206,7 +215,7 @@ class ScopeContextProvider {
 	protected dispatch def void computeScope(TypeReference node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		ctx.onResolveDefinitions [
 			linker.link(node, TYPE_REFERENCE__TYPE) [ name |
-				if (name.segmentCount == 2 && name.firstSegment == ctx.localPrefix) {
+				if (name.segmentCount == 2 && ctx.localPrefix !== null && name.startsWith(ctx.localPrefix)) {
 					return ctx.typeScope.getSingleElement(name.skipFirst(1))
 				}
 				return ctx.typeScope.getSingleElement(name)
@@ -304,7 +313,7 @@ class ScopeContextProvider {
 	protected dispatch def void computeScope(GroupingRef node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
 		ctx.onResolveDefinitions [
 			linker.link(node, GROUPING_REF__NODE) [ name |
-				if (name.segmentCount == 2 && name.firstSegment == ctx.localPrefix) {
+				if (name.segmentCount == 2 && ctx.localPrefix !== null && name.startsWith(ctx.localPrefix)) {
 					return ctx.groupingScope.getSingleElement(name.skipFirst(1))
 				}
 				return ctx.groupingScope.getSingleElement(name)
@@ -441,27 +450,73 @@ class ScopeContextProvider {
 	private def void addToNodeScope(EObject node, QualifiedName name, IScopeContext ctx, boolean isConfig) {
 		ctx.onComputeNodeScope [
 			val options = if (isConfig) emptyMap else #{NO_CONFIG_USER_DATA -> 't'}
-			if (!ctx.schemaNodeScope.tryAddLocal(name, node, options)) {
-				validator.addIssue(node, SCHEMA_NODE__NAME, '''A schema node with the name '«name»' already exists.''', IssueCodes.DUPLICATE_NAME)
+			val result = ctx.schemaNodeScope.tryAddLocal(name, node, options)
+			if (result != MapScope.AddResult.OK) {
+				var code = IssueCodes.DUPLICATE_NAME
+				if (result == MapScope.AddResult.DUPLICATE_PARENT) {
+					// In case the name is already used in a belongs-to module, mark the duplicate name as warning
+					val belonging = node.getContainerOfType(Submodule)?.getBelongingModule(ctx.moduleScope)
+					if (belonging !== null) {
+						val existing = ctx.schemaNodeScope.parent.getSingleElement(name)
+						if (existing !== null && existing.EObjectURI.trimFragment == belonging.eResource.URI)
+							code = IssueCodes.DUPLICATE_NAME_BELONGSTO
+					}
+				}
+				validator.addIssue(node, SCHEMA_NODE__NAME, '''A schema node with the name '«name»' already exists.''', code)
 			}
 		]
 	}
 
 	protected dispatch def void computeScope(BelongsTo element, QualifiedName currentPrefix, IScopeContext ctx, boolean isConfig) {
-		if (element.module !== null && element.module.eIsProxy) {
-			val prefix = element.substatements.filter(Prefix).head?.prefix
-			if (prefix !== null) {
-				ctx.moduleBelongingSubModules.add(getScopeContext(element.module))
-			} else {
+		val importedModule = linkImportedModule(element, ctx)
+		if (importedModule !== null && !importedModule.eIsProxy) {
+			val prefix = element.prefix
+			if (prefix === null) {
 				validator.addIssue(element, BELONGS_TO__MODULE, "The 'prefix' statement is mandatory.", IssueCodes.MISSING_PREFIX)
+			} else {
+				ctx.moduleBelongingSubModules.add(getScopeContext(importedModule))
 			}
 		}
 		handleGeneric(element, currentPrefix, ctx, isConfig);
 	}
+	
+	private def Module linkImportedModule(BelongsTo element, IScopeContext ctx) {
+		return linker.link(element, BELONGS_TO__MODULE) [ name |
+			ctx.moduleScope.getSingleElement(name)
+		]
+	}
 
 	protected dispatch def void computeScope(AbstractImport element, QualifiedName currentPrefix, IScopeContext ctx, boolean isConfig) {
+		val importedModule = linkImportedModule(element, ctx)
+		val prefix = element.prefix
+		
+		if (importedModule instanceof Submodule) {
+			if (element instanceof Import) {
+				validator.addIssue(element, null, '''The submodule '«importedModule.name»' needs to be 'included' not 'imported'.''', IssueCodes.IMPORT_NOT_A_MODULE)
+			}
+			val module = findContainingModule(element)
+			val belongingModule = importedModule.getBelongingModule(ctx.moduleScope)
+			if (belongingModule !== null && belongingModule !== module) {
+				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, '''The imported submodule '«importedModule.name»' belongs to the different module '«belongingModule.name»'.''', IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)			
+			} else {	
+				ctx.moduleBelongingSubModules.add(getScopeContext(importedModule))
+			}
+		}
+		if (importedModule instanceof Module) {
+			if (element instanceof Include) {
+				validator.addIssue(element, null, '''The module '«importedModule.name»' needs to be 'imported' not 'included'.''', IssueCodes.INCLUDE_NOT_A_SUB_MODULE)
+			}
+			if (prefix === null) {
+				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, "The 'prefix' statement is mandatory.", IssueCodes.MISSING_PREFIX)
+			} else {
+				ctx.importedModules.put(prefix, getScopeContext(importedModule))
+			}
+		}
+	}
+	
+	private def linkImportedModule(AbstractImport element, IScopeContext ctx) {
 		val importedRevisionStatement = element.substatements.filter(RevisionDate).head
-		val importedModule = linker.<AbstractModule>link(element, ABSTRACT_IMPORT__MODULE) [ name |
+		linker.<AbstractModule>link(element, ABSTRACT_IMPORT__MODULE) [ name |
 			val candidates = ctx.moduleScope.getElements(name)
 			val revisionToModule = LinkedHashMultimap.create
 			for (candidate : candidates) {
@@ -501,31 +556,6 @@ class ScopeContextProvider {
 			}
 			return result
 		]
-		
-		val prefix = element.substatements.filter(Prefix).head?.prefix
-		
-		if (importedModule instanceof Submodule) {
-			if (element instanceof Import) {
-				validator.addIssue(element, null, '''The submodule '«importedModule.name»' needs to be 'included' not 'imported'.''', IssueCodes.IMPORT_NOT_A_MODULE)
-			}
-			val module = findContainingModule(element)
-			val belongingModule = importedModule.getBelongingModule(ctx.moduleScope)
-			if (belongingModule !== null && belongingModule !== module) {
-				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, '''The imported submodule '«importedModule.name»' belongs to the different module '«belongingModule.name»'.''', IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)			
-			} else {	
-				ctx.moduleBelongingSubModules.add(getScopeContext(importedModule))
-			}
-		}
-		if (importedModule instanceof Module) {
-			if (element instanceof Include) {
-				validator.addIssue(element, null, '''The module '«importedModule.name»' needs to be 'imported' not 'included'.''', IssueCodes.INCLUDE_NOT_A_SUB_MODULE)
-			}
-			if (prefix === null) {
-				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, "The 'prefix' statement is mandatory.", IssueCodes.MISSING_PREFIX)
-			} else {	
-				ctx.importedModules.put(prefix, getScopeContext(importedModule))
-			}
-		}
 	}
 	
 	private def findContainingModule(EObject obj) {

@@ -97,7 +97,9 @@ abstract class AbstractYangTest {
 		val resource = resourceHelper.resource(contents.toString, uri, resourceSet)
 		resource.load(emptyMap)
 		if (!allowErrors)
-			Assert.assertTrue(resource.errors.join('\n')[message], resource.errors.empty)
+			Assert.assertTrue(resource.errors.join('\n')[
+				'''«line»:«column»: «message»'''
+			], resource.errors.empty)
 		return resource
 	}
 

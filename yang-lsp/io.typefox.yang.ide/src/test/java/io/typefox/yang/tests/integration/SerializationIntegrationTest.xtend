@@ -1,5 +1,7 @@
 package io.typefox.yang.tests.integration
 
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
 import com.google.inject.Injector
 import io.typefox.yang.YangStandaloneSetup
 import io.typefox.yang.yang.XpathExpression
@@ -13,7 +15,6 @@ import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
 import org.eclipse.xtext.nodemodel.INode
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
-import org.eclipse.xtext.resource.IResourceDescriptions
 import org.eclipse.xtext.resource.IResourceDescriptionsProvider
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.XtextResourceSet
@@ -42,7 +43,7 @@ class SerializationIntegrationTest {
 	}
 	
 	static Injector injector
-	static IResourceDescriptions descriptions
+	static Multimap<URI, URI> references
 	
 	@BeforeClass
 	static def void beforeClass() {
@@ -52,7 +53,19 @@ class SerializationIntegrationTest {
 			rs.getResource(URI.createFileURI(absolutePath), true)
 		]
 		EcoreUtil.resolveAll(rs)
-		descriptions = injector.getInstance(IResourceDescriptionsProvider).getResourceDescriptions(rs)
+		
+		// Create a multimap of resource URIs to referenced URIs
+		references = HashMultimap.create
+		val descriptions = injector.getInstance(IResourceDescriptionsProvider).getResourceDescriptions(rs)
+		rs.resources.forEach[
+			references.putAll(URI, descriptions.getResourceDescription(URI).referenceDescriptions.map[
+				targetEObjectUri.trimFragment
+			])
+		]
+		
+		// Clear the global resource set
+		rs.resources.forEach[unload]
+		rs.resources.clear()
 	}
 	
 	static def void scanRecursively(File file, (File)=>void acceptor) {
@@ -70,13 +83,15 @@ class SerializationIntegrationTest {
 	val File file
 	
 	@Test def void testSerializing() {
+		// Load all referenced resources and serialize to String
 		val resource = loadResources(URI.createFileURI(this.file.absolutePath))
 		replaceXpathExpressions(resource)
 		removeNodeModel(resource)
-		val s0 = new ByteArrayOutputStream()
-		resource.save(s0, null);
-		s0.close();
+		val s0 = new ByteArrayOutputStream
+		resource.save(s0, null)
 		val text0 = new String(s0.toByteArray, resource.encoding)
+		
+		// Reparse the current resource and serialize again
 		resource.reparse(text0)
 		EcoreUtil.resolveAll(resource)
 		if (!resource.errors.empty) {
@@ -85,42 +100,40 @@ class SerializationIntegrationTest {
 		}
 		replaceXpathExpressions(resource)
 		removeNodeModel(resource)
-		val s1 = new ByteArrayOutputStream()
-		resource.save(s1, null);
-		s1.close();
+		val s1 = new ByteArrayOutputStream
+		resource.save(s1, null)
 		val text1 = new String(s1.toByteArray, resource.encoding)
+		
 		Assert.assertEquals(text0, text1)
 	}
 	
 	protected def void removeNodeModel(XtextResource resource) {
 		resource.allContents.forEach [ object |
-			val adapters = newArrayList 
-			adapters += object.eAdapters.filter[it instanceof INode]
-			object.eAdapters.removeAll(adapters)
+			object.eAdapters.removeIf[it instanceof INode]
 		]
 	}
 	
 	protected def void replaceXpathExpressions(XtextResource resource) {
-		for(val i = resource.allContents; i.hasNext();) {
+		for (val i = resource.allContents; i.hasNext();) {
 			val next = i.next
 			if (next instanceof XpathExpression) {
 				val text = NodeModelUtils.getNode(next).text.trim.fixQuotes
 				val unparsed = YangFactory.eINSTANCE.createUnparsedXpath()
 				unparsed.text = text
+				EcoreUtil.replace(next, unparsed)
 				i.prune()
-				next.eContainer.eSet(next.eContainmentFeature, unparsed)
 			}
 		}
 	}
 	
 	private def String fixQuotes(String s) {
-		if(s.startsWith('"')) { 
+		if (s.startsWith('"')) { 
 			if(!s.endsWith('"'))
 				return s + '"'
 			else 
 				return s
 		}
-		if(s.startsWith("'")) {
+		if (s.startsWith("'")) {
 			if(!s.endsWith("'")) 
 				return s + "'"
 			else
@@ -130,12 +143,12 @@ class SerializationIntegrationTest {
 	}
 	
 	private def loadResources(URI uri) {
-		val uris = newHashSet
+		val uris = newLinkedHashSet
 		uri.addReferencedURIs(uris)
 		val newRs = injector.getInstance(XtextResourceSet)
 		uris.forEach [
 			newRs.getResource(it, true)
-		] 
+		]
 		EcoreUtil.resolveAll(newRs)
 		val xtextResource = newRs.getResource(uri, false) as XtextResource
 		if (!xtextResource.errors.empty) {
@@ -148,9 +161,7 @@ class SerializationIntegrationTest {
 	
 	private def void addReferencedURIs(URI uri, Set<URI> uris) {
 		if (uris.add(uri)) {
-			descriptions.getResourceDescription(uri).referenceDescriptions.forEach [
-				targetEObjectUri.trimFragment.addReferencedURIs(uris)
-			]
+			references.get(uri).forEach[ addReferencedURIs(uris) ]
 		}
 	}
 }

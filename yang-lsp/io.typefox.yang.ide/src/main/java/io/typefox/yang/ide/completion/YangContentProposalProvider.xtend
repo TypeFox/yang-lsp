@@ -351,7 +351,7 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 		val localPrefix = scopeCtx.localPrefix
 		// filter local qualified names out
 		return [ IEObjectDescription desc |
-			return desc.name.segmentCount == 1 || desc.name.firstSegment != localPrefix
+			return desc.name.segmentCount == 1 || localPrefix === null || !desc.name.startsWith(localPrefix)
 		]
 	}
 
