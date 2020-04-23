@@ -110,8 +110,8 @@
         eType="#//SchemaNodeIdentifier" containment="true"/>
   </eClassifiers>
   <eClassifiers xsi:type="ecore:EClass" name="Unique" eSuperTypes="#//OtherStatement #//DescendantSchemaNodeIdentifierReferences"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Choice" eSuperTypes="#//DataSchemaNode"/>
-  <eClassifiers xsi:type="ecore:EClass" name="Case" eSuperTypes="#//DataSchemaNode"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Choice" eSuperTypes="#//SchemaNode"/>
+  <eClassifiers xsi:type="ecore:EClass" name="Case" eSuperTypes="#//SchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Anydata" eSuperTypes="#//DataSchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Anyxml" eSuperTypes="#//DataSchemaNode"/>
   <eClassifiers xsi:type="ecore:EClass" name="Grouping" eSuperTypes="#//SchemaNode"/>

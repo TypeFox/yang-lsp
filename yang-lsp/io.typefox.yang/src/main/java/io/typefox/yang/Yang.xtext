@@ -34,6 +34,8 @@ SchemaNode :
 	Notification  |
 	Rpc |
 	Action |
+	Choice |
+	Case |
 	Input |
 	Output |
 	Typedef
@@ -43,8 +45,6 @@ DataSchemaNode :
 	Anydata |
 	Anyxml |
 	Container |
-	Choice |
-	Case |
 	List |
 	Leaf |
 	LeafList
