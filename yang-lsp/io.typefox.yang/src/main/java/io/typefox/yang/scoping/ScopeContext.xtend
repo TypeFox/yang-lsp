@@ -79,12 +79,6 @@ class ForwardingScopeContext implements IScopeContext {
 	override QualifiedName getLocalPrefix() { resolve.localPrefix }
 	override String getModuleName() { resolve.moduleName }
 	
-	override MapScope getGroupingScope() { resolve.groupingScope }
-	override MapScope getTypeScope() { resolve.typeScope }
-	override MapScope getIdentityScope() { resolve.identityScope }
-	override MapScope getFeatureScope() { resolve.featureScope }
-	override MapScope getExtensionScope() { resolve.extensionScope }
-	override MapScope getSchemaNodeScope() { resolve.schemaNodeScope }
 }
 
 @FinalFieldsConstructor 
