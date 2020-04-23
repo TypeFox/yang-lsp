@@ -29,7 +29,7 @@ import org.eclipse.xtext.ide.editor.contentassist.IdeCrossrefProposalProvider
 import org.eclipse.xtext.ide.editor.syntaxcoloring.ISemanticHighlightingCalculator
 import org.eclipse.xtext.ide.refactoring.IRenameStrategy2
 import org.eclipse.xtext.ide.server.Document
-import org.eclipse.xtext.ide.server.codeActions.ICodeActionService
+import org.eclipse.xtext.ide.server.codeActions.ICodeActionService2
 import org.eclipse.xtext.ide.server.codelens.ICodeLensResolver
 import org.eclipse.xtext.ide.server.codelens.ICodeLensService
 import org.eclipse.xtext.ide.server.commands.IExecutableCommandService
@@ -84,7 +84,7 @@ class YangIdeModule extends AbstractYangIdeModule {
 		return YangContentProposalCreator;
 	}
 
-	def Class<? extends ICodeActionService> bindICodeActionService() {
+	def Class<? extends ICodeActionService2> bindICodeActionService2() {
 		return CodeActionService;
 	}
 

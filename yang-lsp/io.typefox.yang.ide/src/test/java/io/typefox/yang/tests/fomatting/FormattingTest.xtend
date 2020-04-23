@@ -38,7 +38,7 @@ class FormattingTest extends AbstractYangLSPTest {
     val File file 
     
     @Test def void testFormatting_ignoring_comparision_failures() {
-        val content = Files.toString(file, Charsets.UTF_8)
+        val content = Files.asCharSource(file, Charsets.UTF_8).read()
         try {
             testFormatting[
                 model = content

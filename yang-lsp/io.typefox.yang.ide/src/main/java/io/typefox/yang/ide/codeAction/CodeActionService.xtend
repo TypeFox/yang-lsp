@@ -2,25 +2,21 @@ package io.typefox.yang.ide.codeAction
 
 import io.typefox.yang.validation.IssueCodes
 import org.eclipse.emf.common.util.URI
-import org.eclipse.lsp4j.CodeActionParams
 import org.eclipse.lsp4j.Command
 import org.eclipse.lsp4j.TextEdit
 import org.eclipse.lsp4j.WorkspaceEdit
-import org.eclipse.xtext.ide.server.Document
-import org.eclipse.xtext.ide.server.codeActions.ICodeActionService
-import org.eclipse.xtext.resource.XtextResource
-import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.lsp4j.jsonrpc.messages.Either
+import org.eclipse.xtext.ide.server.codeActions.ICodeActionService2
 
-class CodeActionService implements ICodeActionService {
+class CodeActionService implements ICodeActionService2 {
 	
 	static val COMMAND_ID = 'yang.apply.workspaceEdit'
 	
-	override getCodeActions(Document document, XtextResource resource, CodeActionParams params, CancelIndicator indicator) {
+	override getCodeActions(Options options) {
 		val result = <Command>newArrayList
-		for (d : params.context.diagnostics) {
+		for (d : options.codeActionParams.context.diagnostics) {
 			if (d.code == IssueCodes.INCORRECT_VERSION) {
-				result += createFix('Change to "1.1".', resource.URI, new TextEdit => [
+				result += createFix('Change to "1.1".', options.resource.URI, new TextEdit => [
 					newText = "1.1"
 					range = d.range
 				])			
