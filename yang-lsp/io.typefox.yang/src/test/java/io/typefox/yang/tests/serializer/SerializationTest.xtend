@@ -302,6 +302,66 @@ class SerializationTest extends AbstractYangTest {
 			'''.toString, serialized)
 	}
 	
+	@Test
+	def void testIssue181() {
+		load('''
+			module nef {
+				yang-version 1.1;
+			}
+		''')
+		val resource = load('''
+			submodule nef-submodule-eventexposure {
+			    yang-version 1.1;
+			    belongs-to nef {
+			        prefix "nefe";
+			    }
+			    grouping nnef-eventexposure {
+			        container problem-type-uris {
+			            description "URI to identifies the problem type.";
+			                list problem-type-uri {
+			                    key error-code;
+			                    unique uri;
+			                    leaf error-code {
+			                        type int32;
+			                    }
+			                    leaf uri {
+			                        type inet:uri;
+			                        mandatory true;
+			                    }
+			                }
+			            }
+			   }
+			}
+		''') as XtextResource
+		
+		val saveOptions = SaveOptions.newBuilder.format.options
+		val serialized = resource.serializer.serialize(resource.contents.head, saveOptions)
+		assertEquals('''
+			submodule nef-submodule-eventexposure {
+			    yang-version 1.1;
+			    belongs-to nef {
+			        prefix "nefe";
+			    }
+			    grouping nnef-eventexposure {
+			        container problem-type-uris {
+			            description "URI to identifies the problem type.";
+			            list problem-type-uri {
+			                key error-code;
+			                unique uri;
+			                leaf error-code {
+			                    type int32;
+			                }
+			                leaf uri {
+			                    type inet:uri;
+			                    mandatory true;
+			                }
+			            }
+			        }
+			    }
+			}
+			'''.toString, serialized)
+	}
+	
 	private def <T extends Statement> create(Statement it, EClass substmtEClass, Class<T> clazz) {
 		val Statement stmt = YangFactory.eINSTANCE.create(substmtEClass) as Statement
 		it.substatements.add(stmt)

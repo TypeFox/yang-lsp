@@ -97,7 +97,7 @@ class YangSerializerScopeProvider implements IScopeProvider {
 				// filter default inputs/outputs
 				val lastSegment = original.qualifiedName.lastSegment
 				val isInputOrOutput = (lastSegment == 'input' || lastSegment == 'output')
-				if(allowDefaultInputOutput !== isInputOrOutput) 
+				if (allowDefaultInputOutput != isInputOrOutput)
 					return null
 			}
 			if (original.qualifiedName.segmentCount < 2)
@@ -106,14 +106,12 @@ class YangSerializerScopeProvider implements IScopeProvider {
 			val moduleName = original.qualifiedName.segments.get(original.qualifiedName.segmentCount - 2)
 			if (moduleName == module.name)
 				return new AliasedEObjectDescription(simpleName, original)
-			if (module.name == moduleName)
-				return toPrefixedDescription(module.prefix, original);
 			for (sub : module.substatements) {
 				switch sub {
 					AbstractImport case sub.module.name == moduleName:
 						return toPrefixedDescription(sub.prefix, original)
 					BelongsTo case sub.module.name == moduleName:
-						return toPrefixedDescription(sub.prefix, original)
+						return new AliasedEObjectDescription(simpleName, original)
 				}
 			}
 			val simpleNamedElement = delegate.getSingleElement(simpleName)
