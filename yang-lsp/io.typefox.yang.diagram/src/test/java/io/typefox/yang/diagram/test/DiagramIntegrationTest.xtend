@@ -7,6 +7,8 @@
  */
 package io.typefox.yang.diagram.test
 
+import com.google.common.collect.HashMultimap
+import com.google.common.collect.Multimap
 import com.google.inject.Guice
 import com.google.inject.Injector
 import io.typefox.yang.YangRuntimeModule
@@ -23,7 +25,6 @@ import org.eclipse.sprotty.util.IdCache
 import org.eclipse.sprotty.xtext.IDiagramGenerator
 import org.eclipse.sprotty.xtext.ls.IssueProvider
 import org.eclipse.xtend.lib.annotations.FinalFieldsConstructor
-import org.eclipse.xtext.resource.IResourceDescriptions
 import org.eclipse.xtext.resource.IResourceDescriptionsProvider
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.XtextResourceSet
@@ -52,7 +53,7 @@ class DiagramIntegrationTest {
 	}
 	
 	static Injector injector
-	static IResourceDescriptions descriptions
+	static Multimap<URI, URI> references
 	
 	@BeforeClass
 	static def void beforeClass() {
@@ -67,7 +68,19 @@ class DiagramIntegrationTest {
 			rs.getResource(URI.createFileURI(absolutePath), true)
 		]
 		EcoreUtil.resolveAll(rs)
-		descriptions = injector.getInstance(IResourceDescriptionsProvider).getResourceDescriptions(rs)
+		
+		// Create a multimap of resource URIs to referenced URIs
+		references = HashMultimap.create
+		val descriptions = injector.getInstance(IResourceDescriptionsProvider).getResourceDescriptions(rs)
+		rs.resources.forEach[
+			references.putAll(URI, descriptions.getResourceDescription(URI).referenceDescriptions.map[
+				targetEObjectUri.trimFragment
+			])
+		]
+		
+		// Clear the global resource set
+		rs.resources.forEach[unload]
+		rs.resources.clear()
 	}
 	
 	static def void scanRecursively(File file, (File)=>void acceptor) {
@@ -94,7 +107,7 @@ class DiagramIntegrationTest {
 	
 	
 	private def loadResources(URI uri) {
-		val uris = newHashSet
+		val uris = newLinkedHashSet
 		uri.addReferencedURIs(uris)
 		val newRs = injector.getInstance(XtextResourceSet)
 		uris.forEach [
@@ -104,7 +117,9 @@ class DiagramIntegrationTest {
 		val xtextResource = newRs.getResource(uri, false) as XtextResource
 		if (!xtextResource.errors.empty) {
 			System.err.println(xtextResource.parseResult.rootNode.text)
-			Assert.fail(xtextResource.errors.map[message].join('\n'))
+			Assert.fail(xtextResource.errors.map[
+				'''«line»:«column»: «message»'''
+			].join('\n'))
 		}
 
 		return xtextResource
@@ -112,9 +127,7 @@ class DiagramIntegrationTest {
 	
 	private def void addReferencedURIs(URI uri, Set<URI> uris) {
 		if (uris.add(uri)) {
-			descriptions.getResourceDescription(uri).referenceDescriptions.forEach [
-				targetEObjectUri.trimFragment.addReferencedURIs(uris)
-			]
+			references.get(uri).forEach[ addReferencedURIs(uris) ]
 		}
 	}
 }

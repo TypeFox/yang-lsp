@@ -153,7 +153,9 @@ class SerializationIntegrationTest {
 		val xtextResource = newRs.getResource(uri, false) as XtextResource
 		if (!xtextResource.errors.empty) {
 			System.err.println(xtextResource.parseResult.rootNode.text)
-			Assert.fail(xtextResource.errors.map[message].join('\n'))
+			Assert.fail(xtextResource.errors.map[
+				'''«line»:«column»: «message»'''
+			].join('\n'))
 		}
 
 		return xtextResource
