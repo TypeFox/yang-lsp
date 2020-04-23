@@ -87,11 +87,11 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 	}
 
 	protected def String getMatchingCrossReferenceName(CrossReference crossref, EObject target, QualifiedName qn, IScope scope) {
-		val ruleName = linkingHelper.getRuleNameFrom(crossref)
 		for (desc : scope.getElements(target)) {
 			if (desc.name == qn) {
 				val unconverted = qualifiedNameConverter.toString(desc.name)
 				try {
+					val ruleName = linkingHelper.getRuleNameFrom(crossref)
 					return valueConverter.toString(unconverted, ruleName)
 				} catch (ValueConverterException e) {
 					// Try next
