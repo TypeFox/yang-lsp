@@ -51,6 +51,7 @@ import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.util.internal.Log
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
+import org.eclipse.xtext.ide.editor.syntaxcoloring.HighlightingStyles
 
 @Log
 @Singleton
@@ -399,6 +400,9 @@ class YangSemanticHighlightingCalculator extends DefaultSemanticHighlightingCalc
 	}
 
 	override toScopes(String styleId) {
+		if (styleId == HighlightingStyles.TASK_ID) {
+			return emptyList;
+		}
 		val scopes = STYLE_MAPPINGS.get(styleId);
 		Preconditions.checkNotNull(scopes, '''Cannot map style ID '«styleId»' to the corresponding TextMate scopes.''');
 		return scopes;

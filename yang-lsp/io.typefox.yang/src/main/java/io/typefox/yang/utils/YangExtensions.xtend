@@ -3,8 +3,8 @@ package io.typefox.yang.utils
 import com.google.inject.Singleton
 import io.typefox.yang.yang.AbstractModule
 import io.typefox.yang.yang.BelongsTo
-import io.typefox.yang.yang.Import
 import io.typefox.yang.yang.Module
+import io.typefox.yang.yang.OtherStatement
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Statement
 import io.typefox.yang.yang.Submodule
@@ -93,17 +93,11 @@ class YangExtensions {
 	/**
 	 * Returns the prefix of an element
 	 */
-	def dispatch String getPrefix(Module it) {
+	def dispatch String getPrefix(OtherStatement it) {
 		substatements.filter(Prefix).head?.prefix
 	}
 	def dispatch String getPrefix(Submodule it) {
 		substatements.filter(BelongsTo).head?.prefix
-	}
-	def dispatch String getPrefix(BelongsTo it) {
-		substatements.filter(Prefix).head?.prefix
-	}
-	def dispatch String getPrefix(Import it) {
-		substatements.filter(Prefix).head?.prefix
 	}
 	
 	def String getRevisionFromFileName(AbstractModule module) {

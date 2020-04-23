@@ -35,6 +35,9 @@ class IssueCodes extends ConfigurableIssueCodesProvider {
 	public static val DUPLICATE_NAME = 'duplicate-name'.error('''
 		A duplicate local name.
 	''')
+	public static val DUPLICATE_NAME_BELONGSTO = 'duplicate-name-belongsto'.warn('''
+		A local name is duplicate to a belongs-to module.
+	''')
 	public static val MISSING_PREFIX = 'missing-prefix'.error('''
 	''')
 	public static val AMBIGUOUS_IMPORT = 'ambiguous-import'.warn('''

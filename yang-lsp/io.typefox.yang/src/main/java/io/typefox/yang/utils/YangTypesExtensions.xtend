@@ -106,56 +106,56 @@ class YangTypesExtensions {
 	 * Returns {@code true} if the type argument is a direct subtype of the built-in integer.
 	 */
 	def boolean isInteger(Type it) {
-		return integerBuiltins.get.keySet.contains(typeRef.builtin);
+		return integerBuiltins.get.keySet.contains(typeRef?.builtin);
 	}
 
 	/**
 	 * Returns {@code true} if the type argument is a direct subtype of the built-in 64-bit decimal.
 	 */
 	def boolean isDecimal(Type it) {
-		return decimalBuiltin.get == typeRef.builtin;
+		return decimalBuiltin.get == typeRef?.builtin;
 	}
 
 	/**
 	 * Returns {@code true} if the type argument is a direct subtype of the built-in string YANG type.
 	 */
 	def boolean isString(Type it) {
-		return stringBuiltin.get == typeRef.builtin;
+		return stringBuiltin.get == typeRef?.builtin;
 	}
 
 	/**
 	 * {@code true} if the argument is a direct subtype of the binary built-in YANG type.
 	 */
 	def boolean isBinary(Type it) {
-		return binaryBuiltin.get == typeRef.builtin;
+		return binaryBuiltin.get == typeRef?.builtin;
 	}
 
 	/**
 	 * Returns {@code true} if the type argument is a subtype of the built-in YANG enumeration type.
 	 */
 	def boolean isEnumeration(Type it) {
-		return enumerationBuiltin.get == typeRef.builtin;
+		return enumerationBuiltin.get == typeRef?.builtin;
 	}
 
 	/**
 	 * {@code true} if the type is a direct subtype of the built-in union type, otherwise {@code false}.
 	 */
 	def boolean isUnion(Type it) {
-		return unionBuiltin.get == typeRef.builtin;
+		return unionBuiltin.get == typeRef?.builtin;
 	}
 
 	/**
 	 * Returns {@code true} if the argument is a directly derived from the bits YANG type, otherwise {@code false}.
 	 */
 	def boolean isBits(Type it) {
-		return bitsBuiltin.get == typeRef.builtin;
+		return bitsBuiltin.get == typeRef?.builtin;
 	}
 
 	/**
 	 * {@code true} if the type is an identity reference built-in type, otherwise {@code false}.
 	 */
 	def boolean isIdentityref(Type it) {
-		return identityrefBuiltin.get == typeRef.builtin;
+		return identityrefBuiltin.get == typeRef?.builtin;
 	}
 
 	/**

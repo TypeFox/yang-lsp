@@ -24,7 +24,7 @@ import org.eclipse.xtext.util.internal.Log
 interface IScopeContext {
 	
 	def IScope getModuleScope()
-	def String getLocalPrefix()
+	def QualifiedName getLocalPrefix()
 	def String getModuleName()
 	
 	def Map<String, IScopeContext> getImportedModules()
@@ -76,7 +76,7 @@ class ForwardingScopeContext implements IScopeContext {
 	}
 	
 	override IScope getModuleScope() { resolve.moduleScope }
-	override String getLocalPrefix() { resolve.localPrefix }
+	override QualifiedName getLocalPrefix() { resolve.localPrefix }
 	override String getModuleName() { resolve.moduleName }
 	
 	override MapScope getGroupingScope() { resolve.groupingScope }
@@ -127,30 +127,30 @@ class LocalNodeScopeContext extends LocalScopeContext {
 @Log
 class ScopeContext implements IScopeContext {
 
-	@Accessors(PUBLIC_GETTER) final IScope moduleScope
+	@Accessors val IScope moduleScope
 	
-	@Accessors(PUBLIC_GETTER) final MapScope groupingScope = new MapScope(new LazyScope[computeParentDefinitionScope[getGroupingScope]])
-	@Accessors(PUBLIC_GETTER) final MapScope typeScope = new MapScope(new LazyScope[computeParentDefinitionScope[getTypeScope]])
-	@Accessors(PUBLIC_GETTER) final MapScope identityScope = new MapScope(new LazyScope[computeParentDefinitionScope[getIdentityScope]])
-	@Accessors(PUBLIC_GETTER) final MapScope featureScope = new MapScope(new LazyScope[computeParentDefinitionScope[getFeatureScope]])
-	@Accessors(PUBLIC_GETTER) final MapScope extensionScope = new MapScope(new LazyScope[computeParentDefinitionScope[getExtensionScope]])
+	@Accessors val MapScope groupingScope = new MapScope(new LazyScope[computeParentDefinitionScope[getGroupingScope]])
+	@Accessors val MapScope typeScope = new MapScope(new LazyScope[computeParentDefinitionScope[getTypeScope]])
+	@Accessors val MapScope identityScope = new MapScope(new LazyScope[computeParentDefinitionScope[getIdentityScope]])
+	@Accessors val MapScope featureScope = new MapScope(new LazyScope[computeParentDefinitionScope[getFeatureScope]])
+	@Accessors val MapScope extensionScope = new MapScope(new LazyScope[computeParentDefinitionScope[getExtensionScope]])
 	MapScope schemaNodeScope
 	
 	List<Runnable> resolveDefinitions = newArrayList
 	List<Runnable> computeNodeScope = newArrayList
 	List<Runnable> afterAll = newArrayList
 							  
-	@Accessors(PUBLIC_GETTER) Map<String, IScopeContext> importedModules = newHashMap
-	@Accessors final String localPrefix
-	@Accessors final String moduleName
+	@Accessors val Map<String, IScopeContext> importedModules = newHashMap
+	@Accessors val QualifiedName localPrefix
+	@Accessors val String moduleName
 	/**
-	 * the scopes from other files belonging to the same module
+	 * The scopes from other files belonging to the same module
 	 */
-	@Accessors(PUBLIC_GETTER) Set<IScopeContext> moduleBelongingSubModules = new LinkedHashSet
+	@Accessors val Set<IScopeContext> moduleBelongingSubModules = new LinkedHashSet
 
 	new(IScope moduleScope, String prefix, String moduleName) {
 		this.moduleScope = moduleScope
-		this.localPrefix = prefix
+		this.localPrefix = if (prefix !== null) QualifiedName.create(prefix)
 		this.moduleName = moduleName
 	}
 	
@@ -189,11 +189,11 @@ class ScopeContext implements IScopeContext {
 		for (subModule : moduleBelongingSubModules) {
 			val subModuleScope = subModule.schemaNodeScope
 			if (subModuleScope !== null) {			
-				result.add(subModuleScope.getLocalOnly())
+				result.add(subModuleScope.localOnly)
 			}
 		}
-		for (imported : this.importedModules.entrySet) {
-			val scope = imported.value.schemaNodeScope
+		for (imported : importedModules.values) {
+			val scope = imported.schemaNodeScope
 			if (scope !== null) {			
 				result.add(scope)
 			}
@@ -203,25 +203,25 @@ class ScopeContext implements IScopeContext {
 	
 	private def IScope computeParentDefinitionScope((IScopeContext)=>MapScope fun) {
 		var result = newArrayList()
-		if (this.localPrefix !== null) {				
-			val prefix = QualifiedName.create(this.localPrefix)
-			result.add(new PrefixingScope(fun.apply(this).localOnly, prefix))
+		if (localPrefix !== null) {				
+			result.add(new PrefixingScope(fun.apply(this).localOnly, localPrefix))
 		}
 		for (subModule : moduleBelongingSubModules) {
 			val scope = fun.apply(subModule).localOnly
 			result.add(scope)
-			if (this.localPrefix !== null) {				
-				val prefix = QualifiedName.create(this.localPrefix)
-				result.add(new PrefixingScope(scope, prefix))
+			if (localPrefix !== null) {				
+				result.add(new PrefixingScope(scope, localPrefix))
 			}
 		}
-		for (imported : this.importedModules.entrySet) {
+		for (imported : importedModules.entrySet) {
 			val scope = fun.apply(imported.value).localOnly
 			val prefix = QualifiedName.create(imported.key)
 			result.add(new PrefixingScope(scope, prefix))
 			for (submodule : imported.value.moduleBelongingSubModules) {
-				val subScope = fun.apply(submodule).localOnly
-				result.add(new PrefixingScope(subScope, prefix))
+				if (submodule != this) {
+					val subScope = fun.apply(submodule).localOnly
+					result.add(new PrefixingScope(subScope, prefix))
+				}
 			}
 		}
 		return new CompositeScope(result)
@@ -276,25 +276,24 @@ class ScopeContext implements IScopeContext {
 		/**
 		 * @return true, if the element could be added
 		 */
-		def boolean tryAddLocal(QualifiedName name, EObject element) {
+		def AddResult tryAddLocal(QualifiedName name, EObject element) {
 			tryAddLocal(name, element, emptyMap)
 		}
 		
-		def boolean tryAddLocal(QualifiedName name, EObject element, Map<String,String> userData) {
+		def AddResult tryAddLocal(QualifiedName name, EObject element, Map<String,String> userData) {
 			val description = new EObjectDescription(name, element, userData)
 			val existingLocal = this.elements.put(name, description)
 			if (existingLocal !== null) {
 				// put it back if it was existing locally
 				this.elements.put(name, existingLocal)
-				return false
+				return AddResult.DUPLICATE_LOCAL
 			}
 			// now check parents
 			val existing = parent.getSingleElement(name)
 			if (existing !== null && !allowShadowParent) {
-				return false
-			} else {
-				return true
+				return AddResult.DUPLICATE_PARENT
 			}
+			return AddResult.OK
 		}
 		
 		def boolean allowShadowParent() {
@@ -303,6 +302,10 @@ class ScopeContext implements IScopeContext {
 				
 		def IScope getLocalOnly() {
 			return new MapScope(IScope.NULLSCOPE, elements)
+		}
+		
+		static enum AddResult {
+			OK, DUPLICATE_LOCAL, DUPLICATE_PARENT
 		}
 	}
 

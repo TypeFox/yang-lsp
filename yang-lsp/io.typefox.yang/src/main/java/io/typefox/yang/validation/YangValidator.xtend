@@ -133,7 +133,7 @@ class YangValidator extends AbstractYangValidator {
 				val submoduleVersion = submoduleStatement.module.yangVersion
 				if(submoduleVersion != baseModuleVersion) {
 					val message = '''Cannot include a version «submoduleVersion» submodule in a version «baseModuleVersion» module.''';
-					error(message, submoduleStatement, ABSTRACT_IMPORT__MODULE, BAD_INCLUDE_YANG_VERSION);				
+					error(message, submoduleStatement, ABSTRACT_IMPORT__MODULE, BAD_INCLUDE_YANG_VERSION);
 				}
 			];
 
@@ -161,7 +161,7 @@ class YangValidator extends AbstractYangValidator {
 				val baseModuleVersion = belongsTo.module.yangVersion
 				if(submoduleVersion != baseModuleVersion) {
 					val message = '''A version «submoduleVersion» submodule cannot be included in a version «baseModuleVersion» module.''';
-					error(message, belongsTo, BELONGS_TO__MODULE, BAD_INCLUDE_YANG_VERSION);				
+					error(message, belongsTo, BELONGS_TO__MODULE, BAD_INCLUDE_YANG_VERSION);
 				}
 			]
 	}
@@ -350,7 +350,7 @@ class YangValidator extends AbstractYangValidator {
 					&& revisionStatement.revision !== null 
 					&& revisionStatement.revision != revisionFile) {
 					val message = '''The revision date in the file name does not match.''';
-					warning(message, revisionStatement, REVISION__REVISION, REVISION_MISMATCH);						
+					warning(message, revisionStatement, REVISION__REVISION, REVISION_MISMATCH);
 				}
 			} catch (java.text.ParseException e) {
 				val message = '''The revision date in the file name should be in the following format: "YYYY-MM-DD".''';
