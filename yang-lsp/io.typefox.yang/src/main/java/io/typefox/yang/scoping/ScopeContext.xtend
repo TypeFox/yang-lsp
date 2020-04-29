@@ -4,6 +4,7 @@ import com.google.common.collect.Iterables
 import com.google.inject.Provider
 import io.typefox.yang.scoping.ScopeContext.LazyScope
 import io.typefox.yang.scoping.ScopeContext.MapScope
+import io.typefox.yang.yang.Deviation
 import java.util.LinkedHashSet
 import java.util.List
 import java.util.Map
@@ -62,27 +63,14 @@ interface IScopeContext {
 	override MapScope getExtensionScope() {new MapScope }
 }
 
-@FinalFieldsConstructor
-class ForwardingScopeContext implements IScopeContext {
-	@Delegate val IScopeContext parent
-	val Provider<IScopeContext> forward
-	IScopeContext resolvedForward
-	
-	private def resolve() {
-		if (resolvedForward === null) {
-			resolvedForward = forward.get ?: parent
-		}
-		return resolvedForward
-	}
-	
-	override IScope getModuleScope() { resolve.moduleScope }
-	override QualifiedName getLocalPrefix() { resolve.localPrefix }
-	override String getModuleName() { resolve.moduleName }
-	
+@Data class DeviationScopeContext implements IScopeContext {
+	@Delegate IScopeContext original
+	Deviation deviation
 }
 
 @FinalFieldsConstructor 
-@Accessors(PUBLIC_GETTER) class LocalScopeContext implements IScopeContext {
+@Accessors(PUBLIC_GETTER)
+class LocalScopeContext implements IScopeContext {
 	@Delegate val IScopeContext parent
 	
 	val MapScope groupingScope = new MapScope(new LazyScope[getParent.getGroupingScope])

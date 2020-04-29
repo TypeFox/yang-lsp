@@ -1,0 +1,15 @@
+module ericsson-certm-sgsn-mme {
+    yang-version 1.1;
+    namespace "urn:rdns:com:ericsson:oammodel:ericsson-certm-sgsn-mme";
+    prefix ecertm;
+
+    revision "2019-08-21";
+
+    container certm {
+ 
+        leaf user-label {
+            type string;
+            description "Label for free use. An additional descriptive text.";
+        }
+    }
+}
