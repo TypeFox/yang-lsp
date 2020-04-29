@@ -195,21 +195,21 @@ class ScopeContextProvider {
 		handleGeneric(node, nodePath, ctx, isConfig)
 	}
 	
-	private def doLinkNodeLater(SchemaNodeIdentifier identifier, QualifiedName prefix, IScopeContext context) {
+	private def doLinkNodeLater(SchemaNodeIdentifier identifier, QualifiedName nodePath, IScopeContext context) {
 		context.runAfterAll [
-			internalLinkNode(identifier, prefix, context)
+			internalLinkNode(identifier, nodePath, context)
 		]
 	}
 	
-	private def QualifiedName internalLinkNode(SchemaNodeIdentifier identifier, QualifiedName prefix, IScopeContext context) {
+	private def QualifiedName internalLinkNode(SchemaNodeIdentifier identifier, QualifiedName nodePath, IScopeContext context) {
 		if (identifier.target !== null) {
-			internalLinkNode(identifier.target, prefix, context) 
+			internalLinkNode(identifier.target, nodePath, context) 
 		}
-		val pref = identifier.internalGetQualifiedName(prefix, context)
+		val qn = identifier.internalGetQualifiedName(nodePath, context)
 		linker.link(identifier, YangPackage.Literals.SCHEMA_NODE_IDENTIFIER__SCHEMA_NODE) [
-			context.schemaNodeScope.getSingleElement(pref)
+			context.schemaNodeScope.getSingleElement(qn)
 		]
-		return pref
+		return qn
 	}
 	
 	protected dispatch def void computeScope(TypeReference node, QualifiedName nodePath, IScopeContext ctx, boolean isConfig) {
@@ -424,18 +424,12 @@ class ScopeContextProvider {
 		val context = switch node {
 			Grouping : 
 				new LocalNodeScopeContext(ctx)
+			Deviation case node.reference !== null:
+				new DeviationScopeContext(ctx, node)
 			SchemaNode : {
 				val scope = Adapter.findInEmfObject(node)?.scopeContext ?: new LocalScopeContext(ctx)
 				new Adapter(scope, newPath).attachToEmfObject(node)
 				scope
-			}
-			Deviation: {
-				// The substatements of a deviation are resolved in the context of the referenced node
-				new ForwardingScopeContext(ctx) [
-					val refNode = node.reference?.schemaNode
-					if (refNode !== null)
-						Adapter.findInEmfObject(refNode)?.scopeContext
-				]
 			}
 			default:
 				ctx
@@ -644,9 +638,9 @@ class ScopeContextProvider {
 	}
 	
 	private def QualifiedName internalGetQualifiedName(SchemaNodeIdentifier identifier, QualifiedName p, IScopeContext ctx) {
-		var prefix = if (identifier.target !== null) {
+		val prefix = if (identifier.target !== null) {
 			internalGetQualifiedName(identifier.target, p, ctx)			
-		} else if (identifier.isIsAbsolute) {
+		} else if (identifier.isAbsolute) {
 			QualifiedName.EMPTY
 		} else {
 			p
@@ -655,13 +649,19 @@ class ScopeContextProvider {
 		if (qn !== null) {
 			var firstSeg = ctx.moduleName
 			if (qn.segmentCount === 2) {
-				firstSeg = ctx.importedModules.get(qn.firstSegment)?.moduleName ?: ctx.moduleName
+				val importedName = ctx.importedModules.get(qn.firstSegment)?.moduleName
+				if (importedName !== null)
+					firstSeg = importedName
+			} else if (ctx instanceof DeviationScopeContext) {
+				val deviationName = internalGetQualifiedName(ctx.deviation.reference, QualifiedName.EMPTY, ctx.original)
+				if (deviationName.segmentCount >= 2)
+					firstSeg = deviationName.getSegment(deviationName.segmentCount - 2)
 			}
-			var secondSeg = qn.lastSegment
+			val secondSeg = qn.lastSegment
 			return prefix.append(firstSeg).append(secondSeg)
 		} else if (identifier.schemaNode !== null && !identifier.schemaNode.eIsProxy()) {
 			val moduleName = identifier.schemaNode.getContainerOfType(AbstractModule)?.name
-			if(moduleName !== null && identifier.schemaNode.name !== null)
+			if (moduleName !== null && identifier.schemaNode.name !== null)
 				return prefix.append(moduleName).append(identifier.schemaNode.name)
 		} 
 		return prefix

@@ -1,0 +1,21 @@
+module ericsson-certm-ext-sgsn-mme {
+	yang-version 1.1;
+	namespace "urn:rdns:com:ericsson:oammodel:ericsson-certm-ext-sgsn-mme";
+	prefix certmxsgsnmme;
+
+	import ietf-yang-types {
+		prefix yang;
+	}
+
+	import ericsson-certm-sgsn-mme {
+		prefix ecertm;
+	}
+
+	revision "2019-01-24";
+
+	deviation /ecertm:certm/ecertm:user-label {
+		deviate replace {
+			type yang:date-and-time;
+		}
+	}
+}
