@@ -1,7 +1,7 @@
 buildscript {
 	repositories.jcenter()
 	dependencies {
-		classpath 'org.xtext:xtext-gradle-plugin:2.0.1'
+		classpath 'org.xtext:xtext-gradle-plugin:2.0.8'
 	}
 }
 
@@ -9,7 +9,6 @@ apply from: "${rootDir}/gradle/versions.gradle"
 
 subprojects {
 	repositories {
-		mavenLocal()
 		mavenCentral()
 		maven {
 			name 'sonatype-snapshots'

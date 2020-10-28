@@ -8,12 +8,12 @@ configurations {
 }
 
 dependencies {
-	compile "org.eclipse.xtext:org.eclipse.xtext:${versions.xtext}"
-	compile "com.google.code.gson:gson:${versions.gson}"
-	compile "xerces:xercesImpl:${versions.xerces}"
+	implementation "org.eclipse.xtext:org.eclipse.xtext:${versions.xtext}"
+	implementation "com.google.code.gson:gson:${versions.gson}"
+	implementation "xerces:xercesImpl:${versions.xerces}"
 	
-	testCompile "junit:junit:${versions.junit}"
-	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
+	testImplementation "junit:junit:${versions.junit}"
+	testImplementation "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
     
 	mwe2 "org.eclipse.emf:org.eclipse.emf.mwe2.launch:${versions.mwe2}"
 	mwe2 "org.eclipse.xtext:org.eclipse.xtext.common.types:${versions.xtext}"

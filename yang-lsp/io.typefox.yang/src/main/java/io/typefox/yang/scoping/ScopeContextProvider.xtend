@@ -422,11 +422,14 @@ class ScopeContextProvider {
 			}
 		}
 		val context = switch node {
-			Grouping : 
-				new LocalNodeScopeContext(ctx)
+			Grouping: {
+				val scope = new LocalNodeScopeContext(ctx)
+				new Adapter(scope, newPath).attachToEmfObject(node)
+				scope
+			}
 			Deviation case node.reference !== null:
 				new DeviationScopeContext(ctx, node)
-			SchemaNode : {
+			SchemaNode: {
 				val scope = Adapter.findInEmfObject(node)?.scopeContext ?: new LocalScopeContext(ctx)
 				new Adapter(scope, newPath).attachToEmfObject(node)
 				scope
