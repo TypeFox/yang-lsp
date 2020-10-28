@@ -289,6 +289,14 @@ class ModuleSerializeTest {
 			}
 		''', targetModule, false)
 	}
+	
+	@Test
+	def void testIssue188() {
+		val targetModule = loadModuleFile("_3gpp-common-fm.yang")
+		val resource = targetModule.eResource as XtextResource
+		// Check that no exception is thrown during serialization
+		resource.serializer.serialize(targetModule)
+	}
 
 	private def Unknown createTailfSuppressEchoProperty() {
 		createTailfWithValueProperty("suppress-echo", "true", null, null)

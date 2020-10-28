@@ -4,16 +4,19 @@ import io.typefox.yang.tests.AbstractYangTest
 import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Container
 import io.typefox.yang.yang.Description
+import io.typefox.yang.yang.Grouping
 import io.typefox.yang.yang.Module
 import io.typefox.yang.yang.Namespace
 import io.typefox.yang.yang.Organization
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Statement
+import io.typefox.yang.yang.Uses
 import io.typefox.yang.yang.YangFactory
 import io.typefox.yang.yang.YangPackage
 import io.typefox.yang.yang.YangVersion
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EClass
+import org.eclipse.emf.ecore.InternalEObject
 import org.eclipse.xtext.resource.SaveOptions
 import org.eclipse.xtext.resource.XtextResource
 import org.junit.Test
@@ -356,6 +359,91 @@ class SerializationTest extends AbstractYangTest {
 			                    mandatory true;
 			                }
 			            }
+			        }
+			    }
+			}
+			'''.toString, serialized)
+	}
+	
+	@Test
+	def void testIssue188() {
+		val resource = load('''
+			module _3gpp-common-fm2 {
+			    yang-version 1.1;
+			    namespace "urn:3gpp:sa5:_3gpp-common-fm2";
+			    prefix "fm3gpp2";
+			
+			    revision 2020-10-08;
+			
+			    grouping AlarmRecordGrp {
+			
+			        leaf alarmId {
+			            type string;
+			        }
+			
+			        grouping ThresholdPackGrp {
+			            leaf thresholdLevel {
+			                type string;
+			            }
+			            leaf thresholdValue {
+			                type string;
+			            }
+			        }
+			
+			        grouping ThresholdInfoGrp {
+			            leaf measurementType {
+			                type string;
+			            }
+			
+			            uses ThresholdPackGrp;
+			        }
+			
+			        list thresholdInfo {
+			            uses ThresholdInfoGrp;
+			        }
+			    }
+			}
+		''') as XtextResource
+		resource.assertNoErrors()
+		val module = resource.contents.head as Module
+		val uses = module.substatements.get(4).substatements.get(2).substatements.get(1) as Uses
+		assertTrue(uses.grouping.node instanceof Grouping)
+		assertFalse((uses.grouping.node as InternalEObject).eIsProxy)
+		
+		val serialized = resource.serializer.serialize(resource.contents.head)
+		assertEquals('''
+			module _3gpp-common-fm2 {
+			    yang-version 1.1;
+			    namespace "urn:3gpp:sa5:_3gpp-common-fm2";
+			    prefix "fm3gpp2";
+			
+			    revision 2020-10-08;
+			
+			    grouping AlarmRecordGrp {
+			
+			        leaf alarmId {
+			            type string;
+			        }
+			
+			        grouping ThresholdPackGrp {
+			            leaf thresholdLevel {
+			                type string;
+			            }
+			            leaf thresholdValue {
+			                type string;
+			            }
+			        }
+			
+			        grouping ThresholdInfoGrp {
+			            leaf measurementType {
+			                type string;
+			            }
+			
+			            uses ThresholdPackGrp;
+			        }
+			
+			        list thresholdInfo {
+			            uses ThresholdInfoGrp;
 			        }
 			    }
 			}
