@@ -12,7 +12,6 @@ import io.typefox.yang.YangRuntimeModule
 import io.typefox.yang.YangStandaloneSetup
 import io.typefox.yang.diagram.YangDiagramModule
 import io.typefox.yang.ide.YangIdeModule
-import io.typefox.yang.tests.YangInjectorProvider
 import org.eclipse.xtext.util.Modules2
 
 class YangDiagramInjectorProvider extends YangInjectorProvider {

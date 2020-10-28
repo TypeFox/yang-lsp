@@ -9,7 +9,6 @@ package io.typefox.yang.diagram.test
 
 import com.google.inject.Inject
 import io.typefox.yang.diagram.YangDiagramGenerator
-import io.typefox.yang.tests.AbstractYangTest
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.sprotty.util.IdCache
 import org.eclipse.sprotty.xtext.IDiagramGenerator
