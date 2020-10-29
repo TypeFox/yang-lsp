@@ -46,6 +46,10 @@ import io.typefox.yang.yang.Unknown
 import io.typefox.yang.yang.Uses
 import io.typefox.yang.yang.When
 import io.typefox.yang.yang.YangPackage
+import java.util.ArrayList
+import java.util.List
+import java.util.regex.Pattern
+import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.emf.ecore.resource.ResourceSet
@@ -54,9 +58,11 @@ import org.eclipse.xtend.lib.annotations.Data
 import org.eclipse.xtext.EcoreUtil2
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.EObjectDescription
+import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsData
 import org.eclipse.xtext.resource.impl.ResourceDescriptionsProvider
 import org.eclipse.xtext.scoping.IScope
+import org.eclipse.xtext.util.Wrapper
 import org.eclipse.xtext.util.internal.EmfAdaptable
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
@@ -526,15 +532,17 @@ class ScopeContextProvider {
 			}
 			if (revisionToModule.empty)
 				return null
+			
 			val matches = newArrayList
 			if (importedRevisionStatement !== null) {
 				linker.<Revision>link(importedRevisionStatement, REVISION_DATE__DATE) [ revisionName |
-					matches += revisionToModule.get(revisionName.toString).sortBy[EObjectURI.trimFragment.toString]
-					if (matches.isEmpty) {
+					val revisionModules = revisionToModule.get(revisionName.toString).sortBy[EObjectURI.trimFragment.toString]
+					if (revisionModules.isEmpty) {
 						// date will not be linked, that's enough as an error message
 						return null
 					}
-					val importedModule = EcoreUtil.resolve(matches.head.EObjectOrProxy, element) as AbstractModule
+					matches += revisionModules
+					val importedModule = EcoreUtil.resolve(revisionModules.head.EObjectOrProxy, element) as AbstractModule
 					val revisionToBeLinked = importedModule.substatements.filter(Revision).findFirst[revision == revisionName.toString]
 					if (revisionToBeLinked === null)
 						// revision is from filename, so nothing to link here
@@ -542,17 +550,61 @@ class ScopeContextProvider {
 					else
 						return EObjectDescription.create(revisionName, revisionToBeLinked)
 				]
-			} 
+			}
+			
 			if (matches.empty) {
 				matches += revisionToModule.get(revisionToModule.keys.max)
 			}
-			val iter = matches.iterator
-			val result = if (iter.hasNext) iter.next
-			if (iter.hasNext) {
-				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, '''Multiple modules '«name»' with matching revision are available [«matches.join(', ')[name.toString]»]''', IssueCodes.AMBIGUOUS_IMPORT)
+			val filtered = filterUnrelatedModules(element.eResource, matches)
+			if (filtered.size > 1) {
+				val modulePaths = filtered.map[EObjectURI.path].stripCommonPath
+				validator.addIssue(element, ABSTRACT_IMPORT__MODULE,
+					'''Multiple modules '«name»' with matching revision are available [«modulePaths.join(', ')»]''',
+					IssueCodes.AMBIGUOUS_IMPORT)
 			}
-			return result
+			return filtered.head
 		]
+	}
+	
+	private def List<IEObjectDescription> filterUnrelatedModules(Resource resource, List<IEObjectDescription> candidates) {
+		if (candidates.size <= 1)
+			return candidates
+		val resourceDir = resource.URI.directory
+		if (resourceDir === null)
+			return candidates
+		val result = new ArrayList(candidates)
+		result.removeIf[candidate |
+			val dir = candidate.EObjectURI.directory
+			!resourceDir.startsWith(dir) && !dir.startsWith(resourceDir)
+		]
+		if (result.empty)
+			return candidates
+		else
+			return result
+	}
+	
+	private def getDirectory(URI uri) {
+		if (uri === null)
+			return null
+		val path = uri.path
+		val endIndex = path.lastIndexOf('/')
+		if (endIndex >= 0)
+			return path.substring(0, endIndex)
+		else
+			return path
+	}
+	
+	private def stripCommonPath(Iterable<String> paths) {
+		val head = paths.head
+		val tail = paths.tail
+		val matcher = Pattern.compile('/').matcher(head)
+		val commonIndex = Wrapper.wrap(0)
+		while (matcher.find) {
+			val prefix = head.substring(0, matcher.end)
+			if (tail.forall[startsWith(prefix)])
+				commonIndex.set = matcher.end
+		}
+		return paths.map[substring(commonIndex.get)]
 	}
 	
 	private def findContainingModule(EObject obj) {

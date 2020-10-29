@@ -375,7 +375,71 @@ class ModuleLinkingTest extends AbstractYangTest {
 			}
 		''')
 		validator.validate(foo)
-		assertNoErrors(foo.root)
+		assertNoIssues(foo.root)
+		validator.validate(bar)
+		assertWarning(bar.allContents.filter(Import).head, IssueCodes.AMBIGUOUS_IMPORT)
+		assertEquals(foo.root.name, bar.allContents.filter(Import).head.module.name)
+	}
+	
+	@Test def void testDuplicateRevisionUnrelatedPath() {
+		val foo = load('''
+			module foo {
+			    namespace foo;
+			    prefix foo;
+				revision 2002-02-02;
+			}
+		''', '/dir1')
+		load('''
+			module foo {
+			    namespace foo;
+			    prefix foo;
+				revision 2002-02-02;
+			}
+		''', '/dir2')
+		val bar = load('''
+			module bar {
+				namespace bar;
+				prefix bar;
+				import foo {
+					prefix foo;
+					revision-date 2002-02-02;
+			    }
+			}
+		''', '/dir1')
+		validator.validate(foo)
+		assertNoIssues(foo.root)
+		validator.validate(bar)
+		assertNoIssues(bar.root)
+		assertEquals(foo.root.name, bar.allContents.filter(Import).head.module.name)
+	}
+	
+	@Test def void testDuplicateRevisionAllUnrelated() {
+		val foo = load('''
+			module foo {
+			    namespace foo;
+			    prefix foo;
+				revision 2002-02-02;
+			}
+		''', '/dir1')
+		load('''
+			module foo {
+			    namespace foo;
+			    prefix foo;
+				revision 2002-02-02;
+			}
+		''', '/dir2')
+		val bar = load('''
+			module bar {
+				namespace bar;
+				prefix bar;
+				import foo {
+					prefix foo;
+					revision-date 2002-02-02;
+			    }
+			}
+		''', '/dir3')
+		validator.validate(foo)
+		assertNoIssues(foo.root)
 		validator.validate(bar)
 		assertWarning(bar.allContents.filter(Import).head, IssueCodes.AMBIGUOUS_IMPORT)
 		assertEquals(foo.root.name, bar.allContents.filter(Import).head.module.name)

@@ -85,15 +85,19 @@ abstract class AbstractYangTest {
 	}
 
 	protected def Resource loadWithSyntaxErrors(CharSequence contents) {
-		load(contents, true)
+		load(contents, '', true)
 	}
 	
 	protected def Resource load(CharSequence contents) {
-		load(contents, false)
+		load(contents, '', false)
 	}
 	
-	protected def Resource load(CharSequence contents, boolean allowErrors) {
-		val uri = URI.createURI("synthetic:///__synthetic" + resourceSet.resources.size + ".yang")
+	protected def Resource load(CharSequence contents, String path) {
+		load(contents, path, false)
+	}
+	
+	protected def Resource load(CharSequence contents, String path, boolean allowErrors) {
+		val uri = URI.createURI('''synthetic://«path»/__synthetic«resourceSet.resources.size».yang''')
 		val resource = resourceHelper.resource(contents.toString, uri, resourceSet)
 		resource.load(emptyMap)
 		if (!allowErrors)
