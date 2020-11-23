@@ -88,7 +88,9 @@ ESCAPED_DQ_STRING= \\\" [^\\\"]* \\\"?
 NUMBER= ("+"|"-")? {U_NUMBER}
 U_NUMBER= [0-9]+ ("." [0-9]+)? | "." [0-9]+
 
-OPERATOR= "and" | "or" | "mod" | "div" | "*" | "|" | "+" | "-" | "=" | "!=" | "<" | "<=" | ">" | ">="
+SYMBOLIC_OPERATOR= "*" | "|" | "+" | "-" | "=" | "!=" | "<" | "<=" | ">" | ">="
+
+LEXICAL_OPERATOR= "and" | "or" | "mod" | "div"
 
 STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | {SL_COMMENT})*
 
@@ -123,7 +125,8 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 	{SL_COMMENT} { return RULE_SL_COMMENT; }
 	\"          {yybegin(IN_EXPRESSION_STRING); return RULE_HIDDEN;}
 	"'"         {yybegin(IN_SQ_EXPRESSION_STRING); return RULE_HIDDEN;}
-	{OPERATOR}  { return RULE_OPERATOR; }
+	{SYMBOLIC_OPERATOR}  { return RULE_SYMBOLIC_OPERATOR; }
+	{LEXICAL_OPERATOR}  { return RULE_LEXICAL_OPERATOR; }
 	"binary"                {return Binary;}
 	"bits"                  {return Bits;}
 	"boolean"               {return Boolean;}
@@ -161,7 +164,8 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 <IN_EXPRESSION_STRING> {
 	{SINGLE_QUOTED_STRING} { return RULE_STRING; }
 	{ESCAPED_DQ_STRING}    { return RULE_STRING; }
-	{OPERATOR}  { return RULE_OPERATOR; }
+	{SYMBOLIC_OPERATOR}  { return RULE_SYMBOLIC_OPERATOR; }
+	{LEXICAL_OPERATOR}  { return RULE_LEXICAL_OPERATOR; }
 	"binary"                {return Binary;}
 	"bits"                  {return Bits;}
 	"boolean"               {return Boolean;}
@@ -201,7 +205,8 @@ STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | 
 
 <IN_SQ_EXPRESSION_STRING> {
 	{DOUBLE_QUOTED_STRING}    { return RULE_STRING; }
-	{OPERATOR}  { return RULE_OPERATOR; }
+	{SYMBOLIC_OPERATOR}  { return RULE_SYMBOLIC_OPERATOR; }
+	{LEXICAL_OPERATOR}  { return RULE_LEXICAL_OPERATOR; }
 	"binary"                {return Binary;}
 	"bits"                  {return Bits;}
 	"boolean"               {return Boolean;}

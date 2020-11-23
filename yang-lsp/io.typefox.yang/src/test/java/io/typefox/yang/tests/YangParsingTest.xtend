@@ -326,6 +326,14 @@ class YangParsingTest {
 		}'''.wrapModule.assertNoParserErrors;
 	}
 
+	@Test
+	def void testGH193() {
+		'''
+		typedef foo1 {
+		  type or:origin-ref;
+		}'''.wrapModule.assertNoParserErrors;
+	}
+
 	private def wrapModule(CharSequence it) '''
 		module foo {
 			«it»
