@@ -658,7 +658,7 @@ IdOrKw :
 ;
 
 QualifiedTypeName:
-	((ID | KEYWORD) ':')? (ID|KEYWORD)
+	((ID | KEYWORD | LEXICAL_OPERATOR) ':')? (ID|KEYWORD)
 ;
 
 BUILTIN_TYPE :
@@ -691,6 +691,7 @@ KEYWORD :
 	| 'delete'
 	| 'deprecated'
 	| 'false'
+	| 'or'
 	| 'max'
 	| 'min'
 	| 'not-supported'
@@ -780,7 +781,8 @@ terminal ID       : 'an id';
 terminal EXTENSION_NAME : 'ID:ID // only valid on statement ctx';
 terminal STRING   : 'an unquoted string';
 terminal NUMBER   : 'positive integer value';
-terminal OPERATOR : 'and' | 'or' | 'mod' | 'div' | '*' | '/' | '//' | '|' | '+' | '-' | '=' | '!=' | '<' | '<=' | '>' | '>=';
+terminal SYMBOLIC_OPERATOR : '*' | '/' | '//' | '|' | '+' | '-' | '=' | '!=' | '<' | '<=' | '>' | '>=';
+terminal LEXICAL_OPERATOR : 'a lexical operator'; //'and' | 'or' | 'mod' | 'div';
 
 terminal ML_COMMENT	: '/*' -> '*/';
 terminal SL_COMMENT 	: '//' !('\n'|'\r')* ('\r'? '\n')?;

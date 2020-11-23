@@ -1,3 +1,3 @@
 {
-	"excludePath": "build:bin" 
+	"excludePath": "bin:build" 
 }
