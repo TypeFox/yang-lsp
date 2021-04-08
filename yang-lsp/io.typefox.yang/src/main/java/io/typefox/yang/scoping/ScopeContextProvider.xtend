@@ -161,7 +161,16 @@ class ScopeContextProvider {
 			return null
 		}
 		return linker.<Module>link(belongsTo, BELONGS_TO__MODULE) [ name |
-			moduleScope.getSingleElement(name)
+			val candidates = moduleScope.getElements(name)
+			val matches = newArrayList
+			for (candidate : candidates) {
+				matches.add(candidate)
+			}
+			val filtered = filterUnrelatedModules(submodule.eResource, matches)
+			if (filtered.size > 0) {
+				return filtered.head
+			}
+			return matches.head // take first
 		]
 	}
 	
@@ -577,6 +586,12 @@ class ScopeContextProvider {
 			val dir = candidate.EObjectURI.directory
 			!resourceDir.startsWith(dir) && !dir.startsWith(resourceDir)
 		]
+		if(result.size > 1) {
+			result.removeIf [ candidate |
+				val dir = candidate.EObjectURI.directory
+				resourceDir != dir
+			]
+		}
 		if (result.empty)
 			return candidates
 		else
