@@ -27,6 +27,7 @@ import org.eclipse.xtext.EcoreUtil2
 import org.junit.Test
 
 import static io.typefox.yang.validation.IssueCodes.*
+import org.junit.Assert
 
 /**
  * Validation test for the YANG language.
@@ -1523,6 +1524,32 @@ class YangValidatorTest extends AbstractYangTest {
 			}
 		''');
 		assertError(EcoreUtil2.getAllContentsOfType(root, Status).head, TYPE_ERROR);
+	}
+	
+	@Test
+	def void checkUriToProblem_01() {
+		val model = loadWithSyntaxErrors('''
+			module bug196 {
+			    prefix bug196;
+			    namespace bug196;
+			    leaf key-id {
+			        type string;
+			
+			        when "/ctxsr6k:contexts/ctxr6k:context/ctxr6k:context-"
+			             + "name='local'" {
+			                  description
+			                  "";
+			         }
+			         }
+			    }
+			}
+		''');
+		
+		val issues = validator.validate(model)
+		val noUriIssues = issues.filter[it.uriToProblem === null].toList
+		Assert.assertEquals("Some issues has no uriToProblem set", 0, noUriIssues.size)
+		val eofError = issues.findFirst["missing EOF at '}'" == message]
+		Assert.assertEquals("Wrong URI to problem provided", "synthetic:///__synthetic0.yang", eofError.uriToProblem.toString)
 	}
 
 }
