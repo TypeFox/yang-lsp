@@ -34,6 +34,7 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import static org.junit.Assert.*
+import org.eclipse.xtext.resource.SaveOptions
 
 @RunWith(XtextRunner)
 @InjectWith(YangInjectorProvider)
@@ -297,6 +298,61 @@ class ModuleSerializeTest {
 		// Check that no exception is thrown during serialization
 		resource.serializer.serialize(targetModule)
 	}
+	@Test
+	def void testIssue197() {
+		val targetModule = loadModuleFile("issue197/serialize_197.yang")
+
+		val leaf = YangFactory.eINSTANCE.createLeaf
+		leaf.name = "user-label1"
+		leaf.substatements.add(YangFactory.eINSTANCE.createDescription => [
+			description = '''
+			Here is a list;
+			            x
+			            y
+			            z'''
+		])
+
+		val leaf2 = YangFactory.eINSTANCE.createLeaf
+		leaf2.name = "user-label2"
+		leaf2.substatements.add(YangFactory.eINSTANCE.createDescription => [
+			description = '''
+			Here is a list,
+			            x
+			            y
+			            z'''
+		])
+
+		targetModule.substatements.add(leaf) // with semicolon
+		targetModule.substatements.add(leaf2) // with comma
+
+		assertSerialized('''
+			module serialize_197 {
+			    yang-version 1.1;
+			    namespace serialize_197;
+			    prefix mf3gppdeviations;
+			
+			    leaf user-label {
+			        type string;
+			        description "Here is a list;
+			        x
+			        y
+			        z";
+			    }
+			    leaf user-label1 {
+			        description 'Here is a list;
+			            x
+			            y
+			            z';
+			    }
+			    leaf user-label2 {
+			        description 'Here is a list,
+			            x
+			            y
+			            z';
+			    }
+			}
+		''', targetModule, false, true)
+	}
 
 	private def Unknown createTailfSuppressEchoProperty() {
 		createTailfWithValueProperty("suppress-echo", "true", null, null)
@@ -358,8 +414,12 @@ class ModuleSerializeTest {
 	}
 	
 	private def assertSerialized(CharSequence expected, AbstractModule targetModule, boolean ignoreWhitespace) {
+		assertSerialized(expected, targetModule, ignoreWhitespace, false)
+	}
+	private def assertSerialized(CharSequence expected, AbstractModule targetModule, boolean ignoreWhitespace, boolean format) {
 		val resource = targetModule.eResource as XtextResource
-		val actual = resource.serializer.serialize(targetModule)
+		val opt = if(format)SaveOptions.newBuilder.format.options else SaveOptions.newBuilder.options
+		val actual = resource.serializer.serialize(targetModule, opt)
 		if (ignoreWhitespace)
 			assertEquals(expected.toString.trim.replaceAll('\\s+', ' '), actual.trim.replaceAll('\\s+', ' '))
 		else
