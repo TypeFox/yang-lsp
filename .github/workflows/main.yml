@@ -20,3 +20,8 @@ jobs:
     - name: Run Gradle Build and Tests
       run: ./gradlew --no-daemon build
       working-directory: yang-lsp
+    - name: Publish Unit Test Results
+      uses: EnricoMi/publish-unit-test-result-action@v1
+      if: always()
+      with:
+        files: yang-lsp/**/test-results/**/*.xml
