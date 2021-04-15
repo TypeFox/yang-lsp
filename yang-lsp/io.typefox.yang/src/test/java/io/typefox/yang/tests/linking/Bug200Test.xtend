@@ -52,7 +52,7 @@ class Bug200Test extends AbstractYangTest {
 
 	@Test
 	def void testBelongsToIncludeLinking_01() {
-		// path doen't matter but better for debugging
+		// path doesn't matter but better for debugging
 		val superRes = augment_super.load('super')
 		val sub1Res = augment_sub1.load('sub1')
 		val sub0Res = augment_sub0.load('sub0')
@@ -68,8 +68,7 @@ class Bug200Test extends AbstractYangTest {
 
 	@Test
 	def void testBelongsToIncludeLinking_02() {
-		println('''''')
-		// path doen't matter but better for debugging
+		// path doesn't matter but better for debugging
 		val sub0Res = augment_sub0.load('sub0')
 		val superRes = augment_super.load('super')
 		val sub1Res = augment_sub1.load('sub1')
@@ -82,7 +81,7 @@ class Bug200Test extends AbstractYangTest {
 	@Test
 	def void testBelongsToIncludeLinking_03() {
 		println('''''')
-		// path doen't matter but better for debugging
+		// path doesn't matter but better for debugging
 		val sub1Res = augment_sub1.load('sub1')
 		val superRes = augment_super.load('super')
 		val sub0Res = augment_sub0.load('sub0')
