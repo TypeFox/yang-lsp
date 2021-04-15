@@ -213,7 +213,13 @@ class ScopeContextProvider {
 		}
 		val qn = identifier.internalGetQualifiedName(nodePath, context)
 		linker.link(identifier, YangPackage.Literals.SCHEMA_NODE_IDENTIFIER__SCHEMA_NODE) [
-			context.schemaNodeScope.getSingleElement(qn)
+			val element = context.schemaNodeScope.getSingleElement(qn)
+			if(element !== null) {
+				return element
+			}
+			// try sub-module scope.
+			// When sub module is loaded before super module, SchemaNodes might not be propagated properly
+			context.moduleBelongingSubModules.map[subCtx | subCtx.schemaNodeScope.getSingleElement(qn)].filterNull.head
 		]
 		return qn
 	}

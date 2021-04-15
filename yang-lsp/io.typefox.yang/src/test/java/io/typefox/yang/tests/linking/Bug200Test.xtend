@@ -19,9 +19,6 @@ class Bug200Test extends AbstractYangTest {
 		   include augment-sub1;
 		        
 		   augment "/interfaces/ifEntry" {
-		     leaf someNode {
-		       type string;
-		     }
 		   } 
 		 }
 		
@@ -38,15 +35,6 @@ class Bug200Test extends AbstractYangTest {
 		
 		  augment "/interfaces" {
 		    list ifEntry {
-		      key "ifIndex";
-		      
-		      leaf ifIndex {
-		        type int32;
-		      }
-		    }
-		    leaf llm1 {
-		      type string;
-		      mandatory true;
 		    }
 		  }
 		} 
@@ -86,6 +74,19 @@ class Bug200Test extends AbstractYangTest {
 		val superRes = augment_super.load('super')
 		val sub1Res = augment_sub1.load('sub1')
 		sub0Res.root // fully resolve
+		superRes.assertNoErrors;
+		sub1Res.assertNoErrors;
+		sub0Res.assertNoErrors;
+	}
+
+	@Test
+	def void testBelongsToIncludeLinking_03() {
+		println('''''')
+		// path doen't matter but better for debugging
+		val sub1Res = augment_sub1.load('sub1')
+		val superRes = augment_super.load('super')
+		val sub0Res = augment_sub0.load('sub0')
+		sub1Res.root // fully resolve
 		superRes.assertNoErrors;
 		sub1Res.assertNoErrors;
 		sub0Res.assertNoErrors;
