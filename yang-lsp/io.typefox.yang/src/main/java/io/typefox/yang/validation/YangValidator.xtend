@@ -481,7 +481,7 @@ class YangValidator extends AbstractYangValidator {
 		// (4) If the target node is a choice node, the "case" statement or a
 		// shorthand "case" statement (see Section 7.9.2) can be used within the "augment" statement.
 		val target = path?.schemaNode;
-		if (target !== null) {
+		if (target !== null && !target.eIsProxy) {
 			val validSubstatements = validAugmentStatements.get(target.eClass);
 			if (validSubstatements.nullOrEmpty) {
 				// Implicit `input` and `output` is added to all "rpc" and "action" statements. (See: RFC 7950 7.14)
