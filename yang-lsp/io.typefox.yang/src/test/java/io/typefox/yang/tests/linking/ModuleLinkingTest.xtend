@@ -445,5 +445,76 @@ class ModuleLinkingTest extends AbstractYangTest {
 		assertEquals(foo.root.name, bar.allContents.filter(Import).head.module.name)
 	}
 	
+	/**
+	 * Issue: #195
+	 */
+	@Test def void testLinkToSiblingsAndChildrenFirst_01() {
+		val foo1 = load('''
+			module simple1 {
+			    yang-version 1.1;
+			    namespace urn:rdns:simple1;
+			    prefix simple1e;
+			    include subx;
+			   
+			    revision 2021-02-22;
+			    
+			    container simple1 {
+			    }
+			}
+		''', '/dir1')
+		val foo2 = load('''
+			module simple1 {
+			    yang-version 1.1;
+			    namespace urn:rdns:simple1;
+			    prefix simple1e;
+			    include subx;
+			   
+			    revision 2021-02-22;
+			    
+			    container simple1 {
+			    }
+			}
+		''', '/dir2')
+		
+		val sub1 = load('''
+			submodule subx {
+			    yang-version 1.1;
+			    belongs-to simple1 {
+			        prefix simple1e;
+			    }
+			    revision 2021-02-22;
+			
+			    container subc {
+			        leaf x {
+			            type string;
+			        }
+			    }
+			}
+		''', '/dir1')
+		val sub2 = load('''
+			submodule subx {
+			    yang-version 1.1;
+			    belongs-to simple1 {
+			        prefix simple1e;
+			    }
+			    revision 2021-02-22;
+			
+			    container subc {
+			        leaf x {
+			            type string;
+			        }
+			    }
+			}
+		''', '/dir2')
+		validator.validate(foo1)
+		assertNoIssues(foo1.root)
+		validator.validate(foo2)
+		assertNoIssues(foo2.root)
+		validator.validate(sub1)
+		assertNoIssues(sub1.root)
+		validator.validate(sub2)
+		assertNoIssues(sub2.root)
+	}
+	
 	
 }

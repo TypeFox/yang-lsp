@@ -161,7 +161,16 @@ class ScopeContextProvider {
 			return null
 		}
 		return linker.<Module>link(belongsTo, BELONGS_TO__MODULE) [ name |
-			moduleScope.getSingleElement(name)
+			val candidates = moduleScope.getElements(name)
+			val matches = newArrayList
+			for (candidate : candidates) {
+				matches.add(candidate)
+			}
+			val filtered = filterUnrelatedModules(submodule.eResource, matches)
+			if (filtered.size > 0) {
+				return filtered.head
+			}
+			return matches.head // take first
 		]
 	}
 	
@@ -213,7 +222,13 @@ class ScopeContextProvider {
 		}
 		val qn = identifier.internalGetQualifiedName(nodePath, context)
 		linker.link(identifier, YangPackage.Literals.SCHEMA_NODE_IDENTIFIER__SCHEMA_NODE) [
-			context.schemaNodeScope.getSingleElement(qn)
+			val element = context.schemaNodeScope.getSingleElement(qn)
+			if(element !== null) {
+				return element
+			}
+			// try sub-module scope.
+			// When sub module is loaded before super module, SchemaNodes might not be propagated properly
+			context.moduleBelongingSubModules.map[subCtx | subCtx.schemaNodeScope.getSingleElement(qn)].filterNull.head
 		]
 		return qn
 	}
@@ -577,6 +592,12 @@ class ScopeContextProvider {
 			val dir = candidate.EObjectURI.directory
 			!resourceDir.startsWith(dir) && !dir.startsWith(resourceDir)
 		]
+		if(result.size > 1) {
+			result.removeIf [ candidate |
+				val dir = candidate.EObjectURI.directory
+				resourceDir != dir
+			]
+		}
 		if (result.empty)
 			return candidates
 		else
