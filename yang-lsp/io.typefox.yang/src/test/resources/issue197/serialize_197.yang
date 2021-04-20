@@ -1,0 +1,13 @@
+module serialize_197 {
+  yang-version 1.1;
+  namespace serialize_197;
+  prefix mf3gppdeviations;
+
+  leaf user-label {
+    type string;
+    description "Here is a list;
+        x
+        y
+        z";
+  }
+}
