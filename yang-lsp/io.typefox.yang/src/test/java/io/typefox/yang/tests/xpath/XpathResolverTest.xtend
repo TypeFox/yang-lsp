@@ -193,4 +193,26 @@ class XpathResolverTest extends AbstractYangTest {
 		assertNoErrors(r.root)
 	}
 	
+	@Test def void testConcatPath() {
+		val r = '''
+			module bug_113 {
+			    prefix bug_113;
+			    namespace bug_113;
+			    list l1-list1 {
+			        leaf lf1-list2 {
+			            type string;
+			        }
+			    }
+			    container test {
+			        must "/l1-" 
+			        +  "list1";
+			    }
+			    container test2 {
+			        must "/l1-"+"list1" + "/lf1-"+"list2";
+			    }
+			}
+		'''.load
+		assertNoErrors(r.root)
+	}
+	
 }

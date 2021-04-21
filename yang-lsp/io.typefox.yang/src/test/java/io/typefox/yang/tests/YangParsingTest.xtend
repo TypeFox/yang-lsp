@@ -333,6 +333,54 @@ class YangParsingTest {
 		  type or:origin-ref;
 		}'''.wrapModule.assertNoParserErrors;
 	}
+	@Test
+	def void testIssue_113_01() {
+		val model = '''
+		path "/qosipose-"
+		+ "map/name"'''.wrapModule.parse
+
+		assertEquals(
+		'''
+		XpathLocation {
+		    cref XpathExpression target AbsolutePath {
+		        cref XpathStep step XpathStep {
+		            cref XpathNodeTest node XpathNameTest {
+		                ref SchemaNode ref ref: SchemaNode@(unresolved proxy __synthetic0.yang#|0)
+		            }
+		        }
+		    }
+		    cref XpathStep step XpathStep {
+		        cref XpathNodeTest node XpathNameTest {
+		            ref SchemaNode ref ref: SchemaNode@(unresolved proxy __synthetic0.yang#|1)
+		        }
+		    }
+		}'''.toString,
+			EmfFormatter.objToStr((model.substatements.head as Path).reference).toPlatformLineSeparator)
+	}
+	@Test
+	def void testIssue_113_02() {
+		val model = '''
+		path "/qosipose-map"
+		+ "/name"'''.wrapModule.parse
+
+		assertEquals(
+		'''
+		XpathLocation {
+		    cref XpathExpression target AbsolutePath {
+		        cref XpathStep step XpathStep {
+		            cref XpathNodeTest node XpathNameTest {
+		                ref SchemaNode ref ref: SchemaNode@(unresolved proxy __synthetic0.yang#|0)
+		            }
+		        }
+		    }
+		    cref XpathStep step XpathStep {
+		        cref XpathNodeTest node XpathNameTest {
+		            ref SchemaNode ref ref: SchemaNode@(unresolved proxy __synthetic0.yang#|1)
+		        }
+		    }
+		}'''.toString,
+			EmfFormatter.objToStr((model.substatements.head as Path).reference).toPlatformLineSeparator)
+	}
 
 	private def wrapModule(CharSequence it) '''
 		module foo {

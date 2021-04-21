@@ -18,7 +18,11 @@ module yangster-test {
 			type string;
 		}
 	}
-	
-	container c2 {
+	container cont-one {
+        leaf leaf-one {
+            type string;
+        }
+	}
+    container c2 {
 	}
 }

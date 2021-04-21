@@ -94,6 +94,8 @@ class ModuleSerializeTest {
 					prefix ytest;
 				}
 				container cb {
+			        must "number(.) <= number(lb/list-leaf-"
+			        +"c/leafref)";
 				    list lb {
 				        leaf lfb {
 				            type leafref {
@@ -114,6 +116,16 @@ class ModuleSerializeTest {
 				        	type leafref { 
 				        		path "/ytest:" + "c1/ytest" + ":l1";
 				        	}
+				        }
+				        leaf list-leaf-c {
+				            type leafref {
+				                path "/ytest:cont-one/ytest:leaf-one";
+				            }
+				        }
+				        leaf list-leaf-c2 {
+				            type leafref {
+				                path "/ytest:cont-" +/ytest:leaf" + "-one";
+				            }
 				        }
 				    }
 				}
@@ -249,7 +261,11 @@ class ModuleSerializeTest {
 			        }
 			        t:suppress-echo true;
 			    }
-				
+				container cont-one {
+				    leaf leaf-one {
+				        type string;
+				    }
+				}
 				container c2 {
 				t:callpoint is-system-created-cb {
 			            t:set-hook node;

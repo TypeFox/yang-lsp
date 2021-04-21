@@ -1,14 +1,31 @@
 module bug_114 {
     prefix bug_114;
     namespace bug_114;
-    list l1 {
-        leaf lf1 {
+    list l1-list1 {
+        leaf lf1-list2 {
             type string;
         }
     }
-    deviation l1 {
+
+    container test {
+        must "/l1-" + "list1";
+        
+    }
+    container test2 {
+        must "/l1-" + "list1" + "/lf1-list2";
+        
+    }
+     container test3 {
+        must "/l1-list1";
+        
+    }
+     container test4 {
+        must "/l1-list1" + "/lf1-list2";
+        
+    }
+    deviation l1-list1 {
         deviate add {
-            unique lf1;
+            unique  "lf1-list2";
         }
     }
 }

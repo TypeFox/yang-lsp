@@ -6,6 +6,9 @@ module xpath-serialize {
 		prefix ytest;
 	}
 	container cb {
+        must "number(.) <= number(lb/list-leaf-"
+        +"c/leafref)";
+        
 	    list lb {
 	        leaf lfb {
 	            type leafref {
@@ -26,6 +29,16 @@ module xpath-serialize {
 	        	type leafref { 
 	        		path "/ytest:" + "c1/ytest" + ":l1";
 	        	}
+	        }
+	        leaf list-leaf-c {
+	            type leafref {
+	                path "/ytest:cont-one/ytest:leaf-one";
+	            }
+	        }
+	        leaf list-leaf-c2 {
+	            type leafref {
+	                path "/ytest:cont-" + "one/ytest:leaf" + "-one";
+	            }
 	        }
 	    }
 	}
