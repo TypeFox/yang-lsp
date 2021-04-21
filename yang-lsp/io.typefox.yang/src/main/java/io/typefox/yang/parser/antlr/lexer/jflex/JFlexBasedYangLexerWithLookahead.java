@@ -21,8 +21,6 @@ public class JFlexBasedYangLexerWithLookahead extends JFlexBasedInternalYangLexe
 
 	@Override
 	public Token nextToken() {
-//		if(true)
-//			return super.nextToken();
 		Token currentSuperToken = super.nextToken();
 
 		if (currentToken == null) {
@@ -57,7 +55,6 @@ public class JFlexBasedYangLexerWithLookahead extends JFlexBasedInternalYangLexe
 
 	/**
 	 * 
-	 * @return <code>true</code> in case [ID][HIDDEN][HIDDEN][ID]
 	 */
 	private boolean canSquash(Token currentToken, Token lookAheadToken, Token lookAheadToken2,
 			Token currentSuperToken) {
@@ -78,8 +75,7 @@ public class JFlexBasedYangLexerWithLookahead extends JFlexBasedInternalYangLexe
 		CommonToken lookAheadCommonToken = (CommonToken) lookAheadToken;
 		CommonToken squashed = new CommonTokenWithText(currentToken.getText() + currentSuperToken.getText(),
 				currentSuperToken.getType(), lookAheadCommonToken.getChannel(),
-				((CommonToken) currentToken).getStartIndex());
-		System.out.println("JFlexBasedYangLexerWithLookahead.squash(): to " + squashed.getText());
+				((CommonToken) currentToken).getStartIndex(), ((CommonToken) currentSuperToken).getStopIndex());
 		return squashed;
 	}
 }
