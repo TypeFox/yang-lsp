@@ -55,6 +55,7 @@ public class JFlexBasedYangLexerWithLookahead extends JFlexBasedInternalYangLexe
 
 	/**
 	 * 
+	 * @return <code>true</code> in case [ID][HIDDEN][HIDDEN][ID]
 	 */
 	private boolean canSquash(Token currentToken, Token lookAheadToken, Token lookAheadToken2,
 			Token currentSuperToken) {
