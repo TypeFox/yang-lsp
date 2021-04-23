@@ -7,6 +7,8 @@ import com.google.inject.Binder
 import io.typefox.yang.documentation.DocumentationProvider
 import io.typefox.yang.formatting2.YangIndentationInformation
 import io.typefox.yang.formatting2.YangTextRegionAccessBuilder
+import io.typefox.yang.parser.antlr.lexer.jflex.JFlexBasedInternalYangLexer
+import io.typefox.yang.parser.antlr.lexer.jflex.JFlexBasedYangLexerWithLookahead
 import io.typefox.yang.resource.YangCrossReferenceSerializer
 import io.typefox.yang.resource.YangResource
 import io.typefox.yang.resource.YangSerializer
@@ -124,4 +126,7 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 		YangTokenUtil
 	}
 	
+	def Class<? extends JFlexBasedInternalYangLexer> bindJFlexBasedInternalYangLexer() {
+		return JFlexBasedYangLexerWithLookahead
+	}
 }

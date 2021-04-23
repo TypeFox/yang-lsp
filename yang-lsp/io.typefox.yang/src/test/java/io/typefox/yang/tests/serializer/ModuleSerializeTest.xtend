@@ -86,72 +86,108 @@ class ModuleSerializeTest {
 	def void testSerializeOriginalXPath() {
 		val targetModule = loadModuleFile("xpath-serialize.yang")
 		assertSerialized('''
-			module xpath-serialize {
-				namespace xpath;
-				prefix xs;
-				yang-version 1.1;
-				import yangster-test {
-					prefix ytest;
-				}
-				container cb {
-				    list lb {
-				        leaf lfb {
-				            type leafref {
-				                path "/ytest:c1/ytest:l1";
-				            }
-				        }
-				        leaf lfb2 { 
-				        	type leafref { 
-				        		path "/ytest:c1" + "/ytest:l1";
-				        	}
-				        }
-				        leaf lfb3 { 
-				        	type leafref { 
-				        		path "/ytest:c1/" + "ytest:l1";
-				        	}
-				        }
-				        leaf lfb4 { 
-				        	type leafref { 
-				        		path "/ytest:" + "c1/ytest" + ":l1";
-				        	}
-				        }
-				    }
-				}
-			}
+		module xpath-serialize {
+		    namespace xpath;
+		    prefix xs;
+		    yang-version 1.1;
+		    import yangster-test {
+		        prefix ytest;
+		    }
+		    container cb {
+		        must "number(.) <= number(lb/list-leaf-"
+		        +"c/leafref)";
+		
+		        list lb {
+		            leaf lfb {
+		                type leafref {
+		                    path "/ytest:c1/ytest:l1";
+		                }
+		            }
+		            leaf lfb2 {
+		                type leafref {
+		                    path "/ytest:c1" + "/ytest:l1";
+		                }
+		            }
+		            leaf lfb3 {
+		                type leafref {
+		                    path "/ytest:c1/" + "ytest:l1";
+		                }
+		            }
+		            leaf lfb4 {
+		                type leafref {
+		                    path "/ytest:" + "c1/ytest" + ":l1";
+		                }
+		            }
+		            leaf list-leaf-c {
+		                type leafref {
+		                    path "/ytest:cont-one/ytest:leaf-one";
+		                }
+		            }
+		            leaf list-leaf-c2 {
+		                type leafref {
+		                    path "/ytest:cont-" + "one/ytest:leaf" + "-one";
+		                }
+		            }
+		            leaf list-leaf-c3 {
+		                type leafref {
+		                    path "/ytest:cont-" + "one/ytest:" + "leaf" + "-one";
+		                }
+		            }
+		        }
+		    }
+		}
 		''', targetModule, false)
 		EcoreUtil.resolveAll(targetModule)
 		assertSerialized('''
 			module xpath-serialize {
-				namespace xpath;
-				prefix xs;
-				yang-version 1.1;
-				import yangster-test {
-					prefix ytest;
-				}
-				container cb {
-				    list lb {
-				        leaf lfb {
-				            type leafref {
-				                path "/ytest:c1/ytest:l1";
-				            }
-				        }
-				        leaf lfb2 { 
-				        	type leafref { 
-				        		path "/ytest:c1" + "/ytest:l1";
-				        	}
-				        }
-				        leaf lfb3 { 
-				        	type leafref { 
-				        		path "/ytest:c1/" + "ytest:l1";
-				        	}
-				        }
-				        leaf lfb4 { 
-				        	type leafref { 
-				        		path "/ytest:" + "c1/ytest" + ":l1";
-				        	}
-				        }
-				    }
-				}
+			    namespace xpath;
+			    prefix xs;
+			    yang-version 1.1;
+			    import yangster-test {
+			        prefix ytest;
+			    }
+			    container cb {
+			        must "number(.) <= number(lb/list-leaf-"
+			        +"c/leafref)";
+			
+			        list lb {
+			            leaf lfb {
+			                type leafref {
+			                    path "/ytest:c1/ytest:l1";
+			                }
+			            }
+			            leaf lfb2 {
+			                type leafref {
+			                    path "/ytest:c1" + "/ytest:l1";
+			                }
+			            }
+			            leaf lfb3 {
+			                type leafref {
+			                    path "/ytest:c1/" + "ytest:l1";
+			                }
+			            }
+			            leaf lfb4 {
+			                type leafref {
+			                    path "/ytest:" + "c1/ytest" + ":l1";
+			                }
+			            }
+			            leaf list-leaf-c {
+			                type leafref {
+			                    path "/ytest:cont-one/ytest:leaf-one";
+			                }
+			            }
+			            leaf list-leaf-c2 {
+			                type leafref {
+			                    path "/ytest:cont-" + "one/ytest:leaf" + "-one";
+			                }
+			            }
+			            leaf list-leaf-c3 {
+			                type leafref {
+			                    path "/ytest:cont-" + "one/ytest:" + "leaf" + "-one";
+			                }
+			            }
+			        }
+			    }
 			}
 		''', targetModule, false)
 	}
@@ -249,7 +285,11 @@ class ModuleSerializeTest {
 			        }
 			        t:suppress-echo true;
 			    }
-				
+				container cont-one {
+				    leaf leaf-one {
+				        type string;
+				    }
+				}
 				container c2 {
 				t:callpoint is-system-created-cb {
 			            t:set-hook node;

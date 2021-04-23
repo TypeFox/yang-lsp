@@ -54,7 +54,11 @@ import static io.typefox.yang.parser.antlr.internal.InternalYangParser.*;
 		private static final long serialVersionUID = 1L;
 
 		public CommonTokenWithText(String tokenText, int type, int defaultChannel, int offset) {
-			super(null, type, defaultChannel, offset, offset + tokenText.length() - 1);
+			this(tokenText, type, defaultChannel, offset, offset + tokenText.length() - 1);
+		}
+		
+		public CommonTokenWithText(String tokenText, int type, int defaultChannel, int offset, int end) {
+			super(null, type, defaultChannel, offset, end);
 			this.text = tokenText;
 		}
 	}
