@@ -132,7 +132,8 @@ class ScopeContextProvider {
 		val result = new ScopeContext(
 			moduleScope,
 			module.prefix,
-			module.getModuleName(moduleScope)
+			module.getModuleName(moduleScope),
+			module.name
 		)
 		new Adapter(result, QualifiedName.EMPTY).attachToEmfObject(module)
 		
@@ -226,9 +227,6 @@ class ScopeContextProvider {
 			if(element !== null) {
 				return element
 			}
-			// try sub-module scope.
-			// When sub module is loaded before super module, SchemaNodes might not be propagated properly
-			context.moduleBelongingSubModules.map[subCtx | subCtx.schemaNodeScope.getSingleElement(qn)].filterNull.head
 		]
 		return qn
 	}

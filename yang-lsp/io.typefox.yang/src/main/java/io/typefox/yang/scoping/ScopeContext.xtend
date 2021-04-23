@@ -125,15 +125,17 @@ class ScopeContext implements IScopeContext {
 	@Accessors val Map<String, IScopeContext> importedModules = newHashMap
 	@Accessors val QualifiedName localPrefix
 	@Accessors val String moduleName
+	protected val String createdFrom
 	/**
 	 * The scopes from other files belonging to the same module
 	 */
 	@Accessors val Set<IScopeContext> moduleBelongingSubModules = new LinkedHashSet
 
-	new(IScope moduleScope, String prefix, String moduleName) {
+	new(IScope moduleScope, String prefix, String moduleName, String createdFrom) {
 		this.moduleScope = moduleScope
 		this.localPrefix = if (prefix !== null) QualifiedName.create(prefix)
 		this.moduleName = moduleName
+		this.createdFrom = createdFrom
 	}
 	
 	override getSchemaNodeScope() {
@@ -170,8 +172,18 @@ class ScopeContext implements IScopeContext {
 		var result = newArrayList()
 		for (subModule : moduleBelongingSubModules) {
 			val subModuleScope = subModule.schemaNodeScope
-			if (subModuleScope !== null) {			
+			if (subModuleScope !== null) {
 				result.add(subModuleScope.localOnly)
+			} else {
+				//try again later if subModule is currently resolving
+				result.add(new LazyScope[subModule.schemaNodeScope] {
+					override getScope() {
+						val scope = super.getScope()
+						if (scope === null)
+							return IScope.NULLSCOPE
+						return scope
+					}
+				}) 
 			}
 		}
 		for (imported : importedModules.values) {
@@ -361,6 +373,43 @@ class ScopeContext implements IScopeContext {
 		override getSingleElement(EObject object) {
 			return this.getElements(object).head
 		}
-	} 
-}
+	}
+	
+	/*
+	// Useful for debugging
+	override toString() {
+		val visited = newHashSet
+		return toString(visited)
+	}
+	private def String toString(IScopeContext scope, Set<IScopeContext> visited) {
+		if(Proxy.isProxyClass(scope.class))
+			return scope.toString
+		visited.add(scope)
+		'''
+		«scope.info»
+		   «FOR subCtx: scope.safeSubModules(visited)»
+		   «subCtx.toString(visited)»
+		   «ENDFOR»
+		'''
+	}
+	
+	private def safeSubModules(IScopeContext scope, Set<IScopeContext> visited) {
+		visited.add(scope)
+		return scope.moduleBelongingSubModules.map [ subCtx |
+			if (visited.contains(subCtx)) {
+				Proxy.newProxyInstance(this.class.classLoader, #[IScopeContext], new InvocationHandler() {
+					override invoke(Object proxy, Method method, Object[] args) throws Throwable {
+						if (method.name == "toString")
+							return '''ref to «subCtx.info»'''.toString
+					}
+				}) as IScopeContext
+			} else
+				subCtx
+		]
+	}
+	
+	private def String info(IScopeContext scopeCtx)
+	'''«scopeCtx.moduleName»«IF scopeCtx instanceof ScopeContext» for «scopeCtx.createdFrom» (def: «scopeCtx.resolveDefinitions?.size», node: «scopeCtx.computeNodeScope?.size») nodescope: «scopeCtx.schemaNodeScope»«ENDIF»'''
+ 	*/
+ }
 
