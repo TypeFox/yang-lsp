@@ -60,6 +60,19 @@ class ResourceValidator extends ResourceValidatorImpl {
 		super.validate(resource, mode, monitor, acceptor)
 	}
 	
+	override protected void collectResourceDiagnostics(Resource resource, CancelIndicator monitor,
+		IAcceptor<Issue> acceptor) {
+		val resourceUriAwareDelegate = [ Issue issue |
+			if (issue instanceof IssueImpl) {
+				if (issue.uriToProblem === null) {
+					issue.uriToProblem = resource.URI
+				}
+			}
+			acceptor.accept(issue)
+		]
+		super.collectResourceDiagnostics(resource, monitor, resourceUriAwareDelegate)
+	}
+	
 	override protected createAcceptor(List<Issue> result) {
 		val delegate = super.createAcceptor(result)
 		return [
