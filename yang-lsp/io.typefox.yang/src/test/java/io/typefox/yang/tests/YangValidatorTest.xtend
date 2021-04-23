@@ -1548,7 +1548,7 @@ class YangValidatorTest extends AbstractYangTest {
 		val issues = validator.validate(model)
 		val noUriIssues = issues.filter[it.uriToProblem === null].toList
 		Assert.assertEquals("Some issues has no uriToProblem set", 0, noUriIssues.size)
-		val eofError = issues.findFirst["missing EOF at '}'" == message]
+		val eofError = issues.findFirst["extraneous input '}' expecting EOF" == message]
 		Assert.assertEquals("Wrong URI to problem provided", "synthetic:///__synthetic0.yang", eofError.uriToProblem.toString)
 	}
 

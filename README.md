@@ -1,5 +1,5 @@
 # yang-lsp
-[![Build Status](https://travis-ci.org/theia-ide/yang-lsp.svg?branch=master)](https://travis-ci.org/theia-ide/yang-lsp)
+[![GH Build Status](https://github.com/theia-ide/yang-lsp/actions/workflows/main.yml/badge.svg?branch=master)](https://github.com/theia-ide/yang-lsp/actions/workflows/main.yml)
 [![Build status](https://ci.appveyor.com/api/projects/status/96eo9k5yo0wtpj50/branch/master?svg=true)](https://ci.appveyor.com/project/kittaakos/yang-lsp/branch/master)
 
 A language server for YANG (see [Language Server Protocol](https://github.com/Microsoft/language-server-protocol)).
