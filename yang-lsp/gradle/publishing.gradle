@@ -1,0 +1,95 @@
+java {
+	withJavadocJar()
+	withSourcesJar()
+}
+
+publishing {
+	publications {
+		mavenJava(MavenPublication) {
+			from components.java
+			pom {
+				afterEvaluate {
+					groupId project.group
+					artifactId project.name
+					version project.version
+					if (project.hasProperty('title')) {
+						name = project.title
+						description = project.description
+					}
+				}
+				url = 'https://github.com/theia-ide/yang-lsp'
+				scm {
+					connection = 'scm:git:git@github.com:theia-ide/yang-lsp.git'
+					developerConnection = 'scm:git:git@github.com:theia-ide/yang-lsp.git'
+					url = 'git@github.com:theia-ide/yang-lsp.git'
+				}
+				licenses {
+					license {
+						name = 'Apache License 2.0'
+						url = 'http://www.apache.org/licenses/LICENSE-2.0'
+					}
+				}
+				developers {
+					developer {
+						name = 'Dennis Huebner'
+						email = 'dennis.huebner@typefox.io'
+						organizationUrl = 'http://typefox.io'
+					}
+					developer {
+						name = 'Miro Spönemann'
+						email = 'miro.spoenemann@typefox.io'
+						organizationUrl = 'http://typefox.io'
+					}
+					developer {
+						name = 'Jan Bicker'
+						email = 'jan.bicker@typefox.io'
+						organizationUrl = 'http://typefox.io'
+					}
+					developer {
+						name = 'Sven Efftinge'
+						email = 'sven.efftinge@typefox.io'
+						organizationUrl = 'http://typefox.io'
+					}
+					developer {
+						name = 'Ákos Kitta'
+						email = 'akos.kitta@typefox.io'
+						organizationUrl = 'http://typefox.io'
+					}
+					developer {
+						name = 'Jan Köhnlein'
+						email = 'jan.koehnlein@typefox.io'
+						organizationUrl = 'http://typefox.io'
+					}
+					developer {
+						name = 'Alex Tugarev'
+						email = 'alex.tugarev@typefox.io'
+						organizationUrl = 'http://typefox.io'
+					}
+ 				}
+			}
+		}
+	}
+	repositories {
+		maven {
+			def releasesRepoUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
+			def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
+			url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+			credentials {
+				username = rootProject.findProperty('ossrhUsername') ?: ''
+				password = rootProject.findProperty('ossrhPassword') ?: ''
+			}
+//			url "file:" + file("${rootDir}/build/maven-repository")
+		}
+	}
+
+	signing {
+//		sign publishing.publications.mavenJava
+	}
+
+
+	javadoc {
+		if (JavaVersion.current().isJava9Compatible()) {
+			options.addBooleanOption('html5', true)
+		}
+	}
+}
