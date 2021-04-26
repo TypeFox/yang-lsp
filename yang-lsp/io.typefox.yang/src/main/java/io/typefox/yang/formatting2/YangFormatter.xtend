@@ -87,6 +87,7 @@ import org.eclipse.xtext.formatting2.AbstractFormatter2
 import org.eclipse.xtext.formatting2.FormatterPreferenceKeys
 import org.eclipse.xtext.formatting2.FormatterRequest
 import org.eclipse.xtext.formatting2.IFormattableDocument
+import org.eclipse.xtext.formatting2.IHiddenRegionFormatter
 import org.eclipse.xtext.formatting2.regionaccess.IHiddenRegion
 import org.eclipse.xtext.formatting2.regionaccess.IHiddenRegionPart
 import org.eclipse.xtext.formatting2.regionaccess.ISemanticRegion
@@ -96,6 +97,7 @@ import org.eclipse.xtext.formatting2.regionaccess.internal.TextRegions
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.preferences.BooleanKey
 import org.eclipse.xtext.preferences.MapBasedPreferenceValues
+import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
@@ -107,7 +109,7 @@ class YangFormatter extends AbstractFormatter2 {
     // Option Keys
     
     public static val FORCE_NEW_LINE = new BooleanKey("FORCE_NEW_LINE", true)
-    
+    static val Procedure1<? super IHiddenRegionFormatter> ONE_SPACE_PRESERVE_NEWLINE = [setNewLines(0, 0, 1); oneSpace]
     // Defaults
 
     override protected initialize(FormatterRequest request) {
@@ -463,7 +465,16 @@ class YangFormatter extends AbstractFormatter2 {
     }
 
     def dispatch void format(Key k, extension IFormattableDocument it) {
-		k.references.last.semanticRegions.forEach[append[noSpace]]
+    	k.regionFor.keyword(keyAccess.keyKeyword_1).append(ONE_SPACE_PRESERVE_NEWLINE)
+    	k.references.last.semanticRegions.forEach[append[noSpace]]
+    	if(k.references.size > 1) {
+			val prepend = k.references.head.semanticRegions.head
+			if (!MultilineStringReplacer.isQuote(prepend.text)) {
+				addReplacer(new QuoteStringReplacer(prepend, true))
+				val append = k.references.last.semanticRegions.last
+				addReplacer(new QuoteStringReplacer(append, false))
+			}
+		}
 		formatStatement(k)	
     }
     

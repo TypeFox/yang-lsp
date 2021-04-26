@@ -5,6 +5,9 @@ import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Container
 import io.typefox.yang.yang.Description
 import io.typefox.yang.yang.Grouping
+import io.typefox.yang.yang.KeyReference
+import io.typefox.yang.yang.Leaf
+import io.typefox.yang.yang.List
 import io.typefox.yang.yang.Module
 import io.typefox.yang.yang.Namespace
 import io.typefox.yang.yang.Organization
@@ -448,6 +451,102 @@ class SerializationTest extends AbstractYangTest {
 			    }
 			}
 			'''.toString, serialized)
+	}
+	@Test
+	def void testIssue_202() {
+		val resource = load('''
+			module  testKeys {
+			    yang-version 1.1;
+			    namespace urn:ietf:params:xml:ns:yang: testKeys;
+			    prefix  testKeys;
+			
+			    container container-name {
+			        list list-name {
+			            leaf leaf-name1 {
+			                type int32 {}
+			            }
+			            leaf leaf-name2 {
+			                type int32 {}
+			            }
+			        }
+			        list list-name2 {
+			            key "leaf-name10 leaf-name20";
+			            leaf leaf-name10 {
+			                type int32 {}
+			            }
+			            leaf leaf-name20 {
+			                type int32 {}
+			            }
+			        }
+			        list list-name3 {
+			            key 	'  
+			             leaf-name100 
+			             leaf-name200  ';
+			            leaf leaf-name100 {
+			                type int32 {}
+			            }
+			            leaf leaf-name200 {
+			                type int32 {}
+			            }
+			        }
+			    }
+			}
+		''') as XtextResource
+		val list = (resource.contents.head as Module).substatementsOfType(Container).head.substatementsOfType(List).head
+		val key = YangFactory.eINSTANCE.createKey();
+		list.substatements.add(0, key)
+		list.substatementsOfType(Leaf).forEach [ keyLeaf |
+			val KeyReference keyRef = YangFactory.eINSTANCE.createKeyReference();
+			keyRef.setNode(keyLeaf);
+			key.getReferences().add(keyRef);
+		]
+		val saveOptions = SaveOptions.newBuilder.format.options
+		val serialized = resource.serializer.serialize(resource.contents.head, saveOptions)
+		assertEquals('''
+		module testKeys {
+		    yang-version 1.1;
+		    namespace urn:ietf:params:xml:ns:yang: testKeys;
+		    prefix testKeys;
+		
+		    container container-name {
+		        list list-name {
+		            key "leaf-name1 leaf-name2";
+		            leaf leaf-name1 {
+		                type int32 {
+		                }
+		            }
+		            leaf leaf-name2 {
+		                type int32 {
+		                }
+		            }
+		        }
+		        list list-name2 {
+		            key "leaf-name10 leaf-name20";
+		            leaf leaf-name10 {
+		                type int32 {
+		                }
+		            }
+		            leaf leaf-name20 {
+		                type int32 {
+		                }
+		            }
+		        }
+		        list list-name3 {
+		            key '  
+		             leaf-name100 
+		             leaf-name200';
+		            leaf leaf-name100 {
+		                type int32 {
+		                }
+		            }
+		            leaf leaf-name200 {
+		                type int32 {
+		                }
+		            }
+		        }
+		    }
+		}
+		'''.toString, serialized)
 	}
 	
 	private def <T extends Statement> create(Statement it, EClass substmtEClass, Class<T> clazz) {
