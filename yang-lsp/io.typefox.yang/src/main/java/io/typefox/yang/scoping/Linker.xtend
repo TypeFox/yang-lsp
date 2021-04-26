@@ -34,8 +34,10 @@ class Linker {
 				LinkingErrorMessageProvider.markOK(element)
 			} else if (candidate !== null) {
 				val resolved = EcoreUtil.resolve(candidate.getEObjectOrProxy, element)
-				element.eSet(reference, resolved) // replace SchemaNode with linked value (e.g. Leaf, List)
-				return resolved as T
+				if(reference.EType.isInstance(resolved)) {
+					element.eSet(reference, resolved) // replace SchemaNode with linked value (e.g. Leaf, List)
+					return resolved as T
+				}
 			}
 		}
 		return element.eGet(reference, false) as InternalEObject as T

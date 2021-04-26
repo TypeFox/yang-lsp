@@ -164,7 +164,7 @@ class ScopeContextProvider {
 		return linker.<Module>link(belongsTo, BELONGS_TO__MODULE) [ name |
 			val candidates = moduleScope.getElements(name)
 			val matches = newArrayList
-			for (candidate : candidates) {
+			for (candidate : candidates.filter[it.EClass == MODULE]) {
 				matches.add(candidate)
 			}
 			val filtered = filterUnrelatedModules(submodule.eResource, matches)
@@ -498,7 +498,7 @@ class ScopeContextProvider {
 	
 	private def Module linkImportedModule(BelongsTo element, IScopeContext ctx) {
 		return linker.link(element, BELONGS_TO__MODULE) [ name |
-			ctx.moduleScope.getSingleElement(name)
+			ctx.moduleScope.getElements(name).filter[it.EClass == MODULE].head
 		]
 	}
 

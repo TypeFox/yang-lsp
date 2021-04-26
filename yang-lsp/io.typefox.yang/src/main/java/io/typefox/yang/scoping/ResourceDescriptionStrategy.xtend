@@ -3,7 +3,9 @@ package io.typefox.yang.scoping
 import com.google.inject.Inject
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Module
 import io.typefox.yang.yang.Revision
+import io.typefox.yang.yang.Submodule
 import io.typefox.yang.yang.YangFactory
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.InternalEObject
@@ -30,7 +32,11 @@ class ResourceDescriptionStrategy extends DefaultResourceDescriptionStrategy {
 					REVISION -> leadingRevision
 				}
 			}
-			val proxy = YangFactory.eINSTANCE.createAbstractModule()
+			val proxy = switch(m) {
+				Module: YangFactory.eINSTANCE.createModule()
+				Submodule: YangFactory.eINSTANCE.createSubmodule()
+				default: YangFactory.eINSTANCE.createAbstractModule()
+			}
 			(proxy as InternalEObject).eSetProxyURI(EcoreUtil.getURI(m))
 			acceptor.accept(new EObjectDescription(QualifiedName.create(m.name), proxy, data))
 			return false
