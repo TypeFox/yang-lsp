@@ -3,6 +3,10 @@ java {
 	withSourcesJar()
 }
 
+tasks.withType(GenerateModuleMetadata) {
+	enabled = false
+}
+
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
@@ -39,7 +43,7 @@ publishing {
 						name = 'Miro Spönemann'
 						email = 'miro.spoenemann@typefox.io'
 						organizationUrl = 'http://typefox.io'
-					}
+					}	
 					developer {
 						name = 'Jan Bicker'
 						email = 'jan.bicker@typefox.io'
@@ -69,25 +73,27 @@ publishing {
 			}
 		}
 	}
+
 	repositories {
 		maven {
-/*	
+			name = "OSSRH"
 			def releasesRepoUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
 			def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
 			url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 			credentials {
-				username = rootProject.findProperty('ossrhUsername') ?: ''
-				password = rootProject.findProperty('ossrhPassword') ?: ''
+				username = System.getenv('SONATYPE_USERNAME') ?: ''
+				password = System.getenv('SONATYPE_PASSWORD') ?: ''
 			}
-*/			
-			url = "file:" + file("${rootDir}/build/maven-repository")
+//			url = "file:" + file("${rootDir}/build/maven-repository")
 		}
 	}
 
 	signing {
-//		sign publishing.publications.mavenJava
+    	def signingKey = findProperty("signingKey")
+    	def signingPassword = findProperty("signingPassword")
+    	useInMemoryPgpKeys(signingKey, signingPassword)
+		sign publishing.publications.mavenJava
 	}
-
 
 	javadoc {
 		if (JavaVersion.current().isJava9Compatible()) {
