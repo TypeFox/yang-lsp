@@ -3,7 +3,7 @@ description = 'Language infrastructure for Yang based on Xtext'
 
 configurations {
 	mwe2 {
-		extendsFrom compile
+		extendsFrom implementation
 	}
 }
 
