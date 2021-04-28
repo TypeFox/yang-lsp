@@ -37,37 +37,42 @@ publishing {
 					developer {
 						name = 'Dennis Huebner'
 						email = 'dennis.huebner@typefox.io'
-						organizationUrl = 'http://typefox.io'
+						organizationUrl = 'https://typefox.io'
 					}
 					developer {
 						name = 'Miro Spönemann'
 						email = 'miro.spoenemann@typefox.io'
-						organizationUrl = 'http://typefox.io'
+						organizationUrl = 'https://typefox.io'
 					}	
 					developer {
 						name = 'Jan Bicker'
 						email = 'jan.bicker@typefox.io'
-						organizationUrl = 'http://typefox.io'
+						organizationUrl = 'https://typefox.io'
 					}
 					developer {
 						name = 'Sven Efftinge'
 						email = 'sven.efftinge@typefox.io'
-						organizationUrl = 'http://typefox.io'
+						organizationUrl = 'https://typefox.io'
 					}
 					developer {
 						name = 'Ákos Kitta'
 						email = 'akos.kitta@typefox.io'
-						organizationUrl = 'http://typefox.io'
+						organizationUrl = 'https://typefox.io'
 					}
 					developer {
 						name = 'Jan Köhnlein'
 						email = 'jan.koehnlein@typefox.io'
-						organizationUrl = 'http://typefox.io'
+						organizationUrl = 'https://typefox.io'
 					}
 					developer {
 						name = 'Alex Tugarev'
 						email = 'alex.tugarev@typefox.io'
-						organizationUrl = 'http://typefox.io'
+						organizationUrl = 'https://typefox.io'
+					}
+					developer {
+						name = 'Kai Salmen'
+						email = 'kai.salmen@typefox.io'
+						organizationUrl = 'https://typefox.io'
 					}
  				}
 			}
@@ -79,11 +84,12 @@ publishing {
 			name = "OSSRH"
 			def releasesRepoUrl = 'https://oss.sonatype.org/service/local/staging/deploy/maven2/'
 			def snapshotsRepoUrl = 'https://oss.sonatype.org/content/repositories/snapshots/'
-			url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
 			credentials {
 				username = System.getenv('SONATYPE_USERNAME') ?: ''
 				password = System.getenv('SONATYPE_PASSWORD') ?: ''
 			}
+			url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
+			// use this URL for local testing/debugging purposes
 //			url = "file:" + file("${rootDir}/build/maven-repository")
 		}
 	}
