@@ -20,7 +20,9 @@ jobs:
         java-version: 8
         distribution: adopt
     - name: Evaluate version
-      run: echo ::set-env name=HAVE_SNAPSHOT::$(grep "version =.*SNAPSHOT" gradle/versions.gradle | wc -l)
+      run: |
+          echo "HAVE_SNAPSHOT=$(grep "version =.*SNAPSHOT" gradle/versions.gradle | wc -l)" >> $GITHUB_ENV
+      working-directory: yang-lsp
     - name: Run Gradle Build, Tests and Publish Snapshots
       if: env.HAVE_SNAPSHOT == 1
       run: ./gradlew --no-daemon build publish
