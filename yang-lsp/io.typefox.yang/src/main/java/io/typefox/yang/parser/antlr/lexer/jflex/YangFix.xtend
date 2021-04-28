@@ -7,7 +7,7 @@ import java.util.regex.Pattern
 
 class YangFix {
 	
-	static val CONCAT_PATTERN = Pattern.compile('(\"\\s*\\+\\s*\"|\'\\s*\\+\\s*\')')
+	public static val CONCAT_PATTERN = Pattern.compile('(\"\\s*\\+\\s*\"|\'\\s*\\+\\s*\')')
 	
 	def static void main(String[] args) {
 		val reader = new FileReader(args.get(0))

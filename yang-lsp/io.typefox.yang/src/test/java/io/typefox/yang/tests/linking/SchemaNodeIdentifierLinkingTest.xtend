@@ -127,4 +127,73 @@ class SchemaNodeIdentifierLinkingTest extends AbstractYangTest {
 		''')
 		this.validator.assertNoErrors(m1.root)
 	}
+	
+	@Test def void testConcated_issue205() {
+		val m1 = load('''
+			module foo {
+				namespace "foo:foo";
+				prefix x;
+				
+				grouping g2 {
+					container c12 {
+					}
+				}
+				
+				uses g2 {
+					 augment "c12" {
+					 container c22foo-bar {}
+					 leaf lm1 {
+					 	type string;
+					 	mandatory true;
+					 	 }
+					 }
+				}
+				
+			}
+		''')
+		val m2 = load('''
+			module bar {
+			    namespace "foo:bar";
+			    prefix y;
+			    import foo {
+			        prefix f;
+			    }
+			
+			    augment "/f:c12/f:c22foo-bar" {
+			        container c32 {
+			        }
+			    }
+			    augment "/f:c12" + "/f:c22foo-bar" {
+			        container c33 {
+			        }
+			    }
+			    augment "/f:c12/" + "f:c22foo-bar" {
+			        container c34 {
+			        }
+			    }
+			    augment "/f:c12/f" + ":c22foo-bar" {
+			        container c35 {
+			        }
+			    }
+			    augment "/f:c12/f:c2"+ "2foo-bar" {
+			        container c36a {
+			        }
+			    }
+			    augment "/f:c12/f:"  + "c22foo-bar" {
+			        container c36 {
+			        }
+			    }
+			    augment "/f:c12/f:c22foo-" + "bar" {
+			        container c38 {
+			        }
+			    }
+			    augment "/f:c12/f:c22foo" + "-bar" {
+			        container c37 {
+			        }
+			    }
+			}
+		''')
+		this.validator.assertNoErrors(m1)
+		this.validator.assertNoErrors(m2)
+	}
 }

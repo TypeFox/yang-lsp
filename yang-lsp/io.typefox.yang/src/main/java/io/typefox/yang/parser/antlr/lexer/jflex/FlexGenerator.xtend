@@ -38,13 +38,16 @@ class FlexGenerator {
 		NUMBER= ("+"|"-")? {U_NUMBER}
 		U_NUMBER= [0-9]+ ("." [0-9]+)? | "." [0-9]+
 		
-		OPERATOR= "and" | "or" | "mod" | "div" | "*" | "|" | "+" | "-" | "=" | "!=" | "<" | "<=" | ">" | ">="
+		SYMBOLIC_OPERATOR= "*" | "|" | "+" | "-" | "=" | "!=" | "<" | "<=" | ">" | ">="
+		
+		LEXICAL_OPERATOR= "and" | "or" | "mod" | "div"
 		
 		STRING_CONCAT= ({WS} | {ML_COMMENT} | {SL_COMMENT})* "+" ({WS} | {ML_COMMENT} | {SL_COMMENT})*
 	'''
 	
 	val GenericExpressionMode = new ExpressionMode('EXPRESSION','''
-		{OPERATOR}  { return RULE_OPERATOR; }
+		{SYMBOLIC_OPERATOR}  { return RULE_SYMBOLIC_OPERATOR; }
+		{LEXICAL_OPERATOR}  { return RULE_LEXICAL_OPERATOR; }
 		"binary"                {return Binary;}
 		"bits"                  {return Bits;}
 		"boolean"               {return Boolean;}
@@ -310,7 +313,10 @@ class FlexGenerator {
 				private static final long serialVersionUID = 1L;
 		
 				public CommonTokenWithText(String tokenText, int type, int defaultChannel, int offset) {
-					super(null, type, defaultChannel, offset, offset + tokenText.length() - 1);
+					this(tokenText, type, defaultChannel, offset, offset + tokenText.length() - 1);
+				}
+				public CommonTokenWithText(String tokenText, int type, int defaultChannel, int offset, int endOffset) {
+					super(null, type, defaultChannel, offset, endOffset);
 					this.text = tokenText;
 				}
 			}

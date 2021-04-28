@@ -1,7 +1,10 @@
 package io.typefox.yang.scoping
 
 import com.google.inject.Inject
+import io.typefox.yang.parser.antlr.lexer.jflex.YangFix
 import io.typefox.yang.validation.LinkingErrorMessageProvider
+import io.typefox.yang.yang.SchemaNodeIdentifier
+import io.typefox.yang.yang.impl.XpathNameTestImpl
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
 import org.eclipse.emf.ecore.InternalEObject
@@ -13,7 +16,6 @@ import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.resource.EObjectDescription
 import org.eclipse.xtext.resource.IEObjectDescription
-import io.typefox.yang.yang.impl.XpathNameTestImpl
 
 class Linker {
 
@@ -42,7 +44,8 @@ class Linker {
 		}
 		return element.eGet(reference, false) as InternalEObject as T
 	}
-
+	
+	
 	def QualifiedName getLinkingName(EObject element, EReference reference) {
 		val proxy = element.eGet(reference, false) as InternalEObject
 		if (proxy !== null) {
@@ -56,6 +59,15 @@ class Linker {
 					if (element instanceof XpathNameTestImpl) {
 						if(element.prefix !== null) 
 							return qualifiedNameConverter.toQualifiedName(element.prefix).append(simpleName)		
+					} else if(element instanceof SchemaNodeIdentifier) {
+						return QualifiedName.create(simpleName.segments.map[
+							var modified = it?.trim() // remove hidden token
+							val concatMatcher = YangFix.CONCAT_PATTERN.matcher(modified)
+							if(concatMatcher.find)
+								modified = concatMatcher.replaceAll("")
+							return modified
+							
+						].toList)// remove possible HIDDEN tokens (ID["+]["]ID)
 					}
 					return simpleName;
 				} else {

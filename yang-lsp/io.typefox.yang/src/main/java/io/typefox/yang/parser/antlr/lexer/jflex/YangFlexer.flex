@@ -56,9 +56,8 @@ import static io.typefox.yang.parser.antlr.internal.InternalYangParser.*;
 		public CommonTokenWithText(String tokenText, int type, int defaultChannel, int offset) {
 			this(tokenText, type, defaultChannel, offset, offset + tokenText.length() - 1);
 		}
-		
-		public CommonTokenWithText(String tokenText, int type, int defaultChannel, int offset, int end) {
-			super(null, type, defaultChannel, offset, end);
+		public CommonTokenWithText(String tokenText, int type, int defaultChannel, int offset, int endOffset) {
+			super(null, type, defaultChannel, offset, endOffset);
 			this.text = tokenText;
 		}
 	}
