@@ -549,6 +549,118 @@ class SerializationTest extends AbstractYangTest {
 		'''.toString, serialized)
 	}
 	
+	@Test
+	def void testIssue_205() {
+		load('''
+		module foo {
+			namespace "foo:foo";
+			prefix x;
+			
+			grouping g2 {
+				container c12 {
+				}
+			}
+			
+			uses g2 {
+				 augment "c12" {
+				 container c22foo-bar {}
+				 leaf lm1 {
+				 	type string;
+				 	mandatory true;
+				 	 }
+				 }
+			}
+			
+		}
+		''')
+		val resource = load('''
+			module bar {
+			    namespace "foo:bar";
+			    prefix y;
+			    import foo {
+			        prefix f;
+			    }
+			
+			    augment "/f:c12/f:c22foo-bar" {
+			        container c32 {
+			        }
+			    }
+			    augment "/f:c12" + "/f:c22foo-bar" {
+			        container c33 {
+			        }
+			    }
+			    augment "/f:c12/" + "f:c22foo-bar" {
+			        container c34 {
+			        }
+			    }
+			    augment "/f:c12/f" + ":c22foo-bar" {
+			        container c35 {
+			        }
+			    }
+			    augment "/f:c12/f:c2"+ "2foo-bar" {
+			        container c36a {
+			        }
+			    }
+			    augment "/f:c12/f:"  + "c22foo-bar" {
+			        container c36 {
+			        }
+			    }
+			    augment "/f:c12/f:c22foo-" + "bar" {
+			        container c38 {
+			        }
+			    }
+			    augment "/f:c12/f:c22foo" + "-bar" {
+			        container c37 {
+			        }
+			    }
+			}
+		''') as XtextResource
+		
+		val serialized = resource.serializer.serialize(resource.contents.head)
+		assertEquals('''
+		module bar {
+		    namespace "foo:bar";
+		    prefix y;
+		    import foo {
+		        prefix f;
+		    }
+		
+		    augment "/f:c12/f:c22foo-bar" {
+		        container c32 {
+		        }
+		    }
+		    augment "/f:c12" + "/f:c22foo-bar" {
+		        container c33 {
+		        }
+		    }
+		    augment "/f:c12/" + "f:c22foo-bar" {
+		        container c34 {
+		        }
+		    }
+		    augment "/f:c12/f:c22foo-bar" {
+		        container c35 {
+		        }
+		    }
+		    augment "/f:c12/f:c22foo-bar" {
+		        container c36a {
+		        }
+		    }
+		    augment "/f:c12/f:c22foo-bar" {
+		        container c36 {
+		        }
+		    }
+		    augment "/f:c12/f:c22foo-bar" {
+		        container c38 {
+		        }
+		    }
+		    augment "/f:c12/f:c22foo-bar" {
+		        container c37 {
+		        }
+		    }
+		}
+		'''.toString, serialized)
+	}
+	
 	private def <T extends Statement> create(Statement it, EClass substmtEClass, Class<T> clazz) {
 		val Statement stmt = YangFactory.eINSTANCE.create(substmtEClass) as Statement
 		it.substatements.add(stmt)
