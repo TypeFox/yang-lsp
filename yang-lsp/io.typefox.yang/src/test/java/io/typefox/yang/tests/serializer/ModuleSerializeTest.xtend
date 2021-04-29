@@ -94,8 +94,7 @@ class ModuleSerializeTest {
 		        prefix ytest;
 		    }
 		    container cb {
-		        must "number(.) <= number(lb/list-leaf-"
-		        +"c/leafref)";
+		        must "number(.) <= number(lb/list-leaf-c/leafref)";
 		
 		        list lb {
 		            leaf lfb {
@@ -125,12 +124,12 @@ class ModuleSerializeTest {
 		            }
 		            leaf list-leaf-c2 {
 		                type leafref {
-		                    path "/ytest:cont-" + "one/ytest:leaf" + "-one";
+		                    path "/ytest:cont-one/ytest:leaf" + "-one";
 		                }
 		            }
 		            leaf list-leaf-c3 {
 		                type leafref {
-		                    path "/ytest:cont-" + "one/ytest:" + "leaf" + "-one";
+		                    path "/ytest:cont-one/ytest:" + "leaf" + "-one";
 		                }
 		            }
 		        }
@@ -147,8 +146,7 @@ class ModuleSerializeTest {
 			        prefix ytest;
 			    }
 			    container cb {
-			        must "number(.) <= number(lb/list-leaf-"
-			        +"c/leafref)";
+			        must "number(.) <= number(lb/list-leaf-c/leafref)";
 			
 			        list lb {
 			            leaf lfb {
@@ -178,12 +176,12 @@ class ModuleSerializeTest {
 			            }
 			            leaf list-leaf-c2 {
 			                type leafref {
-			                    path "/ytest:cont-" + "one/ytest:leaf" + "-one";
+			                    path "/ytest:cont-one/ytest:leaf" + "-one";
 			                }
 			            }
 			            leaf list-leaf-c3 {
 			                type leafref {
-			                    path "/ytest:cont-" + "one/ytest:" + "leaf" + "-one";
+			                    path "/ytest:cont-one/ytest:" + "leaf" + "-one";
 			                }
 			            }
 			        }

@@ -49,25 +49,26 @@ class Linker {
 	def QualifiedName getLinkingName(EObject element, EReference reference) {
 		val proxy = element.eGet(reference, false) as InternalEObject
 		if (proxy !== null) {
+			val concatinationExtractor = [ String it |
+				var modified = it?.trim() // remove spaces from hidden tokens
+				val concatMatcher = YangFix.CONCAT_PATTERN.matcher(modified)
+				if (concatMatcher.find)
+					modified = concatMatcher.replaceAll("")
+				return modified
+			]
 			if (proxy.eIsProxy) {
 				val uri = proxy.eProxyURI
 				if (uri.trimFragment == element.eResource.getURI &&
 					lazyURIEncoder.isCrossLinkFragment(element.eResource, uri.fragment)) {
 					val node = lazyURIEncoder.getNode(element, uri.fragment)
 					val symbol = linkingHelper.getCrossRefNodeAsString(node, true)
-					val simpleName = qualifiedNameConverter.toQualifiedName(symbol);
+					var simpleName = qualifiedNameConverter.toQualifiedName(symbol)
+					if (element instanceof XpathNameTestImpl || element instanceof SchemaNodeIdentifier) {
+						simpleName = QualifiedName.create(simpleName.segments.map(concatinationExtractor).toList)// remove possible HIDDEN tokens (ID["+]["]ID)
+					}
 					if (element instanceof XpathNameTestImpl) {
 						if(element.prefix !== null) 
 							return qualifiedNameConverter.toQualifiedName(element.prefix).append(simpleName)		
-					} else if(element instanceof SchemaNodeIdentifier) {
-						return QualifiedName.create(simpleName.segments.map[
-							var modified = it?.trim() // remove hidden token
-							val concatMatcher = YangFix.CONCAT_PATTERN.matcher(modified)
-							if(concatMatcher.find)
-								modified = concatMatcher.replaceAll("")
-							return modified
-							
-						].toList)// remove possible HIDDEN tokens (ID["+]["]ID)
 					}
 					return simpleName;
 				} else {
@@ -77,7 +78,8 @@ class Linker {
 			} else {
 				val symbol = NodeModelUtils.findNodesForFeature(element, reference).map[leafNodes.filter[!isHidden].map[getText].join("")].join("")
 				if (!symbol.empty) {
-					return qualifiedNameConverter.toQualifiedName(symbol)
+					val qName = qualifiedNameConverter.toQualifiedName(symbol)
+					return QualifiedName.create(qName.segments.map(concatinationExtractor).toList)
 				} 
 			}
 		}

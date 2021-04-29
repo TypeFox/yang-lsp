@@ -193,7 +193,7 @@ class XpathResolverTest extends AbstractYangTest {
 		assertNoErrors(r.root)
 	}
 	
-	@Test def void testConcatPath() {
+	@Test def void testConcatPath_01() {
 		val r = '''
 			module bug_113 {
 			    prefix bug_113;
@@ -214,5 +214,59 @@ class XpathResolverTest extends AbstractYangTest {
 		'''.load
 		assertNoErrors(r.root)
 	}
+	@Test def void testConcatPath_02() {
+		val r = '''
+			module testModule {
+			    prefix testModule;
+			    namespace testModule;
+			   
+			    container tesdt {
+			        must "context=current()/."+"./../d";
+			    }
+			}
+		'''.load
+		assertNoErrors(r.root)
+	}
 	
+	
+	@Test def void testConcatPath_03() {
+		val r = '''
+			module testModule {
+			    prefix testModule;
+			    namespace testModule;
+			    
+			    list session {
+			        unique "s-n-p/s-n-"
+			        + "p-ch/ref-ip s-n-p/s-n-"
+			        + "p-ch/sref-ip";
+			
+			        container s-n-p {
+			            choice s-n-p-ch {
+			                case ref-ip {
+			                }
+			                case sref-ip {
+			                }
+			            }
+			        }
+			    }
+			}
+		'''.load
+		assertNoErrors(r.root)
+	}
+	@Test def void testConcatPath_04() {
+		val r = '''
+			module testModule {
+			    prefix testModule;
+			    namespace testModule;
+			   
+			    container test2 {
+					must "count(router:context/router6"
+			                        + "000:ip/router6000:source-"
+			                        + "address/ifxrouter6000:options/ifxrouter600"
+			                        + "0:dhcp-server)<2" ;
+			    }
+			}
+		'''.load
+		assertNoErrors(r.root)
+	}
 }
