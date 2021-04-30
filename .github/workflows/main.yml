@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - ks-gha-gradle-and-maven-deploy
   pull_request:
     branches:
       - master
