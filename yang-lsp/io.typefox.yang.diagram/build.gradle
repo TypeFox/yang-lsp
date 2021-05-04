@@ -4,15 +4,16 @@ ext.title = 'Yang Diagram Generator'
 description = 'Overview diagram generator for Yang based on sprotty'
 
 dependencies {
-	compile project(':io.typefox.yang.ide')
-	compile "org.eclipse.lsp4j:org.eclipse.lsp4j:${versions.lsp4j}"
-	compile "org.eclipse.elk:org.eclipse.elk.alg.layered:${versions.elk}"
-	compile "org.eclipse.sprotty:org.eclipse.sprotty.server:${versions.sprotty}"
-	compile "org.eclipse.sprotty:org.eclipse.sprotty.layout:${versions.sprotty}"
-	compile "org.eclipse.sprotty:org.eclipse.sprotty.xtext:${versions.sprotty}"
+	implementation project(':io.typefox.yang')
+	implementation project(':io.typefox.yang.ide')
+	implementation "org.eclipse.lsp4j:org.eclipse.lsp4j:${versions.lsp4j}"
+	implementation "org.eclipse.elk:org.eclipse.elk.alg.layered:${versions.elk}"
+	implementation "org.eclipse.sprotty:org.eclipse.sprotty.server:${versions.sprotty}"
+	implementation "org.eclipse.sprotty:org.eclipse.sprotty.layout:${versions.sprotty}"
+	implementation "org.eclipse.sprotty:org.eclipse.sprotty.xtext:${versions.sprotty}"
 	
-	testCompile "junit:junit:${versions.junit}"
-	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
+	testImplementation "junit:junit:${versions.junit}"
+	testImplementation "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
 }
 
 // Reuse the test infrastructure from the Yang base module

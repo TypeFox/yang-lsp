@@ -22,11 +22,12 @@ subprojects {
 	apply plugin: 'org.xtext.xtend'
 	apply plugin: 'eclipse'
 	apply plugin: 'idea'
-	apply plugin: 'maven'
+	apply plugin: 'maven-publish'
+	apply plugin: 'signing'
 
 	apply from: "${rootDir}/gradle/java-compiler-settings.gradle"
 	apply from: "${rootDir}/gradle/source-layout.gradle"
-	apply from: "${rootDir}/gradle/maven-deployment.gradle"
+	apply from: "${rootDir}/gradle/publishing.gradle"
 }
 
 task clean(type: Delete) {

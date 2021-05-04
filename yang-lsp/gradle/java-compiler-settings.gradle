@@ -9,6 +9,7 @@ task sourcesJar(type: Jar, dependsOn: classes) {
 	group 'Build'
 	description 'Assembles a jar archive containing the sources.'
 	classifier = 'sources'
+	duplicatesStrategy = DuplicatesStrategy.EXCLUDE
 	from sourceSets.main.allSource
 }
 

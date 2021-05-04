@@ -2,11 +2,11 @@ ext.title = 'Yang Language Server'
 description = 'Generic IDE services for Yang offered via the Language Server Protocol'
 
 dependencies {
-	compile project(':io.typefox.yang')
-	compile "org.eclipse.xtext:org.eclipse.xtext.ide:${versions.xtext}"
+	implementation project(':io.typefox.yang')
+	implementation "org.eclipse.xtext:org.eclipse.xtext.ide:${versions.xtext}"
 	
-	testCompile "junit:junit:${versions.junit}"
-	testCompile "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
+	testImplementation "junit:junit:${versions.junit}"
+	testImplementation "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
 }
 
 test {

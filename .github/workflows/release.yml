@@ -1,12 +1,8 @@
-name: CI
+name: Release
 
 on:
-  push:
-    branches:
-      - master
-  pull_request:
-    branches:
-      - master
+  release:
+    types: [published]
 
 jobs:
   build:
@@ -22,20 +18,12 @@ jobs:
       run: |
           echo "HAVE_SNAPSHOT=$(grep "version =.*SNAPSHOT" gradle/versions.gradle | wc -l)" >> $GITHUB_ENV
       working-directory: yang-lsp
-    - name: Run Gradle Build, Tests
-      run: ./gradlew --no-daemon build
-      working-directory: yang-lsp
-    - name: Gradle Publish Snapshots
-      if: env.HAVE_SNAPSHOT == 1 && github.repository == 'theia-ide/yang-lsp' && github.ref == 'refs/heads/master'
-      run: ./gradlew --no-daemon publish
+    - name: Run Gradle Build, Tests and Publish Snapshots
+      if: env.HAVE_SNAPSHOT == 0
+      run: ./gradlew --no-daemon build publish
       working-directory: yang-lsp
       env:
           SONATYPE_USERNAME: ${{ secrets.SONATYPE_USERNAME }}
           SONATYPE_PASSWORD: ${{ secrets.SONATYPE_PASSWORD }}
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.MAVEN_GPG_PRIVATE_KEY  }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.MAVEN_GPG_PASSPHRASE  }}
-    - name: Publish Unit Test Results
-      uses: EnricoMi/publish-unit-test-result-action@v1
-      if: always()
-      with:
-        files: yang-lsp/**/test-results/**/*.xml
