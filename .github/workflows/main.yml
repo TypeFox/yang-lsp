@@ -4,7 +4,6 @@ on:
   push:
     branches:
       - master
-      - ks-gha-add-version
   pull_request:
     branches:
       - master
@@ -22,7 +21,7 @@ jobs:
     - name: Evaluate version
       run: |
           echo "PROJECT_VERSION=$(gradle properties -q | grep "version:" | awk '{print $2}')" >> $GITHUB_ENV
-          echo "HAVE_SNAPSHOT=$(grep "version =.*SNAPSHOT" $PROJECT_VERSION | wc -l)" >> $GITHUB_ENV
+          echo "HAVE_SNAPSHOT=$(gradle properties -q | grep "version:" | awk '{print $2}' | grep SNAPSHOT | wc -l)" >> $GITHUB_ENV
       working-directory: yang-lsp
     - name: Run Gradle build, execute tests and copy zip
       run: ./gradlew --no-daemon build copyDist
@@ -44,6 +43,6 @@ jobs:
     - name: Archive yang-language-server_diagram-extension
       uses: actions/upload-artifact@v2
       with:
-        name: yang-language-server_diagram-extension_{{ env.PROJECT_VERSION }}
+        name: yang-language-server_diagram-extension_${{ env.PROJECT_VERSION }}
         path: |
           yang-lsp/build/yang-language-server_diagram-extension*.zip
