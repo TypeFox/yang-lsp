@@ -22,8 +22,8 @@ jobs:
       run: |
           echo "HAVE_SNAPSHOT=$(grep "version =.*SNAPSHOT" gradle/versions.gradle | wc -l)" >> $GITHUB_ENV
       working-directory: yang-lsp
-    - name: Run Gradle Build, Tests
-      run: ./gradlew --no-daemon build
+    - name: Run Gradle build, execute tests and copy zip
+      run: ./gradlew --no-daemon build copyDist
       working-directory: yang-lsp
     - name: Gradle Publish Snapshots
       if: env.HAVE_SNAPSHOT == 1 && github.repository == 'theia-ide/yang-lsp' && github.ref == 'refs/heads/master'
@@ -39,3 +39,9 @@ jobs:
       if: always()
       with:
         files: yang-lsp/**/test-results/**/*.xml
+    - name: Archive yang-language-server_diagram-extension
+      uses: actions/upload-artifact@v2
+      with:
+        name: yang-language-server_diagram-extension
+        path: |
+          yang-lsp/build/yang-language-server_diagram-extension*.zip
