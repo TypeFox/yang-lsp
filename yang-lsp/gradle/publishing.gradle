@@ -1,7 +1,3 @@
-tasks.withType(GenerateModuleMetadata) {
-	enabled = false
-}
-
 publishing {
 	publications {
 		mavenJava(MavenPublication) {
@@ -84,7 +80,7 @@ publishing {
 				password = System.getenv('SONATYPE_PASSWORD') ?: ''
 			}
 			url = version.endsWith('SNAPSHOT') ? snapshotsRepoUrl : releasesRepoUrl
-			// use this URL for local testing/debugging purposes
+			// use this URL for local testing/debugging purposes			
 //			url = "file:" + file("${rootDir}/build/maven-repository")
 		}
 	}

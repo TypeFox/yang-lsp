@@ -25,7 +25,22 @@ subprojects {
 	apply plugin: 'maven-publish'
 	apply plugin: 'signing'
 
-	apply from: "${rootDir}/gradle/java-compiler-settings.gradle"
+	sourceCompatibility = '1.8'
+
+	java {
+		withJavadocJar()
+		withSourcesJar()
+	}
+
+	tasks.withType(Javadoc) {
+		options.addStringOption('Xdoclint:none', '-quiet')
+		options.tags = [ 'model', 'generated', 'ordered' ] 
+	}
+
+	tasks.withType(GenerateModuleMetadata) {
+		enabled = false
+	}
+
 	apply from: "${rootDir}/gradle/source-layout.gradle"
 	apply from: "${rootDir}/gradle/publishing.gradle"
 }
