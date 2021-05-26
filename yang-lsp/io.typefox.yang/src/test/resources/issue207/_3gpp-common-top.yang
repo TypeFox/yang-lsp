@@ -1,0 +1,36 @@
+module _3gpp-common-top {
+  yang-version 1.1;
+  
+  namespace urn:3gpp:sa5:_3gpp-common-top;
+  prefix top3gpp;
+  
+  organization "3gpp SA5";
+  description "The model defines a YANG mapping of the top level 
+    information classes used for management of 5G networks and 
+    network slicing.";
+  reference 
+    "3GPP TS 28.622 
+    Generic Network Resource Model (NRM)
+    Integration Reference Point (IRP);
+    Information Service (IS)
+    
+    3GPP TS 28.620 
+    Umbrella Information Model (UIM)";
+
+  revision 2019-06-17 {
+    description "Initial revision";
+  }
+  
+  grouping Top_Grp {
+    description "Abstract class supplying a naming attribute";
+    reference "3GPP TS 28.620";
+
+    leaf id {
+      type string;
+      description "Key leaf (namingAttribute) for a class/list.
+        Should be used as a key leaf for lists representing 
+        stage 2 classes.";
+      reference "3GPP TS 32.300 Name convention for managed objects";    
+    }    
+  }  
+}

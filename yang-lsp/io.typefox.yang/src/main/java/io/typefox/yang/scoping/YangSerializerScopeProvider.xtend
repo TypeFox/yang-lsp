@@ -4,8 +4,11 @@ import com.google.inject.Inject
 import io.typefox.yang.utils.YangExtensions
 import io.typefox.yang.yang.AbstractImport
 import io.typefox.yang.yang.AbstractModule
+import io.typefox.yang.yang.Action
 import io.typefox.yang.yang.BelongsTo
 import io.typefox.yang.yang.Revision
+import io.typefox.yang.yang.Rpc
+import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.YangPackage
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.emf.ecore.EReference
@@ -17,9 +20,6 @@ import org.eclipse.xtext.resource.impl.AliasedEObjectDescription
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.IScopeProvider
 import org.eclipse.xtext.scoping.Scopes
-import io.typefox.yang.yang.SchemaNodeIdentifier
-import io.typefox.yang.yang.Rpc
-import io.typefox.yang.yang.Action
 
 class YangSerializerScopeProvider implements IScopeProvider {
 

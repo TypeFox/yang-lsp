@@ -1,0 +1,39 @@
+module _3gpp-nr-nrm-nrcelldu207 {
+  yang-version 1.1;
+  namespace "urn:3gpp:sa5:_3gpp-nr-nrm-nrcelldu207";
+  prefix "nrcelldu3gpp";
+
+  import _3gpp-common-managed-element207 { prefix me3gpp; }
+  import _3gpp-nr-nrm-gnbdufunction207 { prefix gnbdu3gpp; }
+
+
+  typedef DistinguishedName {   
+    type string;
+    description "test pattern";
+  } 
+
+
+  grouping NRCellDUGrp {
+    description "Represents the NRCellDU IOC.";
+    reference "3GPP TS 28.541";
+        
+    leaf-list bWPRef {
+      description "Reference to corresponding BWP instance.";
+      min-elements 0;
+      type DistinguishedName;    	       	
+    }
+
+  }
+
+  augment "/me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction" {
+
+    list NRCellDU {
+      description "Represents the information of a cell known by DU.";
+      reference "3GPP TS 28.541";
+      key id;
+      container attributes {
+        uses NRCellDUGrp;
+      }
+    }
+  }
+}

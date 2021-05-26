@@ -1,0 +1,15 @@
+module _3gpp-common-managed-element207 {
+  yang-version 1.1;  
+  namespace urn:3gpp:sa5:_3gpp-common-managed-element207;
+  prefix "me3gpp";
+    
+  import _3gpp-common-top { prefix top3gpp; }
+  
+  list ManagedElement {
+    description "test management element .";
+
+    key id;   
+    uses top3gpp:Top_Grp;
+    
+  }    
+}

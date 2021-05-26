@@ -25,6 +25,7 @@ import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EClass
 import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtext.resource.IResourceDescription
+import org.eclipse.xtext.resource.SaveOptions
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.resource.XtextResourceSet
 import org.eclipse.xtext.testing.InjectWith
@@ -34,7 +35,6 @@ import org.junit.Test
 import org.junit.runner.RunWith
 
 import static org.junit.Assert.*
-import org.eclipse.xtext.resource.SaveOptions
 
 @RunWith(XtextRunner)
 @InjectWith(YangInjectorProvider)
@@ -391,7 +391,34 @@ class ModuleSerializeTest {
 			}
 		''', targetModule, false, true)
 	}
-
+	
+	@Test
+	def void testIssue207() {
+		val targetModule = loadModuleFile("issue207/nrcelldu-vdu-dev.yang")
+		assertSerialized('''
+			module nrcelldu-vdu-dev {
+			    yang-version 1.1;
+			    
+			    namespace urn:rdns:com:ericsson:oammodel:nrcelldu-vdu-dev;
+			    prefix nrcelldu3gppdev;
+			
+			    import _3gpp-common-managed-element207 { prefix me3gpp; }
+			    import _3gpp-nr-nrm-gnbdufunction207 { prefix gnbdu3gpp; }
+			    import _3gpp-nr-nrm-nrcelldu207 { prefix nrcelldu3gpp; }
+			
+			
+			    deviation /me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/nrcelldu3gpp:NRCellDU/nrcelldu3gpp:attributes/nrcelldu3gpp:bWPRef {
+			      deviate add {
+			        must 're-match(., concat("ManagedElement=", ../../../../me3gpp:id,",GNBDUFunction=", ../../../gnbdu3gpp:id,",BWP=[^,]+"))' {
+			            error-message
+			            "Must refer to a BWP in the same GNBDUFunction as the NRCellDU.";
+			        }
+			      }
+			    }
+			
+			}
+			''', targetModule, false)
+	}
 	private def Unknown createTailfSuppressEchoProperty() {
 		createTailfWithValueProperty("suppress-echo", "true", null, null)
 	}

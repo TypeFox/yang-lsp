@@ -1,0 +1,21 @@
+module nrcelldu-vdu-dev {
+    yang-version 1.1;
+    
+    namespace urn:rdns:com:ericsson:oammodel:nrcelldu-vdu-dev;
+    prefix nrcelldu3gppdev;
+
+    import _3gpp-common-managed-element207 { prefix me3gpp; }
+    import _3gpp-nr-nrm-gnbdufunction207 { prefix gnbdu3gpp; }
+    import _3gpp-nr-nrm-nrcelldu207 { prefix nrcelldu3gpp; }
+
+
+    deviation /me3gpp:ManagedElement/gnbdu3gpp:GNBDUFunction/nrcelldu3gpp:NRCellDU/nrcelldu3gpp:attributes/nrcelldu3gpp:bWPRef {
+      deviate add {
+        must 're-match(., concat("ManagedElement=", ../../../../me3gpp:id,",GNBDUFunction=", ../../../gnbdu3gpp:id,",BWP=[^,]+"))' {
+            error-message
+            "Must refer to a BWP in the same GNBDUFunction as the NRCellDU.";
+        }
+      }
+    }
+
+}

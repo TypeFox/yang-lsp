@@ -8,6 +8,8 @@ import io.typefox.yang.yang.CurrentRef
 import io.typefox.yang.yang.ParentRef
 import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.RevisionDate
+import io.typefox.yang.yang.XpathNameTest
+import io.typefox.yang.yang.YangPackage
 import io.typefox.yang.yang.impl.XpathNameTestImpl
 import org.eclipse.emf.ecore.EObject
 import org.eclipse.xtext.CrossReference
@@ -21,6 +23,7 @@ import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.nodemodel.INode
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.IScopeProvider
+import org.eclipse.xtext.scoping.impl.FilteringScope
 import org.eclipse.xtext.serializer.diagnostic.ISerializationDiagnostic.Acceptor
 import org.eclipse.xtext.serializer.tokens.CrossReferenceSerializer
 import org.eclipse.xtext.serializer.tokens.SerializerScopeProviderBinding
@@ -106,7 +109,16 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 			return '..'
 		if (semanticObject instanceof CurrentRef)
 			return '.'
-		val nameFromSuper = super.getCrossReferenceNameFromScope(semanticObject, crossref, target, scope, errors)
+		val scopetoUse = if (semanticObject instanceof XpathNameTest &&
+				GrammarUtil.getReference(crossref, semanticObject.eClass) === YangPackage.Literals.XPATH_NAME_TEST__REF) {
+				val prefix = (semanticObject as XpathNameTest).prefix
+				new FilteringScope(scope, [ eObjDescr |
+					return prefix.nullOrEmpty || eObjDescr.name.segmentCount != 2 ||
+						prefix == eObjDescr.name.firstSegment
+				])
+			} else
+				scope
+		val nameFromSuper = super.getCrossReferenceNameFromScope(semanticObject, crossref, target, scopetoUse, errors)
 		if (semanticObject instanceof XpathNameTestImpl) {
 			if (nameFromSuper.startsWith(semanticObject.prefix + ':')) {
 				return nameFromSuper.substring(semanticObject.prefix.length + 1)

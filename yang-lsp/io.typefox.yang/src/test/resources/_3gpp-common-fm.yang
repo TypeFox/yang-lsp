@@ -4,7 +4,7 @@ module _3gpp-common-fm {
   prefix "fm3gpp";
     
   import ietf-yang-types { prefix yang; }
-  import _3gpp-common-top { prefix top3gpp; }
+  import _3gpp-common-top-r { prefix top3gpp; }
   import _3gpp-common-yang-types { prefix types3gpp; }
 
   organization "3GPP SA5";

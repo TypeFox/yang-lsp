@@ -1,0 +1,20 @@
+module _3gpp-nr-nrm-gnbdufunction207 {
+  yang-version 1.1;
+  namespace "urn:3gpp:sa5:_3gpp-nr-nrm-gnbdufunction207";
+  prefix "gnbdu3gpp";
+
+  import _3gpp-common-managed-element207 { prefix me3gpp; }
+  import _3gpp-common-top { prefix top3gpp; }
+
+
+
+  augment "/me3gpp:ManagedElement" {
+
+    list GNBDUFunction {
+      key id;
+      description "Represents the logical function DU of gNB or en-gNB.";
+      reference "3GPP TS 28.541";
+      uses top3gpp:Top_Grp;
+    }
+  }
+}
