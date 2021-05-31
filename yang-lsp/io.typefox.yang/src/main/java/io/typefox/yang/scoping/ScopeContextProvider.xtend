@@ -629,7 +629,7 @@ class ScopeContextProvider {
 	private def findContainingModule(EObject obj) {
 		val candidate = EcoreUtil2.getContainerOfType(obj, AbstractModule)
 		if (candidate instanceof Submodule) {
-			return candidate.substatements.filter(BelongsTo).head.module
+			return candidate.substatements.filter(BelongsTo).head?.module
 		}
 		return candidate
 	}
