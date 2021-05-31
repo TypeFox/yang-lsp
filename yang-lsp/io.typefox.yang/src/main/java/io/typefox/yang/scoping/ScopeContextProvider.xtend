@@ -472,7 +472,7 @@ class ScopeContextProvider {
 				if (result == MapScope.AddResult.DUPLICATE_PARENT) {
 					// In case the name is already used in a belongs-to module, mark the duplicate name as warning
 					val belonging = node.getContainerOfType(Submodule)?.getBelongingModule(ctx.moduleScope)
-					if (belonging !== null) {
+					if (belonging !== null && !belonging.eIsProxy) {
 						val existing = ctx.schemaNodeScope.parent.getSingleElement(name)
 						if (existing !== null && existing.EObjectURI.trimFragment == belonging.eResource.URI)
 							code = IssueCodes.DUPLICATE_NAME_BELONGSTO
@@ -512,7 +512,7 @@ class ScopeContextProvider {
 			}
 			val module = findContainingModule(element)
 			val belongingModule = importedModule.getBelongingModule(ctx.moduleScope)
-			if (belongingModule !== null && belongingModule !== module) {
+			if (module !== null && !module.eIsProxy && belongingModule !== null && !belongingModule.eIsProxy && belongingModule !== module) {
 				validator.addIssue(element, ABSTRACT_IMPORT__MODULE, '''The imported submodule '«importedModule.name»' belongs to the different module '«belongingModule.name»'.''', IssueCodes.INCLUDED_SUB_MODULE_BELONGS_TO_DIFFERENT_MODULE)			
 			} else {	
 				ctx.moduleBelongingSubModules.add(getScopeContext(importedModule))
