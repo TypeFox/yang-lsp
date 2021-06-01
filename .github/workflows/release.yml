@@ -16,7 +16,8 @@ jobs:
         distribution: adopt
     - name: Evaluate version
       run: |
-          echo "HAVE_SNAPSHOT=$(grep "version =.*SNAPSHOT" gradle/versions.gradle | wc -l)" >> $GITHUB_ENV
+          echo "PROJECT_VERSION=$(gradle properties -q | grep "version:" | awk '{print $2}')" >> $GITHUB_ENV
+          echo "HAVE_SNAPSHOT=$(gradle properties -q | grep "version:" | awk '{print $2}' | grep SNAPSHOT | wc -l)" >> $GITHUB_ENV
       working-directory: yang-lsp
     - name: Run Gradle build, execute tests and copy zip
       run: ./gradlew --no-daemon build copyDist
@@ -33,6 +34,6 @@ jobs:
     - name: Archive yang-language-server_diagram-extension
       uses: actions/upload-artifact@v2
       with:
-        name: yang-language-server_diagram-extension
+        name: yang-language-server_diagram-extension_${{ env.PROJECT_VERSION }}
         path: |
           yang-lsp/build/yang-language-server_diagram-extension*.zip
