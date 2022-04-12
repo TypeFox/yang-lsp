@@ -24,6 +24,7 @@ import org.eclipse.xtext.nodemodel.INode
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.IScopeProvider
 import org.eclipse.xtext.scoping.impl.FilteringScope
+import org.eclipse.xtext.scoping.impl.SimpleScope
 import org.eclipse.xtext.serializer.diagnostic.ISerializationDiagnostic.Acceptor
 import org.eclipse.xtext.serializer.tokens.CrossReferenceSerializer
 import org.eclipse.xtext.serializer.tokens.SerializerScopeProviderBinding
@@ -31,9 +32,10 @@ import org.eclipse.xtext.serializer.tokens.SerializerScopeProviderBinding
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 import static extension org.eclipse.xtext.EcoreUtil2.*
+import org.eclipse.xtext.naming.IQualifiedNameProvider
 
 class YangCrossReferenceSerializer extends CrossReferenceSerializer {
-	
+
 	@Inject extension YangExtensions
 
 	@Inject LinkingHelper linkingHelper
@@ -44,14 +46,16 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 	IScopeProvider scopeProvider
 
 	@Inject IValueConverterService valueConverter
-	
-	override serializeCrossRef(EObject semanticObject, CrossReference crossref, EObject target, INode node, Acceptor errors) {
+	@Inject IQualifiedNameProvider qName
+
+	override serializeCrossRef(EObject semanticObject, CrossReference crossref, EObject target, INode node,
+		Acceptor errors) {
 		if (semanticObject instanceof RevisionDate) {
 			val import = semanticObject.getContainerOfType(AbstractImport)
 			if (import?.module !== null)
 				return import.module.substatementsOfType(Revision).head?.revision ?: import.module.revisionFromFileName
 		}
-		
+
 		// The following code is copied and adapted from the superclass
 		if ((target === null || target.eIsProxy) && node !== null) {
 			return tokenUtil.serializeNode(node)
@@ -64,7 +68,7 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 				errors.accept(diagnostics.getNoScopeFoundDiagnostic(semanticObject, crossref, target))
 			return null
 		}
-		
+
 		var resolvedTarget = target
 		if (target !== null && target.eIsProxy) {
 			resolvedTarget = handleProxy(target, semanticObject, ref)
@@ -89,7 +93,8 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 		return getCrossReferenceNameFromScope(semanticObject, crossref, resolvedTarget, scope, errors)
 	}
 
-	protected def String getMatchingCrossReferenceName(CrossReference crossref, EObject target, QualifiedName qn, IScope scope) {
+	protected def String getMatchingCrossReferenceName(CrossReference crossref, EObject target, QualifiedName qn,
+		IScope scope) {
 		for (desc : scope.getElements(target)) {
 			if (desc.name == qn) {
 				val unconverted = qualifiedNameConverter.toString(desc.name)
@@ -103,28 +108,52 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 		}
 		return null
 	}
-	
-	override protected getCrossReferenceNameFromScope(EObject semanticObject, CrossReference crossref, EObject target, IScope scope, Acceptor errors) {
+
+	override protected getCrossReferenceNameFromScope(EObject semanticObject, CrossReference crossref, EObject target,
+		IScope scope, Acceptor errors) {
 		if (semanticObject instanceof ParentRef)
 			return '..'
 		if (semanticObject instanceof CurrentRef)
 			return '.'
-		val scopetoUse = if (semanticObject instanceof XpathNameTest &&
-				GrammarUtil.getReference(crossref, semanticObject.eClass) === YangPackage.Literals.XPATH_NAME_TEST__REF) {
+		val isRefTo_XPATH_NAME_TEST__REF = semanticObject instanceof XpathNameTest &&
+			GrammarUtil.getReference(crossref, semanticObject.eClass) === YangPackage.Literals.XPATH_NAME_TEST__REF
+		val scopetoUse = if (isRefTo_XPATH_NAME_TEST__REF) {
 				val prefix = (semanticObject as XpathNameTest).prefix
 				new FilteringScope(scope, [ eObjDescr |
-					return prefix.nullOrEmpty || eObjDescr.name.segmentCount != 2 ||
+					val shouldFilterOut = prefix.nullOrEmpty || eObjDescr.name.segmentCount != 2 ||
 						prefix == eObjDescr.name.firstSegment
+					return shouldFilterOut
 				])
 			} else
 				scope
-		val nameFromSuper = super.getCrossReferenceNameFromScope(semanticObject, crossref, target, scopetoUse, errors)
-		if (semanticObject instanceof XpathNameTestImpl) {
-			if (nameFromSuper.startsWith(semanticObject.prefix + ':')) {
-				return nameFromSuper.substring(semanticObject.prefix.length + 1)
+
+		var elements = scopetoUse.getElements(target).toList
+		if (isRefTo_XPATH_NAME_TEST__REF && elements.size > 1 && target !== null && !target.eIsProxy) {
+			// in case several objects are in scope, try to find one that matches the target object
+			val targetURI = EcoreUtil2.getURI(target)
+			val filtered = elements.filter[EObjectURI.equals(targetURI)].toList
+			if (filtered.size > 1) {
+				val targetQname = qName.getFullyQualifiedName(target)
+				val simpleNameMatch = filtered.findFirst[it.name.lastSegment == targetQname.lastSegment]
+				if (simpleNameMatch !== null) {
+					elements = #[simpleNameMatch]
+				}
+			}
+			if (filtered.size > 0) {
+				elements = filtered
 			}
 		}
-		return nameFromSuper
+
+		val nameFromSuper = super.getCrossReferenceNameFromScope(semanticObject, crossref, target,
+			new SimpleScope(elements), errors)
+		return nameFromSuper.removeContainerPrefixIfNeeded(semanticObject)
 	}
-	
+	private def String removeContainerPrefixIfNeeded(String name, EObject semanticObject) {
+		if (semanticObject instanceof XpathNameTestImpl) {
+			if (name.startsWith(semanticObject.prefix + ':')) {
+				return name.substring(semanticObject.prefix.length + 1)
+			}
+		}
+		return name
+	}
 }

@@ -50,6 +50,7 @@ import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.util.internal.EmfAdaptable
 import org.eclipse.xtext.util.internal.Log
+import org.eclipse.xtext.scoping.IScope
 
 @Log
 class XpathResolver {
@@ -408,7 +409,7 @@ class XpathResolver {
 		}
 	}
 	
-	def List<IEObjectDescription> findNodes(QualifiedName prefix, QualifiedName name, Axis mode, MapScope nodeScope) {
+	def List<IEObjectDescription> findNodes(QualifiedName prefix, QualifiedName name, Axis mode, IScope nodeScope) {
 		if (mode === Axis.SIBLINGS) {
 			return findNodes(prefix.skipLast, name, Axis.CHILDREN, nodeScope)
 		} else if (mode === Axis.DESCENDANTS_OR_SELF) {
@@ -421,7 +422,7 @@ class XpathResolver {
 					.toList
 		} else if (mode == Axis.PARENT) {
 			val parent = getNodeHierarchy(prefix.skipLast, nodeScope, true).head
-			if (parent !== null)						
+			if (parent !== null)
 				return #[parent]
 			else
 				return #[Linker.ROOT]
@@ -458,7 +459,7 @@ class XpathResolver {
 	 * the hierarchy of parents. Used to avoid duplicate scope lookups.
 	 */
 	protected def Iterable<IEObjectDescription> getNodeHierarchy(
-			QualifiedName startQName, MapScope nodeScope, boolean stopAtNull) {
+			QualifiedName startQName, IScope nodeScope, boolean stopAtNull) {
 		[
 			new AbstractIterator<IEObjectDescription> {
 				QualifiedName qname = startQName

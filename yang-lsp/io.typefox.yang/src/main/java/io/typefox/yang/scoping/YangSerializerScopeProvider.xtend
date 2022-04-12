@@ -86,9 +86,11 @@ class YangSerializerScopeProvider implements IScopeProvider {
 		}
 
 		protected def Iterable<IEObjectDescription> convertNames(Iterable<IEObjectDescription> descs) {
-			descs.toList.map [
+			val originElements = descs.toList
+			val convertedElements = originElements.map[
 				convertName(it)
 			].filterNull
+			return convertedElements
 		}
 
 		protected def IEObjectDescription convertName(IEObjectDescription original) {

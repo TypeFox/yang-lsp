@@ -188,7 +188,7 @@ class ScopeContext implements IScopeContext {
 		}
 		for (imported : importedModules.values) {
 			val scope = imported.schemaNodeScope
-			if (scope !== null) {			
+			if (scope !== null) {
 				result.add(scope)
 			}
 		}
@@ -197,13 +197,13 @@ class ScopeContext implements IScopeContext {
 	
 	private def IScope computeParentDefinitionScope((IScopeContext)=>MapScope fun) {
 		var result = newArrayList()
-		if (localPrefix !== null) {				
+		if (localPrefix !== null) {
 			result.add(new PrefixingScope(fun.apply(this).localOnly, localPrefix))
 		}
 		for (subModule : moduleBelongingSubModules) {
 			val scope = fun.apply(subModule).localOnly
 			result.add(scope)
-			if (localPrefix !== null) {				
+			if (localPrefix !== null) {
 				result.add(new PrefixingScope(scope, localPrefix))
 			}
 		}
