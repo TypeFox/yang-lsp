@@ -62,6 +62,9 @@ class Linker {
 					lazyURIEncoder.isCrossLinkFragment(element.eResource, uri.fragment)) {
 					val node = lazyURIEncoder.getNode(element, uri.fragment)
 					val symbol = linkingHelper.getCrossRefNodeAsString(node, true)
+					if(symbol.nullOrEmpty) {
+						return null
+					}
 					var simpleName = qualifiedNameConverter.toQualifiedName(symbol)
 					if (element instanceof XpathNameTestImpl || element instanceof SchemaNodeIdentifier) {
 						simpleName = QualifiedName.create(simpleName.segments.map(concatinationExtractor).toList)// remove possible HIDDEN tokens (ID["+]["]ID)
