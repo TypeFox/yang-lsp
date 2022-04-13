@@ -107,23 +107,27 @@ class YangSerializerScopeProvider implements IScopeProvider {
 			val simpleName = QualifiedName.create(original.qualifiedName.lastSegment)
 			val moduleName = original.qualifiedName.segments.get(original.qualifiedName.segmentCount - 2)
 			if (moduleName == module.name)
-				return new AliasedEObjectDescription(simpleName, original)
+				return createAliasDescription(simpleName, original)
 			for (sub : module.substatements) {
 				switch sub {
 					AbstractImport case sub.module.name == moduleName:
 						return toPrefixedDescription(sub.prefix, original)
 					BelongsTo case sub.module.name == moduleName:
-						return new AliasedEObjectDescription(simpleName, original)
+						return createAliasDescription(simpleName, original)
 				}
 			}
 			val simpleNamedElement = delegate.getSingleElement(simpleName)
 			if (simpleNamedElement === null || simpleNamedElement == original)
-				return new AliasedEObjectDescription(simpleName, original)
+				return createAliasDescription(simpleName, original)
 			return null
 		}
 
 		protected def toPrefixedDescription(String prefix, IEObjectDescription original) {
-			new AliasedEObjectDescription(QualifiedName.create(prefix, original.qualifiedName.lastSegment), original)
+			createAliasDescription(QualifiedName.create(prefix, original.qualifiedName.lastSegment), original)
+		}
+		
+		protected def createAliasDescription(QualifiedName alias, IEObjectDescription original) {
+			return new AliasedEObjectDescription(alias, original)
 		}
 	}
 }

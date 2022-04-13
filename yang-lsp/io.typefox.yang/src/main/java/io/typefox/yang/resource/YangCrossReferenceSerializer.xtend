@@ -120,9 +120,9 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 		val scopetoUse = if (isRefTo_XPATH_NAME_TEST__REF) {
 				val prefix = (semanticObject as XpathNameTest).prefix
 				new FilteringScope(scope, [ eObjDescr |
-					val shouldFilterOut = prefix.nullOrEmpty || eObjDescr.name.segmentCount != 2 ||
+					val keepEntry = prefix.nullOrEmpty || eObjDescr.name.segmentCount != 2 ||
 						prefix == eObjDescr.name.firstSegment
-					return shouldFilterOut
+					return keepEntry
 				])
 			} else
 				scope
@@ -131,12 +131,12 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 		if (isRefTo_XPATH_NAME_TEST__REF && elements.size > 1 && target !== null && !target.eIsProxy) {
 			// in case several objects are in scope, try to find one that matches the target object
 			val targetURI = EcoreUtil2.getURI(target)
-			val filtered = elements.filter[EObjectURI.equals(targetURI)].toList
+			var filtered = elements.filter[EObjectURI.equals(targetURI)].toList
 			if (filtered.size > 1) {
 				val targetQname = qName.getFullyQualifiedName(target)
 				val simpleNameMatch = filtered.findFirst[it.name.lastSegment == targetQname.lastSegment]
 				if (simpleNameMatch !== null) {
-					elements = #[simpleNameMatch]
+					filtered = #[simpleNameMatch]
 				}
 			}
 			if (filtered.size > 0) {
@@ -148,6 +148,7 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 			new SimpleScope(elements), errors)
 		return nameFromSuper.removeContainerPrefixIfNeeded(semanticObject)
 	}
+
 	private def String removeContainerPrefixIfNeeded(String name, EObject semanticObject) {
 		if (semanticObject instanceof XpathNameTestImpl) {
 			if (name.startsWith(semanticObject.prefix + ':')) {
