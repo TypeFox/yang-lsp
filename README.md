@@ -32,7 +32,7 @@ The yang-lsp is the base of multiple binaries
 
 | Repository | Client | Binary | Bin Repo | CI  | Trigger |
 | ---------- | ------ | ------ | -------- | --- | ---------- |
-| [yang-lsp](https://github.com/theia-ide/yangs-lsp) | LSP           | JAR + script | Jenkins          | [Docker Hub](https://hub.docker.com/r/typefox/yang-lsp/builds) | GitHub hook | 
+| [yang-lsp](https://github.com/theia-ide/yangs-lsp) | LSP           | JAR + script | GH Action Artifacts | [GH Action](https://github.com/theia-ide/yang-lsp/actions/workflows/main.yml) | GH Commit / PR | 
 | [yangster](https://github.com/theia-ide/yangster)  | Theia Browser | Docker image | Docker Hub | [Docker Hub](https://hub.docker.com/r/typefox/yangster/builds) | GitHub hook / Jenkins pipeline| 
 |                                                    | Theia          | Theia extension| npm |  [Jenkins](http://services.typefox.io/open-source/jenkins/job/yangster/) | `yarn run publish` | 
 | [yangster-electron](https://github.com/theia-ide/yangster-electron) | Theia Electron | executables | ? | ? | ? |
