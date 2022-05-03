@@ -40,6 +40,12 @@ jobs:
       if: always()
       with:
         files: yang-lsp/**/test-results/**/*.xml
+    - name: Archive yang-language-server
+      uses: actions/upload-artifact@v2
+      with:
+        name: yang-language-server_${{ env.PROJECT_VERSION }}
+        path: |
+          yang-lsp/build/yang-language-server_[0-9]*.zip
     - name: Archive yang-language-server_diagram-extension
       uses: actions/upload-artifact@v2
       with:
