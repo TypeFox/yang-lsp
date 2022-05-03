@@ -13,7 +13,6 @@ import org.eclipse.xtext.util.Wrapper
 
 import static io.typefox.yang.formatting2.MultilineStringReplacer.Line.PartType.*
 
-import static extension com.google.common.base.Strings.*
 
 @FinalFieldsConstructor
 class MultilineStringReplacer implements ITextReplacer {
