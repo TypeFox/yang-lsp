@@ -15,7 +15,7 @@ class CodeActionService implements ICodeActionService2 {
 	override getCodeActions(Options options) {
 		val result = <Command>newArrayList
 		for (d : options.codeActionParams.context.diagnostics) {
-			if (d.code == IssueCodes.INCORRECT_VERSION) {
+			if (d.code.getLeft() == IssueCodes.INCORRECT_VERSION) {
 				result += createFix('Change to "1.1".', options.resource.URI, new TextEdit => [
 					newText = "1.1"
 					range = d.range

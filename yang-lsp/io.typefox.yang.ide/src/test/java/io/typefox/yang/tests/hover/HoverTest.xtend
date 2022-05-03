@@ -19,7 +19,8 @@ class HoverTest extends AbstractYangLSPTest {
 			column = 8
 			expectedHover = '''
 				[[0, 7] .. [0, 10]]
-				   Hello
+				kind: markdown
+				value:    Hello
 				This is super.
 				   test
 				Bla blubb
@@ -41,7 +42,8 @@ class HoverTest extends AbstractYangLSPTest {
 			column = 8
 			expectedHover = '''
 				[[0, 7] .. [0, 10]]
-				   Hello
+				kind: markdown
+				value:    Hello
 				This is super.
 				   test
 				Bla blubb

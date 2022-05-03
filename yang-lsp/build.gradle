@@ -25,8 +25,8 @@ subprojects {
 	apply plugin: 'maven-publish'
 	apply plugin: 'signing'
 
-	sourceCompatibility = '1.8'
-	targetCompatibility = '1.8'
+	sourceCompatibility = '11'
+	targetCompatibility = '11'
 	
 	java {
 		withJavadocJar()
@@ -45,7 +45,7 @@ subprojects {
 	apply from: "${rootDir}/gradle/source-layout.gradle"
 	apply from: "${rootDir}/gradle/publishing.gradle"
 	
-	ext.xtextVersion = '2.26.0.M1'
+	ext.xtextVersion = '2.25.0'
 	
 	configurations.all {
 		if (name.contains("Tooling")) {
