@@ -1,8 +1,8 @@
-version = '0.5.0-SNAPSHOT'
+version = '0.6.0-SNAPSHOT'
 
 ext.versions = [
-    xtext: '2.25.0',
-    lsp4j: '0.10.0',
+    xtext: '2.26.0',
+    lsp4j: '0.12.0',
     sprotty: '0.9.0',
     elk: '0.7.0',
     gson: '2.8.6',

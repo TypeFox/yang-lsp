@@ -1,9 +1,7 @@
 package io.typefox.yang.ide.editor.syntaxcoloring
 
-import com.google.common.base.Preconditions
 import com.google.common.base.Predicate
 import com.google.common.collect.ImmutableList
-import com.google.common.collect.ImmutableSet
 import com.google.common.collect.Lists
 import com.google.inject.Inject
 import com.google.inject.Singleton
@@ -44,18 +42,16 @@ import org.eclipse.emf.ecore.EStructuralFeature
 import org.eclipse.emf.ecore.util.EcoreUtil
 import org.eclipse.xtext.ide.editor.syntaxcoloring.DefaultSemanticHighlightingCalculator
 import org.eclipse.xtext.ide.editor.syntaxcoloring.IHighlightedPositionAcceptor
-import org.eclipse.xtext.ide.server.semanticHighlight.ISemanticHighlightingStyleToTokenMapper
 import org.eclipse.xtext.nodemodel.INode
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.util.CancelIndicator
 import org.eclipse.xtext.util.internal.Log
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
-import org.eclipse.xtext.ide.editor.syntaxcoloring.HighlightingStyles
 
 @Log
 @Singleton
-class YangSemanticHighlightingCalculator extends DefaultSemanticHighlightingCalculator implements ISemanticHighlightingStyleToTokenMapper {
+class YangSemanticHighlightingCalculator extends DefaultSemanticHighlightingCalculator {
 
 	/**
 	 * The double-quote (&quot;) character.
@@ -394,7 +390,7 @@ class YangSemanticHighlightingCalculator extends DefaultSemanticHighlightingCalc
 
 		nodes.forEach[acceptor.acceptNode(it, style, rest)];
 	}
-
+/*
 	override getAllStyleIds() {
 		return ImmutableSet.copyOf(STYLE_MAPPINGS.keySet);
 	}
@@ -407,7 +403,7 @@ class YangSemanticHighlightingCalculator extends DefaultSemanticHighlightingCalc
 		Preconditions.checkNotNull(scopes, '''Cannot map style ID '«styleId»' to the corresponding TextMate scopes.''');
 		return scopes;
 	}
-
+*/
 	private static def List<String> yang(List<String> scopes) {
 		return ImmutableList.builder.addAll(scopes).add('source.yang').build;
 	}

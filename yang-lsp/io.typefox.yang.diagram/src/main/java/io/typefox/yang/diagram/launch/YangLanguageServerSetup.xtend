@@ -13,6 +13,7 @@ import io.typefox.yang.diagram.YangDiagramModule
 import io.typefox.yang.ide.YangIdeModule
 import io.typefox.yang.ide.YangIdeSetup
 import io.typefox.yang.ide.server.YangProjectManager
+import java.util.logging.LogManager
 import org.eclipse.elk.alg.layered.options.LayeredMetaDataProvider
 import org.eclipse.elk.core.util.persistence.ElkGraphResourceFactory
 import org.eclipse.emf.ecore.resource.Resource
@@ -27,6 +28,11 @@ import org.eclipse.xtext.util.Modules2
 class YangLanguageServerSetup extends DiagramLanguageServerSetup {
 	
 	override setupLanguages() {
+		try {
+			LogManager.getLogManager().readConfiguration(
+				this.getClass().getClassLoader().getResourceAsStream('server_logging.properties'));
+		} catch (Throwable ex) {
+		}
 		// Initialize ELK
 		ElkLayoutEngine.initialize(new LayeredMetaDataProvider)
 		Resource.Factory.Registry.INSTANCE.extensionToFactoryMap.put('elkg', new ElkGraphResourceFactory)

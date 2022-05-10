@@ -1,5 +1,5 @@
 buildscript {
-	repositories.jcenter()
+	repositories.mavenCentral()
 	dependencies {
 		classpath 'org.xtext:xtext-gradle-plugin:2.0.8'
 	}

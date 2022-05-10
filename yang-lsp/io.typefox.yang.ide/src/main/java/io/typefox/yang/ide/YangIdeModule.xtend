@@ -35,7 +35,6 @@ import org.eclipse.xtext.ide.server.codelens.ICodeLensService
 import org.eclipse.xtext.ide.server.commands.IExecutableCommandService
 import org.eclipse.xtext.ide.server.contentassist.ContentAssistService
 import org.eclipse.xtext.ide.server.formatting.FormattingService
-import org.eclipse.xtext.ide.server.semanticHighlight.ISemanticHighlightingStyleToTokenMapper
 import org.eclipse.xtext.ide.server.symbol.DocumentSymbolMapper.DocumentSymbolKindProvider
 import org.eclipse.xtext.ide.server.symbol.DocumentSymbolMapper.DocumentSymbolNameProvider
 import org.eclipse.xtext.ide.server.symbol.DocumentSymbolService
@@ -116,10 +115,12 @@ class YangIdeModule extends AbstractYangIdeModule {
 	def Class<? extends ISemanticHighlightingCalculator> bindISemanticHighlightingCalculator() {
 		return YangSemanticHighlightingCalculator;
 	}
-
+/*
+ 
 	def Class<? extends ISemanticHighlightingStyleToTokenMapper> bindISemanticHighlightingStyleToTokenMapper() {
 		return YangSemanticHighlightingCalculator;
 	}
+ */
 
 	def Class<? extends HierarchicalDocumentSymbolService> bindHierarchicalDocumentSymbolService() {
 		return YangHierarchicalDocumentSymbolService;
