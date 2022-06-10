@@ -11,10 +11,6 @@ dependencies {
 	implementation "org.eclipse.sprotty:org.eclipse.sprotty.server:${versions.sprotty}"
 	implementation "org.eclipse.sprotty:org.eclipse.sprotty.layout:${versions.sprotty}"
 	implementation "org.eclipse.sprotty:org.eclipse.sprotty.xtext:${versions.sprotty}"
-	constraints {
-		implementation "org.eclipse.xtext:org.eclipse.xtext.ide:${versions.xtext}"
-		implementation "org.eclipse.xtend:org.eclipse.xtend.lib:${versions.xtext}"
-	}
 	testImplementation "junit:junit:${versions.junit}"
 	testImplementation "org.eclipse.xtext:org.eclipse.xtext.testing:${versions.xtext}"
 }
