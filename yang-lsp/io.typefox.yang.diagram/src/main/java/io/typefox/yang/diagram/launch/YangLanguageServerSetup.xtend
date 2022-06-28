@@ -19,7 +19,6 @@ import org.eclipse.elk.core.util.persistence.ElkGraphResourceFactory
 import org.eclipse.emf.ecore.resource.Resource
 import org.eclipse.sprotty.layout.ElkLayoutEngine
 import org.eclipse.sprotty.xtext.launch.DiagramLanguageServerSetup
-import org.eclipse.sprotty.xtext.ls.SyncDiagramServerModule
 import org.eclipse.xtext.ide.server.ProjectManager
 import org.eclipse.xtext.ide.server.ServerModule
 import org.eclipse.xtext.resource.IResourceServiceProvider
@@ -48,7 +47,7 @@ class YangLanguageServerSetup extends DiagramLanguageServerSetup {
 	override getLanguageServerModule() {
 		Modules2.mixin(
 			new ServerModule,
-			new SyncDiagramServerModule,
+			new YangSyncDiagramServerModule,
 			[
 				bind(IResourceServiceProvider.Registry).toProvider(IResourceServiceProvider.Registry.RegistryProvider)
 				bind(ProjectManager).to(YangProjectManager)

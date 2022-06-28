@@ -1,7 +1,6 @@
 package io.typefox.yang.ide.editor.syntaxcoloring
 
 import com.google.common.base.Predicate
-import com.google.common.collect.ImmutableList
 import com.google.common.collect.Lists
 import com.google.inject.Inject
 import com.google.inject.Singleton
@@ -26,6 +25,7 @@ import io.typefox.yang.yang.IfFeature
 import io.typefox.yang.yang.Key
 import io.typefox.yang.yang.Leaf
 import io.typefox.yang.yang.LeafList
+import io.typefox.yang.yang.List
 import io.typefox.yang.yang.Must
 import io.typefox.yang.yang.Notification
 import io.typefox.yang.yang.Refine
@@ -33,7 +33,6 @@ import io.typefox.yang.yang.Rpc
 import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.When
-import java.util.List
 import org.eclipse.core.runtime.OperationCanceledException
 import org.eclipse.emf.common.util.URI
 import org.eclipse.emf.ecore.EObject
@@ -88,33 +87,7 @@ class YangSemanticHighlightingCalculator extends DefaultSemanticHighlightingCalc
 		/*6c*/ val KEY_STYLE = 'yang-key-statement,';
 	}
 
-	static interface Scopes {
-		val NORMAL_DATA_NODE_SCOPES = #['keyword.control'].yang;
-		val ALTERNATIVE_DATA_NODE_SCOPES = #['beginning.punctuation.definition.list.markdown'].yang;
-		val REUSABLE_DATA_NODE_SCOPES = #['support.type.property-name'].yang;
-		val EXTENDIBLE_MODULE_STATEMENT_SCOPES = #['punctuation.definition.tag'].yang;
-		val CONDITIONAL_MODULE_STATEMENT_SCOPES = #['emphasis'].yang;
-		val CONSTRAINT_MODULE_STATEMENT_SCOPES = #['strong'].yang;
-		val INTERFACE_STATEMENT_SCOPES = #['support.type.property-name'].yang;
-		val REFERENCEABLE_STATEMENT_SCOPES = #['constant.regexp'].yang;
-		val DESCRIPTION_SCOPES = #['keyword.other.unit'].yang;
-		val DEFAULT_SCOPES = #['keyword.operator'].yang;
-		val KEY_SCOPES = #['string.regexp'].yang;
-	}
-
-	public static val STYLE_MAPPINGS = #{
-		Styles.NORMAL_DATA_NODE_STYLE -> Scopes.NORMAL_DATA_NODE_SCOPES,
-		Styles.ALTERNATIVE_DATA_NODE_STYLE -> Scopes.ALTERNATIVE_DATA_NODE_SCOPES,
-		Styles.REUSABLE_DATA_NODE_STYLE -> Scopes.REUSABLE_DATA_NODE_SCOPES,
-		Styles.EXTENDIBLE_MODULE_STATEMENT_STYLE -> Scopes.EXTENDIBLE_MODULE_STATEMENT_SCOPES,
-		Styles.CONDITIONAL_MODULE_STATEMENT_STYLE -> Scopes.CONDITIONAL_MODULE_STATEMENT_SCOPES,
-		Styles.CONSTRAINT_MODULE_STATEMENT_STYLE -> Scopes.CONSTRAINT_MODULE_STATEMENT_SCOPES,
-		Styles.INTERFACE_STATEMENT_STYLE -> Scopes.INTERFACE_STATEMENT_SCOPES,
-		Styles.REFERENCEABLE_STATEMENT_STYLE -> Scopes.REFERENCEABLE_STATEMENT_SCOPES,
-		Styles.DESCRIPTION_STYLE -> Scopes.DESCRIPTION_SCOPES,
-		Styles.DEFAULT_STYLE -> Scopes.DEFAULT_SCOPES,
-		Styles.KEY_STYLE -> Scopes.KEY_SCOPES
-	};
+	
 
 	override protected highlightElement(EObject object, IHighlightedPositionAcceptor acceptor,
 		CancelIndicator cancelIndicator) {
@@ -149,7 +122,7 @@ class YangSemanticHighlightingCalculator extends DefaultSemanticHighlightingCalc
 		return doHighlightNodeForFeature(acceptor, SCHEMA_NODE__NAME, Styles.NORMAL_DATA_NODE_STYLE);
 	}
 
-	protected dispatch def boolean doHighlightElement(io.typefox.yang.yang.List it,
+	protected dispatch def boolean doHighlightElement(List it,
 		IHighlightedPositionAcceptor acceptor) {
 
 		return doHighlightNodeForFeature(acceptor, SCHEMA_NODE__NAME, Styles.NORMAL_DATA_NODE_STYLE);
@@ -389,23 +362,6 @@ class YangSemanticHighlightingCalculator extends DefaultSemanticHighlightingCalc
 		String... rest) {
 
 		nodes.forEach[acceptor.acceptNode(it, style, rest)];
-	}
-/*
-	override getAllStyleIds() {
-		return ImmutableSet.copyOf(STYLE_MAPPINGS.keySet);
-	}
-
-	override toScopes(String styleId) {
-		if (styleId == HighlightingStyles.TASK_ID) {
-			return emptyList;
-		}
-		val scopes = STYLE_MAPPINGS.get(styleId);
-		Preconditions.checkNotNull(scopes, '''Cannot map style ID '«styleId»' to the corresponding TextMate scopes.''');
-		return scopes;
-	}
-*/
-	private static def List<String> yang(List<String> scopes) {
-		return ImmutableList.builder.addAll(scopes).add('source.yang').build;
 	}
 
 }

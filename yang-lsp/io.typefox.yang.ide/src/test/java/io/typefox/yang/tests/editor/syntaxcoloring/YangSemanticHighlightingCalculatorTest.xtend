@@ -1,46 +1,40 @@
 package io.typefox.yang.tests.editor.syntaxcoloring
 
 import com.google.inject.Inject
-import io.typefox.yang.ide.editor.syntaxcoloring.YangSemanticHighlightingCalculator
 import io.typefox.yang.tests.AbstractYangLSPTest
-import java.util.List
 import java.util.UUID
+import org.eclipse.lsp4j.ClientCapabilities
+import org.eclipse.lsp4j.SemanticTokensCapabilities
+import org.eclipse.lsp4j.TextDocumentClientCapabilities
 import org.eclipse.xtext.ide.server.UriExtensions
 import org.junit.Before
 import org.junit.Ignore
 import org.junit.Test
 
-import static io.typefox.yang.ide.editor.syntaxcoloring.YangSemanticHighlightingCalculator.Scopes.*
-import static org.junit.Assert.*
-
-import static extension java.lang.reflect.Modifier.*
-
-@Ignore('Missing semantic highlighting implementation')
+@Ignore("Fix semantic highlighting and implement new tests")
 class YangSemanticHighlightingCalculatorTest extends AbstractYangLSPTest {
 
 	@Inject
 	extension UriExtensions;
 
-	// List<List<String>> scopes;
 
 	@Before
 	def void before() {
-		/*
-		scopes = initialize[
+		initialize[
 			capabilities = new ClientCapabilities() => [
 				textDocument = new TextDocumentClientCapabilities() => [
-					semanticHighlightingCapabilities = new SemanticHighlightingCapabilities() => [
-						semanticHighlighting = true;
+					semanticTokens = new SemanticTokensCapabilities(true) => [
+						overlappingTokenSupport = true;
 					];
 				];
 			];
-		].capabilities.semanticHighlighting.scopes;
-		*/
+		]
 	}
 
 	@Test
 	def void checkStylesAndScopes() {
-		val scopes = YangSemanticHighlightingCalculator.Scopes.declaredFields.filter [
+		/*
+		 * val scopes = YangSemanticHighlightingCalculator.Scopes.declaredFields.filter [
 			modifiers.static && modifiers.public && type === List
 		];
 		val styles = YangSemanticHighlightingCalculator.Styles.declaredFields.filter [
@@ -61,22 +55,23 @@ class YangSemanticHighlightingCalculatorTest extends AbstractYangLSPTest {
 			assertTrue('''Cannot find scope '«expectedScopeName»' for style: «styleName».''', scopes.exists [
 				name == expectedScopeName
 			]);
-		];
+		];*/
 	}
 
 	@Test
 	def void checkDescription_singleLine() {
-		'''
+		/*'''
 		module x {
 		  description "desc";
 		}'''.assertInfos('''
 0 : []
 1 : [14:6:«DESCRIPTION_SCOPES»]
-2 : []''');
+2 : []''');*/
 	}
 
 	@Test
 	def void checkDescription_multiLine() {
+		/* 
 		'''
 		module x {
 		  description 
@@ -92,6 +87,7 @@ class YangSemanticHighlightingCalculatorTest extends AbstractYangLSPTest {
 4 : [0:2:«DESCRIPTION_SCOPES»]
 5 : [0:7:«DESCRIPTION_SCOPES»]
 6 : []''');
+*/
 	}
 
 	protected def String open(CharSequence content) {
