@@ -12,6 +12,7 @@ import static extension io.typefox.yang.utils.YangStringUtils.*
 import org.eclipse.xtend.lib.annotations.Accessors
 
 class YangValueConverterService extends AbstractDeclarativeValueConverterService {
+
 	
 	@Inject StringConverter stringValueConverter;
 	
@@ -26,31 +27,34 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 	}
 	
 	static class StringConverter implements IValueConverter<String>, IValueConverter.RuleSpecific {
+		public static val char[] QUOTES = #['"',"'"]
 		
 		override toString(String value) throws ValueConverterException {
 			return value.addQuotesIfNecessary
 		}
 		
-		static val char[] quotes = #['"','\'']
 		
 		override toValue(String string, INode node) throws ValueConverterException {
 			val result = new StringBuilder
 			for (n : node.leafNodes) {
 				if (!n.hidden) {
-					val seg = n.text 					
-					if (seg.length>=2) {
-						val first = seg.charAt(0)
-						if (quotes.contains(first) && seg.charAt(seg.length-1) === first) {
-							result.append(seg.substring(1, seg.length-1))
-						} else {
-							result.append(seg)
-						}
+					val seg = n.text
+					if (isQuoted(seg)) {
+						result.append(seg.substring(1, seg.length-1))
 					} else {
 						result.append(seg)
 					}
 				}
 			}
 			return result.toString
+		}
+		
+		def static boolean isQuoted(String text) {
+			if(text.length < 2) {
+				return false
+			}
+			val first = text.charAt(0)
+			return QUOTES.contains(first) && text.charAt(text.length-1) === first
 		}
 		
 		@Accessors AbstractRule rule

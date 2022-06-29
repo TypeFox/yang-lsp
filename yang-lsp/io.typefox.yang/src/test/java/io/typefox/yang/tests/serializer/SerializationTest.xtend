@@ -11,8 +11,11 @@ import io.typefox.yang.yang.List
 import io.typefox.yang.yang.Module
 import io.typefox.yang.yang.Namespace
 import io.typefox.yang.yang.Organization
+import io.typefox.yang.yang.Pattern
 import io.typefox.yang.yang.Prefix
 import io.typefox.yang.yang.Statement
+import io.typefox.yang.yang.Type
+import io.typefox.yang.yang.Typedef
 import io.typefox.yang.yang.Uses
 import io.typefox.yang.yang.YangFactory
 import io.typefox.yang.yang.YangPackage
@@ -659,6 +662,31 @@ class SerializationTest extends AbstractYangTest {
 		    }
 		}
 		'''.toString, serialized)
+	}
+	
+	@Test
+	def void testIssue220() {
+		val module = YangFactory.eINSTANCE.createModule
+		module.setName("serialize-test")
+		val typeDef = module.create(YangPackage.eINSTANCE.typedef, Typedef)
+		typeDef.setName("my-dt")
+		val type = typeDef.create(YangPackage.eINSTANCE.type, Type)
+		type.typeRef = YangFactory.eINSTANCE.createTypeReference => [builtin = "string"]
+		val pattern = type.create(YangPackage.eINSTANCE.pattern, Pattern)
+		val resource = resourceSet.createResource(URI.createFileURI("serialize-test.yang")) as XtextResource
+		resource.contents.add(module)
+
+		pattern.regexp = "(/.*/i?)"
+
+		assertEquals('''
+		module serialize-test {
+		    typedef my-dt {
+		        type string {
+		            pattern '(/.*/i?)';
+		        }
+		    }
+		}'''.toString, resource.serializer.serialize(module))
+
 	}
 	
 	private def <T extends Statement> create(Statement it, EClass substmtEClass, Class<T> clazz) {

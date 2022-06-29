@@ -41,6 +41,8 @@ import org.eclipse.xtext.validation.IssueSeveritiesProvider
 import org.eclipse.xtext.validation.ResourceValidatorImpl
 import org.eclipse.xtext.workspace.IProjectConfigProvider
 import org.eclipse.xtext.workspace.ProjectConfigProvider
+import org.eclipse.xtext.serializer.tokens.IValueSerializer
+import io.typefox.yang.resource.YangValueSerializer
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
@@ -128,5 +130,8 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 	
 	def Class<? extends JFlexBasedInternalYangLexer> bindJFlexBasedInternalYangLexer() {
 		return JFlexBasedYangLexerWithLookahead
+	}
+	def Class<? extends IValueSerializer> bindIValueSerializer() {
+		return YangValueSerializer
 	}
 }
