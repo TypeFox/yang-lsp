@@ -115,12 +115,6 @@ class YangIdeModule extends AbstractYangIdeModule {
 	def Class<? extends ISemanticHighlightingCalculator> bindISemanticHighlightingCalculator() {
 		return YangSemanticHighlightingCalculator;
 	}
-/*
- 
-	def Class<? extends ISemanticHighlightingStyleToTokenMapper> bindISemanticHighlightingStyleToTokenMapper() {
-		return YangSemanticHighlightingCalculator;
-	}
- */
 
 	def Class<? extends HierarchicalDocumentSymbolService> bindHierarchicalDocumentSymbolService() {
 		return YangHierarchicalDocumentSymbolService;
