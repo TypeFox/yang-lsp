@@ -1,0 +1,108 @@
+{
+  "value": {
+    "rpcs": [
+      {
+        "name": "set-current-datetime"
+      },
+      {
+        "name": "system-restart"
+      }
+    ],
+    "name": "ietf-system",
+    "children": [
+      {
+        "name": "system",
+        "children": [
+          {
+            "name": "contact"
+          },
+          {
+            "name": "hostname"
+          },
+          {
+            "name": "location"
+          },
+          {
+            "name": "clock"
+          },
+          {
+            "name": "ntp",
+            "children": [
+              {
+                "name": "enabled"
+              }
+            ]
+          },
+          {
+            "name": "dns-resolver",
+            "children": [
+              {
+                "name": "options",
+                "children": [
+                  {
+                    "name": "timeout"
+                  },
+                  {
+                    "name": "attempts"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "radius",
+            "children": [
+              {
+                "name": "options",
+                "children": [
+                  {
+                    "name": "timeout"
+                  },
+                  {
+                    "name": "attempts"
+                  }
+                ]
+              }
+            ]
+          },
+          {
+            "name": "authentication"
+          }
+        ]
+      },
+      {
+        "name": "system-state",
+        "children": [
+          {
+            "name": "platform",
+            "children": [
+              {
+                "name": "os-name"
+              },
+              {
+                "name": "os-release"
+              },
+              {
+                "name": "os-version"
+              },
+              {
+                "name": "machine"
+              }
+            ]
+          },
+          {
+            "name": "clock",
+            "children": [
+              {
+                "name": "current-datetime"
+              },
+              {
+                "name": "boot-datetime"
+              }
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
