@@ -9,6 +9,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.util.List;
+import java.util.Optional;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
@@ -18,7 +19,9 @@ import org.junit.Test;
 import com.google.common.collect.Maps;
 import com.google.gson.GsonBuilder;
 
+import io.typefox.yang.processor.DataTreeSerializer;
 import io.typefox.yang.processor.ProcessedDataTree;
+import io.typefox.yang.processor.ProcessedDataTree.ModuleData;
 import io.typefox.yang.processor.YangProcessor;
 import io.typefox.yang.tests.AbstractYangTest;
 import io.typefox.yang.yang.AbstractModule;
@@ -26,22 +29,96 @@ import io.typefox.yang.yang.AbstractModule;
 public class YangProcessorTest extends AbstractYangTest {
 
 	@Test
-	public void processModulesTest() throws IOException {
+	public void processModules_NoDeviation_TreeTest() throws IOException {
 
+		var sysModule = processData(false);
+
+		String expectation = null;
+
+		/// CLI tree test
+		try (InputStream in = this.getClass().getClassLoader()
+				.getResourceAsStream("io/typefox/yang/tests/processor/expectation-nodev.txt");
+				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+			var writer = new StringWriter();
+			br.transferTo(writer);
+			expectation = writer.getBuffer().toString();
+		}
+		assertEquals(expectation, new DataTreeSerializer().serialize(sysModule.get()).toString());
+
+	}
+
+	@Test
+	public void processModules_TreeTest() throws IOException {
+
+		var sysModule = processData(true);
+
+		String expectation = null;
+
+		/// CLI tree test
+		try (InputStream in = this.getClass().getClassLoader()
+				.getResourceAsStream("io/typefox/yang/tests/processor/expectation.txt");
+				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+			var writer = new StringWriter();
+			br.transferTo(writer);
+			expectation = writer.getBuffer().toString();
+		}
+		assertEquals(expectation, new DataTreeSerializer().serialize(sysModule.get()).toString());
+
+	}
+
+	@Test
+	public void processModules_NoDeviation_JsonTest() throws IOException {
+		
+		var sysModule = processData(false);
+		
+		String expectation = null;
+		
+		// Json output test
+		try (InputStream in = this.getClass().getClassLoader()
+				.getResourceAsStream("io/typefox/yang/tests/processor/expectation-nodev.json");
+				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+			var writer = new StringWriter();
+			br.transferTo(writer);
+			expectation = writer.getBuffer().toString();
+		}
+		assertEquals(expectation, new GsonBuilder().setPrettyPrinting().create().toJson(sysModule.get()));
+		
+	}
+	@Test
+	public void processModules_JsonTest() throws IOException {
+
+		var sysModule = processData(true);
+
+		String expectation = null;
+
+		// Json output test
+		try (InputStream in = this.getClass().getClassLoader()
+				.getResourceAsStream("io/typefox/yang/tests/processor/expectation.json");
+				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+			var writer = new StringWriter();
+			br.transferTo(writer);
+			expectation = writer.getBuffer().toString();
+		}
+		assertEquals(expectation, new GsonBuilder().setPrettyPrinting().create().toJson(sysModule.get()));
+
+	}
+
+	private Optional<ModuleData> processData(boolean withDeviation) throws IOException {
 		var resourceMap = Maps.<String, Resource>newHashMap();
 		List<String> files = newArrayList();
 		try (InputStream in = this.getClass().getClassLoader().getResourceAsStream("processor");
 				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
 			String resource;
 			while ((resource = br.readLine()) != null) {
-				if (resource.endsWith(".yang"))
+				if (resource.endsWith(".yang") && (withDeviation || !resource.equals("example-system-ext.yang")))
 					files.add(resource);
 			}
 		}
 
 		files.stream().forEach(it -> resourceMap.put(it,
-				resourceSet.getResource(URI.createFileURI("src/test/resources/processor/" + it), true)));
+				resourceSet.createResource(URI.createFileURI("src/test/resources/processor/" + it))));
 		var resource = resourceMap.get("ietf-system.yang");
+		resource.load(resourceSet.getLoadOptions());
 		EcoreUtil.resolveAll(resource);
 		assertNoErrors(resource);
 
@@ -53,16 +130,8 @@ public class YangProcessorTest extends AbstractYangTest {
 		});
 
 		ProcessedDataTree dataTree = new YangProcessor().process(modules, null, null);
-		String expectation = null;
-
-		try (InputStream in = this.getClass().getClassLoader()
-				.getResourceAsStream("io/typefox/yang/tests/processor/expectation.json");
-				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
-			var writer = new StringWriter();
-			br.transferTo(writer);
-			expectation = writer.getBuffer().toString();
-		}
 		var sysModule = dataTree.getModules().stream().filter(mod -> "ietf-system".equals(mod.getName())).findFirst();
-		assertEquals(expectation, new GsonBuilder().setPrettyPrinting().create().toJson(sysModule));
+		return sysModule;
+
 	}
 }

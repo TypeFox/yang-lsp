@@ -5,13 +5,18 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.util.List;
 
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
 import com.google.gson.GsonBuilder;
 
+import io.typefox.yang.processor.ProcessedDataTree.ForeignModuleAdapter;
 import io.typefox.yang.yang.AbstractModule;
+import io.typefox.yang.yang.Augment;
 import io.typefox.yang.yang.Deviate;
 import io.typefox.yang.yang.Deviation;
+import io.typefox.yang.yang.Prefix;
 import io.typefox.yang.yang.SchemaNode;
+import io.typefox.yang.yang.Statement;
 
 public class YangProcessor {
 
@@ -61,6 +66,16 @@ public class YangProcessor {
 					}
 					break;
 				}
+			} else if (ele instanceof Augment) {
+				var augment = (Augment) ele;
+				augment.getSubstatements().forEach((subStatement) -> {
+					Statement copy = EcoreUtil.copy(subStatement);
+					Prefix prefix = (Prefix) module.getSubstatements().stream().filter(s -> (s instanceof Prefix))
+							.findFirst().get();
+					if (prefix != null)
+						copy.eAdapters().add(new ForeignModuleAdapter(prefix.getPrefix()));
+					augment.getPath().getSchemaNode().getSubstatements().add(copy);
+				});
 			}
 		}));
 
