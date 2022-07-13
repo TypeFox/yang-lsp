@@ -14,9 +14,9 @@ import com.google.gson.GsonBuilder;
 
 import io.typefox.yang.processor.ProcessedDataTree.ElementData;
 import io.typefox.yang.processor.ProcessedDataTree.ElementKind;
-import io.typefox.yang.processor.ProcessedDataTree.HasStatements;
 import io.typefox.yang.processor.ProcessedDataTree.ListData;
 import io.typefox.yang.processor.ProcessedDataTree.ModuleData;
+import io.typefox.yang.processor.ProcessedDataTree.Named;
 import io.typefox.yang.processor.ProcessorUtility.ModuleIdentifier;
 import io.typefox.yang.yang.AbstractModule;
 import io.typefox.yang.yang.Action;
@@ -102,12 +102,28 @@ public class YangProcessor {
 
 				augment.getSubstatements().stream().filter(sub -> !(sub instanceof IfFeature))
 						.forEach((subStatement) -> {
-							Statement copy = EcoreUtil.copy(subStatement);
-							// add augment's feature conditions to copied augment children
-							copy.getSubstatements().addAll(EcoreUtil.copyAll(ifFeatures));
-							// memorize source module information as adapter
-							copy.eAdapters().add(new ForeignModuleAdapter(globalModuleId));
-							augment.getPath().getSchemaNode().getSubstatements().add(copy);
+							// TODO check what can be added
+							if (subStatement instanceof SchemaNode) {
+								SchemaNode copy = EcoreUtil.copy((SchemaNode) subStatement);
+								// add augment's feature conditions to copied augment children
+								copy.getSubstatements().addAll(EcoreUtil.copyAll(ifFeatures));
+
+								// memorize source module information as adapter
+								copy.eAdapters().add(new ForeignModuleAdapter(globalModuleId));
+
+								// Remove same named existing node
+								var existing = augment.getPath().getSchemaNode().getSubstatements().stream()
+										.filter((statement) -> {
+											if (statement instanceof SchemaNode) {
+												return copy.getName().equals(((SchemaNode) statement).getName());
+											}
+											return false;
+										}).findFirst();
+								if (existing.isPresent()) {
+									augment.getPath().getSchemaNode().getSubstatements().remove(existing.get());
+								}
+								augment.getPath().getSchemaNode().getSubstatements().add(copy);
+							}
 						});
 			}
 		}));
@@ -115,14 +131,22 @@ public class YangProcessor {
 		modules.forEach((module) -> {
 			var moduleData = new ModuleData(module);
 			processedDataTree.addModule(moduleData);
-			processChildren(module, moduleData);
+			processChildren(module, moduleData, evalCtx);
 		});
 		return processedDataTree;
 	}
 
-	private void processChildren(Statement statement, HasStatements parent) {
+	private void processChildren(Statement statement, Named parent, FeatureEvaluationContext evalCtx) {
+		if (!ProcessorUtility.isEnabled(statement, evalCtx)) {
+			// filtered by a feature
+			return;
+		}
 		statement.getSubstatements().stream().forEach(ele -> {
-			HasStatements child = null;
+			if (!ProcessorUtility.isEnabled(ele, evalCtx)) {
+				// filtered by a feature
+				return;
+			}
+			ElementData child = null;
 			if (ele instanceof Container) {
 				child = new ElementData((Container) ele, ElementKind.Container);
 			} else if (ele instanceof Leaf) {
@@ -146,7 +170,7 @@ public class YangProcessor {
 				if (adapted != null) {
 					grouping.eAdapters().add(new ForeignModuleAdapter(adapted.moduleId));
 				}
-				processChildren(grouping, parent);
+				processChildren(grouping, parent, evalCtx);
 			} else if (ele instanceof Refine) {
 				child = new ElementData((SchemaNode) ele, ElementKind.Refine);
 			} else if (ele instanceof Input) {
@@ -158,11 +182,19 @@ public class YangProcessor {
 			} else if (ele instanceof Rpc) {
 				var rpc = new ElementData((Rpc) ele, ElementKind.Rpc);
 				((ModuleData) parent).addToRpcs(rpc);
-				processChildren(ele, rpc);
+				processChildren(ele, rpc, evalCtx);
 			}
 			if (child != null) {
+				// Wrap choice's direct non-case children into case Element
+				// See https://www.rfc-editor.org/rfc/rfc6020#section-7.9.2
+				if (parent instanceof ElementData && ((ElementData) parent).elementKind == ElementKind.Choice
+						&& ElementKind.mayOmitCase.contains(child.elementKind)) {
+					var caseWraper = ElementData.createNamedWrapper(child.getName(), ElementKind.Case);
+					caseWraper.addToChildren(child);
+					child = caseWraper;
+				}
 				parent.addToChildren(child);
-				processChildren(ele, child);
+				processChildren(ele, child, evalCtx);
 			}
 		});
 	}

@@ -3,6 +3,7 @@ package io.typefox.yang.processor;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.eclipse.emf.ecore.EObject;
 import org.eclipse.xtext.EcoreUtil2;
 
 import io.typefox.yang.processor.FeatureExpressions.FeatureCondition;
@@ -31,8 +32,12 @@ public class ProcessorUtility {
 		return getPrefix(module);
 	}
 
-	public static ModuleIdentifier moduleIdentifier(Statement statement) {
-		var module = EcoreUtil2.getContainerOfType(statement, AbstractModule.class);
+	public static ModuleIdentifier moduleIdentifier(EObject eObj) {
+		ForeignModuleAdapter foreignAdapter = ForeignModuleAdapter.find(eObj);
+		if (foreignAdapter != null) {
+			return foreignAdapter.moduleId;
+		}
+		var module = new YangExtensions().getMainModule(eObj);
 		Prefix prefix = (Prefix) module.getSubstatements().stream().filter(s -> (s instanceof Prefix)).findFirst()
 				.get();
 		return new ModuleIdentifier(module.getName(), prefix != null ? prefix.getPrefix() : null);
@@ -41,6 +46,10 @@ public class ProcessorUtility {
 	public static List<IfFeature> findIfFeatures(Statement statement) {
 		return statement.getSubstatements().stream().filter(sub -> sub instanceof IfFeature).map(IfFeature.class::cast)
 				.collect(Collectors.toList());
+	}
+
+	public static boolean isEnabled(Statement statement, FeatureEvaluationContext evalCtx) {
+		return checkIfFeatures(findIfFeatures(statement), evalCtx);
 	}
 
 	public static boolean checkIfFeatures(List<IfFeature> ifFeatures, FeatureEvaluationContext evalCtx) {

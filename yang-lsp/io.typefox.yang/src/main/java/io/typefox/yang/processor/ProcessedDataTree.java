@@ -3,20 +3,26 @@ package io.typefox.yang.processor;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
+import java.util.Set;
+
+import org.eclipse.xtext.nodemodel.ICompositeNode;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
 import com.google.common.base.Objects;
+import com.google.common.collect.Sets;
 
+import io.typefox.yang.processor.FeatureExpressions.FeatureCondition;
 import io.typefox.yang.yang.AbstractModule;
 import io.typefox.yang.yang.Config;
-import io.typefox.yang.yang.Expression;
-import io.typefox.yang.yang.FeatureReference;
 import io.typefox.yang.yang.IfFeature;
 import io.typefox.yang.yang.Key;
 import io.typefox.yang.yang.Mandatory;
+import io.typefox.yang.yang.Path;
 import io.typefox.yang.yang.Presence;
 import io.typefox.yang.yang.SchemaNode;
 import io.typefox.yang.yang.Type;
 import io.typefox.yang.yang.Typedef;
+import io.typefox.yang.yang.XpathExpression;
 
 public class ProcessedDataTree {
 
@@ -88,7 +94,10 @@ public class ProcessedDataTree {
 	}
 
 	static public enum ElementKind {
-		Container, Leaf, LeafList, List, Rpc, Choice, Case, Action, Grouping, Refine, Uses, Input, Output, Notification
+		Container, Leaf, LeafList, List, Rpc, Choice, Case, Action, Grouping, Refine, Uses, Input, Output, Notification,
+		AnyXml;
+
+		public static Set<ElementKind> mayOmitCase = Sets.newHashSet(AnyXml, Container, Leaf, List, LeafList);
 	}
 
 	static public enum AccessKind {
@@ -114,15 +123,20 @@ public class ProcessedDataTree {
 
 		transient private ElementData parent;
 
-		ElementKind elementKind = ElementKind.Leaf;
+		final ElementKind elementKind;
 		ValueType type;
-		List<String> featureConditions;
+		private List<String> featureConditions;
 		AccessKind accessKind;
 		Cardinality cardinality;
 
-		public ElementData(SchemaNode ele, ElementKind elementKind) {
-			this.name = ProcessorUtility.qualifiedName(ele);
+
+		private ElementData(String name, ElementKind elementKind) {
+			this.name = name;
 			this.elementKind = elementKind;
+		}
+
+		public ElementData(SchemaNode ele, ElementKind elementKind) {
+			this(ProcessorUtility.qualifiedName(ele), elementKind);
 			configureElement(ele);
 		}
 
@@ -147,17 +161,9 @@ public class ProcessedDataTree {
 			}
 			ele.getSubstatements().stream().forEach((sub) -> {
 				if (sub instanceof Type) {
-					var typeRef = ((Type) sub).getTypeRef();
-					if (typeRef.getBuiltin() != null) {
-						this.type = new ValueType(null, typeRef.getBuiltin());
-					} else {
-						Typedef typedef = typeRef.getType();
-						String typePrefix = ProcessorUtility.getPrefix(typedef);
-						String prefix = Objects.equal(typePrefix, ProcessorUtility.getPrefix(ele)) ? null : typePrefix;
-						this.type = new ValueType(prefix, typedef.getName());
-					}
+					this.type = createValueType((Type) sub);
 				} else if (sub instanceof IfFeature) {
-					this.addFeatureCondition(createFeatureCondition(((IfFeature) sub).getCondition()));
+					this.addFeatureCondition(FeatureCondition.create(((IfFeature) sub).getCondition()).toString());
 				} else if (sub instanceof Config) {
 					if (!"true".equals(((Config) sub).getIsConfig())) {
 						this.accessKind = AccessKind.ro;
@@ -170,7 +176,42 @@ public class ProcessedDataTree {
 			});
 		}
 
+		private ValueType createValueType(Type typeStatement) {
+			var typeRef = typeStatement.getTypeRef();
+			if (typeRef.getBuiltin() != null) {
+				if ("leafref".equals(typeRef.getBuiltin())) {
+					Path pathRef = (Path) typeStatement.getSubstatements().stream().filter(s -> s instanceof Path)
+							.findFirst().get();
+					if (pathRef != null && pathRef.getReference() != null) {
+						return new ValueType(null, "-> " + serializedXpath(pathRef.getReference()));
+					}
+				}
+				return new ValueType(null, typeRef.getBuiltin());
+			}
+
+			Typedef typedef = typeRef.getType();
+			// FIXME use import statement prefix
+			var typeModule = ProcessorUtility.moduleIdentifier(typedef);
+			String prefix = Objects.equal(typeModule.name, ProcessorUtility.moduleIdentifier(typeRef).name) ? null
+					: typeModule.prefix;
+			return new ValueType(prefix, typedef.getName());
+		}
+
+		private String serializedXpath(XpathExpression reference) {
+			// TODO use serializer or implement a an own simple one
+			ICompositeNode nodeFor = NodeModelUtils.findActualNodeFor(reference);
+			if (nodeFor != null) {
+				var nodeText = nodeFor.getText();
+				nodeText = nodeText.replaceAll("\"|'|\s|\n|\r", "").replaceAll("\\+", "");
+				return nodeText;
+			}
+			return "leafref";
+		}
+
 		private void addFeatureCondition(String condition) {
+			if (condition == null) {
+				throw new IllegalArgumentException("Feature condition may not be null");
+			}
 			if (featureConditions == null)
 				featureConditions = newArrayList();
 			featureConditions.add(condition);
@@ -195,6 +236,15 @@ public class ProcessedDataTree {
 			if (child instanceof ElementData)
 				((ElementData) child).parent = this;
 		}
+
+		public static ElementData createNamedWrapper(String name, ElementKind elementKind) {
+			return new ElementData(name, elementKind);
+		}
+
+		public List<String> getFeatureConditions() {
+			return featureConditions;
+		}
+
 	}
 
 	public static class ListData extends ElementData {
@@ -228,13 +278,6 @@ public class ProcessedDataTree {
 				}
 			}
 		}
-	}
-
-	public static String createFeatureCondition(Expression condition) {
-		if (condition instanceof FeatureReference) {
-			return ((FeatureReference) condition).getFeature().getName();
-		}
-		return null;
 	}
 
 }

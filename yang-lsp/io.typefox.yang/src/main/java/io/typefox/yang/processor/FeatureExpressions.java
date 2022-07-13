@@ -1,5 +1,6 @@
 package io.typefox.yang.processor;
 
+import io.typefox.yang.processor.ProcessorUtility.ModuleIdentifier;
 import io.typefox.yang.yang.BinaryOperation;
 import io.typefox.yang.yang.Expression;
 import io.typefox.yang.yang.Feature;
@@ -12,15 +13,17 @@ public class FeatureExpressions {
 
 		abstract boolean evaluate(FeatureEvaluationContext ctx);
 
-		static FeatureCondition create(Expression exp) {
+		public static FeatureCondition create(Expression exp) {
 			return build(exp);
 		}
 
 		private static FeatureCondition build(Expression exp) {
 			if (exp instanceof FeatureReference) {
-				return new IsFeatureCondition(((FeatureReference) exp).getFeature());
+				return new IsFeatureCondition(((FeatureReference) exp).getFeature(),
+						ProcessorUtility.moduleIdentifier(exp));
 			} else if (exp instanceof UnaryOperation) {
-				return new IsFeatureCondition(((FeatureReference) exp).getFeature(), true);
+				return new IsFeatureCondition(((FeatureReference) exp).getFeature(), true,
+						ProcessorUtility.moduleIdentifier(exp));
 			} else if (exp instanceof BinaryOperation) {
 				BinaryOperation bin = (BinaryOperation) exp;
 				return new BinaryFeatureCondition(build(bin.getLeft()), build(bin.getRight()),
@@ -34,15 +37,16 @@ public class FeatureExpressions {
 
 		final private Feature feature;
 		final private boolean not;
+		final private ModuleIdentifier conditionModule;
 
-		public IsFeatureCondition(Feature feature) {
-			this(feature, false);
+		public IsFeatureCondition(Feature feature, ModuleIdentifier conditionModule) {
+			this(feature, false, conditionModule);
 		}
 
-		public IsFeatureCondition(Feature feature, boolean not) {
+		public IsFeatureCondition(Feature feature, boolean not, ModuleIdentifier conditionModule) {
 			this.feature = feature;
+			this.conditionModule = conditionModule;
 			this.not = not;
-
 		}
 
 		@Override
@@ -50,9 +54,16 @@ public class FeatureExpressions {
 			return not ? !ctx.isActive(feature) : ctx.isActive(feature);
 		}
 
+		private String toStringValue = null;
+
 		@Override
 		public String toString() {
-			return (not ? "!" : "") + feature.getName();
+			if (toStringValue == null) {
+				ModuleIdentifier featureModule = ProcessorUtility.moduleIdentifier(feature);
+				String prefix = conditionModule.name.equals(featureModule.name) ? "" : featureModule.prefix + ":";
+				toStringValue = (not ? "!" : "") + prefix + feature.getName();
+			}
+			return toStringValue;
 		}
 	}
 
@@ -90,7 +101,7 @@ public class FeatureExpressions {
 
 		@Override
 		public String toString() {
-			return left.toString() + (isAnd ? " && " : " || ") + right.toString();
+			return left.toString() + (isAnd ? " and " : " or ") + right.toString();
 		}
 	}
 }
