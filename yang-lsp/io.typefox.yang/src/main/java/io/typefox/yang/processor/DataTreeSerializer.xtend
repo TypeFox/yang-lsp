@@ -54,7 +54,7 @@ class DataTreeSerializer {
 		val type = ele.getType
 		
 		'''
-			«indent»+«prefix»«label»«ele.cardinality?.toString()»«keys»«IF type !== null»   «type»«ENDIF»«IF ele.featureCondition !== null» {«ele.featureCondition»}?«ENDIF»
+			«indent»+«prefix»«label»«ele.cardinality?.toString()»«keys»«IF type !== null»   «type»«ENDIF»«IF ele.featureConditions !== null» {«ele.featureConditions.join(', ')»}?«ENDIF»
 			«IF ele.children !== null»
 				«FOR child : ele.children»
 					«doSerialize(child, indent + (needsConnect?'|  ':'   '), needsConnect(child, ele.children))»

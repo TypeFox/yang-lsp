@@ -4,48 +4,28 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.List;
 
-import org.eclipse.emf.common.notify.Adapter;
-import org.eclipse.emf.common.notify.impl.AdapterImpl;
-import org.eclipse.emf.ecore.EObject;
-
 import com.google.common.base.Objects;
 
 import io.typefox.yang.yang.AbstractModule;
-import io.typefox.yang.yang.Action;
-import io.typefox.yang.yang.Case;
-import io.typefox.yang.yang.Choice;
 import io.typefox.yang.yang.Config;
-import io.typefox.yang.yang.Container;
-import io.typefox.yang.yang.DataSchemaNode;
 import io.typefox.yang.yang.Expression;
 import io.typefox.yang.yang.FeatureReference;
-import io.typefox.yang.yang.Grouping;
-import io.typefox.yang.yang.GroupingRef;
 import io.typefox.yang.yang.IfFeature;
-import io.typefox.yang.yang.Input;
 import io.typefox.yang.yang.Key;
-import io.typefox.yang.yang.Leaf;
-import io.typefox.yang.yang.LeafList;
 import io.typefox.yang.yang.Mandatory;
-import io.typefox.yang.yang.Notification;
-import io.typefox.yang.yang.Output;
 import io.typefox.yang.yang.Presence;
-import io.typefox.yang.yang.Refine;
-import io.typefox.yang.yang.Rpc;
 import io.typefox.yang.yang.SchemaNode;
-import io.typefox.yang.yang.Statement;
 import io.typefox.yang.yang.Type;
 import io.typefox.yang.yang.Typedef;
-import io.typefox.yang.yang.Uses;
 
 public class ProcessedDataTree {
 
-	List<ModuleData> modules;
+	private List<ModuleData> modules;
 
-	public void addModule(AbstractModule module) {
+	public void addModule(ModuleData moduleData) {
 		if (modules == null)
 			modules = newArrayList();
-		modules.add(new ModuleData(module));
+		modules.add(moduleData);
 	}
 
 	public List<ModuleData> getModules() {
@@ -79,7 +59,6 @@ public class ProcessedDataTree {
 
 		public ModuleData(AbstractModule ele) {
 			this.name = ele.getName();
-			processChildren(ele, this);
 		}
 
 		public void addToRpcs(ElementData rpc) {
@@ -137,13 +116,17 @@ public class ProcessedDataTree {
 
 		ElementKind elementKind = ElementKind.Leaf;
 		ValueType type;
-		String featureCondition;
+		List<String> featureConditions;
 		AccessKind accessKind;
 		Cardinality cardinality;
 
 		public ElementData(SchemaNode ele, ElementKind elementKind) {
-			this.name = qualifiedName(ele);
+			this.name = ProcessorUtility.qualifiedName(ele);
 			this.elementKind = elementKind;
+			configureElement(ele);
+		}
+
+		protected void configureElement(SchemaNode ele) {
 			if (elementKind == ElementKind.Input) {
 				this.name = "input";
 				this.accessKind = AccessKind.w;
@@ -174,7 +157,7 @@ public class ProcessedDataTree {
 						this.type = new ValueType(prefix, typedef.getName());
 					}
 				} else if (sub instanceof IfFeature) {
-					this.featureCondition = createFeatureCondition(((IfFeature) sub).getCondition());
+					this.addFeatureCondition(createFeatureCondition(((IfFeature) sub).getCondition()));
 				} else if (sub instanceof Config) {
 					if (!"true".equals(((Config) sub).getIsConfig())) {
 						this.accessKind = AccessKind.ro;
@@ -185,6 +168,12 @@ public class ProcessedDataTree {
 					this.cardinality = Cardinality.presence;
 				}
 			});
+		}
+
+		private void addFeatureCondition(String condition) {
+			if (featureConditions == null)
+				featureConditions = newArrayList();
+			featureConditions.add(condition);
 		}
 
 		public ValueType getType() {
@@ -241,53 +230,6 @@ public class ProcessedDataTree {
 		}
 	}
 
-	private static void processChildren(Statement statement, HasStatements parent) {
-		statement.getSubstatements().stream().forEach(ele -> {
-			HasStatements child = null;
-			if (ele instanceof Container) {
-				child = new ElementData((Container) ele, ElementKind.Container);
-			} else if (ele instanceof Leaf) {
-				child = new ElementData((DataSchemaNode) ele, ElementKind.Leaf);
-			} else if (ele instanceof LeafList) {
-				child = new ElementData((DataSchemaNode) ele, ElementKind.LeafList);
-			} else if (ele instanceof io.typefox.yang.yang.List) {
-				child = new ListData((io.typefox.yang.yang.List) ele, ElementKind.List);
-			} else if (ele instanceof Choice) {
-				child = new ElementData((SchemaNode) ele, ElementKind.Choice);
-			} else if (ele instanceof Case) {
-				child = new ElementData((SchemaNode) ele, ElementKind.Case);
-			} else if (ele instanceof Action) {
-				child = new ElementData((SchemaNode) ele, ElementKind.Action);
-			} else if (ele instanceof Grouping) {
-				child = new ElementData((SchemaNode) ele, ElementKind.Grouping);
-			} else if (ele instanceof Uses) {
-				GroupingRef groupingRef = ((Uses) ele).getGrouping();
-				ForeignModuleAdapter adapted = ForeignModuleAdapter.find(ele);
-				Grouping grouping = groupingRef.getNode();
-				if (adapted != null) {
-					grouping.eAdapters().add(new ForeignModuleAdapter(adapted.modulePrefix));
-				}
-				processChildren(grouping, parent);
-			} else if (ele instanceof Refine) {
-				child = new ElementData((SchemaNode) ele, ElementKind.Refine);
-			} else if (ele instanceof Input) {
-				child = new ElementData((SchemaNode) ele, ElementKind.Input);
-			} else if (ele instanceof Output) {
-				child = new ElementData((SchemaNode) ele, ElementKind.Output);
-			} else if (ele instanceof Notification) {
-				child = new ElementData((SchemaNode) ele, ElementKind.Notification);
-			} else if (ele instanceof Rpc) {
-				var rpc = new ElementData((Rpc) ele, ElementKind.Rpc);
-				((ModuleData) parent).addToRpcs(rpc);
-				processChildren(ele, rpc);
-			}
-			if (child != null) {
-				parent.addToChildren(child);
-				processChildren(ele, child);
-			}
-		});
-	}
-
 	public static String createFeatureCondition(Expression condition) {
 		if (condition instanceof FeatureReference) {
 			return ((FeatureReference) condition).getFeature().getName();
@@ -295,31 +237,4 @@ public class ProcessedDataTree {
 		return null;
 	}
 
-	private static String qualifiedName(SchemaNode node) {
-		ForeignModuleAdapter foreignAdapter = ForeignModuleAdapter.find(node);
-		if (foreignAdapter != null) {
-			return foreignAdapter.modulePrefix + ":" + node.getName();
-		}
-		return node.getName();
-	}
-
-	public static class ForeignModuleAdapter extends AdapterImpl {
-		final String modulePrefix;
-
-		public ForeignModuleAdapter(String modulePrefix) {
-			this.modulePrefix = modulePrefix;
-		}
-
-		public static ForeignModuleAdapter find(EObject eObject) {
-			for (Adapter adapter : eObject.eAdapters()) {
-				if (adapter instanceof ForeignModuleAdapter) {
-					return (ForeignModuleAdapter) adapter;
-				}
-			}
-			if (eObject.eContainer() != null) {
-				return find(eObject.eContainer());
-			}
-			return null;
-		}
-	}
 }

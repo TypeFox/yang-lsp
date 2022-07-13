@@ -78,7 +78,9 @@
               "children": [
                 {
                   "elementKind": "Case",
-                  "featureCondition": "timezone-name",
+                  "featureConditions": [
+                    "timezone-name"
+                  ],
                   "cardinality": "mandatory",
                   "name": "timezone-name",
                   "children": [
@@ -113,7 +115,9 @@
         },
         {
           "elementKind": "Container",
-          "featureCondition": "ntp",
+          "featureConditions": [
+            "ntp"
+          ],
           "cardinality": "presence",
           "name": "ntp",
           "children": [
@@ -171,7 +175,9 @@
                                 "prefix": "inet",
                                 "name": "port-number"
                               },
-                              "featureCondition": "ntp-udp-port",
+                              "featureConditions": [
+                                "ntp-udp-port"
+                              ],
                               "cardinality": "optional",
                               "name": "port"
                             }
@@ -269,7 +275,9 @@
                                 "prefix": "inet",
                                 "name": "port-number"
                               },
-                              "featureCondition": "dns-udp-tcp-port",
+                              "featureConditions": [
+                                "dns-udp-tcp-port"
+                              ],
                               "cardinality": "optional",
                               "name": "port"
                             }
@@ -308,7 +316,9 @@
         },
         {
           "elementKind": "Container",
-          "featureCondition": "radius",
+          "featureConditions": [
+            "radius"
+          ],
           "cardinality": "not_set",
           "name": "radius",
           "children": [
@@ -412,7 +422,9 @@
         },
         {
           "elementKind": "Container",
-          "featureCondition": "authentication",
+          "featureConditions": [
+            "authentication"
+          ],
           "cardinality": "not_set",
           "name": "authentication",
           "children": [
@@ -429,7 +441,9 @@
                 "name"
               ],
               "elementKind": "List",
-              "featureCondition": "local-users",
+              "featureConditions": [
+                "local-users"
+              ],
               "cardinality": "many",
               "name": "user",
               "children": [

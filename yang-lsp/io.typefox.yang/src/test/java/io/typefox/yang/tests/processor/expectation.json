@@ -33,7 +33,6 @@
   "children": [
     {
       "elementKind": "Container",
-      "featureCondition": "ldap-authentication",
       "cardinality": "not_set",
       "name": "system",
       "children": [
@@ -74,7 +73,9 @@
               "children": [
                 {
                   "elementKind": "Case",
-                  "featureCondition": "timezone-name",
+                  "featureConditions": [
+                    "timezone-name"
+                  ],
                   "cardinality": "mandatory",
                   "name": "timezone-name",
                   "children": [
@@ -109,7 +110,9 @@
         },
         {
           "elementKind": "Container",
-          "featureCondition": "ntp",
+          "featureConditions": [
+            "ntp"
+          ],
           "cardinality": "presence",
           "name": "ntp",
           "children": [
@@ -126,7 +129,6 @@
                 "name"
               ],
               "elementKind": "List",
-              "featureCondition": "ntp-security",
               "cardinality": "many",
               "name": "server",
               "children": [
@@ -168,7 +170,9 @@
                                 "prefix": "inet",
                                 "name": "port-number"
                               },
-                              "featureCondition": "ntp-udp-port",
+                              "featureConditions": [
+                                "ntp-udp-port"
+                              ],
                               "cardinality": "optional",
                               "name": "port"
                             }
@@ -308,7 +312,9 @@
                                 "prefix": "inet",
                                 "name": "port-number"
                               },
-                              "featureCondition": "dns-udp-tcp-port",
+                              "featureConditions": [
+                                "dns-udp-tcp-port"
+                              ],
                               "cardinality": "optional",
                               "name": "port"
                             }
@@ -347,7 +353,9 @@
         },
         {
           "elementKind": "Container",
-          "featureCondition": "radius",
+          "featureConditions": [
+            "radius"
+          ],
           "cardinality": "not_set",
           "name": "radius",
           "children": [
@@ -451,7 +459,9 @@
         },
         {
           "elementKind": "Container",
-          "featureCondition": "oauth2-client-authentication",
+          "featureConditions": [
+            "authentication"
+          ],
           "cardinality": "not_set",
           "name": "authentication",
           "children": [
@@ -468,6 +478,9 @@
                 "name"
               ],
               "elementKind": "List",
+              "featureConditions": [
+                "local-users"
+              ],
               "cardinality": "many",
               "name": "user",
               "children": [
@@ -591,7 +604,9 @@
               "type": {
                 "name": "string"
               },
-              "featureCondition": "local-target-classes",
+              "featureConditions": [
+                "local-target-classes"
+              ],
               "cardinality": "many",
               "name": "sysxext:target-types"
             },
@@ -1080,7 +1095,9 @@
                       "type": {
                         "name": "uint32"
                       },
-                      "featureCondition": "authentication-failure-alarm",
+                      "featureConditions": [
+                        "authentication-failure-alarm"
+                      ],
                       "cardinality": "optional",
                       "name": "sysxext:failure-count-interval"
                     },
@@ -1089,13 +1106,17 @@
                       "type": {
                         "name": "uint32"
                       },
-                      "featureCondition": "authentication-failure-alarm",
+                      "featureConditions": [
+                        "authentication-failure-alarm"
+                      ],
                       "cardinality": "optional",
                       "name": "sysxext:max-failure"
                     },
                     {
                       "elementKind": "Action",
-                      "featureCondition": "authentication-failure-alarm",
+                      "featureConditions": [
+                        "authentication-failure-alarm"
+                      ],
                       "cardinality": "optional",
                       "name": "sysxext:clear-authentication-failure-alarm"
                     },
@@ -1164,7 +1185,9 @@
                               "children": [
                                 {
                                   "elementKind": "Case",
-                                  "featureCondition": "local-definitions-supported",
+                                  "featureConditions": [
+                                    "local-definitions-supported"
+                                  ],
                                   "cardinality": "mandatory",
                                   "name": "sysxext:local",
                                   "children": [
@@ -1222,7 +1245,10 @@
                                 },
                                 {
                                   "elementKind": "Case",
-                                  "featureCondition": "raw-public-keys",
+                                  "featureConditions": [
+                                    "truststore-supported",
+                                    "raw-public-keys"
+                                  ],
                                   "cardinality": "mandatory",
                                   "name": "sysxext:truststore",
                                   "children": [
@@ -1266,7 +1292,9 @@
         },
         {
           "elementKind": "Container",
-          "featureCondition": "ldap-authentication",
+          "featureConditions": [
+            "ldap-authentication"
+          ],
           "cardinality": "presence",
           "name": "sysxext:ldap",
           "children": [
@@ -1383,7 +1411,9 @@
                   "children": [
                     {
                       "elementKind": "Case",
-                      "featureCondition": "ldap-clear",
+                      "featureConditions": [
+                        "ldap-clear"
+                      ],
                       "cardinality": "mandatory",
                       "name": "sysxext:clear",
                       "children": [
@@ -1419,7 +1449,9 @@
                                   "children": [
                                     {
                                       "elementKind": "Container",
-                                      "featureCondition": "x509-certificate-auth",
+                                      "featureConditions": [
+                                        "x509-certificate-auth"
+                                      ],
                                       "cardinality": "not_set",
                                       "name": "sysxext:certificate",
                                       "children": [
@@ -1430,7 +1462,9 @@
                                           "children": [
                                             {
                                               "elementKind": "Case",
-                                              "featureCondition": "local-definitions-supported",
+                                              "featureConditions": [
+                                                "local-definitions-supported"
+                                              ],
                                               "cardinality": "mandatory",
                                               "name": "sysxext:local",
                                               "children": [
@@ -1508,7 +1542,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:symmetric-key-ref"
                                                                 },
@@ -1517,7 +1553,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:asymmetric-key-ref"
                                                                 }
@@ -1548,7 +1586,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:symmetric-key-ref"
                                                                 },
@@ -1557,7 +1597,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:asymmetric-key-ref"
                                                                 }
@@ -1588,7 +1630,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:symmetric-key-ref"
                                                                 },
@@ -1597,7 +1641,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:asymmetric-key-ref"
                                                                 }
@@ -1690,7 +1736,9 @@
                                             },
                                             {
                                               "elementKind": "Case",
-                                              "featureCondition": "keystore-supported",
+                                              "featureConditions": [
+                                                "keystore-supported"
+                                              ],
                                               "cardinality": "mandatory",
                                               "name": "sysxext:keystore",
                                               "children": [
@@ -1725,7 +1773,9 @@
                                     },
                                     {
                                       "elementKind": "Container",
-                                      "featureCondition": "raw-public-key-auth",
+                                      "featureConditions": [
+                                        "raw-public-key-auth"
+                                      ],
                                       "cardinality": "not_set",
                                       "name": "sysxext:raw-public-key",
                                       "children": [
@@ -1736,7 +1786,9 @@
                                           "children": [
                                             {
                                               "elementKind": "Case",
-                                              "featureCondition": "local-definitions-supported",
+                                              "featureConditions": [
+                                                "local-definitions-supported"
+                                              ],
                                               "cardinality": "mandatory",
                                               "name": "sysxext:local",
                                               "children": [
@@ -1814,7 +1866,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:symmetric-key-ref"
                                                                 },
@@ -1823,7 +1877,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:asymmetric-key-ref"
                                                                 }
@@ -1854,7 +1910,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:symmetric-key-ref"
                                                                 },
@@ -1863,7 +1921,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:asymmetric-key-ref"
                                                                 }
@@ -1894,7 +1954,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:symmetric-key-ref"
                                                                 },
@@ -1903,7 +1965,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:asymmetric-key-ref"
                                                                 }
@@ -1927,7 +1991,9 @@
                                             },
                                             {
                                               "elementKind": "Case",
-                                              "featureCondition": "keystore-supported",
+                                              "featureConditions": [
+                                                "keystore-supported"
+                                              ],
                                               "cardinality": "mandatory",
                                               "name": "sysxext:keystore",
                                               "children": [
@@ -1947,7 +2013,9 @@
                                     },
                                     {
                                       "elementKind": "Container",
-                                      "featureCondition": "psk-auth",
+                                      "featureConditions": [
+                                        "psk-auth"
+                                      ],
                                       "cardinality": "not_set",
                                       "name": "sysxext:psk",
                                       "children": [
@@ -1958,7 +2026,9 @@
                                           "children": [
                                             {
                                               "elementKind": "Case",
-                                              "featureCondition": "local-definitions-supported",
+                                              "featureConditions": [
+                                                "local-definitions-supported"
+                                              ],
                                               "cardinality": "mandatory",
                                               "name": "sysxext:local",
                                               "children": [
@@ -2020,7 +2090,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:symmetric-key-ref"
                                                                 },
@@ -2029,7 +2101,9 @@
                                                                   "type": {
                                                                     "name": "leafref"
                                                                   },
-                                                                  "featureCondition": "keystore-supported",
+                                                                  "featureConditions": [
+                                                                    "keystore-supported"
+                                                                  ],
                                                                   "cardinality": "optional",
                                                                   "name": "ks:asymmetric-key-ref"
                                                                 }
@@ -2053,7 +2127,9 @@
                                             },
                                             {
                                               "elementKind": "Case",
-                                              "featureCondition": "keystore-supported",
+                                              "featureConditions": [
+                                                "keystore-supported"
+                                              ],
                                               "cardinality": "mandatory",
                                               "name": "sysxext:keystore",
                                               "children": [
@@ -2082,7 +2158,9 @@
                               "children": [
                                 {
                                   "elementKind": "Container",
-                                  "featureCondition": "x509-certificate-auth",
+                                  "featureConditions": [
+                                    "x509-certificate-auth"
+                                  ],
                                   "cardinality": "presence",
                                   "name": "sysxext:ca-certs",
                                   "children": [
@@ -2093,7 +2171,9 @@
                                       "children": [
                                         {
                                           "elementKind": "Case",
-                                          "featureCondition": "local-definitions-supported",
+                                          "featureConditions": [
+                                            "local-definitions-supported"
+                                          ],
                                           "cardinality": "mandatory",
                                           "name": "sysxext:local",
                                           "children": [
@@ -2132,7 +2212,10 @@
                                         },
                                         {
                                           "elementKind": "Case",
-                                          "featureCondition": "x509-certificates",
+                                          "featureConditions": [
+                                            "truststore-supported",
+                                            "x509-certificates"
+                                          ],
                                           "cardinality": "mandatory",
                                           "name": "sysxext:truststore",
                                           "children": [
@@ -2152,7 +2235,9 @@
                                 },
                                 {
                                   "elementKind": "Container",
-                                  "featureCondition": "x509-certificate-auth",
+                                  "featureConditions": [
+                                    "x509-certificate-auth"
+                                  ],
                                   "cardinality": "presence",
                                   "name": "sysxext:server-certs",
                                   "children": [
@@ -2163,7 +2248,9 @@
                                       "children": [
                                         {
                                           "elementKind": "Case",
-                                          "featureCondition": "local-definitions-supported",
+                                          "featureConditions": [
+                                            "local-definitions-supported"
+                                          ],
                                           "cardinality": "mandatory",
                                           "name": "sysxext:local",
                                           "children": [
@@ -2202,7 +2289,10 @@
                                         },
                                         {
                                           "elementKind": "Case",
-                                          "featureCondition": "x509-certificates",
+                                          "featureConditions": [
+                                            "truststore-supported",
+                                            "x509-certificates"
+                                          ],
                                           "cardinality": "mandatory",
                                           "name": "sysxext:truststore",
                                           "children": [
@@ -2222,7 +2312,9 @@
                                 },
                                 {
                                   "elementKind": "Container",
-                                  "featureCondition": "raw-public-key-auth",
+                                  "featureConditions": [
+                                    "raw-public-key-auth"
+                                  ],
                                   "cardinality": "presence",
                                   "name": "sysxext:raw-public-keys",
                                   "children": [
@@ -2233,7 +2325,9 @@
                                       "children": [
                                         {
                                           "elementKind": "Case",
-                                          "featureCondition": "local-definitions-supported",
+                                          "featureConditions": [
+                                            "local-definitions-supported"
+                                          ],
                                           "cardinality": "mandatory",
                                           "name": "sysxext:local",
                                           "children": [
@@ -2291,7 +2385,10 @@
                                         },
                                         {
                                           "elementKind": "Case",
-                                          "featureCondition": "raw-public-keys",
+                                          "featureConditions": [
+                                            "truststore-supported",
+                                            "raw-public-keys"
+                                          ],
                                           "cardinality": "mandatory",
                                           "name": "sysxext:truststore",
                                           "children": [
@@ -2311,7 +2408,9 @@
                                 },
                                 {
                                   "elementKind": "Container",
-                                  "featureCondition": "psk-auth",
+                                  "featureConditions": [
+                                    "psk-auth"
+                                  ],
                                   "cardinality": "presence",
                                   "name": "sysxext:psks"
                                 }
@@ -2319,7 +2418,9 @@
                             },
                             {
                               "elementKind": "Container",
-                              "featureCondition": "tls-client-hello-params-config",
+                              "featureConditions": [
+                                "tls-client-hello-params-config"
+                              ],
                               "cardinality": "not_set",
                               "name": "sysxext:hello-params",
                               "children": [
@@ -2357,7 +2458,9 @@
                             },
                             {
                               "elementKind": "Container",
-                              "featureCondition": "tls-client-keepalives",
+                              "featureConditions": [
+                                "tls-client-keepalives"
+                              ],
                               "cardinality": "presence",
                               "name": "sysxext:keepalives",
                               "children": [
@@ -2461,7 +2564,9 @@
                     },
                     {
                       "elementKind": "Case",
-                      "featureCondition": "ldap-sasl-external",
+                      "featureConditions": [
+                        "ldap-sasl-external"
+                      ],
                       "cardinality": "mandatory",
                       "name": "sysxext:sasl-external",
                       "children": [
@@ -2521,7 +2626,9 @@
                       "children": [
                         {
                           "elementKind": "Case",
-                          "featureCondition": "ldap-custom-filter",
+                          "featureConditions": [
+                            "ldap-custom-filter"
+                          ],
                           "cardinality": "mandatory",
                           "name": "sysxext:custom",
                           "children": [
@@ -2552,7 +2659,9 @@
                         },
                         {
                           "elementKind": "Case",
-                          "featureCondition": "ldap-posix-filter",
+                          "featureConditions": [
+                            "ldap-posix-filter"
+                          ],
                           "cardinality": "mandatory",
                           "name": "sysxext:posix",
                           "children": [
@@ -2708,7 +2817,9 @@
         },
         {
           "elementKind": "Container",
-          "featureCondition": "authentication",
+          "featureConditions": [
+            "authentication"
+          ],
           "cardinality": "not_set",
           "name": "sysxext:authentication",
           "children": [
@@ -2717,7 +2828,9 @@
                 "name"
               ],
               "elementKind": "List",
-              "featureCondition": "local-users",
+              "featureConditions": [
+                "local-users"
+              ],
               "cardinality": "many",
               "name": "sysxext:user",
               "children": [
@@ -2802,7 +2915,9 @@
             },
             {
               "elementKind": "Container",
-              "featureCondition": "local-users",
+              "featureConditions": [
+                "local-users"
+              ],
               "cardinality": "not_set",
               "name": "sysxext:admin-user",
               "children": [
