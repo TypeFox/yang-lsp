@@ -58,6 +58,14 @@ public class ProcessedDataTree {
 		public String getName() {
 			return name;
 		}
+
+		public String getSimpleName() {
+			if (name == null) {
+				return null;
+			}
+			var segments = name.split(":");
+			return segments[segments.length - 1];
+		}
 	}
 
 	public static class ModuleData extends Named {
@@ -121,14 +129,13 @@ public class ProcessedDataTree {
 
 	public static class ElementData extends Named {
 
-		transient private ElementData parent;
-
 		final ElementKind elementKind;
 		ValueType type;
 		private List<String> featureConditions;
-		AccessKind accessKind;
+		private AccessKind accessKind = AccessKind.not_set;
 		Cardinality cardinality;
 
+		transient private SchemaNode origin;
 
 		private ElementData(String name, ElementKind elementKind) {
 			this.name = name;
@@ -137,14 +144,32 @@ public class ProcessedDataTree {
 
 		public ElementData(SchemaNode ele, ElementKind elementKind) {
 			this(ProcessorUtility.qualifiedName(ele), elementKind);
+			this.origin = ele;
 			configureElement(ele);
 		}
 
+		public SchemaNode getOrigin() {
+			return origin;
+		}
+
+		public AccessKind getAccessKind() {
+			return accessKind;
+		}
+
 		protected void configureElement(SchemaNode ele) {
+
+			this.accessKind = AccessKind.rw;
+			this.cardinality = Cardinality.optional;
+
 			if (elementKind == ElementKind.Input) {
 				this.name = "input";
 				this.accessKind = AccessKind.w;
-			} else if (elementKind == ElementKind.Rpc) {
+				this.cardinality = Cardinality.mandatory;
+			} else if (elementKind == ElementKind.Output) {
+				this.name = "output";
+				this.accessKind = AccessKind.ro;
+				this.cardinality = Cardinality.mandatory;
+			} else if (elementKind == ElementKind.Rpc || elementKind == ElementKind.Action) {
 				this.accessKind = AccessKind.x;
 			} else if (elementKind == ElementKind.Notification) {
 				this.accessKind = AccessKind.n;
@@ -156,8 +181,6 @@ public class ProcessedDataTree {
 				this.cardinality = Cardinality.many;
 			} else if (elementKind == ElementKind.Container) {
 				this.cardinality = Cardinality.not_set;
-			} else {
-				this.cardinality = Cardinality.optional;
 			}
 			ele.getSubstatements().stream().forEach((sub) -> {
 				if (sub instanceof Type) {
@@ -221,20 +244,20 @@ public class ProcessedDataTree {
 			return type;
 		}
 
-		public AccessKind getAccessKind() {
-			if (accessKind != null)
-				return accessKind;
-			else if (parent != null)
-				return parent.getAccessKind();
-			else
-				return AccessKind.not_set;
-		}
-
 		@Override
 		public void addToChildren(HasStatements child) {
 			super.addToChildren(child);
-			if (child instanceof ElementData)
-				((ElementData) child).parent = this;
+			if (child instanceof ElementData) {
+				ElementData elementData = (ElementData) child;
+				// default not set
+				if (elementData.accessKind == AccessKind.rw) {
+					if (accessKind == AccessKind.ro || accessKind == AccessKind.w) {
+						elementData.accessKind = accessKind;
+					} else if (elementKind == ElementKind.Notification) {
+						elementData.accessKind = AccessKind.not_set;
+					}
+				}
+			}
 		}
 
 		public static ElementData createNamedWrapper(String name, ElementKind elementKind) {
@@ -273,7 +296,7 @@ public class ProcessedDataTree {
 			super.addToChildren(child);
 			if (child instanceof ElementData) {
 				ElementData elementData = (ElementData) child;
-				if (getKeys().contains(elementData.getName())) {
+				if (getKeys().contains(elementData.getSimpleName())) {
 					elementData.cardinality = Cardinality.mandatory;
 				}
 			}

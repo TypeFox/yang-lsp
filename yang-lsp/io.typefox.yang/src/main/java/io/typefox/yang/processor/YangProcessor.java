@@ -2,13 +2,17 @@ package io.typefox.yang.processor;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
+import org.eclipse.xtext.nodemodel.impl.CompositeNodeWithSemanticElement;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
 import com.google.gson.GsonBuilder;
 
@@ -104,9 +108,9 @@ public class YangProcessor {
 						.forEach((subStatement) -> {
 							// TODO check what can be added
 							if (subStatement instanceof SchemaNode) {
-								SchemaNode copy = EcoreUtil.copy((SchemaNode) subStatement);
+								SchemaNode copy = copyEObject((SchemaNode) subStatement);
 								// add augment's feature conditions to copied augment children
-								copy.getSubstatements().addAll(EcoreUtil.copyAll(ifFeatures));
+								copy.getSubstatements().addAll(copyAllEObjects(ifFeatures));
 
 								// memorize source module information as adapter
 								copy.eAdapters().add(new ForeignModuleAdapter(globalModuleId));
@@ -134,6 +138,30 @@ public class YangProcessor {
 			processChildren(module, moduleData, evalCtx);
 		});
 		return processedDataTree;
+	}
+
+	private <T extends EObject> T copyEObject(T eObj) {
+		return copyAllEObjects(Arrays.asList(eObj)).iterator().next();
+	}
+
+	private <T> Collection<T> copyAllEObjects(Collection<? extends T> eObjects) {
+		Copier copier = new Copier() {
+			private static final long serialVersionUID = 4555795110183792853L;
+
+			@Override
+			protected EObject createCopy(EObject eObject) {
+				EObject createCopy = super.createCopy(eObject);
+				var node = NodeModelUtils.getNode(eObject);
+				if (node instanceof CompositeNodeWithSemanticElement) {
+					// store text information. e.g. to serialize XPath
+					createCopy.eAdapters().add((CompositeNodeWithSemanticElement) node);
+				}
+				return createCopy;
+			}
+		};
+		Collection<T> result = copier.copyAll(eObjects);
+		copier.copyReferences();
+		return result;
 	}
 
 	private void processChildren(Statement statement, Named parent, FeatureEvaluationContext evalCtx) {

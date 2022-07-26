@@ -43,7 +43,7 @@ public class YangProcessorTest extends AbstractYangTest {
 			br.transferTo(writer);
 			expectation = writer.getBuffer().toString();
 		}
-		assertEquals(expectation, new DataTreeSerializer().serialize(sysModule.get()).toString());
+		assertEqualsReduceSpace(expectation, new DataTreeSerializer().serialize(sysModule.get()).toString());
 
 	}
 
@@ -62,7 +62,7 @@ public class YangProcessorTest extends AbstractYangTest {
 			br.transferTo(writer);
 			expectation = writer.getBuffer().toString();
 		}
-		assertEquals(expectation, new DataTreeSerializer().serialize(sysModule.get()).toString());
+		assertEqualsReduceSpace(expectation, new DataTreeSerializer().serialize(sysModule.get()).toString());
 
 	}
 
@@ -83,7 +83,7 @@ public class YangProcessorTest extends AbstractYangTest {
 			br.transferTo(writer);
 			expectation = writer.getBuffer().toString();
 		}
-		assertEquals(expectation, new DataTreeSerializer().serialize(sysModule.get()).toString());
+		assertEqualsReduceSpace(expectation, new DataTreeSerializer().serialize(sysModule.get()).toString());
 
 	}
 
@@ -104,7 +104,7 @@ public class YangProcessorTest extends AbstractYangTest {
 			br.transferTo(writer);
 			expectation = writer.getBuffer().toString();
 		}
-		assertEquals(expectation, new DataTreeSerializer().serialize(sysModule.get()).toString());
+		assertEqualsReduceSpace(expectation, new DataTreeSerializer().serialize(sysModule.get()).toString());
 
 	}
 
@@ -182,4 +182,15 @@ public class YangProcessorTest extends AbstractYangTest {
 		return sysModule;
 
 	}
+
+	private void assertEqualsReduceSpace(String expectation, String actual) {
+		if(expectation != null) {
+			expectation = expectation.replaceAll(" {4,}", "   ");
+		}
+		if(actual != null) {
+			actual = actual.replaceAll(" {4,}", "   ");
+		}
+		assertEquals(expectation, actual);
+	}
+
 }

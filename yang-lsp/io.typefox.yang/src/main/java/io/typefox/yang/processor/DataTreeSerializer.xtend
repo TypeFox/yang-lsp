@@ -3,9 +3,9 @@ package io.typefox.yang.processor
 import io.typefox.yang.processor.ProcessedDataTree.AccessKind
 import io.typefox.yang.processor.ProcessedDataTree.ElementData
 import io.typefox.yang.processor.ProcessedDataTree.HasStatements
+import io.typefox.yang.processor.ProcessedDataTree.ListData
 import io.typefox.yang.processor.ProcessedDataTree.ModuleData
 import java.util.List
-import io.typefox.yang.processor.ProcessedDataTree.ListData
 
 class DataTreeSerializer {
 
@@ -28,10 +28,9 @@ class DataTreeSerializer {
 	}
 
 	dispatch def CharSequence doSerialize(ElementData ele, String indent, boolean needsConnect) {
-		var accessString = 'rw'
-		val access = ele.getAccessKind
-		if (access !== AccessKind.not_set) {
-			accessString = access.name
+		var accessString = "  "
+		if(ele.getAccessKind() != AccessKind.not_set) {
+			accessString = ele.getAccessKind().name
 		}
 		val prefix = switch (ele.elementKind) {
 			case Case:

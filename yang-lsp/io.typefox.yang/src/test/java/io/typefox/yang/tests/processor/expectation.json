@@ -551,7 +551,7 @@
                 {
                   "elementKind": "Leaf",
                   "type": {
-                    "name": "-\u003e leafref"
+                    "name": "-\u003e /sys:system/sys:authentication/password-policy/name"
                   },
                   "featureConditions": [
                     "sys:authentication and sys:local-users"
@@ -562,7 +562,7 @@
                 {
                   "elementKind": "Leaf",
                   "type": {
-                    "name": "-\u003e leafref"
+                    "name": "-\u003e /sys:system/sys:authentication/account-policy/name"
                   },
                   "featureConditions": [
                     "sys:authentication and sys:local-users"
@@ -1190,7 +1190,7 @@
                     {
                       "elementKind": "Leaf",
                       "type": {
-                        "name": "-\u003e leafref"
+                        "name": "-\u003e /sys:system/sys:authentication/password-quality/name"
                       },
                       "cardinality": "optional",
                       "name": "sysxext:password-quality"
@@ -2836,7 +2836,7 @@
                 {
                   "elementKind": "Leaf",
                   "type": {
-                    "name": "-\u003e leafref"
+                    "name": "-\u003e /sys:system/sys:authentication/sys:user/sys:name"
                   },
                   "cardinality": "optional",
                   "name": "sysxext:name"
