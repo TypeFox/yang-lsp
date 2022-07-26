@@ -19,8 +19,10 @@ import org.eclipse.xtext.conversion.IValueConverterService
 import org.eclipse.xtext.conversion.ValueConverterException
 import org.eclipse.xtext.linking.impl.LinkingHelper
 import org.eclipse.xtext.naming.IQualifiedNameConverter
+import org.eclipse.xtext.naming.IQualifiedNameProvider
 import org.eclipse.xtext.naming.QualifiedName
 import org.eclipse.xtext.nodemodel.INode
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils
 import org.eclipse.xtext.scoping.IScope
 import org.eclipse.xtext.scoping.IScopeProvider
 import org.eclipse.xtext.scoping.impl.FilteringScope
@@ -32,7 +34,6 @@ import org.eclipse.xtext.serializer.tokens.SerializerScopeProviderBinding
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 import static extension org.eclipse.xtext.EcoreUtil2.*
-import org.eclipse.xtext.naming.IQualifiedNameProvider
 
 class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 
@@ -89,7 +90,6 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 			if (matchingName !== null)
 				return matchingName
 		}
-
 		return getCrossReferenceNameFromScope(semanticObject, crossref, resolvedTarget, scope, errors)
 	}
 
@@ -128,19 +128,30 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 				scope
 
 		var elements = scopetoUse.getElements(target).toList
-		if (isRefTo_XPATH_NAME_TEST__REF && elements.size > 1 && target !== null && !target.eIsProxy) {
-			// in case several objects are in scope, try to find one that matches the target object
-			val targetURI = EcoreUtil2.getURI(target)
-			var filtered = elements.filter[EObjectURI.equals(targetURI)].toList
-			if (filtered.size > 1) {
-				val targetQname = qName.getFullyQualifiedName(target)
-				val simpleNameMatch = filtered.findFirst[it.name.lastSegment == targetQname.lastSegment]
-				if (simpleNameMatch !== null) {
-					filtered = #[simpleNameMatch]
+		
+		if (target !== null && !target.eIsProxy) {
+			if(elements.size === 0 && (isRefTo_XPATH_NAME_TEST__REF)) {
+				// XXX super implementation called below will fail because scope is empty
+				// Xpath segment element is not in scope, but resolved. Serialize existing node. See #224
+				val existingNode = NodeModelUtils.findActualNodeFor(semanticObject)
+				if (existingNode !== null) {
+					return tokenUtil.serializeNode(existingNode)
 				}
 			}
-			if (filtered.size > 0) {
-				elements = filtered
+			if (isRefTo_XPATH_NAME_TEST__REF && elements.size > 1) {
+				// in case several objects are in scope, try to find one that matches the target object
+				val targetURI = EcoreUtil2.getURI(target)
+				var filtered = elements.filter[EObjectURI.equals(targetURI)].toList
+				if (filtered.size > 1) {
+					val targetQname = qName.getFullyQualifiedName(target)
+					val simpleNameMatch = filtered.findFirst[it.name.lastSegment == targetQname.lastSegment]
+					if (simpleNameMatch !== null) {
+						filtered = #[simpleNameMatch]
+					}
+				}
+				if (filtered.size > 0) {
+					elements = filtered
+				}
 			}
 		}
 

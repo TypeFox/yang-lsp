@@ -55,8 +55,9 @@ class Bug224Test extends AbstractYangTest {
 		        prefix ts-mod;
 		    }
 		    include sub-module0;
-		    // need to import in order to reference augments from sub-module1
-		    include sub-module1;
+		    // Normally need to import in order to reference augments from sub-module1
+		    // But we should still be able to serialize
+		    //include sub-module1;
 		
 		    augment /container {
 		        leaf leaf_from_sub2 {
@@ -111,9 +112,9 @@ class Bug224Test extends AbstractYangTest {
 			        prefix ts-mod;
 			    }
 			    include sub-module0;
-			    // need to import in order to reference augments from sub-module1
-			    include sub-module1;
-			
+			    // Normally need to import in order to reference augments from sub-module1
+			    // But we should still be able to serialize
+			    // include sub-module1;
 			    augment /container {
 			        leaf leaf_from_sub2 {
 			            type leafref {
