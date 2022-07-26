@@ -8,7 +8,6 @@ import io.typefox.yang.yang.CurrentRef
 import io.typefox.yang.yang.ParentRef
 import io.typefox.yang.yang.Revision
 import io.typefox.yang.yang.RevisionDate
-import io.typefox.yang.yang.SchemaNodeIdentifier
 import io.typefox.yang.yang.XpathNameTest
 import io.typefox.yang.yang.YangPackage
 import io.typefox.yang.yang.impl.XpathNameTestImpl
@@ -131,9 +130,9 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 		var elements = scopetoUse.getElements(target).toList
 		
 		if (target !== null && !target.eIsProxy) {
-			if(elements.size === 0 && (isRefTo_XPATH_NAME_TEST__REF || semanticObject instanceof SchemaNodeIdentifier)) {
-				// XXX super implementation called below will fail because scope is empty
-				// Xpath segment element is not in scope, but resolved. Serialize existing node. See #224
+			if(elements.size === 0) {
+				// XXX super implementation called below will fail because the scope is empty
+				// Element is not in scope, but resolved. Serialize existing node. See #224
 				val existingNode = NodeModelUtils.findActualNodeFor(semanticObject)
 				if (existingNode !== null) {
 					return tokenUtil.serializeNode(existingNode)
