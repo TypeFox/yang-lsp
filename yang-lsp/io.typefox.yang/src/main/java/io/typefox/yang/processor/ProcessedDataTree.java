@@ -12,7 +12,6 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 
 import io.typefox.yang.processor.FeatureExpressions.FeatureCondition;
-import io.typefox.yang.yang.AbstractModule;
 import io.typefox.yang.yang.Config;
 import io.typefox.yang.yang.IfFeature;
 import io.typefox.yang.yang.Key;
@@ -40,11 +39,17 @@ public class ProcessedDataTree {
 
 	public static class HasStatements {
 		private List<HasStatements> children;
+		private transient HasStatements parent;
 
 		public void addToChildren(HasStatements child) {
 			if (children == null)
 				children = newArrayList();
 			children.add(child);
+			child.parent = this;
+		}
+
+		public HasStatements getParent() {
+			return parent;
 		}
 
 		public List<HasStatements> getChildren() {
@@ -52,28 +57,76 @@ public class ProcessedDataTree {
 		}
 	}
 
-	public static class Named extends HasStatements {
-		protected String name;
+	public static class ElementIdentifier {
+		final public String name, prefix;
 
-		public String getName() {
-			return name;
+		public ElementIdentifier(String name, String prefix) {
+			super();
+			this.name = name;
+			this.prefix = prefix;
+		}
+
+		@Override
+		public String toString() {
+			return prefix != null ? (prefix + ":" + name) : name;
+		}
+
+		@Override
+		public int hashCode() {
+			final int prime = 31;
+			int result = 1;
+			result = prime * result + ((this.name == null) ? 0 : this.name.hashCode());
+			return prime * result + ((this.prefix == null) ? 0 : this.prefix.hashCode());
+		}
+
+		@Override
+		public boolean equals(final Object obj) {
+			if (this == obj)
+				return true;
+			if (obj == null)
+				return false;
+			if (getClass() != obj.getClass())
+				return false;
+			ElementIdentifier other = (ElementIdentifier) obj;
+			if (this.name == null) {
+				if (other.name != null)
+					return false;
+			} else if (!this.name.equals(other.name))
+				return false;
+			if (this.prefix == null) {
+				if (other.prefix != null)
+					return false;
+			} else if (!this.prefix.equals(other.prefix))
+				return false;
+			return true;
+		}
+	}
+
+	public static class Named extends HasStatements {
+		private ElementIdentifier id;
+
+		public Named(ElementIdentifier id) {
+			this.id = id;
+		}
+
+		public ElementIdentifier getName() {
+			return id;
 		}
 
 		public String getSimpleName() {
-			if (name == null) {
+			if (id == null) {
 				return null;
 			}
-			var segments = name.split(":");
-			return segments[segments.length - 1];
+			return id.name;
 		}
 	}
 
 	public static class ModuleData extends Named {
-		private List<HasStatements> rpcs;
-
-		public ModuleData(AbstractModule ele) {
-			this.name = ele.getName();
+		public ModuleData(ElementIdentifier name) {
+			super(name);
 		}
+
+		private List<HasStatements> rpcs;
 
 		public void addToRpcs(ElementData rpc) {
 			if (rpcs == null)
@@ -137,13 +190,19 @@ public class ProcessedDataTree {
 
 		transient private SchemaNode origin;
 
-		private ElementData(String name, ElementKind elementKind) {
-			this.name = name;
+		private ElementData(ElementIdentifier elementId, ElementKind elementKind) {
+			super(elementId);
 			this.elementKind = elementKind;
 		}
 
 		public ElementData(SchemaNode ele, ElementKind elementKind) {
 			this(ProcessorUtility.qualifiedName(ele), elementKind);
+			this.origin = ele;
+			configureElement(ele);
+		}
+
+		public ElementData(SchemaNode ele, ElementKind elementKind, String name) {
+			this(new ElementIdentifier(name, ProcessorUtility.qualifiedName(ele).prefix), elementKind);
 			this.origin = ele;
 			configureElement(ele);
 		}
@@ -162,17 +221,17 @@ public class ProcessedDataTree {
 			this.cardinality = Cardinality.optional;
 
 			if (elementKind == ElementKind.Input) {
-				this.name = "input";
 				this.accessKind = AccessKind.w;
 				this.cardinality = Cardinality.mandatory;
 			} else if (elementKind == ElementKind.Output) {
-				this.name = "output";
 				this.accessKind = AccessKind.ro;
 				this.cardinality = Cardinality.mandatory;
 			} else if (elementKind == ElementKind.Rpc || elementKind == ElementKind.Action) {
 				this.accessKind = AccessKind.x;
+				this.cardinality = Cardinality.mandatory;
 			} else if (elementKind == ElementKind.Notification) {
 				this.accessKind = AccessKind.n;
+				this.cardinality = Cardinality.mandatory;
 			} else if (elementKind == ElementKind.Case) {
 				this.cardinality = Cardinality.mandatory;
 			} else if (elementKind == ElementKind.LeafList) {
@@ -226,6 +285,11 @@ public class ProcessedDataTree {
 			if (nodeFor != null) {
 				var nodeText = nodeFor.getText();
 				nodeText = nodeText.replaceAll("\"|'|\s|\n|\r", "").replaceAll("\\+", "");
+				int firstColon = nodeText.indexOf(":");
+				if (firstColon > 0) {
+					nodeText = nodeText.substring(0, firstColon)
+							+ nodeText.substring(firstColon).replaceAll("\\/[a-zA-Z]+:", "/");
+				}
 				return nodeText;
 			}
 			return "leafref";
@@ -260,8 +324,8 @@ public class ProcessedDataTree {
 			}
 		}
 
-		public static ElementData createNamedWrapper(String name, ElementKind elementKind) {
-			return new ElementData(name, elementKind);
+		public static ElementData createNamedWrapper(ElementIdentifier elementId, ElementKind elementKind) {
+			return new ElementData(elementId, elementKind);
 		}
 
 		public List<String> getFeatureConditions() {

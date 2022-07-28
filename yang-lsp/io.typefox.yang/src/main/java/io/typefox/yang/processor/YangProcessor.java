@@ -2,26 +2,22 @@ package io.typefox.yang.processor;
 
 import static com.google.common.collect.Lists.newArrayList;
 
-import java.util.Arrays;
-import java.util.Collection;
 import java.util.List;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
-import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
-import org.eclipse.xtext.nodemodel.impl.CompositeNodeWithSemanticElement;
-import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
+import com.google.common.collect.Lists;
 import com.google.gson.GsonBuilder;
 
 import io.typefox.yang.processor.ProcessedDataTree.ElementData;
+import io.typefox.yang.processor.ProcessedDataTree.ElementIdentifier;
 import io.typefox.yang.processor.ProcessedDataTree.ElementKind;
 import io.typefox.yang.processor.ProcessedDataTree.ListData;
 import io.typefox.yang.processor.ProcessedDataTree.ModuleData;
 import io.typefox.yang.processor.ProcessedDataTree.Named;
-import io.typefox.yang.processor.ProcessorUtility.ModuleIdentifier;
 import io.typefox.yang.yang.AbstractModule;
 import io.typefox.yang.yang.Action;
 import io.typefox.yang.yang.Augment;
@@ -39,6 +35,7 @@ import io.typefox.yang.yang.Leaf;
 import io.typefox.yang.yang.LeafList;
 import io.typefox.yang.yang.Notification;
 import io.typefox.yang.yang.Output;
+import io.typefox.yang.yang.Prefix;
 import io.typefox.yang.yang.Refine;
 import io.typefox.yang.yang.Rpc;
 import io.typefox.yang.yang.SchemaNode;
@@ -108,9 +105,9 @@ public class YangProcessor {
 						.forEach((subStatement) -> {
 							// TODO check what can be added
 							if (subStatement instanceof SchemaNode) {
-								SchemaNode copy = copyEObject((SchemaNode) subStatement);
+								SchemaNode copy = ProcessorUtility.copyEObject((SchemaNode) subStatement);
 								// add augment's feature conditions to copied augment children
-								copy.getSubstatements().addAll(copyAllEObjects(ifFeatures));
+								copy.getSubstatements().addAll(ProcessorUtility.copyAllEObjects(ifFeatures));
 
 								// memorize source module information as adapter
 								copy.eAdapters().add(new ForeignModuleAdapter(globalModuleId));
@@ -133,35 +130,15 @@ public class YangProcessor {
 		}));
 
 		modules.forEach((module) -> {
-			var moduleData = new ModuleData(module);
+			String prefix = null;
+			List<Prefix> prefixStatements = ProcessorUtility.findSubstatement(module, Prefix.class);
+			if (!prefixStatements.isEmpty())
+				prefix = prefixStatements.get(0).getPrefix();
+			var moduleData = new ModuleData(new ElementIdentifier(module.getName(), prefix));
 			processedDataTree.addModule(moduleData);
 			processChildren(module, moduleData, evalCtx);
 		});
 		return processedDataTree;
-	}
-
-	private <T extends EObject> T copyEObject(T eObj) {
-		return copyAllEObjects(Arrays.asList(eObj)).iterator().next();
-	}
-
-	private <T> Collection<T> copyAllEObjects(Collection<? extends T> eObjects) {
-		Copier copier = new Copier() {
-			private static final long serialVersionUID = 4555795110183792853L;
-
-			@Override
-			protected EObject createCopy(EObject eObject) {
-				EObject createCopy = super.createCopy(eObject);
-				var node = NodeModelUtils.getNode(eObject);
-				if (node instanceof CompositeNodeWithSemanticElement) {
-					// store text information. e.g. to serialize XPath
-					createCopy.eAdapters().add((CompositeNodeWithSemanticElement) node);
-				}
-				return createCopy;
-			}
-		};
-		Collection<T> result = copier.copyAll(eObjects);
-		copier.copyReferences();
-		return result;
 	}
 
 	private void processChildren(Statement statement, Named parent, FeatureEvaluationContext evalCtx) {
@@ -169,11 +146,13 @@ public class YangProcessor {
 			// filtered by a feature
 			return;
 		}
-		statement.getSubstatements().stream().forEach(ele -> {
+
+		for (Statement ele : statement.getSubstatements()) {
 			if (!ProcessorUtility.isEnabled(ele, evalCtx)) {
 				// filtered by a feature
 				return;
 			}
+
 			ElementData child = null;
 			if (ele instanceof Container) {
 				child = new ElementData((Container) ele, ElementKind.Container);
@@ -192,19 +171,27 @@ public class YangProcessor {
 			} else if (ele instanceof Grouping) {
 				child = new ElementData((SchemaNode) ele, ElementKind.Grouping);
 			} else if (ele instanceof Uses) {
+				/*
+				 * The effect of a “uses” reference to a grouping is that the nodes defined by
+				 * the grouping are copied into the current schema tree and are then updated
+				 * according to the “refine” and “augment” statements.
+				 */
 				GroupingRef groupingRef = ((Uses) ele).getGrouping();
-				ForeignModuleAdapter adapted = ForeignModuleAdapter.find(ele);
 				Grouping grouping = groupingRef.getNode();
+				ForeignModuleAdapter adapted = ForeignModuleAdapter.find(ele);
 				if (adapted != null) {
-					grouping.eAdapters().add(new ForeignModuleAdapter(adapted.moduleId));
+					ForeignModuleAdapter moduleAdapter = new ForeignModuleAdapter(adapted.moduleId);
+					// used groupings are bound to the namespace of the current module
+					grouping.eAdapters().add(moduleAdapter);
 				}
 				processChildren(grouping, parent, evalCtx);
+
 			} else if (ele instanceof Refine) {
 				child = new ElementData((SchemaNode) ele, ElementKind.Refine);
 			} else if (ele instanceof Input) {
-				child = new ElementData((SchemaNode) ele, ElementKind.Input);
+				child = new ElementData((SchemaNode) ele, ElementKind.Input, "input");
 			} else if (ele instanceof Output) {
-				child = new ElementData((SchemaNode) ele, ElementKind.Output);
+				child = new ElementData((SchemaNode) ele, ElementKind.Output, "output");
 			} else if (ele instanceof Notification) {
 				child = new ElementData((SchemaNode) ele, ElementKind.Notification);
 			} else if (ele instanceof Rpc) {
@@ -224,26 +211,45 @@ public class YangProcessor {
 				parent.addToChildren(child);
 				processChildren(ele, child, evalCtx);
 			}
-		});
+		}
 	}
 
-	public static class ForeignModuleAdapter extends AdapterImpl {
-		final ModuleIdentifier moduleId;
+//	private ModuleData parentModule(HasStatements element) {
+//		if (element instanceof ModuleData) {
+//			return (ModuleData) element;
+//		} else if (element.getParent() != null) {
+//			return parentModule(element.getParent());
+//		}
+//		return null;
+//	}
 
-		public ForeignModuleAdapter(ModuleIdentifier moduleId) {
+	public static class ForeignModuleAdapter extends AdapterImpl {
+		final ElementIdentifier moduleId;
+
+		public ForeignModuleAdapter(ElementIdentifier moduleId) {
 			this.moduleId = moduleId;
 		}
 
 		public static ForeignModuleAdapter find(EObject eObject) {
-			for (Adapter adapter : eObject.eAdapters()) {
+			ForeignModuleAdapter containerAdapter = null;
+			if (eObject.eContainer() != null) {
+				containerAdapter = find(eObject.eContainer());
+			}
+			// Container adapter has precedence because of 'uses' statement
+			if (containerAdapter != null) {
+				return containerAdapter;
+			}
+			// Take last added adapter
+			for (Adapter adapter : Lists.reverse(eObject.eAdapters())) {
 				if (adapter instanceof ForeignModuleAdapter) {
 					return (ForeignModuleAdapter) adapter;
 				}
 			}
-			if (eObject.eContainer() != null) {
-				return find(eObject.eContainer());
-			}
 			return null;
+		}
+
+		public String toString() {
+			return moduleId.toString();
 		}
 	}
 }

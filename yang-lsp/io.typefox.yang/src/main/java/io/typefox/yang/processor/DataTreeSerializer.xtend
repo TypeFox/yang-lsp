@@ -11,13 +11,13 @@ class DataTreeSerializer {
 
 	def CharSequence serialize(ModuleData moduleData) {
 		'''
-			module: «moduleData.name»
-			  «FOR child : moduleData.children»
+			module: «moduleData.simpleName»
+			  «FOR child : moduleData.children?:#[]»
 			  	«doSerialize(child, '', needsConnect(child, moduleData.children))»
 			  «ENDFOR»
 			
 			  rpcs:
-			    «FOR rpc : moduleData.rpcs»
+			    «FOR rpc : moduleData.rpcs?:#[]»
 			    	«doSerialize(rpc, '', needsConnect(rpc, moduleData.rpcs))»
 			    «ENDFOR»
 		'''
@@ -36,7 +36,7 @@ class DataTreeSerializer {
 			case Case:
 				'--:'
 			default: {
-				'''«"----".substring(accessString.length)»«accessString» '''
+				'''«"----".substring(accessString.length)»«!accessString.trim.empty?accessString» '''
 			}
 		}
 		val label = switch (ele.elementKind) {
@@ -68,4 +68,5 @@ class DataTreeSerializer {
 		}
 		return true
 	}
+	
 }

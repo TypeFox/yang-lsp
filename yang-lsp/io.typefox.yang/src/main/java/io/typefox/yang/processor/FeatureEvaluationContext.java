@@ -7,7 +7,7 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import io.typefox.yang.processor.ProcessorUtility.ModuleIdentifier;
+import io.typefox.yang.processor.ProcessedDataTree.ElementIdentifier;
 import io.typefox.yang.yang.Feature;
 
 public class FeatureEvaluationContext {
@@ -22,7 +22,7 @@ public class FeatureEvaluationContext {
 	}
 
 	public boolean isActive(Feature feature) {
-		ModuleIdentifier featureModule = ProcessorUtility.moduleIdentifier(feature);
+		ElementIdentifier featureModule = ProcessorUtility.moduleIdentifier(feature);
 		var featureQName = featureGlobalQName(featureModule, feature.getName());
 		if (cache.containsKey(featureQName)) {
 			return cache.get(featureQName);
@@ -42,7 +42,7 @@ public class FeatureEvaluationContext {
 				&& (exclude.isEmpty() || !(exclude.contains(featureQName) || exclude.contains(modulePrefix)));
 	}
 
-	private String featureGlobalQName(ModuleIdentifier module, String featureName) {
+	private String featureGlobalQName(ElementIdentifier module, String featureName) {
 		return module.name + ":" + featureName;
 	}
 }

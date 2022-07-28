@@ -1,6 +1,8 @@
 package io.typefox.yang.processor;
 
-import io.typefox.yang.processor.ProcessorUtility.ModuleIdentifier;
+import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
+
+import io.typefox.yang.processor.ProcessedDataTree.ElementIdentifier;
 import io.typefox.yang.yang.BinaryOperation;
 import io.typefox.yang.yang.Expression;
 import io.typefox.yang.yang.Feature;
@@ -19,11 +21,9 @@ public class FeatureExpressions {
 
 		private static FeatureCondition build(Expression exp) {
 			if (exp instanceof FeatureReference) {
-				return new IsFeatureCondition(((FeatureReference) exp).getFeature(),
-						ProcessorUtility.moduleIdentifier(exp));
+				return new IsFeatureCondition((FeatureReference) exp, ProcessorUtility.moduleIdentifier(exp));
 			} else if (exp instanceof UnaryOperation) {
-				return new IsFeatureCondition(((FeatureReference) exp).getFeature(), true,
-						ProcessorUtility.moduleIdentifier(exp));
+				return new IsFeatureCondition((FeatureReference) exp, true, ProcessorUtility.moduleIdentifier(exp));
 			} else if (exp instanceof BinaryOperation) {
 				BinaryOperation bin = (BinaryOperation) exp;
 				return new BinaryFeatureCondition(build(bin.getLeft()), build(bin.getRight()),
@@ -37,14 +37,16 @@ public class FeatureExpressions {
 
 		final private Feature feature;
 		final private boolean not;
-		final private ModuleIdentifier conditionModule;
+		final private ElementIdentifier conditionModule;
+		final private String text;
 
-		public IsFeatureCondition(Feature feature, ModuleIdentifier conditionModule) {
-			this(feature, false, conditionModule);
+		public IsFeatureCondition(FeatureReference featureRef, ElementIdentifier conditionModule) {
+			this(featureRef, false, conditionModule);
 		}
 
-		public IsFeatureCondition(Feature feature, boolean not, ModuleIdentifier conditionModule) {
-			this.feature = feature;
+		public IsFeatureCondition(FeatureReference featureRef, boolean not, ElementIdentifier conditionModule) {
+			this.feature = featureRef.getFeature();
+			this.text = NodeModelUtils.getTokenText(NodeModelUtils.getNode(featureRef));
 			this.conditionModule = conditionModule;
 			this.not = not;
 		}
@@ -59,9 +61,7 @@ public class FeatureExpressions {
 		@Override
 		public String toString() {
 			if (toStringValue == null) {
-				ModuleIdentifier featureModule = ProcessorUtility.moduleIdentifier(feature);
-				String prefix = conditionModule.name.equals(featureModule.name) ? "" : featureModule.prefix + ":";
-				toStringValue = (not ? "!" : "") + prefix + feature.getName();
+				toStringValue = (not ? "!" : "") + this.text;
 			}
 			return toStringValue;
 		}

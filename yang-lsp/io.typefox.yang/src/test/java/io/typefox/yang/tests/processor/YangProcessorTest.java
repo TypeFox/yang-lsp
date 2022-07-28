@@ -178,7 +178,7 @@ public class YangProcessorTest extends AbstractYangTest {
 		});
 
 		ProcessedDataTree dataTree = new YangProcessor().process(modules, includedFeatures, excludedFeatures);
-		var sysModule = dataTree.getModules().stream().filter(mod -> "ietf-system".equals(mod.getName())).findFirst();
+		var sysModule = dataTree.getModules().stream().filter(mod -> "ietf-system".equals(mod.getSimpleName())).findFirst();
 		return sysModule;
 
 	}
