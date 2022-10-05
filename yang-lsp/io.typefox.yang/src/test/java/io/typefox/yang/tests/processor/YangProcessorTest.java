@@ -69,13 +69,12 @@ public class YangProcessorTest extends AbstractYangTest {
 	@Test
 	public void processModules_TreeTest_FeatureInclude() throws IOException {
 
-		var sysModule = processData(true, newArrayList("example-system-ext:", "sys:"), null);
+		var sysModule = processData(true, newArrayList("example-system-ext:"), null);
 
 		String expectation = null;
 
 		// CLI tree test expect output like:
-		// pyang -f tree ietf-system.yang --deviation-module example-system-ext.yang -F
-		// example-system-ext:
+		// pyang -f tree ietf-system.yang --deviation-module example-system-ext.yang -F example-system-ext:
 		try (InputStream in = this.getClass().getClassLoader()
 				.getResourceAsStream("io/typefox/yang/tests/processor/expectation-feature-only-example.txt");
 				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
@@ -90,13 +89,12 @@ public class YangProcessorTest extends AbstractYangTest {
 	@Test
 	public void processModules_TreeTest_FeatureExclude() throws IOException {
 
-		var sysModule = processData(true, null, newArrayList("ietf-tls-client:x509-certificate-auth"));
+		var sysModule = processData(true, null, newArrayList("example-system-ext:ldap-posix-filter"));
 
 		String expectation = null;
 
 		// CLI tree test expect output like:
-		// pyang -f tree ietf-system.yang --deviation-module example-system-ext.yang -X
-		// example-system-ext:ldap-posix-filter
+		// pyang -f tree ietf-system.yang --deviation-module example-system-ext.yang -X example-system-ext:ldap-posix-filter 
 		try (InputStream in = this.getClass().getClassLoader()
 				.getResourceAsStream("io/typefox/yang/tests/processor/expectation-feature-exclude-f.txt");
 				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {

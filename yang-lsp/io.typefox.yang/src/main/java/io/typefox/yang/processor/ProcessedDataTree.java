@@ -284,7 +284,7 @@ public class ProcessedDataTree {
 			ICompositeNode nodeFor = NodeModelUtils.findActualNodeFor(reference);
 			if (nodeFor != null) {
 				var nodeText = nodeFor.getText();
-				nodeText = nodeText.replaceAll("\"|'|\s|\n|\r", "").replaceAll("\\+", "");
+				nodeText = nodeText.replaceAll("\"|'|\\s|\n|\r", "").replaceAll("\\+", "");
 				int firstColon = nodeText.indexOf(":");
 				if (firstColon > 0) {
 					nodeText = nodeText.substring(0, firstColon)

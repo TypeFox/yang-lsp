@@ -38,7 +38,11 @@ public class FeatureEvaluationContext {
 
 	private boolean isActive(String modulePrefix, String featureQName) {
 		// include <module>: means include none of <module> features...???
-		return (include.isEmpty() || (include.contains(featureQName) || include.contains(modulePrefix)))
+		if(include.contains(modulePrefix) && !include.contains(featureQName)) {
+			// include e.g. 'example-system-ext:' means any of example-system-ext module features should be included
+			return false;
+		}
+		return (include.isEmpty() || include.contains(featureQName))
 				&& (exclude.isEmpty() || !(exclude.contains(featureQName) || exclude.contains(modulePrefix)));
 	}
 

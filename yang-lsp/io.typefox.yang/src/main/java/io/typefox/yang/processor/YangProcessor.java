@@ -142,17 +142,18 @@ public class YangProcessor {
 	}
 
 	private void processChildren(Statement statement, Named parent, FeatureEvaluationContext evalCtx) {
-		if (!ProcessorUtility.isEnabled(statement, evalCtx)) {
+		/*if (!ProcessorUtility.isEnabled(statement, evalCtx)) {
 			// filtered by a feature
 			return;
 		}
-
+		 */
 		for (Statement ele : statement.getSubstatements()) {
-			if (!ProcessorUtility.isEnabled(ele, evalCtx)) {
+			/*
+			 if (!ProcessorUtility.isEnabled(ele, evalCtx)) {
 				// filtered by a feature
 				return;
 			}
-
+			*/
 			ElementData child = null;
 			if (ele instanceof Container) {
 				child = new ElementData((Container) ele, ElementKind.Container);

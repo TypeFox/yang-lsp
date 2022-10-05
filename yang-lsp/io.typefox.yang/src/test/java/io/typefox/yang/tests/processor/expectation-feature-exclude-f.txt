@@ -175,6 +175,40 @@ module: ietf-system
   |  |  |  |        +--rw sysxext:client-identity
   |  |  |  |        |  +--rw (sysxext:auth-type)
   |  |  |  |        |     +--:(sysxext:certificate)
+  |  |  |  |        |     |  +--rw sysxext:certificate {x509-certificate-auth}?
+  |  |  |  |        |     |     +--rw (sysxext:local-or-keystore)
+  |  |  |  |        |     |        +--:(sysxext:local) {local-definitions-supported}?
+  |  |  |  |        |     |        |  +--rw sysxext:local-definition
+  |  |  |  |        |     |        |     +--rw sysxext:algorithm                               iasa:asymmetric-algorithm-type
+  |  |  |  |        |     |        |     +--rw sysxext:public-key-format?                      identityref
+  |  |  |  |        |     |        |     +--rw sysxext:public-key                              binary
+  |  |  |  |        |     |        |     +--rw sysxext:private-key-format?                     identityref
+  |  |  |  |        |     |        |     +--rw (sysxext:private-key-type)
+  |  |  |  |        |     |        |     |  +--:(sysxext:private-key)
+  |  |  |  |        |     |        |     |  |  +--rw sysxext:private-key?                      binary
+  |  |  |  |        |     |        |     |  +--:(sysxext:hidden-private-key)
+  |  |  |  |        |     |        |     |  |  +--rw sysxext:hidden-private-key?               empty
+  |  |  |  |        |     |        |     |  +--:(sysxext:encrypted-private-key)
+  |  |  |  |        |     |        |     |     +--rw sysxext:encrypted-private-key
+  |  |  |  |        |     |        |     |        +--rw (sysxext:key-type)
+  |  |  |  |        |     |        |     |        |  +--:(sysxext:symmetric-key-ref)
+  |  |  |  |        |     |        |     |        |  |  +--rw sysxext:symmetric-key-ref?    -> /ks:keystore/symmetric-keys/symmetric-key/name {keystore-supported}?
+  |  |  |  |        |     |        |     |        |  +--:(sysxext:asymmetric-key-ref)
+  |  |  |  |        |     |        |     |        |     +--rw sysxext:asymmetric-key-ref?   -> /ks:keystore/asymmetric-keys/asymmetric-key/name {keystore-supported}?
+  |  |  |  |        |     |        |     |        +--rw sysxext:value?                      binary
+  |  |  |  |        |     |        |     +--rw sysxext:cert?                                   end-entity-cert-cms
+  |  |  |  |        |     |        |     +---n sysxext:certificate-expiration
+  |  |  |  |        |     |        |     |  +-- sysxext:expiration-date    yang:date-and-time
+  |  |  |  |        |     |        |     +---x sysxext:generate-certificate-signing-request
+  |  |  |  |        |     |        |        +---w sysxext:input
+  |  |  |  |        |     |        |        |  +---w sysxext:subject       binary
+  |  |  |  |        |     |        |        |  +---w sysxext:attributes?   binary
+  |  |  |  |        |     |        |        +--ro sysxext:output
+  |  |  |  |        |     |        |           +--ro sysxext:certificate-signing-request    binary
+  |  |  |  |        |     |        +--:(sysxext:keystore) {keystore-supported}?
+  |  |  |  |        |     |           +--rw sysxext:keystore-reference
+  |  |  |  |        |     |              +--rw sysxext:asymmetric-key?   ks:asymmetric-key-ref
+  |  |  |  |        |     |              +--rw sysxext:certificate?      -> /ks:keystore/asymmetric-keys/asymmetric-key[ks:name = current()/../asymmetric-key]/certificates/certificate/name
   |  |  |  |        |     +--:(sysxext:raw-public-key)
   |  |  |  |        |     |  +--rw sysxext:raw-public-key {raw-public-key-auth}?
   |  |  |  |        |     |     +--rw (sysxext:local-or-keystore)
@@ -222,6 +256,24 @@ module: ietf-system
   |  |  |  |        |              +--:(sysxext:keystore) {keystore-supported}?
   |  |  |  |        |                 +--rw sysxext:keystore-reference?   ks:symmetric-key-ref
   |  |  |  |        +--rw sysxext:server-authentication
+  |  |  |  |        |  +--rw sysxext:ca-certs! {x509-certificate-auth}?
+  |  |  |  |        |  |  +--rw (sysxext:local-or-truststore)
+  |  |  |  |        |  |     +--:(sysxext:local) {local-definitions-supported}?
+  |  |  |  |        |  |     |  +--rw sysxext:local-definition
+  |  |  |  |        |  |     |     +--rw sysxext:cert*                     trust-anchor-cert-cms
+  |  |  |  |        |  |     |     +---n sysxext:certificate-expiration
+  |  |  |  |        |  |     |        +-- sysxext:expiration-date    yang:date-and-time
+  |  |  |  |        |  |     +--:(sysxext:truststore) {truststore-supported,x509-certificates}?
+  |  |  |  |        |  |        +--rw sysxext:truststore-reference?   ts:certificates-ref
+  |  |  |  |        |  +--rw sysxext:server-certs! {x509-certificate-auth}?
+  |  |  |  |        |  |  +--rw (sysxext:local-or-truststore)
+  |  |  |  |        |  |     +--:(sysxext:local) {local-definitions-supported}?
+  |  |  |  |        |  |     |  +--rw sysxext:local-definition
+  |  |  |  |        |  |     |     +--rw sysxext:cert*                     trust-anchor-cert-cms
+  |  |  |  |        |  |     |     +---n sysxext:certificate-expiration
+  |  |  |  |        |  |     |        +-- sysxext:expiration-date    yang:date-and-time
+  |  |  |  |        |  |     +--:(sysxext:truststore) {truststore-supported,x509-certificates}?
+  |  |  |  |        |  |        +--rw sysxext:truststore-reference?   ts:certificates-ref
   |  |  |  |        |  +--rw sysxext:raw-public-keys! {raw-public-key-auth}?
   |  |  |  |        |  |  +--rw (sysxext:local-or-truststore)
   |  |  |  |        |  |     +--:(sysxext:local) {local-definitions-supported}?
@@ -264,8 +316,6 @@ module: ietf-system
   |  |           |  +--rw sysxext:custom
   |  |           |     +--rw sysxext:filter    string
   |  |           |     +--rw sysxext:attr      string
-  |  |           +--:(sysxext:posix) {ldap-posix-filter}?
-  |  |           |  +--rw sysxext:posix?            empty
   |  |           +--:(sysxext:example-filter)
   |  |              +--rw sysxext:example-filter
   |  |                 +--rw sysxext:enable-target-based-access-control?   boolean
