@@ -41,8 +41,11 @@ class CodeLensService implements ICodeLensService {
 						val range = documentExtensions.newRange(resource, kwNode.textRegion)
 						val locations = references.get(uri).map[ refInfo |
 							val eobj = resource.resourceSet.getEObject(refInfo.key, false)
-							return documentExtensions.newLocation(eobj, refInfo.value, -1)
-						].toList
+							// references are not recalculated if related document is changed,
+							// so the source reference might be missing eObj === null
+							if(eobj !== null)
+								return documentExtensions.newLocation(eobj, refInfo.value, -1)
+						].filterNull.toList
 						result += new CodeLens => [
 							it.range = range
 							command = new Command => [
