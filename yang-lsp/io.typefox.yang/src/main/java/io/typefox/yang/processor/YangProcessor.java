@@ -7,7 +7,10 @@ import java.util.List;
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.common.util.EList;
+import org.eclipse.emf.common.util.TreeIterator;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.emf.ecore.util.EcoreUtil.ContentTreeIterator;
 
 import com.google.common.collect.Lists;
 import com.google.gson.GsonBuilder;
@@ -145,15 +148,8 @@ public class YangProcessor {
 		/*if (!ProcessorUtility.isEnabled(statement, evalCtx)) {
 			// filtered by a feature
 			return;
-		}
-		 */
-		for (Statement ele : statement.getSubstatements()) {
-			/*
-			 if (!ProcessorUtility.isEnabled(ele, evalCtx)) {
-				// filtered by a feature
-				return;
-			}
-			*/
+		}*/
+		statement.getSubstatements().stream().filter( ele -> ProcessorUtility.isEnabled(ele, evalCtx)).forEach((ele) -> {
 			ElementData child = null;
 			if (ele instanceof Container) {
 				child = new ElementData((Container) ele, ElementKind.Container);
@@ -212,7 +208,7 @@ public class YangProcessor {
 				parent.addToChildren(child);
 				processChildren(ele, child, evalCtx);
 			}
-		}
+		});
 	}
 
 //	private ModuleData parentModule(HasStatements element) {
