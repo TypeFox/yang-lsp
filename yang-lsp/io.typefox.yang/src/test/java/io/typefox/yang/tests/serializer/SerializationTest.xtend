@@ -29,6 +29,7 @@ import org.junit.Test
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
 import static org.junit.Assert.*
+import org.junit.Ignore
 
 class SerializationTest extends AbstractYangTest {
 	
@@ -686,6 +687,39 @@ class SerializationTest extends AbstractYangTest {
 		        }
 		    }
 		}'''.toString, resource.serializer.serialize(module))
+
+	}
+
+	@Test @Ignore
+	def void testIssue209() {
+		val resource = load('''
+			module test-module {
+			    yang-version 1.1;
+			    namespace urn:ietf:params:xml:ns:yang:test-module;
+			    prefix ts-mod;
+			    container "container" {
+			        must "x > y" + " and x * y < 100";
+			    }
+			    container "container2" {
+			        must "x > y" + /* some ml comment */ " and x * y < 100";
+			    }
+			}
+		''') as XtextResource
+		
+		val serialized = resource.serializer.serialize(resource.contents.head)
+		assertEquals('''
+		module test-module {
+		    yang-version 1.1;
+		    namespace urn:ietf:params:xml:ns:yang:test-module;
+		    prefix ts-mod;
+		    container "container" {
+		        must "x > y" + " and x * y < 100";
+		    }
+		    container "container2" {
+		        must "x > y" + /* some ml comment */ " and x * y < 100";
+		    }
+		}
+		'''.toString, serialized)
 
 	}
 	

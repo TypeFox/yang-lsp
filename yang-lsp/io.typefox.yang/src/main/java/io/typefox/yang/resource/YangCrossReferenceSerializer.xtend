@@ -34,6 +34,7 @@ import org.eclipse.xtext.serializer.tokens.SerializerScopeProviderBinding
 import static io.typefox.yang.yang.YangPackage.Literals.*
 
 import static extension org.eclipse.xtext.EcoreUtil2.*
+import io.typefox.yang.yang.SchemaNodeIdentifier
 
 class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 
@@ -135,7 +136,7 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 				// Element is not in scope, but resolved. Serialize existing node. See #224
 				val existingNode = NodeModelUtils.findActualNodeFor(semanticObject)
 				if (existingNode !== null) {
-					return tokenUtil.serializeNode(existingNode)
+					return removePrefixIfNeeded(tokenUtil.serializeNode(existingNode), semanticObject)
 				}
 			}
 			if (isRefTo_XPATH_NAME_TEST__REF && elements.size > 1) {
@@ -157,13 +158,17 @@ class YangCrossReferenceSerializer extends CrossReferenceSerializer {
 
 		val nameFromSuper = super.getCrossReferenceNameFromScope(semanticObject, crossref, target,
 			new SimpleScope(elements), errors)
-		return nameFromSuper.removeContainerPrefixIfNeeded(semanticObject)
+		return nameFromSuper.removePrefixIfNeeded(semanticObject)
 	}
 
-	private def String removeContainerPrefixIfNeeded(String name, EObject semanticObject) {
+	private def String removePrefixIfNeeded(String name, EObject semanticObject) {
 		if (semanticObject instanceof XpathNameTestImpl) {
 			if (name.startsWith(semanticObject.prefix + ':')) {
 				return name.substring(semanticObject.prefix.length + 1)
+			}
+		} else if(semanticObject instanceof SchemaNodeIdentifier) {
+			if(name.startsWith('/') && semanticObject.isAbsolute) {
+				return name.substring(1) // remove leading slash as it will be serialized as part of `isAbsolute` assigment
 			}
 		}
 		return name
