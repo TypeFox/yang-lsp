@@ -51,6 +51,8 @@ import org.eclipse.xtext.resource.IEObjectDescription
 import org.eclipse.xtext.util.internal.EmfAdaptable
 import org.eclipse.xtext.util.internal.Log
 import org.eclipse.xtext.scoping.IScope
+import com.google.common.base.Suppliers
+import java.util.Collections
 
 @Log
 class XpathResolver {
@@ -85,17 +87,16 @@ class XpathResolver {
 		return type	
 	}
 	
-	def XpathType doResolve(XpathExpression expression, QualifiedName contextNode, IScopeContext context) {
+	def void doResolve(XpathExpression expression, QualifiedName contextNode, IScopeContext context) {
 		val element = context.schemaNodeScope.getSingleElement(contextNode)
 		val initialContext =
 			if (element === null) {
-				Types.nodeSet(emptyList)
+				Types.nodeSet(Collections.EMPTY_LIST)
 			} else {
-				val allDescriptions = context.schemaNodeScope.getElements(element.EObjectOrProxy).toList
-				if (allDescriptions.empty)
-					Types.nodeSet(element)
-				else
-					Types.nodeSet(allDescriptions)
+				val allDescriptions = Suppliers.memoize([|
+					context.schemaNodeScope.getElements(element.EObjectOrProxy).toList
+				])
+				Types.nodeSet(element, allDescriptions)
 			}
 		internalResolve(expression, initialContext, new Context(context.schemaNodeScope, context.moduleName, initialContext))
 	}
@@ -201,7 +202,7 @@ class XpathResolver {
 		if (f.name == 'deref') {
 			val type = internalResolve(e.args.head, contextType, ctx)
 			if (type instanceof NodeSetType) {
-				val desc = type.nodes.head
+				val desc = type.singleNode
 				if (desc !== null) {
 					if (desc.EObjectOrProxy instanceof Leaf) {
 						val l = desc.EObjectOrProxy as Leaf
@@ -213,7 +214,7 @@ class XpathResolver {
 					}
 				}
 			}
-			return Types.nodeSet(#[Linker.ROOT]).install(e)
+			return Types.nodeSet(Linker.ROOT).install(e)
 		}
 		for (arg : e.args) {
 			internalResolve(arg, contextType, ctx)
@@ -252,7 +253,7 @@ class XpathResolver {
 	
 	protected def dispatch XpathType internalResolveStep(CurrentRef e, XpathType contextType, Context ctx) {
 		linker.link(e, YangPackage.Literals.CURRENT_REF__REF) [
-			contextType.EObjectDescription	
+			contextType.EObjectDescription
 		]
 		return contextType
 	}
@@ -299,7 +300,7 @@ class XpathResolver {
 							ref.set(contextType)
 							return contextType.EObjectDescription
 						} else {
-							val descs = contextType.nodes.filter[qualifiedName.lastSegment == qualifiedName.lastSegment].toList
+							val descs = contextType.allNodes.filter[qualifiedName.lastSegment == qualifiedName.lastSegment].toList
 							if (!descs.isEmpty) {
 								val newType = Types.nodeSet(descs)
 								ref.set(newType)
@@ -347,7 +348,7 @@ class XpathResolver {
 		}
 		val ref = new AtomicReference<XpathType>() 
 		linker.link(e.node, YangPackage.Literals.XPATH_NAME_TEST__REF) [
-			val type = computeType(contextType, resolveModulePrefix(e), mode, ctx)
+			val type = computeSingleType(contextType, resolveModulePrefix(e), mode, ctx)
 			ref.set(type)
 			return type.EObjectDescription
 		]
@@ -379,23 +380,35 @@ class XpathResolver {
 		DESCENDANTS_OR_SELF
 	}
 	
+	protected def XpathType computeSingleType(XpathType type, QualifiedName name, Axis mode, Context ctx) {
+		computeType(type, name, mode, true, ctx)
+	}
+	
 	protected def XpathType computeType(XpathType type, QualifiedName name, Axis mode, Context ctx) {
+		computeType(type, name, mode, false, ctx)
+	}
+	
+	private def XpathType computeType(XpathType type, QualifiedName name, Axis mode, boolean onlyFirst, Context ctx) {
 		if (type instanceof NodeSetType) {
 			// handle root
-			if (type.nodes.empty) {
+			if (type.isEmpty) {
 				val nodes = findNodes(QualifiedName.EMPTY, name, mode, ctx.nodeScope)
-				if ( nodes.empty) {
+				if (nodes.empty) {
 					return Types.ANY
 				}
 				return Types.nodeSet(nodes)
 			}
 			val result = newLinkedHashSet()
-			for (n : type.nodes) {
-				val nodes = findNodes(n.qualifiedName, name, mode, ctx.nodeScope)
-				result.addAll(nodes)
-			}
-			if (!result.empty) {
-				return Types.nodeSet(result.toList)
+			if (onlyFirst) {
+				return Types.nodeSet(findNodes(type.singleNode.qualifiedName, name, mode, ctx.nodeScope))
+			} else {
+				for (n : type.allNodes) {
+					val nodes = findNodes(n.qualifiedName, name, mode, ctx.nodeScope)
+					result.addAll(nodes)
+				}
+				if (!result.empty) {
+					return Types.nodeSet(result.toList)
+				}
 			}
 		}
 		return Types.ANY
@@ -410,34 +423,37 @@ class XpathResolver {
 	}
 	
 	def List<IEObjectDescription> findNodes(QualifiedName prefix, QualifiedName name, Axis mode, IScope nodeScope) {
+		val prefixWithoutLast = prefix.skipLast
 		if (mode === Axis.SIBLINGS) {
-			return findNodes(prefix.skipLast, name, Axis.CHILDREN, nodeScope)
+			return findNodes(prefixWithoutLast, name, Axis.CHILDREN, nodeScope)
 		} else if (mode === Axis.DESCENDANTS_OR_SELF) {
-			return findNodes(prefix.skipLast, name, Axis.DESCENDANTS, nodeScope)
+			return findNodes(prefixWithoutLast, name, Axis.DESCENDANTS, nodeScope)
 		} else if (mode == Axis.ANCESTOR) {
-			return findNodes(prefix.skipLast, name, Axis.ANCESTOR_OR_SELF, nodeScope)
+			return findNodes(prefixWithoutLast, name, Axis.ANCESTOR_OR_SELF, nodeScope)
 		} else if (mode == Axis.ANCESTOR_OR_SELF) {
 			return getNodeHierarchy(prefix, nodeScope, false)
 					.filter[name === null || name == ASTERISK || qualifiedName.endsWith(name)]
 					.toList
 		} else if (mode == Axis.PARENT) {
-			val parent = getNodeHierarchy(prefix.skipLast, nodeScope, true).head
+			val parent = getNodeHierarchy(prefixWithoutLast, nodeScope, true).head
 			if (parent !== null)
 				return #[parent]
 			else
 				return #[Linker.ROOT]
 		} else {
-			val elements = nodeScope.allElements.filter [
-				if (qualifiedName.startsWith(prefix) && qualifiedName.segmentCount > prefix.segmentCount) {
-					if (name === null || name == ASTERISK || qualifiedName.endsWith(name)) {
-						if (mode === Axis.DESCENDANTS) {
-							return true
-						} else {
-							// Check whether all intermediate nodes are schema-only nodes
-							val parents = getNodeHierarchy(qualifiedName.skipLast, nodeScope, false)
-									.filter[qualifiedName.segmentCount > prefix.segmentCount]
-							return parents.isEmpty
-						}
+			val elements = nodeScope.allElements.filter [descr |
+				val qName = descr.qualifiedName
+				if (qName.segmentCount > prefix.segmentCount
+					&& (name === null || name == ASTERISK || qName.endsWith(name))
+					&& startsWith(qName, prefix)
+				) {
+					if (mode === Axis.DESCENDANTS) {
+						return true
+					} else {
+						// Check whether all intermediate nodes are schema-only nodes
+						val parents = getNodeHierarchy(qName.skipLast, nodeScope, false)
+								.filter[qualifiedName.segmentCount > prefix.segmentCount]
+						return parents.isEmpty
 					}
 				}
 				return false
@@ -448,8 +464,31 @@ class XpathResolver {
 	
 	private def endsWith(QualifiedName parent, QualifiedName child) {
 		val offset = parent.segmentCount - child.segmentCount
-		if (offset >= 0) 
+		if (offset >= 0) {
+			// called very often: skipFirst does an array copy and creates new QName obj
+			// in case there is only one segment, compare the last only
+			if(child.segmentCount == 1) {
+				return parent.lastSegment == child.lastSegment
+			}
 			return parent.skipFirst(offset) == child
+		}
+		else
+			return false
+	}
+	
+	private def startsWith(QualifiedName parent, QualifiedName prefix) {
+		// called very often. Implemented `startsWith` with some optimizations
+		val offset = parent.segmentCount - prefix.segmentCount
+		if (offset >= 0) {
+			if(prefix.segmentCount == 1) {
+				return parent.firstSegment == prefix.firstSegment
+			}
+			for (var i = prefix.getSegmentCount() - 1; i >= 0; i--) {
+				if(!parent.getSegment(i).equals(prefix.getSegment(i)))
+					return false;
+			}
+			return true;
+		}
 		else
 			return false
 	}
@@ -462,18 +501,22 @@ class XpathResolver {
 			QualifiedName startQName, IScope nodeScope, boolean stopAtNull) {
 		[
 			new AbstractIterator<IEObjectDescription> {
+				
 				QualifiedName qname = startQName
 				IEObjectDescription descr
+				
 				override protected computeNext() {
 					while (qname.segmentCount >= 2) {
 						// Look up node description in scope, if not already done before (see below)
 						val nextDescr = descr ?: nodeScope.getSingleElement(qname)
-						qname = qname.skipLast
-						descr = null
 						if (nextDescr === null && stopAtNull)
 							return endOfData
+
+						qname = qname.skipLast
+						descr = null
+
 						var isInstance = nextDescr.isInstanceNode
-						if (isInstance && nextDescr.EObjectOrProxy instanceof SchemaNode && qname.segmentCount >= 2) {
+						if (isInstance && qname.segmentCount >= 2 && nextDescr.EObjectOrProxy instanceof SchemaNode) {
 							// If the direct parent of a SchemaNode is a Choice, an implicit Case with the same name is inserted.
 							// In this case we skip the implicit Case (and the containing Choice).
 							descr = nodeScope.getSingleElement(qname)
@@ -498,7 +541,7 @@ class XpathResolver {
 	
 	protected def getEObjectDescription(XpathType type) {
 		if (type instanceof NodeSetType) {
-			return type.nodes.head				
+			return type.singleNode
 		}
 		return null
 	}

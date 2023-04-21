@@ -5,6 +5,7 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
+import org.eclipse.core.runtime.OperationCanceledException;
 import org.eclipse.lsp4j.Position;
 import org.eclipse.lsp4j.SemanticTokens;
 import org.eclipse.xtext.ide.editor.syntaxcoloring.IHighlightedPositionAcceptor;
@@ -22,11 +23,14 @@ public class YangSemanticTokensProvider {
 
 			@Override
 			public void addPosition(int offset, int length, String... ids) {
+				if (cancelIndicator.isCanceled())
+					throw new OperationCanceledException();
+
+				Position position = doc.getPosition(offset);
 				for (String styleId : ids) {
 					Optional<TokenType> yangStyle = Arrays.stream(TokenType.values())
 							.filter(e -> e.getYangStyle().equals(styleId)).findFirst();
 					if (yangStyle.isPresent()) {
-						Position position = doc.getPosition(offset);
 						tokens.add(new SemanticToken(position.getLine() + 1, position.getCharacter() + 1, length,
 								yangStyle.get().ordinal(), 0));
 					}

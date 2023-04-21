@@ -175,7 +175,7 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 			XpathExpression: {
 				val type = xpathResolver.getType(obj)
 				if (type instanceof NodeSetType) {
-					return type.nodes
+					return type.allNodes
 				} else {
 					if (obj instanceof XpathLocation) {
 						val p = findPathes(obj.target, context)

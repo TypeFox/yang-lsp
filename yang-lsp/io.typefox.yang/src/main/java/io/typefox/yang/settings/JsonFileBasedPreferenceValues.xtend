@@ -81,7 +81,7 @@ class JsonFileBasedPreferenceValues extends MapBasedPreferenceValues {
 					} else {
 						entry.key
 					}
-					this.put(key, v.asString.toString)				
+					this.put(key, v.asString.toString)
 				} 
 			}
 		}
