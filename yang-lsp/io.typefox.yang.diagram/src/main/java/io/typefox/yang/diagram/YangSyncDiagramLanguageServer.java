@@ -1,7 +1,9 @@
 package io.typefox.yang.diagram;
 
+import java.util.Collections;
 import java.util.concurrent.CompletableFuture;
 
+import org.apache.log4j.Logger;
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.lsp4j.InitializeParams;
 import org.eclipse.lsp4j.SemanticTokens;
@@ -20,6 +22,10 @@ import io.typefox.yang.ide.server.YangAdditionalServerCapabilities;
 
 
 public class YangSyncDiagramLanguageServer extends SyncDiagramLanguageServer {
+	
+	private static final Logger LOG = Logger.getLogger(YangSyncDiagramLanguageServer.class);
+	private static final SemanticTokens EMPTY_SEMANTIC_TOKENS = new SemanticTokens(Collections.emptyList());
+	
 	@Inject
 	YangAdditionalServerCapabilities serverAdditions;
 	@Inject
@@ -40,7 +46,8 @@ public class YangSyncDiagramLanguageServer extends SyncDiagramLanguageServer {
 		URI uri = getURI(params.getTextDocument());
 		ISemanticHighlightingCalculator highlightingCalculator = getService(uri, ISemanticHighlightingCalculator.class);
 		if (highlightingCalculator == null) {
-			throw new UnsupportedOperationException();
+			LOG.error("Semantic Highlighting Calculator service is not registered for URI: " +uri.toString());
+			return EMPTY_SEMANTIC_TOKENS;
 		}
 		return getWorkspaceManager().doRead(uri, (final Document doc, final XtextResource resource) -> {
 			return semantikTokens.highlightedPositionsToSemanticTokens(doc, resource,
