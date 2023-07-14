@@ -12,11 +12,11 @@ publishing {
 						description = project.description
 					}
 				}
-				url = 'https://github.com/theia-ide/yang-lsp'
+				url = 'https://github.com/TypeFox/yang-lsp'
 				scm {
-					connection = 'scm:git:git@github.com:theia-ide/yang-lsp.git'
-					developerConnection = 'scm:git:git@github.com:theia-ide/yang-lsp.git'
-					url = 'git@github.com:theia-ide/yang-lsp.git'
+					connection = 'scm:git:git@github.com:TypeFox/yang-lsp.git'
+					developerConnection = 'scm:git:git@github.com:TypeFox/yang-lsp.git'
+					url = 'git@github.com:TypeFox/yang-lsp.git'
 				}
 				licenses {
 					license {

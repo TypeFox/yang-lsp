@@ -23,7 +23,7 @@ jobs:
       run: ./gradlew --no-daemon build copyDist
       working-directory: yang-lsp
     - name: Gradle Publish Release Artifacts
-      if: env.HAVE_SNAPSHOT == 0 && github.repository == 'theia-ide/yang-lsp'
+      if: env.HAVE_SNAPSHOT == 0 && github.repository == 'TypeFox/yang-lsp'
       run: ./gradlew --no-daemon publish
       working-directory: yang-lsp
       env:
