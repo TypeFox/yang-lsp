@@ -2,6 +2,7 @@ package io.typefox.yang.ide.editor.syntaxcoloring;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -37,7 +38,11 @@ public class YangSemanticTokensProvider {
 				}
 			}
 		};
-		highlightingCalculator.provideHighlightingFor(resource, acceptor, cancelIndicator);
+		try {
+			highlightingCalculator.provideHighlightingFor(resource, acceptor, cancelIndicator);
+		} catch (OperationCanceledException e) {
+			return new SemanticTokens(Collections.emptyList());
+		}
 		return new SemanticTokens(SemanticToken.encodedTokens(tokens));
 	}
 }

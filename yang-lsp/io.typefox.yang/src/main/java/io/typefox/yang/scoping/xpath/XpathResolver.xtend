@@ -348,7 +348,7 @@ class XpathResolver {
 		}
 		val ref = new AtomicReference<XpathType>() 
 		linker.link(e.node, YangPackage.Literals.XPATH_NAME_TEST__REF) [
-			val type = computeSingleType(contextType, resolveModulePrefix(e), mode, ctx)
+			val type = computeType(contextType, resolveModulePrefix(e), mode, ctx)
 			ref.set(type)
 			return type.EObjectDescription
 		]
@@ -380,15 +380,7 @@ class XpathResolver {
 		DESCENDANTS_OR_SELF
 	}
 	
-	protected def XpathType computeSingleType(XpathType type, QualifiedName name, Axis mode, Context ctx) {
-		computeType(type, name, mode, true, ctx)
-	}
-	
 	protected def XpathType computeType(XpathType type, QualifiedName name, Axis mode, Context ctx) {
-		computeType(type, name, mode, false, ctx)
-	}
-	
-	private def XpathType computeType(XpathType type, QualifiedName name, Axis mode, boolean onlyFirst, Context ctx) {
 		if (type instanceof NodeSetType) {
 			// handle root
 			if (type.isEmpty) {
@@ -399,16 +391,12 @@ class XpathResolver {
 				return Types.nodeSet(nodes)
 			}
 			val result = newLinkedHashSet()
-			if (onlyFirst) {
-				return Types.nodeSet(findNodes(type.singleNode.qualifiedName, name, mode, ctx.nodeScope))
-			} else {
-				for (n : type.allNodes) {
-					val nodes = findNodes(n.qualifiedName, name, mode, ctx.nodeScope)
-					result.addAll(nodes)
-				}
-				if (!result.empty) {
-					return Types.nodeSet(result.toList)
-				}
+			for (n : type.allNodes) {
+				val nodes = findNodes(n.qualifiedName, name, mode, ctx.nodeScope)
+				result.addAll(nodes)
+			}
+			if (!result.empty) {
+				return Types.nodeSet(result.toList)
 			}
 		}
 		return Types.ANY
