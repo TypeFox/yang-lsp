@@ -20,14 +20,14 @@ jobs:
         distribution: adopt
     - name: Evaluate version
       run: |
-          echo "PROJECT_VERSION=$(gradle properties -q | grep "version:" | awk '{print $2}')" >> $GITHUB_ENV
-          echo "HAVE_SNAPSHOT=$(gradle properties -q | grep "version:" | awk '{print $2}' | grep SNAPSHOT | wc -l)" >> $GITHUB_ENV
+          echo "PROJECT_VERSION=$(./gradlew --no-daemon properties -q | grep "version:" | awk '{print $2}')" >> $GITHUB_ENV
+          echo "HAVE_SNAPSHOT=$(./gradlew --no-daemon properties -q | grep "version:" | awk '{print $2}' | grep SNAPSHOT | wc -l)" >> $GITHUB_ENV
       working-directory: yang-lsp
     - name: Run Gradle build, execute tests and copy zip
       run: ./gradlew --no-daemon build copyDist
       working-directory: yang-lsp
-    - name: Check Publishing condition
-      run: echo "env.HAVE_SNAPSHOT={{env.HAVE_SNAPSHOT}} github.repository={{github.repository}} github.ref={{github.ref}}"
+    - name: Check Publishing conditions
+      run: echo "env.HAVE_SNAPSHOT=$HAVE_SNAPSHOT github.repository=${{github.repository}} github.ref=${{github.ref}}"
     - name: Gradle Publish Snapshots
       if: env.HAVE_SNAPSHOT == 1 && github.repository == 'typefox/yang-lsp' && github.ref == 'refs/heads/dh/ci-setup'
       run: ./gradlew --no-daemon publish

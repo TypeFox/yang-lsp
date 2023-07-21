@@ -8,16 +8,16 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up JDK
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
         java-version: 11
         distribution: adopt
     - name: Evaluate version
       run: |
-          echo "PROJECT_VERSION=$(gradle properties -q | grep "version:" | awk '{print $2}')" >> $GITHUB_ENV
-          echo "HAVE_SNAPSHOT=$(gradle properties -q | grep "version:" | awk '{print $2}' | grep SNAPSHOT | wc -l)" >> $GITHUB_ENV
+          echo "PROJECT_VERSION=$(./gradlew --no-daemon properties -q | grep "version:" | awk '{print $2}')" >> $GITHUB_ENV
+          echo "HAVE_SNAPSHOT=$(./gradlew --no-daemon properties -q | grep "version:" | awk '{print $2}' | grep SNAPSHOT | wc -l)" >> $GITHUB_ENV
       working-directory: yang-lsp
     - name: Run Gradle build, execute tests and copy zip
       run: ./gradlew --no-daemon build copyDist
@@ -32,13 +32,13 @@ jobs:
           ORG_GRADLE_PROJECT_signingKey: ${{ secrets.MAVEN_GPG_PRIVATE_KEY  }}
           ORG_GRADLE_PROJECT_signingPassword: ${{ secrets.MAVEN_GPG_PASSPHRASE  }}
     - name: Archive yang-language-server
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: yang-language-server_${{ env.PROJECT_VERSION }}
         path: |
           yang-lsp/build/yang-language-server_[0-9]*.zip
     - name: Archive yang-language-server_diagram-extension
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: yang-language-server_diagram-extension_${{ env.PROJECT_VERSION }}
         path: |
