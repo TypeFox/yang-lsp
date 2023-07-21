@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - dh/ci-setup
+      - master
   pull_request:
     branches:
       - master
@@ -29,7 +29,7 @@ jobs:
     - name: Check Publishing conditions
       run: echo "env.HAVE_SNAPSHOT=$HAVE_SNAPSHOT github.repository=${{github.repository}} github.ref=${{github.ref}}"
     - name: Gradle Publish Snapshots
-      if: env.HAVE_SNAPSHOT == 1 && github.repository == 'typefox/yang-lsp' && github.ref == 'refs/heads/dh/ci-setup'
+      if: env.HAVE_SNAPSHOT == 1 && github.repository == 'typefox/yang-lsp' && github.ref == 'refs/heads/master'
       run: ./gradlew --no-daemon publish
       working-directory: yang-lsp
       env:
