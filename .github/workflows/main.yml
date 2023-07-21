@@ -3,7 +3,7 @@ name: CI
 on:
   push:
     branches:
-      - master
+      - dh/ci-setup
   pull_request:
     branches:
       - master
@@ -12,9 +12,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
     - name: Set up JDK
-      uses: actions/setup-java@v2
+      uses: actions/setup-java@v3
       with:
         java-version: 11
         distribution: adopt
@@ -26,8 +26,10 @@ jobs:
     - name: Run Gradle build, execute tests and copy zip
       run: ./gradlew --no-daemon build copyDist
       working-directory: yang-lsp
+    - name: Check Publishing condition
+      run: echo "env.HAVE_SNAPSHOT={{env.HAVE_SNAPSHOT}} github.repository={{github.repository}} github.ref={{github.ref}}"
     - name: Gradle Publish Snapshots
-      if: env.HAVE_SNAPSHOT == 1 && github.repository == 'typefox/yang-lsp' && github.ref == 'refs/heads/master'
+      if: env.HAVE_SNAPSHOT == 1 && github.repository == 'typefox/yang-lsp' && github.ref == 'refs/heads/dh/ci-setup'
       run: ./gradlew --no-daemon publish
       working-directory: yang-lsp
       env:
@@ -41,13 +43,13 @@ jobs:
       with:
         files: yang-lsp/**/test-results/**/*.xml
     - name: Archive yang-language-server
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: yang-language-server_${{ env.PROJECT_VERSION }}
         path: |
           yang-lsp/build/yang-language-server_[0-9]*.zip
     - name: Archive yang-language-server_diagram-extension
-      uses: actions/upload-artifact@v2
+      uses: actions/upload-artifact@v3
       with:
         name: yang-language-server_diagram-extension_${{ env.PROJECT_VERSION }}
         path: |
