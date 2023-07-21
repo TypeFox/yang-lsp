@@ -27,7 +27,7 @@ jobs:
       run: ./gradlew --no-daemon build copyDist
       working-directory: yang-lsp
     - name: Gradle Publish Snapshots
-      if: env.HAVE_SNAPSHOT == 1 && github.repository == 'TypeFox/yang-lsp' && github.ref == 'refs/heads/master'
+      if: env.HAVE_SNAPSHOT == 1 && github.repository == 'typefox/yang-lsp' && github.ref == 'refs/heads/master'
       run: ./gradlew --no-daemon publish
       working-directory: yang-lsp
       env:
