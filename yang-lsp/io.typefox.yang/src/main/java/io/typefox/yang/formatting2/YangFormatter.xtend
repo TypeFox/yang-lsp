@@ -115,7 +115,11 @@ class YangFormatter extends AbstractFormatter2 {
     override protected initialize(FormatterRequest request) {
         val preferences = request.preferences
         if (preferences instanceof MapBasedPreferenceValues) {
-            preferences.put(FormatterPreferenceKeys.indentation, indentationInformation.indentString)
+            val configuredIndent = preferences.getPreference(FormatterPreferenceKeys.indentation)
+            if(configuredIndent === null || preferences.values.get(FormatterPreferenceKeys.indentation.id) === null) {
+                // Overwrite if not already present. Might be configured with FormattingOptions from IDE
+                preferences.put(FormatterPreferenceKeys.indentation, indentationInformation.indentString)
+            }
         }
         super.initialize(request)
     }

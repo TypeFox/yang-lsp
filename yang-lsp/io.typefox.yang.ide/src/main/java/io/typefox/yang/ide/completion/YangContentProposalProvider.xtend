@@ -114,10 +114,10 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 						label = "import " + e.qualifiedName
 						proposal = '''
 							import «e.qualifiedName» {
-								prefix «m.substatements.filter(Prefix).head?.prefix»;
-								«IF rev!==null»
-									revision-date «rev.revision»;
-								«ENDIF»
+							  prefix «m.substatements.filter(Prefix).head?.prefix»;
+							    «IF rev!==null»
+							    revision-date «rev.revision»;
+							    «ENDIF»
 							}
 						'''.toString.replaceAll('  ', indentString);
 						description = "module " + m.name

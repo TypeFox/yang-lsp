@@ -11,6 +11,7 @@ import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.TextRegion
 import com.google.common.base.Strings
+import org.eclipse.xtext.formatting2.FormatterPreferenceKeys
 
 class YangFormattingService extends FormattingService {
 	
@@ -24,7 +25,7 @@ class YangFormattingService extends FormattingService {
 			}
 		}
 		val preferences = newHashMap
-		preferences.put("indentation", indent)
+		preferences.put(FormatterPreferenceKeys.indentation.id, indent)
 		val replacements = format2(resource, new TextRegion(offset, length), new MapBasedPreferenceValues(preferences))
 		return replacements.map [ r |
 			document.toTextEdit(r.replacementText, r.offset, r.length)
