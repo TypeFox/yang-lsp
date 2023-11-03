@@ -194,6 +194,12 @@ Issue code when an ordinal value exceeds its limits.
 
  (default severity: error)
 
+#### `indentation`
+
+Controls the indentation string when formatting or serializing yang files.
+
+ (default: four spaces)
+
 #### `invalid-config`
 
 Issue code when a `config=true` is a child of a `config=false` (see https://tools.ietf.org/html/rfc7950#section-7.21.1)

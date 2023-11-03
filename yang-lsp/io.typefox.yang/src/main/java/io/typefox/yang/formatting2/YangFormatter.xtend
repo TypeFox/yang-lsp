@@ -100,12 +100,13 @@ import org.eclipse.xtext.preferences.MapBasedPreferenceValues
 import org.eclipse.xtext.xbase.lib.Procedures.Procedure1
 
 import static io.typefox.yang.yang.YangPackage.Literals.*
+import org.eclipse.xtext.preferences.IPreferenceValuesProvider
 
 class YangFormatter extends AbstractFormatter2 {
     
     @Inject extension YangGrammarAccess
     @Inject IIndentationInformation indentationInformation
-    
+    @Inject IPreferenceValuesProvider yangSettings
     // Option Keys
     
     public static val FORCE_NEW_LINE = new BooleanKey("FORCE_NEW_LINE", true)
@@ -116,9 +117,14 @@ class YangFormatter extends AbstractFormatter2 {
         val preferences = request.preferences
         if (preferences instanceof MapBasedPreferenceValues) {
             val configuredIndent = preferences.getPreference(FormatterPreferenceKeys.indentation)
+            // Overwrite if not already present. Might be configured with FormattingOptions from IDE
             if(configuredIndent === null || preferences.values.get(FormatterPreferenceKeys.indentation.id) === null) {
-                // Overwrite if not already present. Might be configured with FormattingOptions from IDE
-                preferences.put(FormatterPreferenceKeys.indentation, indentationInformation.indentString)
+                var defaultIndent = yangSettings.getPreferenceValues(request.textRegionAccess.resource).getPreference(FormatterPreferenceKeys.indentation)
+                // if not set using yang.setting. Ask IIndentationInformation
+                if(defaultIndent == FormatterPreferenceKeys.indentation.defaultValue) {
+                    defaultIndent = indentationInformation.indentString
+                }
+                preferences.put(FormatterPreferenceKeys.indentation, defaultIndent)
             }
         }
         super.initialize(request)
