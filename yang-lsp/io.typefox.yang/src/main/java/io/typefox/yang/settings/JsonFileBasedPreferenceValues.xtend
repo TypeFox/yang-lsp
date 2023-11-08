@@ -59,7 +59,7 @@ class JsonFileBasedPreferenceValues extends MapBasedPreferenceValues {
 	
 	def void read() {
 		clear()
-		val bytes = Files.readAllBytes(path)
+		val bytes = readBytes(path)
 		val reader = new JsonReader(new BufferedReader(new InputStreamReader(new ByteArrayInputStream(bytes))))
 		reader.lenient = true
 		val object = Streams.parse(reader)
@@ -68,6 +68,10 @@ class JsonFileBasedPreferenceValues extends MapBasedPreferenceValues {
 		} else {
 			LOG.error("The yang.settings file, did not contain a top level object.")
 		}
+	}
+	
+	protected def byte[] readBytes(Path path) {
+		return Files.readAllBytes(path)
 	}
 	
 	private def void internalFillMap(String prefix, JsonObject object) {
