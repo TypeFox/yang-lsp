@@ -7,5 +7,6 @@
 - Select `v0.5.0` tag from the __Choose a tag__ dropdown, fill out the form and click __Publish release__
 - A [Release](https://github.com/TypeFox/yang-lsp/actions/workflows/release.yml) GH Action will start building and publishing the maven artifacts to the OSS staging repository
 - After a successful build copy build artifacts `language-server_0.5.0.zip` and `yang-language-server_diagram-extension_0.5.0.zip` to the release assets. You can edit an existing release by clicking the __Edit__ icon and upload files using drag and drop.
-- Finally go to [OSS Staging Repository](https://oss.sonatype.org/#stagingRepositories) and __Close__ -> __Release__ the staging yang repositories
+- Go to [OSS Staging Repository](https://oss.sonatype.org/#stagingRepositories) and __Close__ -> __Release__ the staging yang repositories
 - Check the released version inside the [maven repo](https://repo1.maven.org/maven2/io/typefox/yang/)
+- Check if dependent projects (yang-vscode) need to be updated
