@@ -17,16 +17,16 @@ submodule ietf-snmp-target {
     "WG Web:   <http://tools.ietf.org/wg/netmod/>
      WG List:  <mailto:mail@domain.xyz>
 
-     WG Chair: David Kessens
+     WG Chair: John Smith
                <mailto:mail@domain.xyz>
 
-     WG Chair: Juergen Schoenwaelder
+     WG Chair: John Smith
                <mailto:mail@domain.xyz>
 
      Editor:   Martin Bjorklund
                <mailto:mail@domain.xyz>
 
-     Editor:   Juergen Schoenwaelder
+     Editor:   John Smith
                <mailto:mail@domain.xyz>";
 
   description

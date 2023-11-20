@@ -23,7 +23,7 @@ module INET-ADDRESS-MIB {
      "IETF Operations and Management Area";
 
    contact          
-     "Juergen Schoenwaelder (Editor)
+     "John Smith (Editor)
       International University Bremen
       P.O. Box 750 561
       28725 Bremen, Germany

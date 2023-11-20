@@ -207,13 +207,13 @@ class MultilineStringTest extends AbstractYangTest {
                   "WG Web:   <http://tools.ietf.org/wg/netmod/>
                    WG List:  <mailto:mail@domain.xyz>
                    
-                   WG Chair: David Kessens
+                   WG Chair: John Smith
                              <mailto:mail@domain.xyz>
                    
-                   WG Chair: Juergen Schoenwaelder
+                   WG Chair: John Smith
                              <mailto:mail@domain.xyz>
                    
-                   Editor:   Juergen Schoenwaelder
+                   Editor:   John Smith
                              <mailto:mail@domain.xyz>
                   ";
             '''.wrapFormatted
@@ -228,13 +228,13 @@ class MultilineStringTest extends AbstractYangTest {
               "WG Web:   <http://tools.ietf.org/wg/netmod/>
                WG List:  <mailto:mail@domain.xyz>
                
-               WG Chair: David Kessens
+               WG Chair: John Smith
                          <mailto:mail@domain.xyz>
                
-               WG Chair: Juergen Schoenwaelder
+               WG Chair: John Smith
                          <mailto:mail@domain.xyz>
                
-               Editor:   Juergen Schoenwaelder
+               Editor:   John Smith
                          <mailto:mail@domain.xyz>
               ";
             '''.wrapFormatted
@@ -243,13 +243,13 @@ class MultilineStringTest extends AbstractYangTest {
                   "WG Web:   <http://tools.ietf.org/wg/netmod/>
                    WG List:  <mailto:mail@domain.xyz>
                 
-                   WG Chair: David Kessens
+                   WG Chair: John Smith
                              <mailto:mail@domain.xyz>
                 
-                   WG Chair: Juergen Schoenwaelder
+                   WG Chair: John Smith
                              <mailto:mail@domain.xyz>
                 
-                   Editor:   Juergen Schoenwaelder
+                   Editor:   John Smith
                              <mailto:mail@domain.xyz>
                   ";
             '''.wrapUnformatted
@@ -294,7 +294,7 @@ class MultilineStringTest extends AbstractYangTest {
         assertFormattedWithoutSerialization[
             toBeFormatted = '''
             contact
-              "WG Chair: David Kessens
+              "WG Chair: John Smith
                          <mailto:mail@domain.xyz>";
             '''.wrapFormatted
         ]
@@ -307,7 +307,7 @@ class MultilineStringTest extends AbstractYangTest {
                 put(YangFormatter.FORCE_NEW_LINE, "false")
             ]
             toBeFormatted = '''
-            contact "WG Chair: David Kessens
+            contact "WG Chair: John Smith
                                <mailto:mail@domain.xyz>";
             '''.wrapFormatted
         ]
