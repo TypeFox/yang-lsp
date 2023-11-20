@@ -14,9 +14,9 @@ publishing {
 				}
 				url = 'https://github.com/TypeFox/yang-lsp'
 				scm {
-					connection = 'scm:git:mail@domain.xyz:TypeFox/yang-lsp.git'
-					developerConnection = 'scm:git:mail@domain.xyz:TypeFox/yang-lsp.git'
-					url = 'mail@domain.xyz:TypeFox/yang-lsp.git'
+					connection = 'scm:git:git@github.com:TypeFox/yang-lsp.git'
+					developerConnection = 'scm:git:git@github.com:TypeFox/yang-lsp.git'
+					url = 'git@github.com:TypeFox/yang-lsp.git'
 				}
 				licenses {
 					license {
@@ -27,42 +27,42 @@ publishing {
 				developers {
 					developer {
 						name = 'Dennis Huebner'
-						email = 'mail@domain.xyz'
+						email = 'dennis.huebner@typefox.io'
 						organizationUrl = 'https://typefox.io'
 					}
 					developer {
 						name = 'Miro Spönemann'
-						email = 'mail@domain.xyz'
+						email = 'miro.spoenemann@typefox.io'
 						organizationUrl = 'https://typefox.io'
 					}	
 					developer {
 						name = 'Jan Bicker'
-						email = 'mail@domain.xyz'
+						email = 'jan.bicker@typefox.io'
 						organizationUrl = 'https://typefox.io'
 					}
 					developer {
 						name = 'Sven Efftinge'
-						email = 'mail@domain.xyz'
+						email = 'sven.efftinge@typefox.io'
 						organizationUrl = 'https://typefox.io'
 					}
 					developer {
 						name = 'Ákos Kitta'
-						email = 'mail@domain.xyz'
+						email = 'akos.kitta@typefox.io'
 						organizationUrl = 'https://typefox.io'
 					}
 					developer {
 						name = 'Jan Köhnlein'
-						email = 'mail@domain.xyz'
+						email = 'jan.koehnlein@typefox.io'
 						organizationUrl = 'https://typefox.io'
 					}
 					developer {
 						name = 'Alex Tugarev'
-						email = 'mail@domain.xyz'
+						email = 'alex.tugarev@typefox.io'
 						organizationUrl = 'https://typefox.io'
 					}
 					developer {
 						name = 'Kai Salmen'
-						email = 'mail@domain.xyz'
+						email = 'kai.salmen@typefox.io'
 						organizationUrl = 'https://typefox.io'
 					}
  				}
