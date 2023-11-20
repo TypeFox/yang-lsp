@@ -6,6 +6,7 @@ import io.typefox.yang.processor.ProcessedDataTree.HasStatements
 import io.typefox.yang.processor.ProcessedDataTree.ListData
 import io.typefox.yang.processor.ProcessedDataTree.ModuleData
 import java.util.List
+import io.typefox.yang.processor.ProcessedDataTree.ElementKind
 
 class DataTreeSerializer {
 
@@ -51,15 +52,30 @@ class DataTreeSerializer {
 			}
 
 		val type = ele.getType
-		
+		// no idea why this indentation is needed in pyang
+		val additionalIdent = if(ele.elementKind === ElementKind.Choice && prevSibling(ele)?.elementKind === ElementKind.Container) ' ' else ''
 		'''
-			«indent»+«prefix»«label»«ele.cardinality?.toString()»«keys»«IF type !== null»   «type»«ENDIF»«IF ele.featureConditions !== null» {«ele.featureConditions.join(',')»}?«ENDIF»
+			«indent»«additionalIdent»+«prefix»«label»«ele.cardinality?.toString()»«keys»«IF type !== null»   «type»«ENDIF»«IF ele.featureConditions !== null» {«ele.featureConditions.join(',')»}?«ENDIF»
 			«IF ele.children !== null»
 				«FOR child : ele.children»
 					«doSerialize(child, indent + (needsConnect?'|  ':'   '), needsConnect(child, ele.children))»
 				«ENDFOR»
 			«ENDIF»
 		'''
+	}
+	
+	private def ElementData prevSibling(ElementData ele) {
+		val siblings = ele.parent?.children
+		if(siblings === null) {
+			return null
+		}
+		val eleIdx = siblings.indexOf(ele)
+		if(eleIdx > 0) {
+			val prevChild = siblings.get(eleIdx - 1)
+			if(prevChild instanceof ElementData) {
+				return prevChild
+			}
+		}
 	}
 
 	private def boolean needsConnect(HasStatements ele, List<HasStatements> siblings) {

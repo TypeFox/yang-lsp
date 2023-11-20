@@ -275,10 +275,18 @@ public class ProcessedDataTree {
 			// FIXME use import statement prefix
 			var typeModule = ProcessorUtility.moduleIdentifier(typedef);
 			String prefix = Objects.equal(typeModule.name, ProcessorUtility.moduleIdentifier(typeRef).name) ? null
-					: typeModule.prefix;
+							: typeModule.prefix;
 			return new ValueType(prefix, typedef.getName());
 		}
-
+/*
+		private boolean sameParentModule(EObject o1, EObject o2) {
+			var o1module = EcoreUtil2.getContainerOfType(o1, AbstractModule.class);
+			if (o1module != null) {
+				return o1module.equals(EcoreUtil2.getContainerOfType(o2, AbstractModule.class));
+			}
+			return false;
+		}
+*/
 		private String serializedXpath(XpathExpression reference) {
 			// TODO use serializer or implement a an own simple one
 			ICompositeNode nodeFor = NodeModelUtils.findActualNodeFor(reference);

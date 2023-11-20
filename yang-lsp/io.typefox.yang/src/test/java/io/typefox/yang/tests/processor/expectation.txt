@@ -208,7 +208,7 @@ module: ietf-system
   |  |  |  |        |     |        +--:(sysxext:keystore) {keystore-supported}?
   |  |  |  |        |     |           +--rw sysxext:keystore-reference
   |  |  |  |        |     |              +--rw sysxext:asymmetric-key?   ks:asymmetric-key-ref
-  |  |  |  |        |     |              +--rw sysxext:certificate?      -> /ks:keystore/asymmetric-keys/asymmetric-key[ks:name = current()/../asymmetric-key]/certificates/certificate/name
+  |  |  |  |        |     |              +--rw sysxext:certificate?      -> /ks:keystore/asymmetric-keys/asymmetric-key[ks:name=current()/../asymmetric-key]/certificates/certificate/name
   |  |  |  |        |     +--:(sysxext:raw-public-key)
   |  |  |  |        |     |  +--rw sysxext:raw-public-key {raw-public-key-auth}?
   |  |  |  |        |     |     +--rw (sysxext:local-or-keystore)
