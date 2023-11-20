@@ -4,17 +4,11 @@
       "elementKind": "Rpc",
       "accessKind": "x",
       "cardinality": "mandatory",
-      "id": {
-        "name": "set-current-datetime"
-      },
       "children": [
         {
           "elementKind": "Input",
           "accessKind": "w",
           "cardinality": "mandatory",
-          "id": {
-            "name": "input"
-          },
           "children": [
             {
               "elementKind": "Leaf",
@@ -28,9 +22,15 @@
                 "name": "current-datetime"
               }
             }
-          ]
+          ],
+          "id": {
+            "name": "input"
+          }
         }
-      ]
+      ],
+      "id": {
+        "name": "set-current-datetime"
+      }
     },
     {
       "elementKind": "Rpc",
@@ -41,18 +41,11 @@
       }
     }
   ],
-  "id": {
-    "name": "ietf-system",
-    "prefix": "sys"
-  },
   "children": [
     {
       "elementKind": "Container",
       "accessKind": "rw",
       "cardinality": "not_set",
-      "id": {
-        "name": "system"
-      },
       "children": [
         {
           "elementKind": "Leaf",
@@ -92,17 +85,11 @@
           "elementKind": "Container",
           "accessKind": "rw",
           "cardinality": "not_set",
-          "id": {
-            "name": "clock"
-          },
           "children": [
             {
               "elementKind": "Choice",
               "accessKind": "rw",
               "cardinality": "optional",
-              "id": {
-                "name": "timezone"
-              },
               "children": [
                 {
                   "elementKind": "Case",
@@ -111,9 +98,6 @@
                   ],
                   "accessKind": "rw",
                   "cardinality": "mandatory",
-                  "id": {
-                    "name": "timezone-name"
-                  },
                   "children": [
                     {
                       "elementKind": "Leaf",
@@ -126,15 +110,15 @@
                         "name": "timezone-name"
                       }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "timezone-name"
+                  }
                 },
                 {
                   "elementKind": "Case",
                   "accessKind": "rw",
                   "cardinality": "mandatory",
-                  "id": {
-                    "name": "timezone-utc-offset"
-                  },
                   "children": [
                     {
                       "elementKind": "Leaf",
@@ -147,11 +131,20 @@
                         "name": "timezone-utc-offset"
                       }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "timezone-utc-offset"
+                  }
                 }
-              ]
+              ],
+              "id": {
+                "name": "timezone"
+              }
             }
-          ]
+          ],
+          "id": {
+            "name": "clock"
+          }
         },
         {
           "elementKind": "Container",
@@ -160,9 +153,6 @@
           ],
           "accessKind": "rw",
           "cardinality": "presence",
-          "id": {
-            "name": "ntp"
-          },
           "children": [
             {
               "elementKind": "Leaf",
@@ -182,9 +172,6 @@
               "elementKind": "List",
               "accessKind": "rw",
               "cardinality": "many",
-              "id": {
-                "name": "server"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -201,25 +188,16 @@
                   "elementKind": "Choice",
                   "accessKind": "rw",
                   "cardinality": "mandatory",
-                  "id": {
-                    "name": "transport"
-                  },
                   "children": [
                     {
                       "elementKind": "Case",
                       "accessKind": "rw",
                       "cardinality": "mandatory",
-                      "id": {
-                        "name": "udp"
-                      },
                       "children": [
                         {
                           "elementKind": "Container",
                           "accessKind": "rw",
                           "cardinality": "not_set",
-                          "id": {
-                            "name": "udp"
-                          },
                           "children": [
                             {
                               "elementKind": "Leaf",
@@ -248,11 +226,20 @@
                                 "name": "port"
                               }
                             }
-                          ]
+                          ],
+                          "id": {
+                            "name": "udp"
+                          }
                         }
-                      ]
+                      ],
+                      "id": {
+                        "name": "udp"
+                      }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "transport"
+                  }
                 },
                 {
                   "elementKind": "Leaf",
@@ -362,17 +349,20 @@
                     "prefix": "sysxext"
                   }
                 }
-              ]
+              ],
+              "id": {
+                "name": "server"
+              }
             }
-          ]
+          ],
+          "id": {
+            "name": "ntp"
+          }
         },
         {
           "elementKind": "Container",
           "accessKind": "rw",
           "cardinality": "not_set",
-          "id": {
-            "name": "dns-resolver"
-          },
           "children": [
             {
               "elementKind": "LeafList",
@@ -393,9 +383,6 @@
               "elementKind": "List",
               "accessKind": "rw",
               "cardinality": "many",
-              "id": {
-                "name": "server"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -412,25 +399,16 @@
                   "elementKind": "Choice",
                   "accessKind": "rw",
                   "cardinality": "mandatory",
-                  "id": {
-                    "name": "transport"
-                  },
                   "children": [
                     {
                       "elementKind": "Case",
                       "accessKind": "rw",
                       "cardinality": "mandatory",
-                      "id": {
-                        "name": "udp-and-tcp"
-                      },
                       "children": [
                         {
                           "elementKind": "Container",
                           "accessKind": "rw",
                           "cardinality": "not_set",
-                          "id": {
-                            "name": "udp-and-tcp"
-                          },
                           "children": [
                             {
                               "elementKind": "Leaf",
@@ -459,21 +437,30 @@
                                 "name": "port"
                               }
                             }
-                          ]
+                          ],
+                          "id": {
+                            "name": "udp-and-tcp"
+                          }
                         }
-                      ]
+                      ],
+                      "id": {
+                        "name": "udp-and-tcp"
+                      }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "transport"
+                  }
                 }
-              ]
+              ],
+              "id": {
+                "name": "server"
+              }
             },
             {
               "elementKind": "Container",
               "accessKind": "rw",
               "cardinality": "not_set",
-              "id": {
-                "name": "options"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -497,9 +484,15 @@
                     "name": "attempts"
                   }
                 }
-              ]
+              ],
+              "id": {
+                "name": "options"
+              }
             }
-          ]
+          ],
+          "id": {
+            "name": "dns-resolver"
+          }
         },
         {
           "elementKind": "Container",
@@ -508,9 +501,6 @@
           ],
           "accessKind": "rw",
           "cardinality": "not_set",
-          "id": {
-            "name": "radius"
-          },
           "children": [
             {
               "keys": [
@@ -519,9 +509,6 @@
               "elementKind": "List",
               "accessKind": "rw",
               "cardinality": "many",
-              "id": {
-                "name": "server"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -538,25 +525,16 @@
                   "elementKind": "Choice",
                   "accessKind": "rw",
                   "cardinality": "mandatory",
-                  "id": {
-                    "name": "transport"
-                  },
                   "children": [
                     {
                       "elementKind": "Case",
                       "accessKind": "rw",
                       "cardinality": "mandatory",
-                      "id": {
-                        "name": "udp"
-                      },
                       "children": [
                         {
                           "elementKind": "Container",
                           "accessKind": "rw",
                           "cardinality": "not_set",
-                          "id": {
-                            "name": "udp"
-                          },
                           "children": [
                             {
                               "elementKind": "Leaf",
@@ -593,11 +571,20 @@
                                 "name": "shared-secret"
                               }
                             }
-                          ]
+                          ],
+                          "id": {
+                            "name": "udp"
+                          }
                         }
-                      ]
+                      ],
+                      "id": {
+                        "name": "udp"
+                      }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "transport"
+                  }
                 },
                 {
                   "elementKind": "Leaf",
@@ -610,15 +597,15 @@
                     "name": "authentication-type"
                   }
                 }
-              ]
+              ],
+              "id": {
+                "name": "server"
+              }
             },
             {
               "elementKind": "Container",
               "accessKind": "rw",
               "cardinality": "not_set",
-              "id": {
-                "name": "options"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -642,9 +629,15 @@
                     "name": "attempts"
                   }
                 }
-              ]
+              ],
+              "id": {
+                "name": "options"
+              }
             }
-          ]
+          ],
+          "id": {
+            "name": "radius"
+          }
         },
         {
           "elementKind": "Container",
@@ -653,9 +646,6 @@
           ],
           "accessKind": "rw",
           "cardinality": "not_set",
-          "id": {
-            "name": "authentication"
-          },
           "children": [
             {
               "elementKind": "LeafList",
@@ -678,9 +668,6 @@
               ],
               "accessKind": "rw",
               "cardinality": "many",
-              "id": {
-                "name": "user"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -712,9 +699,6 @@
                   "elementKind": "List",
                   "accessKind": "rw",
                   "cardinality": "many",
-                  "id": {
-                    "name": "authorized-key"
-                  },
                   "children": [
                     {
                       "elementKind": "Leaf",
@@ -749,7 +733,10 @@
                         "name": "key-data"
                       }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "authorized-key"
+                  }
                 },
                 {
                   "elementKind": "Leaf",
@@ -853,7 +840,10 @@
                     "prefix": "sysxext"
                   }
                 }
-              ]
+              ],
+              "id": {
+                "name": "user"
+              }
             },
             {
               "elementKind": "Leaf",
@@ -938,11 +928,108 @@
               ],
               "accessKind": "rw",
               "cardinality": "not_set",
+              "children": [
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint16"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "max-consecutive-characters-per-class",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint16"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "min-digit",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint16"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "min-lower",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint16"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "min-upper",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint16"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "min-other",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint16"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "min-points",
+                    "prefix": "sysxext"
+                  }
+                }
+              ],
               "id": {
                 "name": "default-password-quality",
                 "prefix": "sysxext"
-              },
+              }
+            },
+            {
+              "keys": [
+                "name"
+              ],
+              "elementKind": "List",
+              "featureConditions": [
+                "sys:local-users"
+              ],
+              "accessKind": "rw",
+              "cardinality": "many",
               "children": [
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "string"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "mandatory",
+                  "id": {
+                    "name": "name",
+                    "prefix": "sysxext"
+                  }
+                },
                 {
                   "elementKind": "Leaf",
                   "type": {
@@ -1014,121 +1101,24 @@
                     "name": "min-points",
                     "prefix": "sysxext"
                   }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "string"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "user-label",
+                    "prefix": "sysxext"
+                  }
                 }
-              ]
-            },
-            {
-              "keys": [
-                "name"
               ],
-              "elementKind": "List",
-              "featureConditions": [
-                "sys:local-users"
-              ],
-              "accessKind": "rw",
-              "cardinality": "many",
               "id": {
                 "name": "password-quality",
                 "prefix": "sysxext"
-              },
-              "children": [
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "string"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "mandatory",
-                  "id": {
-                    "name": "name",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint16"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "max-consecutive-characters-per-class",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint16"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "min-digit",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint16"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "min-lower",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint16"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "min-upper",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint16"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "min-other",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint16"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "min-points",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "string"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "user-label",
-                    "prefix": "sysxext"
-                  }
-                }
-              ]
+              }
             },
             {
               "elementKind": "Container",
@@ -1137,11 +1127,156 @@
               ],
               "accessKind": "rw",
               "cardinality": "not_set",
+              "children": [
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint16"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "expiry-warning",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint32"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "failure-count-interval",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint32"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "history-length",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint32"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "lockout-duration",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint16"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "max-age",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint32"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "max-failure",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint16"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "min-age",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint16"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "min-length",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "boolean"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "must-change",
+                    "prefix": "sysxext"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "-\u003e /sys:system/authentication/password-quality/name"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "password-quality",
+                    "prefix": "sysxext"
+                  }
+                }
+              ],
               "id": {
                 "name": "default-password-policy",
                 "prefix": "sysxext"
-              },
+              }
+            },
+            {
+              "keys": [
+                "name"
+              ],
+              "elementKind": "List",
+              "featureConditions": [
+                "sys:local-users"
+              ],
+              "accessKind": "rw",
+              "cardinality": "many",
               "children": [
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "string"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "mandatory",
+                  "id": {
+                    "name": "name",
+                    "prefix": "sysxext"
+                  }
+                },
                 {
                   "elementKind": "Leaf",
                   "type": {
@@ -1261,169 +1396,24 @@
                     "name": "password-quality",
                     "prefix": "sysxext"
                   }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "string"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "user-label",
+                    "prefix": "sysxext"
+                  }
                 }
-              ]
-            },
-            {
-              "keys": [
-                "name"
               ],
-              "elementKind": "List",
-              "featureConditions": [
-                "sys:local-users"
-              ],
-              "accessKind": "rw",
-              "cardinality": "many",
               "id": {
                 "name": "password-policy",
                 "prefix": "sysxext"
-              },
-              "children": [
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "string"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "mandatory",
-                  "id": {
-                    "name": "name",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint16"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "expiry-warning",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint32"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "failure-count-interval",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint32"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "history-length",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint32"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "lockout-duration",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint16"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "max-age",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint32"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "max-failure",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint16"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "min-age",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "uint16"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "min-length",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "boolean"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "must-change",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "-\u003e /sys:system/authentication/password-quality/name"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "password-quality",
-                    "prefix": "sysxext"
-                  }
-                },
-                {
-                  "elementKind": "Leaf",
-                  "type": {
-                    "name": "string"
-                  },
-                  "accessKind": "rw",
-                  "cardinality": "optional",
-                  "id": {
-                    "name": "user-label",
-                    "prefix": "sysxext"
-                  }
-                }
-              ]
+              }
             },
             {
               "elementKind": "Container",
@@ -1432,10 +1422,6 @@
               ],
               "accessKind": "rw",
               "cardinality": "not_set",
-              "id": {
-                "name": "default-account-policy",
-                "prefix": "sysxext"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -1473,7 +1459,11 @@
                     "prefix": "sysxext"
                   }
                 }
-              ]
+              ],
+              "id": {
+                "name": "default-account-policy",
+                "prefix": "sysxext"
+              }
             },
             {
               "keys": [
@@ -1485,10 +1475,6 @@
               ],
               "accessKind": "rw",
               "cardinality": "many",
-              "id": {
-                "name": "account-policy",
-                "prefix": "sysxext"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -1550,7 +1536,11 @@
                     "prefix": "sysxext"
                   }
                 }
-              ]
+              ],
+              "id": {
+                "name": "account-policy",
+                "prefix": "sysxext"
+              }
             },
             {
               "elementKind": "Container",
@@ -1559,10 +1549,6 @@
               ],
               "accessKind": "rw",
               "cardinality": "not_set",
-              "id": {
-                "name": "admin-user",
-                "prefix": "sysxext"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -1584,10 +1570,6 @@
                   "elementKind": "List",
                   "accessKind": "rw",
                   "cardinality": "many",
-                  "id": {
-                    "name": "authorized-key",
-                    "prefix": "sysxext"
-                  },
                   "children": [
                     {
                       "elementKind": "Leaf",
@@ -1625,16 +1607,16 @@
                         "prefix": "sysxext"
                       }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "authorized-key",
+                    "prefix": "sysxext"
+                  }
                 },
                 {
                   "elementKind": "Container",
                   "accessKind": "rw",
                   "cardinality": "not_set",
-                  "id": {
-                    "name": "admin-password-policy",
-                    "prefix": "sysxext"
-                  },
                   "children": [
                     {
                       "elementKind": "Leaf",
@@ -1690,9 +1672,17 @@
                         "prefix": "sysxext"
                       }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "admin-password-policy",
+                    "prefix": "sysxext"
+                  }
                 }
-              ]
+              ],
+              "id": {
+                "name": "admin-user",
+                "prefix": "sysxext"
+              }
             },
             {
               "keys": [
@@ -1704,10 +1694,6 @@
               ],
               "accessKind": "rw",
               "cardinality": "many",
-              "id": {
-                "name": "oauth2-client",
-                "prefix": "sysxext"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -1725,19 +1711,11 @@
                   "elementKind": "Choice",
                   "accessKind": "rw",
                   "cardinality": "mandatory",
-                  "id": {
-                    "name": "client-authentication",
-                    "prefix": "sysxext"
-                  },
                   "children": [
                     {
                       "elementKind": "Case",
                       "accessKind": "rw",
                       "cardinality": "mandatory",
-                      "id": {
-                        "name": "client-secret",
-                        "prefix": "sysxext"
-                      },
                       "children": [
                         {
                           "elementKind": "Leaf",
@@ -1751,34 +1729,26 @@
                             "prefix": "sysxext"
                           }
                         }
-                      ]
+                      ],
+                      "id": {
+                        "name": "client-secret",
+                        "prefix": "sysxext"
+                      }
                     },
                     {
                       "elementKind": "Case",
                       "accessKind": "rw",
                       "cardinality": "mandatory",
-                      "id": {
-                        "name": "private-key-jwt",
-                        "prefix": "sysxext"
-                      },
                       "children": [
                         {
                           "elementKind": "Container",
                           "accessKind": "rw",
                           "cardinality": "presence",
-                          "id": {
-                            "name": "private-key-jwt",
-                            "prefix": "sysxext"
-                          },
                           "children": [
                             {
                               "elementKind": "Choice",
                               "accessKind": "rw",
                               "cardinality": "mandatory",
-                              "id": {
-                                "name": "local-or-truststore",
-                                "prefix": "sysxext"
-                              },
                               "children": [
                                 {
                                   "elementKind": "Case",
@@ -1787,19 +1757,11 @@
                                   ],
                                   "accessKind": "rw",
                                   "cardinality": "mandatory",
-                                  "id": {
-                                    "name": "local",
-                                    "prefix": "sysxext"
-                                  },
                                   "children": [
                                     {
                                       "elementKind": "Container",
                                       "accessKind": "rw",
                                       "cardinality": "not_set",
-                                      "id": {
-                                        "name": "local-definition",
-                                        "prefix": "sysxext"
-                                      },
                                       "children": [
                                         {
                                           "keys": [
@@ -1808,10 +1770,6 @@
                                           "elementKind": "List",
                                           "accessKind": "rw",
                                           "cardinality": "many",
-                                          "id": {
-                                            "name": "raw-public-key",
-                                            "prefix": "sysxext"
-                                          },
                                           "children": [
                                             {
                                               "elementKind": "Leaf",
@@ -1862,11 +1820,23 @@
                                                 "prefix": "sysxext"
                                               }
                                             }
-                                          ]
+                                          ],
+                                          "id": {
+                                            "name": "raw-public-key",
+                                            "prefix": "sysxext"
+                                          }
                                         }
-                                      ]
+                                      ],
+                                      "id": {
+                                        "name": "local-definition",
+                                        "prefix": "sysxext"
+                                      }
                                     }
-                                  ]
+                                  ],
+                                  "id": {
+                                    "name": "local",
+                                    "prefix": "sysxext"
+                                  }
                                 },
                                 {
                                   "elementKind": "Case",
@@ -1876,10 +1846,6 @@
                                   ],
                                   "accessKind": "rw",
                                   "cardinality": "mandatory",
-                                  "id": {
-                                    "name": "truststore",
-                                    "prefix": "sysxext"
-                                  },
                                   "children": [
                                     {
                                       "elementKind": "Leaf",
@@ -1894,15 +1860,35 @@
                                         "prefix": "sysxext"
                                       }
                                     }
-                                  ]
+                                  ],
+                                  "id": {
+                                    "name": "truststore",
+                                    "prefix": "sysxext"
+                                  }
                                 }
-                              ]
+                              ],
+                              "id": {
+                                "name": "local-or-truststore",
+                                "prefix": "sysxext"
+                              }
                             }
-                          ]
+                          ],
+                          "id": {
+                            "name": "private-key-jwt",
+                            "prefix": "sysxext"
+                          }
                         }
-                      ]
+                      ],
+                      "id": {
+                        "name": "private-key-jwt",
+                        "prefix": "sysxext"
+                      }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "client-authentication",
+                    "prefix": "sysxext"
+                  }
                 },
                 {
                   "elementKind": "LeafList",
@@ -1916,9 +1902,16 @@
                     "prefix": "sysxext"
                   }
                 }
-              ]
+              ],
+              "id": {
+                "name": "oauth2-client",
+                "prefix": "sysxext"
+              }
             }
-          ]
+          ],
+          "id": {
+            "name": "authentication"
+          }
         },
         {
           "elementKind": "Leaf",
@@ -1939,10 +1932,6 @@
           ],
           "accessKind": "rw",
           "cardinality": "presence",
-          "id": {
-            "name": "ldap",
-            "prefix": "sysxext"
-          },
           "children": [
             {
               "keys": [
@@ -1951,10 +1940,6 @@
               "elementKind": "List",
               "accessKind": "rw",
               "cardinality": "many",
-              "id": {
-                "name": "server",
-                "prefix": "sysxext"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -1972,28 +1957,16 @@
                   "elementKind": "Choice",
                   "accessKind": "rw",
                   "cardinality": "mandatory",
-                  "id": {
-                    "name": "transport",
-                    "prefix": "sysxext"
-                  },
                   "children": [
                     {
                       "elementKind": "Case",
                       "accessKind": "rw",
                       "cardinality": "mandatory",
-                      "id": {
-                        "name": "tcp",
-                        "prefix": "sysxext"
-                      },
                       "children": [
                         {
                           "elementKind": "Container",
                           "accessKind": "rw",
                           "cardinality": "not_set",
-                          "id": {
-                            "name": "tcp",
-                            "prefix": "sysxext"
-                          },
                           "children": [
                             {
                               "elementKind": "Leaf",
@@ -2012,28 +1985,16 @@
                               "elementKind": "Choice",
                               "accessKind": "rw",
                               "cardinality": "optional",
-                              "id": {
-                                "name": "protocol",
-                                "prefix": "sysxext"
-                              },
                               "children": [
                                 {
                                   "elementKind": "Case",
                                   "accessKind": "rw",
                                   "cardinality": "mandatory",
-                                  "id": {
-                                    "name": "ldap",
-                                    "prefix": "sysxext"
-                                  },
                                   "children": [
                                     {
                                       "elementKind": "Container",
                                       "accessKind": "rw",
                                       "cardinality": "not_set",
-                                      "id": {
-                                        "name": "ldap",
-                                        "prefix": "sysxext"
-                                      },
                                       "children": [
                                         {
                                           "elementKind": "Leaf",
@@ -2048,27 +2009,27 @@
                                             "prefix": "sysxext"
                                           }
                                         }
-                                      ]
+                                      ],
+                                      "id": {
+                                        "name": "ldap",
+                                        "prefix": "sysxext"
+                                      }
                                     }
-                                  ]
+                                  ],
+                                  "id": {
+                                    "name": "ldap",
+                                    "prefix": "sysxext"
+                                  }
                                 },
                                 {
                                   "elementKind": "Case",
                                   "accessKind": "rw",
                                   "cardinality": "mandatory",
-                                  "id": {
-                                    "name": "ldaps",
-                                    "prefix": "sysxext"
-                                  },
                                   "children": [
                                     {
                                       "elementKind": "Container",
                                       "accessKind": "rw",
                                       "cardinality": "presence",
-                                      "id": {
-                                        "name": "ldaps",
-                                        "prefix": "sysxext"
-                                      },
                                       "children": [
                                         {
                                           "elementKind": "Leaf",
@@ -2083,37 +2044,57 @@
                                             "prefix": "sysxext"
                                           }
                                         }
-                                      ]
+                                      ],
+                                      "id": {
+                                        "name": "ldaps",
+                                        "prefix": "sysxext"
+                                      }
                                     }
-                                  ]
+                                  ],
+                                  "id": {
+                                    "name": "ldaps",
+                                    "prefix": "sysxext"
+                                  }
                                 }
-                              ]
+                              ],
+                              "id": {
+                                "name": "protocol",
+                                "prefix": "sysxext"
+                              }
                             }
-                          ]
+                          ],
+                          "id": {
+                            "name": "tcp",
+                            "prefix": "sysxext"
+                          }
                         }
-                      ]
+                      ],
+                      "id": {
+                        "name": "tcp",
+                        "prefix": "sysxext"
+                      }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "transport",
+                    "prefix": "sysxext"
+                  }
                 }
-              ]
+              ],
+              "id": {
+                "name": "server",
+                "prefix": "sysxext"
+              }
             },
             {
               "elementKind": "Container",
               "accessKind": "rw",
               "cardinality": "not_set",
-              "id": {
-                "name": "security",
-                "prefix": "sysxext"
-              },
               "children": [
                 {
                   "elementKind": "Choice",
                   "accessKind": "rw",
                   "cardinality": "mandatory",
-                  "id": {
-                    "name": "transport-security",
-                    "prefix": "sysxext"
-                  },
                   "children": [
                     {
                       "elementKind": "Case",
@@ -2122,10 +2103,6 @@
                       ],
                       "accessKind": "rw",
                       "cardinality": "mandatory",
-                      "id": {
-                        "name": "clear",
-                        "prefix": "sysxext"
-                      },
                       "children": [
                         {
                           "elementKind": "Leaf",
@@ -2139,51 +2116,35 @@
                             "prefix": "sysxext"
                           }
                         }
-                      ]
+                      ],
+                      "id": {
+                        "name": "clear",
+                        "prefix": "sysxext"
+                      }
                     },
                     {
                       "elementKind": "Case",
                       "accessKind": "rw",
                       "cardinality": "mandatory",
-                      "id": {
-                        "name": "tls",
-                        "prefix": "sysxext"
-                      },
                       "children": [
                         {
                           "elementKind": "Container",
                           "accessKind": "rw",
                           "cardinality": "presence",
-                          "id": {
-                            "name": "tls",
-                            "prefix": "sysxext"
-                          },
                           "children": [
                             {
                               "elementKind": "Container",
                               "accessKind": "rw",
                               "cardinality": "not_set",
-                              "id": {
-                                "name": "client-identity",
-                                "prefix": "sysxext"
-                              },
                               "children": [
                                 {
                                   "elementKind": "Choice",
                                   "accessKind": "rw",
                                   "cardinality": "mandatory",
-                                  "id": {
-                                    "name": "auth-type",
-                                    "prefix": "sysxext"
-                                  },
                                   "children": [
                                     {
                                       "elementKind": "Case",
                                       "accessKind": "not_set",
-                                      "id": {
-                                        "name": "certificate",
-                                        "prefix": "sysxext"
-                                      },
                                       "children": [
                                         {
                                           "elementKind": "Container",
@@ -2201,10 +2162,6 @@
                                           "elementKind": "Choice",
                                           "accessKind": "rw",
                                           "cardinality": "mandatory",
-                                          "id": {
-                                            "name": "local-or-keystore",
-                                            "prefix": "sysxext"
-                                          },
                                           "children": [
                                             {
                                               "elementKind": "Case",
@@ -2213,19 +2170,11 @@
                                               ],
                                               "accessKind": "rw",
                                               "cardinality": "mandatory",
-                                              "id": {
-                                                "name": "local",
-                                                "prefix": "sysxext"
-                                              },
                                               "children": [
                                                 {
                                                   "elementKind": "Container",
                                                   "accessKind": "rw",
                                                   "cardinality": "not_set",
-                                                  "id": {
-                                                    "name": "local-definition",
-                                                    "prefix": "sysxext"
-                                                  },
                                                   "children": [
                                                     {
                                                       "elementKind": "Leaf",
@@ -2280,18 +2229,10 @@
                                                       "elementKind": "Choice",
                                                       "accessKind": "rw",
                                                       "cardinality": "mandatory",
-                                                      "id": {
-                                                        "name": "private-key-type",
-                                                        "prefix": "sysxext"
-                                                      },
                                                       "children": [
                                                         {
                                                           "elementKind": "Case",
                                                           "accessKind": "not_set",
-                                                          "id": {
-                                                            "name": "private-key",
-                                                            "prefix": "sysxext"
-                                                          },
                                                           "children": [
                                                             {
                                                               "elementKind": "Leaf",
@@ -2305,15 +2246,15 @@
                                                                 "prefix": "sysxext"
                                                               }
                                                             }
-                                                          ]
+                                                          ],
+                                                          "id": {
+                                                            "name": "private-key",
+                                                            "prefix": "sysxext"
+                                                          }
                                                         },
                                                         {
                                                           "elementKind": "Case",
                                                           "accessKind": "not_set",
-                                                          "id": {
-                                                            "name": "hidden-private-key",
-                                                            "prefix": "sysxext"
-                                                          },
                                                           "children": [
                                                             {
                                                               "elementKind": "Leaf",
@@ -2327,15 +2268,15 @@
                                                                 "prefix": "sysxext"
                                                               }
                                                             }
-                                                          ]
+                                                          ],
+                                                          "id": {
+                                                            "name": "hidden-private-key",
+                                                            "prefix": "sysxext"
+                                                          }
                                                         },
                                                         {
                                                           "elementKind": "Case",
                                                           "accessKind": "not_set",
-                                                          "id": {
-                                                            "name": "encrypted-private-key",
-                                                            "prefix": "sysxext"
-                                                          },
                                                           "children": [
                                                             {
                                                               "elementKind": "Container",
@@ -2350,18 +2291,10 @@
                                                               "elementKind": "Choice",
                                                               "accessKind": "rw",
                                                               "cardinality": "mandatory",
-                                                              "id": {
-                                                                "name": "key-type",
-                                                                "prefix": "sysxext"
-                                                              },
                                                               "children": [
                                                                 {
                                                                   "elementKind": "Case",
                                                                   "accessKind": "not_set",
-                                                                  "id": {
-                                                                    "name": "symmetric-key-ref",
-                                                                    "prefix": "sysxext"
-                                                                  },
                                                                   "children": [
                                                                     {
                                                                       "elementKind": "Leaf",
@@ -2378,15 +2311,15 @@
                                                                         "prefix": "sysxext"
                                                                       }
                                                                     }
-                                                                  ]
+                                                                  ],
+                                                                  "id": {
+                                                                    "name": "symmetric-key-ref",
+                                                                    "prefix": "sysxext"
+                                                                  }
                                                                 },
                                                                 {
                                                                   "elementKind": "Case",
                                                                   "accessKind": "not_set",
-                                                                  "id": {
-                                                                    "name": "asymmetric-key-ref",
-                                                                    "prefix": "sysxext"
-                                                                  },
                                                                   "children": [
                                                                     {
                                                                       "elementKind": "Leaf",
@@ -2403,9 +2336,17 @@
                                                                         "prefix": "sysxext"
                                                                       }
                                                                     }
-                                                                  ]
+                                                                  ],
+                                                                  "id": {
+                                                                    "name": "asymmetric-key-ref",
+                                                                    "prefix": "sysxext"
+                                                                  }
                                                                 }
-                                                              ]
+                                                              ],
+                                                              "id": {
+                                                                "name": "key-type",
+                                                                "prefix": "sysxext"
+                                                              }
                                                             },
                                                             {
                                                               "elementKind": "Leaf",
@@ -2419,9 +2360,17 @@
                                                                 "prefix": "sysxext"
                                                               }
                                                             }
-                                                          ]
+                                                          ],
+                                                          "id": {
+                                                            "name": "encrypted-private-key",
+                                                            "prefix": "sysxext"
+                                                          }
                                                         }
-                                                      ]
+                                                      ],
+                                                      "id": {
+                                                        "name": "private-key-type",
+                                                        "prefix": "sysxext"
+                                                      }
                                                     },
                                                     {
                                                       "elementKind": "Leaf",
@@ -2440,10 +2389,6 @@
                                                       "elementKind": "Notification",
                                                       "accessKind": "n",
                                                       "cardinality": "mandatory",
-                                                      "id": {
-                                                        "name": "certificate-expiration",
-                                                        "prefix": "sysxext"
-                                                      },
                                                       "children": [
                                                         {
                                                           "elementKind": "Leaf",
@@ -2458,25 +2403,21 @@
                                                             "prefix": "sysxext"
                                                           }
                                                         }
-                                                      ]
+                                                      ],
+                                                      "id": {
+                                                        "name": "certificate-expiration",
+                                                        "prefix": "sysxext"
+                                                      }
                                                     },
                                                     {
                                                       "elementKind": "Action",
                                                       "accessKind": "x",
                                                       "cardinality": "mandatory",
-                                                      "id": {
-                                                        "name": "generate-certificate-signing-request",
-                                                        "prefix": "sysxext"
-                                                      },
                                                       "children": [
                                                         {
                                                           "elementKind": "Input",
                                                           "accessKind": "w",
                                                           "cardinality": "mandatory",
-                                                          "id": {
-                                                            "name": "input",
-                                                            "prefix": "sysxext"
-                                                          },
                                                           "children": [
                                                             {
                                                               "elementKind": "Leaf",
@@ -2502,16 +2443,16 @@
                                                                 "prefix": "sysxext"
                                                               }
                                                             }
-                                                          ]
+                                                          ],
+                                                          "id": {
+                                                            "name": "input",
+                                                            "prefix": "sysxext"
+                                                          }
                                                         },
                                                         {
                                                           "elementKind": "Output",
                                                           "accessKind": "ro",
                                                           "cardinality": "mandatory",
-                                                          "id": {
-                                                            "name": "output",
-                                                            "prefix": "sysxext"
-                                                          },
                                                           "children": [
                                                             {
                                                               "elementKind": "Leaf",
@@ -2525,13 +2466,29 @@
                                                                 "prefix": "sysxext"
                                                               }
                                                             }
-                                                          ]
+                                                          ],
+                                                          "id": {
+                                                            "name": "output",
+                                                            "prefix": "sysxext"
+                                                          }
                                                         }
-                                                      ]
+                                                      ],
+                                                      "id": {
+                                                        "name": "generate-certificate-signing-request",
+                                                        "prefix": "sysxext"
+                                                      }
                                                     }
-                                                  ]
+                                                  ],
+                                                  "id": {
+                                                    "name": "local-definition",
+                                                    "prefix": "sysxext"
+                                                  }
                                                 }
-                                              ]
+                                              ],
+                                              "id": {
+                                                "name": "local",
+                                                "prefix": "sysxext"
+                                              }
                                             },
                                             {
                                               "elementKind": "Case",
@@ -2540,19 +2497,11 @@
                                               ],
                                               "accessKind": "rw",
                                               "cardinality": "mandatory",
-                                              "id": {
-                                                "name": "keystore",
-                                                "prefix": "sysxext"
-                                              },
                                               "children": [
                                                 {
                                                   "elementKind": "Container",
                                                   "accessKind": "rw",
                                                   "cardinality": "not_set",
-                                                  "id": {
-                                                    "name": "keystore-reference",
-                                                    "prefix": "sysxext"
-                                                  },
                                                   "children": [
                                                     {
                                                       "elementKind": "Leaf",
@@ -2579,21 +2528,33 @@
                                                         "prefix": "sysxext"
                                                       }
                                                     }
-                                                  ]
+                                                  ],
+                                                  "id": {
+                                                    "name": "keystore-reference",
+                                                    "prefix": "sysxext"
+                                                  }
                                                 }
-                                              ]
+                                              ],
+                                              "id": {
+                                                "name": "keystore",
+                                                "prefix": "sysxext"
+                                              }
                                             }
-                                          ]
+                                          ],
+                                          "id": {
+                                            "name": "local-or-keystore",
+                                            "prefix": "sysxext"
+                                          }
                                         }
-                                      ]
+                                      ],
+                                      "id": {
+                                        "name": "certificate",
+                                        "prefix": "sysxext"
+                                      }
                                     },
                                     {
                                       "elementKind": "Case",
                                       "accessKind": "not_set",
-                                      "id": {
-                                        "name": "raw-public-key",
-                                        "prefix": "sysxext"
-                                      },
                                       "children": [
                                         {
                                           "elementKind": "Container",
@@ -2611,10 +2572,6 @@
                                           "elementKind": "Choice",
                                           "accessKind": "rw",
                                           "cardinality": "mandatory",
-                                          "id": {
-                                            "name": "local-or-keystore",
-                                            "prefix": "sysxext"
-                                          },
                                           "children": [
                                             {
                                               "elementKind": "Case",
@@ -2623,19 +2580,11 @@
                                               ],
                                               "accessKind": "rw",
                                               "cardinality": "mandatory",
-                                              "id": {
-                                                "name": "local",
-                                                "prefix": "sysxext"
-                                              },
                                               "children": [
                                                 {
                                                   "elementKind": "Container",
                                                   "accessKind": "rw",
                                                   "cardinality": "not_set",
-                                                  "id": {
-                                                    "name": "local-definition",
-                                                    "prefix": "sysxext"
-                                                  },
                                                   "children": [
                                                     {
                                                       "elementKind": "Leaf",
@@ -2690,18 +2639,10 @@
                                                       "elementKind": "Choice",
                                                       "accessKind": "rw",
                                                       "cardinality": "mandatory",
-                                                      "id": {
-                                                        "name": "private-key-type",
-                                                        "prefix": "sysxext"
-                                                      },
                                                       "children": [
                                                         {
                                                           "elementKind": "Case",
                                                           "accessKind": "not_set",
-                                                          "id": {
-                                                            "name": "private-key",
-                                                            "prefix": "sysxext"
-                                                          },
                                                           "children": [
                                                             {
                                                               "elementKind": "Leaf",
@@ -2715,15 +2656,15 @@
                                                                 "prefix": "sysxext"
                                                               }
                                                             }
-                                                          ]
+                                                          ],
+                                                          "id": {
+                                                            "name": "private-key",
+                                                            "prefix": "sysxext"
+                                                          }
                                                         },
                                                         {
                                                           "elementKind": "Case",
                                                           "accessKind": "not_set",
-                                                          "id": {
-                                                            "name": "hidden-private-key",
-                                                            "prefix": "sysxext"
-                                                          },
                                                           "children": [
                                                             {
                                                               "elementKind": "Leaf",
@@ -2737,15 +2678,15 @@
                                                                 "prefix": "sysxext"
                                                               }
                                                             }
-                                                          ]
+                                                          ],
+                                                          "id": {
+                                                            "name": "hidden-private-key",
+                                                            "prefix": "sysxext"
+                                                          }
                                                         },
                                                         {
                                                           "elementKind": "Case",
                                                           "accessKind": "not_set",
-                                                          "id": {
-                                                            "name": "encrypted-private-key",
-                                                            "prefix": "sysxext"
-                                                          },
                                                           "children": [
                                                             {
                                                               "elementKind": "Container",
@@ -2760,18 +2701,10 @@
                                                               "elementKind": "Choice",
                                                               "accessKind": "rw",
                                                               "cardinality": "mandatory",
-                                                              "id": {
-                                                                "name": "key-type",
-                                                                "prefix": "sysxext"
-                                                              },
                                                               "children": [
                                                                 {
                                                                   "elementKind": "Case",
                                                                   "accessKind": "not_set",
-                                                                  "id": {
-                                                                    "name": "symmetric-key-ref",
-                                                                    "prefix": "sysxext"
-                                                                  },
                                                                   "children": [
                                                                     {
                                                                       "elementKind": "Leaf",
@@ -2788,15 +2721,15 @@
                                                                         "prefix": "sysxext"
                                                                       }
                                                                     }
-                                                                  ]
+                                                                  ],
+                                                                  "id": {
+                                                                    "name": "symmetric-key-ref",
+                                                                    "prefix": "sysxext"
+                                                                  }
                                                                 },
                                                                 {
                                                                   "elementKind": "Case",
                                                                   "accessKind": "not_set",
-                                                                  "id": {
-                                                                    "name": "asymmetric-key-ref",
-                                                                    "prefix": "sysxext"
-                                                                  },
                                                                   "children": [
                                                                     {
                                                                       "elementKind": "Leaf",
@@ -2813,9 +2746,17 @@
                                                                         "prefix": "sysxext"
                                                                       }
                                                                     }
-                                                                  ]
+                                                                  ],
+                                                                  "id": {
+                                                                    "name": "asymmetric-key-ref",
+                                                                    "prefix": "sysxext"
+                                                                  }
                                                                 }
-                                                              ]
+                                                              ],
+                                                              "id": {
+                                                                "name": "key-type",
+                                                                "prefix": "sysxext"
+                                                              }
                                                             },
                                                             {
                                                               "elementKind": "Leaf",
@@ -2829,13 +2770,29 @@
                                                                 "prefix": "sysxext"
                                                               }
                                                             }
-                                                          ]
+                                                          ],
+                                                          "id": {
+                                                            "name": "encrypted-private-key",
+                                                            "prefix": "sysxext"
+                                                          }
                                                         }
-                                                      ]
+                                                      ],
+                                                      "id": {
+                                                        "name": "private-key-type",
+                                                        "prefix": "sysxext"
+                                                      }
                                                     }
-                                                  ]
+                                                  ],
+                                                  "id": {
+                                                    "name": "local-definition",
+                                                    "prefix": "sysxext"
+                                                  }
                                                 }
-                                              ]
+                                              ],
+                                              "id": {
+                                                "name": "local",
+                                                "prefix": "sysxext"
+                                              }
                                             },
                                             {
                                               "elementKind": "Case",
@@ -2844,10 +2801,6 @@
                                               ],
                                               "accessKind": "rw",
                                               "cardinality": "mandatory",
-                                              "id": {
-                                                "name": "keystore",
-                                                "prefix": "sysxext"
-                                              },
                                               "children": [
                                                 {
                                                   "elementKind": "Leaf",
@@ -2862,19 +2815,27 @@
                                                     "prefix": "sysxext"
                                                   }
                                                 }
-                                              ]
+                                              ],
+                                              "id": {
+                                                "name": "keystore",
+                                                "prefix": "sysxext"
+                                              }
                                             }
-                                          ]
+                                          ],
+                                          "id": {
+                                            "name": "local-or-keystore",
+                                            "prefix": "sysxext"
+                                          }
                                         }
-                                      ]
+                                      ],
+                                      "id": {
+                                        "name": "raw-public-key",
+                                        "prefix": "sysxext"
+                                      }
                                     },
                                     {
                                       "elementKind": "Case",
                                       "accessKind": "not_set",
-                                      "id": {
-                                        "name": "psk",
-                                        "prefix": "sysxext"
-                                      },
                                       "children": [
                                         {
                                           "elementKind": "Container",
@@ -2892,10 +2853,6 @@
                                           "elementKind": "Choice",
                                           "accessKind": "rw",
                                           "cardinality": "mandatory",
-                                          "id": {
-                                            "name": "local-or-keystore",
-                                            "prefix": "sysxext"
-                                          },
                                           "children": [
                                             {
                                               "elementKind": "Case",
@@ -2904,19 +2861,11 @@
                                               ],
                                               "accessKind": "rw",
                                               "cardinality": "mandatory",
-                                              "id": {
-                                                "name": "local",
-                                                "prefix": "sysxext"
-                                              },
                                               "children": [
                                                 {
                                                   "elementKind": "Container",
                                                   "accessKind": "rw",
                                                   "cardinality": "not_set",
-                                                  "id": {
-                                                    "name": "local-definition",
-                                                    "prefix": "sysxext"
-                                                  },
                                                   "children": [
                                                     {
                                                       "elementKind": "Leaf",
@@ -2947,18 +2896,10 @@
                                                       "elementKind": "Choice",
                                                       "accessKind": "rw",
                                                       "cardinality": "mandatory",
-                                                      "id": {
-                                                        "name": "key-type",
-                                                        "prefix": "sysxext"
-                                                      },
                                                       "children": [
                                                         {
                                                           "elementKind": "Case",
                                                           "accessKind": "not_set",
-                                                          "id": {
-                                                            "name": "key",
-                                                            "prefix": "sysxext"
-                                                          },
                                                           "children": [
                                                             {
                                                               "elementKind": "Leaf",
@@ -2972,15 +2913,15 @@
                                                                 "prefix": "sysxext"
                                                               }
                                                             }
-                                                          ]
+                                                          ],
+                                                          "id": {
+                                                            "name": "key",
+                                                            "prefix": "sysxext"
+                                                          }
                                                         },
                                                         {
                                                           "elementKind": "Case",
                                                           "accessKind": "not_set",
-                                                          "id": {
-                                                            "name": "hidden-key",
-                                                            "prefix": "sysxext"
-                                                          },
                                                           "children": [
                                                             {
                                                               "elementKind": "Leaf",
@@ -2994,15 +2935,15 @@
                                                                 "prefix": "sysxext"
                                                               }
                                                             }
-                                                          ]
+                                                          ],
+                                                          "id": {
+                                                            "name": "hidden-key",
+                                                            "prefix": "sysxext"
+                                                          }
                                                         },
                                                         {
                                                           "elementKind": "Case",
                                                           "accessKind": "not_set",
-                                                          "id": {
-                                                            "name": "encrypted-key",
-                                                            "prefix": "sysxext"
-                                                          },
                                                           "children": [
                                                             {
                                                               "elementKind": "Container",
@@ -3017,18 +2958,10 @@
                                                               "elementKind": "Choice",
                                                               "accessKind": "rw",
                                                               "cardinality": "mandatory",
-                                                              "id": {
-                                                                "name": "key-type",
-                                                                "prefix": "sysxext"
-                                                              },
                                                               "children": [
                                                                 {
                                                                   "elementKind": "Case",
                                                                   "accessKind": "not_set",
-                                                                  "id": {
-                                                                    "name": "symmetric-key-ref",
-                                                                    "prefix": "sysxext"
-                                                                  },
                                                                   "children": [
                                                                     {
                                                                       "elementKind": "Leaf",
@@ -3045,15 +2978,15 @@
                                                                         "prefix": "sysxext"
                                                                       }
                                                                     }
-                                                                  ]
+                                                                  ],
+                                                                  "id": {
+                                                                    "name": "symmetric-key-ref",
+                                                                    "prefix": "sysxext"
+                                                                  }
                                                                 },
                                                                 {
                                                                   "elementKind": "Case",
                                                                   "accessKind": "not_set",
-                                                                  "id": {
-                                                                    "name": "asymmetric-key-ref",
-                                                                    "prefix": "sysxext"
-                                                                  },
                                                                   "children": [
                                                                     {
                                                                       "elementKind": "Leaf",
@@ -3070,9 +3003,17 @@
                                                                         "prefix": "sysxext"
                                                                       }
                                                                     }
-                                                                  ]
+                                                                  ],
+                                                                  "id": {
+                                                                    "name": "asymmetric-key-ref",
+                                                                    "prefix": "sysxext"
+                                                                  }
                                                                 }
-                                                              ]
+                                                              ],
+                                                              "id": {
+                                                                "name": "key-type",
+                                                                "prefix": "sysxext"
+                                                              }
                                                             },
                                                             {
                                                               "elementKind": "Leaf",
@@ -3086,13 +3027,29 @@
                                                                 "prefix": "sysxext"
                                                               }
                                                             }
-                                                          ]
+                                                          ],
+                                                          "id": {
+                                                            "name": "encrypted-key",
+                                                            "prefix": "sysxext"
+                                                          }
                                                         }
-                                                      ]
+                                                      ],
+                                                      "id": {
+                                                        "name": "key-type",
+                                                        "prefix": "sysxext"
+                                                      }
                                                     }
-                                                  ]
+                                                  ],
+                                                  "id": {
+                                                    "name": "local-definition",
+                                                    "prefix": "sysxext"
+                                                  }
                                                 }
-                                              ]
+                                              ],
+                                              "id": {
+                                                "name": "local",
+                                                "prefix": "sysxext"
+                                              }
                                             },
                                             {
                                               "elementKind": "Case",
@@ -3101,10 +3058,6 @@
                                               ],
                                               "accessKind": "rw",
                                               "cardinality": "mandatory",
-                                              "id": {
-                                                "name": "keystore",
-                                                "prefix": "sysxext"
-                                              },
                                               "children": [
                                                 {
                                                   "elementKind": "Leaf",
@@ -3119,24 +3072,40 @@
                                                     "prefix": "sysxext"
                                                   }
                                                 }
-                                              ]
+                                              ],
+                                              "id": {
+                                                "name": "keystore",
+                                                "prefix": "sysxext"
+                                              }
                                             }
-                                          ]
+                                          ],
+                                          "id": {
+                                            "name": "local-or-keystore",
+                                            "prefix": "sysxext"
+                                          }
                                         }
-                                      ]
+                                      ],
+                                      "id": {
+                                        "name": "psk",
+                                        "prefix": "sysxext"
+                                      }
                                     }
-                                  ]
+                                  ],
+                                  "id": {
+                                    "name": "auth-type",
+                                    "prefix": "sysxext"
+                                  }
                                 }
-                              ]
+                              ],
+                              "id": {
+                                "name": "client-identity",
+                                "prefix": "sysxext"
+                              }
                             },
                             {
                               "elementKind": "Container",
                               "accessKind": "rw",
                               "cardinality": "not_set",
-                              "id": {
-                                "name": "server-authentication",
-                                "prefix": "sysxext"
-                              },
                               "children": [
                                 {
                                   "elementKind": "Container",
@@ -3145,19 +3114,11 @@
                                   ],
                                   "accessKind": "rw",
                                   "cardinality": "presence",
-                                  "id": {
-                                    "name": "ca-certs",
-                                    "prefix": "sysxext"
-                                  },
                                   "children": [
                                     {
                                       "elementKind": "Choice",
                                       "accessKind": "rw",
                                       "cardinality": "mandatory",
-                                      "id": {
-                                        "name": "local-or-truststore",
-                                        "prefix": "sysxext"
-                                      },
                                       "children": [
                                         {
                                           "elementKind": "Case",
@@ -3166,19 +3127,11 @@
                                           ],
                                           "accessKind": "rw",
                                           "cardinality": "mandatory",
-                                          "id": {
-                                            "name": "local",
-                                            "prefix": "sysxext"
-                                          },
                                           "children": [
                                             {
                                               "elementKind": "Container",
                                               "accessKind": "rw",
                                               "cardinality": "not_set",
-                                              "id": {
-                                                "name": "local-definition",
-                                                "prefix": "sysxext"
-                                              },
                                               "children": [
                                                 {
                                                   "elementKind": "LeafList",
@@ -3197,10 +3150,6 @@
                                                   "elementKind": "Notification",
                                                   "accessKind": "n",
                                                   "cardinality": "mandatory",
-                                                  "id": {
-                                                    "name": "certificate-expiration",
-                                                    "prefix": "sysxext"
-                                                  },
                                                   "children": [
                                                     {
                                                       "elementKind": "Leaf",
@@ -3215,11 +3164,23 @@
                                                         "prefix": "sysxext"
                                                       }
                                                     }
-                                                  ]
+                                                  ],
+                                                  "id": {
+                                                    "name": "certificate-expiration",
+                                                    "prefix": "sysxext"
+                                                  }
                                                 }
-                                              ]
+                                              ],
+                                              "id": {
+                                                "name": "local-definition",
+                                                "prefix": "sysxext"
+                                              }
                                             }
-                                          ]
+                                          ],
+                                          "id": {
+                                            "name": "local",
+                                            "prefix": "sysxext"
+                                          }
                                         },
                                         {
                                           "elementKind": "Case",
@@ -3229,10 +3190,6 @@
                                           ],
                                           "accessKind": "rw",
                                           "cardinality": "mandatory",
-                                          "id": {
-                                            "name": "truststore",
-                                            "prefix": "sysxext"
-                                          },
                                           "children": [
                                             {
                                               "elementKind": "Leaf",
@@ -3247,11 +3204,23 @@
                                                 "prefix": "sysxext"
                                               }
                                             }
-                                          ]
+                                          ],
+                                          "id": {
+                                            "name": "truststore",
+                                            "prefix": "sysxext"
+                                          }
                                         }
-                                      ]
+                                      ],
+                                      "id": {
+                                        "name": "local-or-truststore",
+                                        "prefix": "sysxext"
+                                      }
                                     }
-                                  ]
+                                  ],
+                                  "id": {
+                                    "name": "ca-certs",
+                                    "prefix": "sysxext"
+                                  }
                                 },
                                 {
                                   "elementKind": "Container",
@@ -3260,19 +3229,11 @@
                                   ],
                                   "accessKind": "rw",
                                   "cardinality": "presence",
-                                  "id": {
-                                    "name": "server-certs",
-                                    "prefix": "sysxext"
-                                  },
                                   "children": [
                                     {
                                       "elementKind": "Choice",
                                       "accessKind": "rw",
                                       "cardinality": "mandatory",
-                                      "id": {
-                                        "name": "local-or-truststore",
-                                        "prefix": "sysxext"
-                                      },
                                       "children": [
                                         {
                                           "elementKind": "Case",
@@ -3281,19 +3242,11 @@
                                           ],
                                           "accessKind": "rw",
                                           "cardinality": "mandatory",
-                                          "id": {
-                                            "name": "local",
-                                            "prefix": "sysxext"
-                                          },
                                           "children": [
                                             {
                                               "elementKind": "Container",
                                               "accessKind": "rw",
                                               "cardinality": "not_set",
-                                              "id": {
-                                                "name": "local-definition",
-                                                "prefix": "sysxext"
-                                              },
                                               "children": [
                                                 {
                                                   "elementKind": "LeafList",
@@ -3312,10 +3265,6 @@
                                                   "elementKind": "Notification",
                                                   "accessKind": "n",
                                                   "cardinality": "mandatory",
-                                                  "id": {
-                                                    "name": "certificate-expiration",
-                                                    "prefix": "sysxext"
-                                                  },
                                                   "children": [
                                                     {
                                                       "elementKind": "Leaf",
@@ -3330,11 +3279,23 @@
                                                         "prefix": "sysxext"
                                                       }
                                                     }
-                                                  ]
+                                                  ],
+                                                  "id": {
+                                                    "name": "certificate-expiration",
+                                                    "prefix": "sysxext"
+                                                  }
                                                 }
-                                              ]
+                                              ],
+                                              "id": {
+                                                "name": "local-definition",
+                                                "prefix": "sysxext"
+                                              }
                                             }
-                                          ]
+                                          ],
+                                          "id": {
+                                            "name": "local",
+                                            "prefix": "sysxext"
+                                          }
                                         },
                                         {
                                           "elementKind": "Case",
@@ -3344,10 +3305,6 @@
                                           ],
                                           "accessKind": "rw",
                                           "cardinality": "mandatory",
-                                          "id": {
-                                            "name": "truststore",
-                                            "prefix": "sysxext"
-                                          },
                                           "children": [
                                             {
                                               "elementKind": "Leaf",
@@ -3362,11 +3319,23 @@
                                                 "prefix": "sysxext"
                                               }
                                             }
-                                          ]
+                                          ],
+                                          "id": {
+                                            "name": "truststore",
+                                            "prefix": "sysxext"
+                                          }
                                         }
-                                      ]
+                                      ],
+                                      "id": {
+                                        "name": "local-or-truststore",
+                                        "prefix": "sysxext"
+                                      }
                                     }
-                                  ]
+                                  ],
+                                  "id": {
+                                    "name": "server-certs",
+                                    "prefix": "sysxext"
+                                  }
                                 },
                                 {
                                   "elementKind": "Container",
@@ -3375,19 +3344,11 @@
                                   ],
                                   "accessKind": "rw",
                                   "cardinality": "presence",
-                                  "id": {
-                                    "name": "raw-public-keys",
-                                    "prefix": "sysxext"
-                                  },
                                   "children": [
                                     {
                                       "elementKind": "Choice",
                                       "accessKind": "rw",
                                       "cardinality": "mandatory",
-                                      "id": {
-                                        "name": "local-or-truststore",
-                                        "prefix": "sysxext"
-                                      },
                                       "children": [
                                         {
                                           "elementKind": "Case",
@@ -3396,19 +3357,11 @@
                                           ],
                                           "accessKind": "rw",
                                           "cardinality": "mandatory",
-                                          "id": {
-                                            "name": "local",
-                                            "prefix": "sysxext"
-                                          },
                                           "children": [
                                             {
                                               "elementKind": "Container",
                                               "accessKind": "rw",
                                               "cardinality": "not_set",
-                                              "id": {
-                                                "name": "local-definition",
-                                                "prefix": "sysxext"
-                                              },
                                               "children": [
                                                 {
                                                   "keys": [
@@ -3417,10 +3370,6 @@
                                                   "elementKind": "List",
                                                   "accessKind": "rw",
                                                   "cardinality": "many",
-                                                  "id": {
-                                                    "name": "raw-public-key",
-                                                    "prefix": "sysxext"
-                                                  },
                                                   "children": [
                                                     {
                                                       "elementKind": "Leaf",
@@ -3471,11 +3420,23 @@
                                                         "prefix": "sysxext"
                                                       }
                                                     }
-                                                  ]
+                                                  ],
+                                                  "id": {
+                                                    "name": "raw-public-key",
+                                                    "prefix": "sysxext"
+                                                  }
                                                 }
-                                              ]
+                                              ],
+                                              "id": {
+                                                "name": "local-definition",
+                                                "prefix": "sysxext"
+                                              }
                                             }
-                                          ]
+                                          ],
+                                          "id": {
+                                            "name": "local",
+                                            "prefix": "sysxext"
+                                          }
                                         },
                                         {
                                           "elementKind": "Case",
@@ -3485,10 +3446,6 @@
                                           ],
                                           "accessKind": "rw",
                                           "cardinality": "mandatory",
-                                          "id": {
-                                            "name": "truststore",
-                                            "prefix": "sysxext"
-                                          },
                                           "children": [
                                             {
                                               "elementKind": "Leaf",
@@ -3503,11 +3460,23 @@
                                                 "prefix": "sysxext"
                                               }
                                             }
-                                          ]
+                                          ],
+                                          "id": {
+                                            "name": "truststore",
+                                            "prefix": "sysxext"
+                                          }
                                         }
-                                      ]
+                                      ],
+                                      "id": {
+                                        "name": "local-or-truststore",
+                                        "prefix": "sysxext"
+                                      }
                                     }
-                                  ]
+                                  ],
+                                  "id": {
+                                    "name": "raw-public-keys",
+                                    "prefix": "sysxext"
+                                  }
                                 },
                                 {
                                   "elementKind": "Container",
@@ -3521,7 +3490,11 @@
                                     "prefix": "sysxext"
                                   }
                                 }
-                              ]
+                              ],
+                              "id": {
+                                "name": "server-authentication",
+                                "prefix": "sysxext"
+                              }
                             },
                             {
                               "elementKind": "Container",
@@ -3530,19 +3503,11 @@
                               ],
                               "accessKind": "rw",
                               "cardinality": "not_set",
-                              "id": {
-                                "name": "hello-params",
-                                "prefix": "sysxext"
-                              },
                               "children": [
                                 {
                                   "elementKind": "Container",
                                   "accessKind": "rw",
                                   "cardinality": "not_set",
-                                  "id": {
-                                    "name": "tls-versions",
-                                    "prefix": "sysxext"
-                                  },
                                   "children": [
                                     {
                                       "elementKind": "LeafList",
@@ -3556,16 +3521,16 @@
                                         "prefix": "sysxext"
                                       }
                                     }
-                                  ]
+                                  ],
+                                  "id": {
+                                    "name": "tls-versions",
+                                    "prefix": "sysxext"
+                                  }
                                 },
                                 {
                                   "elementKind": "Container",
                                   "accessKind": "rw",
                                   "cardinality": "not_set",
-                                  "id": {
-                                    "name": "cipher-suites",
-                                    "prefix": "sysxext"
-                                  },
                                   "children": [
                                     {
                                       "elementKind": "LeafList",
@@ -3579,9 +3544,17 @@
                                         "prefix": "sysxext"
                                       }
                                     }
-                                  ]
+                                  ],
+                                  "id": {
+                                    "name": "cipher-suites",
+                                    "prefix": "sysxext"
+                                  }
                                 }
-                              ]
+                              ],
+                              "id": {
+                                "name": "hello-params",
+                                "prefix": "sysxext"
+                              }
                             },
                             {
                               "elementKind": "Container",
@@ -3590,10 +3563,6 @@
                               ],
                               "accessKind": "rw",
                               "cardinality": "presence",
-                              "id": {
-                                "name": "keepalives",
-                                "prefix": "sysxext"
-                              },
                               "children": [
                                 {
                                   "elementKind": "Leaf",
@@ -3619,31 +3588,39 @@
                                     "prefix": "sysxext"
                                   }
                                 }
-                              ]
+                              ],
+                              "id": {
+                                "name": "keepalives",
+                                "prefix": "sysxext"
+                              }
                             }
-                          ]
+                          ],
+                          "id": {
+                            "name": "tls",
+                            "prefix": "sysxext"
+                          }
                         }
-                      ]
+                      ],
+                      "id": {
+                        "name": "tls",
+                        "prefix": "sysxext"
+                      }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "transport-security",
+                    "prefix": "sysxext"
+                  }
                 },
                 {
                   "elementKind": "Choice",
                   "accessKind": "rw",
                   "cardinality": "mandatory",
-                  "id": {
-                    "name": "authentication-type",
-                    "prefix": "sysxext"
-                  },
                   "children": [
                     {
                       "elementKind": "Case",
                       "accessKind": "rw",
                       "cardinality": "mandatory",
-                      "id": {
-                        "name": "simple-anonymous",
-                        "prefix": "sysxext"
-                      },
                       "children": [
                         {
                           "elementKind": "Leaf",
@@ -3657,25 +3634,21 @@
                             "prefix": "sysxext"
                           }
                         }
-                      ]
+                      ],
+                      "id": {
+                        "name": "simple-anonymous",
+                        "prefix": "sysxext"
+                      }
                     },
                     {
                       "elementKind": "Case",
                       "accessKind": "rw",
                       "cardinality": "mandatory",
-                      "id": {
-                        "name": "simple-unauthenticated",
-                        "prefix": "sysxext"
-                      },
                       "children": [
                         {
                           "elementKind": "Container",
                           "accessKind": "rw",
                           "cardinality": "not_set",
-                          "id": {
-                            "name": "simple-unauthenticated",
-                            "prefix": "sysxext"
-                          },
                           "children": [
                             {
                               "elementKind": "Leaf",
@@ -3689,27 +3662,27 @@
                                 "prefix": "sysxext"
                               }
                             }
-                          ]
+                          ],
+                          "id": {
+                            "name": "simple-unauthenticated",
+                            "prefix": "sysxext"
+                          }
                         }
-                      ]
+                      ],
+                      "id": {
+                        "name": "simple-unauthenticated",
+                        "prefix": "sysxext"
+                      }
                     },
                     {
                       "elementKind": "Case",
                       "accessKind": "rw",
                       "cardinality": "mandatory",
-                      "id": {
-                        "name": "simple-authenticated",
-                        "prefix": "sysxext"
-                      },
                       "children": [
                         {
                           "elementKind": "Container",
                           "accessKind": "rw",
                           "cardinality": "not_set",
-                          "id": {
-                            "name": "simple-authenticated",
-                            "prefix": "sysxext"
-                          },
                           "children": [
                             {
                               "elementKind": "Leaf",
@@ -3735,9 +3708,17 @@
                                 "prefix": "sysxext"
                               }
                             }
-                          ]
+                          ],
+                          "id": {
+                            "name": "simple-authenticated",
+                            "prefix": "sysxext"
+                          }
                         }
-                      ]
+                      ],
+                      "id": {
+                        "name": "simple-authenticated",
+                        "prefix": "sysxext"
+                      }
                     },
                     {
                       "elementKind": "Case",
@@ -3746,10 +3727,6 @@
                       ],
                       "accessKind": "rw",
                       "cardinality": "mandatory",
-                      "id": {
-                        "name": "sasl-external",
-                        "prefix": "sysxext"
-                      },
                       "children": [
                         {
                           "elementKind": "Leaf",
@@ -3763,9 +3740,17 @@
                             "prefix": "sysxext"
                           }
                         }
-                      ]
+                      ],
+                      "id": {
+                        "name": "sasl-external",
+                        "prefix": "sysxext"
+                      }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "authentication-type",
+                    "prefix": "sysxext"
+                  }
                 },
                 {
                   "elementKind": "Leaf",
@@ -3779,16 +3764,16 @@
                     "prefix": "sysxext"
                   }
                 }
-              ]
+              ],
+              "id": {
+                "name": "security",
+                "prefix": "sysxext"
+              }
             },
             {
               "elementKind": "Container",
               "accessKind": "rw",
               "cardinality": "not_set",
-              "id": {
-                "name": "options",
-                "prefix": "sysxext"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -3818,19 +3803,11 @@
                   "elementKind": "Container",
                   "accessKind": "rw",
                   "cardinality": "not_set",
-                  "id": {
-                    "name": "group-filter",
-                    "prefix": "sysxext"
-                  },
                   "children": [
                     {
                       "elementKind": "Choice",
                       "accessKind": "rw",
                       "cardinality": "optional",
-                      "id": {
-                        "name": "group-filter",
-                        "prefix": "sysxext"
-                      },
                       "children": [
                         {
                           "elementKind": "Case",
@@ -3839,19 +3816,11 @@
                           ],
                           "accessKind": "rw",
                           "cardinality": "mandatory",
-                          "id": {
-                            "name": "custom",
-                            "prefix": "sysxext"
-                          },
                           "children": [
                             {
                               "elementKind": "Container",
                               "accessKind": "rw",
                               "cardinality": "not_set",
-                              "id": {
-                                "name": "custom",
-                                "prefix": "sysxext"
-                              },
                               "children": [
                                 {
                                   "elementKind": "Leaf",
@@ -3877,9 +3846,17 @@
                                     "prefix": "sysxext"
                                   }
                                 }
-                              ]
+                              ],
+                              "id": {
+                                "name": "custom",
+                                "prefix": "sysxext"
+                              }
                             }
-                          ]
+                          ],
+                          "id": {
+                            "name": "custom",
+                            "prefix": "sysxext"
+                          }
                         },
                         {
                           "elementKind": "Case",
@@ -3888,10 +3865,6 @@
                           ],
                           "accessKind": "rw",
                           "cardinality": "mandatory",
-                          "id": {
-                            "name": "posix",
-                            "prefix": "sysxext"
-                          },
                           "children": [
                             {
                               "elementKind": "Leaf",
@@ -3905,25 +3878,21 @@
                                 "prefix": "sysxext"
                               }
                             }
-                          ]
+                          ],
+                          "id": {
+                            "name": "posix",
+                            "prefix": "sysxext"
+                          }
                         },
                         {
                           "elementKind": "Case",
                           "accessKind": "rw",
                           "cardinality": "mandatory",
-                          "id": {
-                            "name": "example-filter",
-                            "prefix": "sysxext"
-                          },
                           "children": [
                             {
                               "elementKind": "Container",
                               "accessKind": "rw",
                               "cardinality": "not_set",
-                              "id": {
-                                "name": "example-filter",
-                                "prefix": "sysxext"
-                              },
                               "children": [
                                 {
                                   "elementKind": "Leaf",
@@ -3949,17 +3918,41 @@
                                     "prefix": "sysxext"
                                   }
                                 }
-                              ]
+                              ],
+                              "id": {
+                                "name": "example-filter",
+                                "prefix": "sysxext"
+                              }
                             }
-                          ]
+                          ],
+                          "id": {
+                            "name": "example-filter",
+                            "prefix": "sysxext"
+                          }
                         }
-                      ]
+                      ],
+                      "id": {
+                        "name": "group-filter",
+                        "prefix": "sysxext"
+                      }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "group-filter",
+                    "prefix": "sysxext"
+                  }
                 }
-              ]
+              ],
+              "id": {
+                "name": "options",
+                "prefix": "sysxext"
+              }
             }
-          ]
+          ],
+          "id": {
+            "name": "ldap",
+            "prefix": "sysxext"
+          }
         },
         {
           "elementKind": "Container",
@@ -3973,23 +3966,20 @@
             "prefix": "sysxext"
           }
         }
-      ]
+      ],
+      "id": {
+        "name": "system"
+      }
     },
     {
       "elementKind": "Container",
       "accessKind": "ro",
       "cardinality": "not_set",
-      "id": {
-        "name": "system-state"
-      },
       "children": [
         {
           "elementKind": "Container",
           "accessKind": "ro",
           "cardinality": "not_set",
-          "id": {
-            "name": "platform"
-          },
           "children": [
             {
               "elementKind": "Leaf",
@@ -4035,15 +4025,15 @@
                 "name": "machine"
               }
             }
-          ]
+          ],
+          "id": {
+            "name": "platform"
+          }
         },
         {
           "elementKind": "Container",
           "accessKind": "ro",
           "cardinality": "not_set",
-          "id": {
-            "name": "clock"
-          },
           "children": [
             {
               "elementKind": "Leaf",
@@ -4081,7 +4071,10 @@
                 "prefix": "sysxext"
               }
             }
-          ]
+          ],
+          "id": {
+            "name": "clock"
+          }
         },
         {
           "elementKind": "Leaf",
@@ -4114,10 +4107,6 @@
           ],
           "accessKind": "ro",
           "cardinality": "not_set",
-          "id": {
-            "name": "authentication",
-            "prefix": "sysxext"
-          },
           "children": [
             {
               "keys": [
@@ -4129,10 +4118,6 @@
               ],
               "accessKind": "ro",
               "cardinality": "many",
-              "id": {
-                "name": "user",
-                "prefix": "sysxext"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -4247,7 +4232,11 @@
                     "prefix": "sysxext"
                   }
                 }
-              ]
+              ],
+              "id": {
+                "name": "user",
+                "prefix": "sysxext"
+              }
             },
             {
               "elementKind": "Container",
@@ -4256,10 +4245,6 @@
               ],
               "accessKind": "ro",
               "cardinality": "not_set",
-              "id": {
-                "name": "admin-user",
-                "prefix": "sysxext"
-              },
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -4277,10 +4262,6 @@
                   "elementKind": "Container",
                   "accessKind": "ro",
                   "cardinality": "not_set",
-                  "id": {
-                    "name": "admin-password-policy",
-                    "prefix": "sysxext"
-                  },
                   "children": [
                     {
                       "elementKind": "Leaf",
@@ -4306,7 +4287,11 @@
                         "prefix": "sysxext"
                       }
                     }
-                  ]
+                  ],
+                  "id": {
+                    "name": "admin-password-policy",
+                    "prefix": "sysxext"
+                  }
                 },
                 {
                   "elementKind": "Leaf",
@@ -4347,11 +4332,26 @@
                     "prefix": "sysxext"
                   }
                 }
-              ]
+              ],
+              "id": {
+                "name": "admin-user",
+                "prefix": "sysxext"
+              }
             }
-          ]
+          ],
+          "id": {
+            "name": "authentication",
+            "prefix": "sysxext"
+          }
         }
-      ]
+      ],
+      "id": {
+        "name": "system-state"
+      }
     }
-  ]
+  ],
+  "id": {
+    "name": "ietf-system",
+    "prefix": "sys"
+  }
 }

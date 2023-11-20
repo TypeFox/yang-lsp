@@ -15,9 +15,9 @@ import com.google.gson.GsonBuilder;
 import io.typefox.yang.processor.ProcessedDataTree.ElementData;
 import io.typefox.yang.processor.ProcessedDataTree.ElementIdentifier;
 import io.typefox.yang.processor.ProcessedDataTree.ElementKind;
+import io.typefox.yang.processor.ProcessedDataTree.HasStatements;
 import io.typefox.yang.processor.ProcessedDataTree.ListData;
 import io.typefox.yang.processor.ProcessedDataTree.ModuleData;
-import io.typefox.yang.processor.ProcessedDataTree.Named;
 import io.typefox.yang.yang.AbstractModule;
 import io.typefox.yang.yang.Action;
 import io.typefox.yang.yang.Augment;
@@ -141,7 +141,7 @@ public class YangProcessor {
 		return processedDataTree;
 	}
 
-	private void processChildren(Statement statement, Named parent, FeatureEvaluationContext evalCtx) {
+	private void processChildren(Statement statement, HasStatements parent, FeatureEvaluationContext evalCtx) {
 		/*if (!ProcessorUtility.isEnabled(statement, evalCtx)) {
 			// filtered by a feature
 			return;

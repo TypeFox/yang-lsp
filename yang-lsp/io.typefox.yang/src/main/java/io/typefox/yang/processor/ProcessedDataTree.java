@@ -37,10 +37,16 @@ public class ProcessedDataTree {
 		return modules;
 	}
 
-	public static class HasStatements {
+	public static class HasStatements extends Named {
+
+		public HasStatements(ElementIdentifier id) {
+			super(id);
+		}
+
 		private List<HasStatements> children;
 		private transient HasStatements parent;
-
+		 
+		
 		public void addToChildren(HasStatements child) {
 			if (children == null)
 				children = newArrayList();
@@ -102,7 +108,7 @@ public class ProcessedDataTree {
 		}
 	}
 
-	public static class Named extends HasStatements {
+	public static class Named {
 		private ElementIdentifier id;
 
 		public Named(ElementIdentifier id) {
@@ -121,7 +127,7 @@ public class ProcessedDataTree {
 		}
 	}
 
-	public static class ModuleData extends Named {
+	public static class ModuleData extends HasStatements {
 		public ModuleData(ElementIdentifier name) {
 			super(name);
 		}
@@ -180,7 +186,7 @@ public class ProcessedDataTree {
 		}
 	}
 
-	public static class ElementData extends Named {
+	public static class ElementData extends HasStatements {
 
 		final ElementKind elementKind;
 		ValueType type;
