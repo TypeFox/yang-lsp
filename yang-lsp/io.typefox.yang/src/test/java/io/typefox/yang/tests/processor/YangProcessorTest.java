@@ -69,7 +69,7 @@ public class YangProcessorTest extends AbstractYangTest {
 	@Test
 	public void processModules_TreeTest_FeatureInclude() throws IOException {
 
-		var sysModule = processData(true, newArrayList("example-system-ext:ldap"), null);
+		var sysModule = processData(true, newArrayList("example-system-ext:"), null);
 
 		String expectation = null;
 
