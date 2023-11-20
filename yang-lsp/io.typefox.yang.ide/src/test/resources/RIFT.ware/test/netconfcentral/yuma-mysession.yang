@@ -10,7 +10,7 @@ module yuma-mysession {
   organization  "Netconf Central";
 
   contact
-    "Andy Bierman <andy@netconfcentral.org>";
+    "Andy Bierman <mail@domain.xyz>";
 
   description
     "This module contains RPC methods for 

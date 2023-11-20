@@ -27,23 +27,23 @@ module DIFFSERV-DSCP-TC {
       Cisco Systems
       1121 Via Del Rey
       Santa Barbara, CA 93117, USA
-      E-mail: fred@cisco.com
+      E-mail: mail@domain.xyz
       
       Kwok Ho Chan
       Nortel Networks
       600 Technology Park Drive
       Billerica, MA 01821, USA
-      E-mail: khchan@nortelnetworks.com
+      E-mail: mail@domain.xyz
       
       Andrew Smith
       Harbour Networks
       Jiuling Building
       21 North Xisanhuan Ave.
       Beijing, 100089, PRC
-      E-mail: ah_smith@acm.org
+      E-mail: mail@domain.xyz
       
         Differentiated Services Working Group:
-        diffserv@ietf.org";
+        mail@domain.xyz";
 
    description      
      "The Textual Conventions defined in this module should be used

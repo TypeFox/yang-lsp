@@ -79,7 +79,7 @@ class YangValidatorTest extends AbstractYangTest {
 			module example-system {
 			  namespace "urn:example:system";
 			  yang-version 1.1;
-			  contact "joe@example.com";
+			  contact "mail@domain.xyz";
 			  prefix "asd";
 			}
 		''');
@@ -117,8 +117,8 @@ class YangValidatorTest extends AbstractYangTest {
 			  yang-version 1.1;
 			  namespace "urn:example:system";
 			  prefix "sys";
-			  contact "joe@example.com";
-			  contact "joe@example.com";
+			  contact "mail@domain.xyz";
+			  contact "mail@domain.xyz";
 			}
 		''');
 		assertError(root.firstSubstatementsOfType(Contact), SUBSTATEMENT_CARDINALITY);

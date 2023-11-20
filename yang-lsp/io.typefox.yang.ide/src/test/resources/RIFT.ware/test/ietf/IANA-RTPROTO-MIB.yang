@@ -29,7 +29,7 @@ module IANA-RTPROTO-MIB {
       Marina del Rey, CA 90292-6601
       
       Phone: +1 310 823 9358
-      EMail: iana@iana.org";
+      EMail: mail@domain.xyz";
 
    description      
      "This MIB module defines the IANAipRouteProtocol and

@@ -30,14 +30,14 @@ module SNMP-USM-AES-MIB {
       14D-318
       Whippany, NJ  07981, USA
       973-386-2163
-      uri@bell-labs.com
+      mail@domain.xyz
       
       Fabio Maino
       Andiamo Systems, Inc.
       375 East Tasman Drive
       San Jose, CA  95134, USA
       408-853-7530
-      fmaino@andiamo.com
+      mail@domain.xyz
       
       Keith McCloghrie
       Cisco Systems, Inc.
@@ -45,7 +45,7 @@ module SNMP-USM-AES-MIB {
       San Jose, CA  95134-1706, USA
       
       408-526-5260
-      kzm@cisco.com";
+      mail@domain.xyz";
 
    description      
      "Definitions of Object Identities needed for

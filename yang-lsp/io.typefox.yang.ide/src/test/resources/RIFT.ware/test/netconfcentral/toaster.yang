@@ -8,7 +8,7 @@ module toaster {
         "Netconf Central";
 
     contact
-        "Andy Bierman <andy@netconfcentral.org>";
+        "Andy Bierman <mail@domain.xyz>";
 
     description
         "YANG version of the TOASTER-MIB.";

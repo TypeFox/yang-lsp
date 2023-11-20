@@ -27,8 +27,8 @@ module EtherLike-MIB {
       Working Group";
 
    contact          
-     "WG E-mail: hubmib@ietf.org
-      To subscribe: hubmib-request@ietf.org
+     "WG E-mail: mail@domain.xyz
+      To subscribe: mail@domain.xyz
       
              Chair: Dan Romascanu
             Postal: Avaya Inc.
@@ -36,7 +36,7 @@ module EtherLike-MIB {
                     Tel Aviv 61131
                     Israel
                Tel: +972 3 645 8414
-            E-mail: dromasca@avaya.com
+            E-mail: mail@domain.xyz
       
            Editor: John Flick
            Postal: Hewlett-Packard Company
@@ -45,7 +45,7 @@ module EtherLike-MIB {
                    USA
               Tel: +1 916 785 4018
               Fax: +1 916 785 1199
-           E-mail: johnf@rose.hp.com";
+           E-mail: mail@domain.xyz";
 
    description      
      "The MIB module to describe generic objects for

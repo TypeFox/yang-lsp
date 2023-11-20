@@ -21,7 +21,7 @@ module iana-if-type {
              Marina del Rey, CA 90292
 
      Tel:    +1 310 823 9358
-     <mailto:iana@iana.org>";
+     <mailto:mail@domain.xyz>";
 
     description
       "This YANG module defines YANG identities for IANA-registered
@@ -34,7 +34,7 @@ module iana-if-type {
      the IANA web site.
 
      Requests for new values should be made to IANA via
-     email (iana@iana.org).
+     email (mail@domain.xyz).
 
      Copyright (c) 2014 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.

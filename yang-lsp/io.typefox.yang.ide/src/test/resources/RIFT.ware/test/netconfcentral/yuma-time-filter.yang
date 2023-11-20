@@ -13,7 +13,7 @@ module yuma-time-filter {
 
     organization  "Netconf Central";
 
-    contact "Andy Bierman <andy@netconfcentral.org>.";
+    contact "Andy Bierman <mail@domain.xyz>.";
 
     description 
       "Yuma <datastore> extension for optimizing datastore

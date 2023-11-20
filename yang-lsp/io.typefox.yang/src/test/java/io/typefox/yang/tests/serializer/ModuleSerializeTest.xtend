@@ -299,11 +299,11 @@ class ModuleSerializeTest {
 	
 	@Test
 	def void testIssue171() {
-		val targetModule = loadModuleFile("issue171/ericsson-mf-vdu-deviations.yang")
+		val targetModule = loadModuleFile("issue171/company-mf-vdu-deviations.yang")
 		assertSerialized('''
-			module ericsson-mf-vdu-deviations {
+			module company-mf-vdu-deviations {
 			  yang-version 1.1;
-			  namespace urn:rdns:com:ericsson:oammodel:ericsson-mf-vdu-deviations;
+			  namespace urn:rdns:com:company:oammodel:company-mf-vdu-deviations;
 			  prefix mf3gppdeviations;
 			
 			  import _3gpp-common-managed-element { prefix me3gpp; }
@@ -399,7 +399,7 @@ class ModuleSerializeTest {
 			module nrcelldu-vdu-dev {
 			    yang-version 1.1;
 			    
-			    namespace urn:rdns:com:ericsson:oammodel:nrcelldu-vdu-dev;
+			    namespace urn:rdns:com:company:oammodel:nrcelldu-vdu-dev;
 			    prefix nrcelldu3gppdev;
 			
 			    import _3gpp-common-managed-element207 { prefix me3gpp; }

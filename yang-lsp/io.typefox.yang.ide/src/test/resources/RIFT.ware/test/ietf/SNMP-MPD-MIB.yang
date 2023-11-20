@@ -24,8 +24,8 @@ module SNMP-MPD-MIB {
      "SNMPv3 Working Group";
 
    contact          
-     "WG-EMail:   snmpv3@lists.tislabs.com
-      Subscribe:  snmpv3-request@lists.tislabs.com
+     "WG-EMail:   mail@domain.xyz
+      Subscribe:  mail@domain.xyz
       
       Co-Chair:   Russ Mundy
                   Network Associates Laboratories
@@ -33,7 +33,7 @@ module SNMP-MPD-MIB {
                   Rockville, MD 20850-4601
                   USA
       
-      EMail:      mundy@tislabs.com
+      EMail:      mail@domain.xyz
       phone:      +1 301-947-7107
       
       Co-Chair &
@@ -43,7 +43,7 @@ module SNMP-MPD-MIB {
                   P. O. Box 5005
                   Rochester NH 03866-5005
                   USA
-      EMail:      dbh@enterasys.com
+      EMail:      mail@domain.xyz
       phone:      +1 603-337-2614
       
       Co-editor:  Jeffrey Case
@@ -51,7 +51,7 @@ module SNMP-MPD-MIB {
       postal:     3001 Kimberlin Heights Road
                   Knoxville, TN 37920-9716
                   USA
-      EMail:      case@snmp.com
+      EMail:      mail@domain.xyz
       phone:      +1 423-573-1434
       
       Co-editor:  Randy Presuhn
@@ -59,7 +59,7 @@ module SNMP-MPD-MIB {
       postal:     2141 North First Street
                   San Jose, CA 95131
                   USA
-      EMail:      randy_presuhn@bmc.com
+      EMail:      mail@domain.xyz
       phone:      +1 408-546-1006
       
       Co-editor:  Bert Wijnen
@@ -67,7 +67,7 @@ module SNMP-MPD-MIB {
       postal:     Schagen 33
                   3461 GL Linschoten
                   Netherlands
-      EMail:      bwijnen@lucent.com
+      EMail:      mail@domain.xyz
       phone:      +31 348-680-485";
 
    description      

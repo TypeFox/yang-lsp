@@ -26,27 +26,27 @@ module AGENTX-MIB {
      "AgentX Working Group";
 
    contact          
-     "WG-email:   agentx@dorothy.bmc.com
-      Subscribe:  agentx-request@dorothy.bmc.com
+     "WG-email:   mail@domain.xyz
+      Subscribe:  mail@domain.xyz
       WG-email Archive:  ftp://ftp.peer.com/pub/agentx/archives
       FTP repository:  ftp://ftp.peer.com/pub/agentx
       http://www.ietf.org/html.charters/agentx-charter.html
       
       Chair:      Bob Natale
                   ACE*COMM Corporation
-      Email:      bnatale@acecomm.com
+      Email:      mail@domain.xyz
       
       WG editor:  Mark Ellison
                   Ellison Software Consulting, Inc.
-      Email:      ellison@world.std.com
+      Email:      mail@domain.xyz
       
       Co-author:  Lauren Heintz
                   Cisco Systems,
-      EMail:      lheintz@cisco.com
+      EMail:      mail@domain.xyz
       
       Co-author:  Smitha Gudur
                   Independent Consultant
-      Email:      sgudur@hotmail.com";
+      Email:      mail@domain.xyz";
 
    description      
      "This is the MIB module for the SNMP Agent Extensibility

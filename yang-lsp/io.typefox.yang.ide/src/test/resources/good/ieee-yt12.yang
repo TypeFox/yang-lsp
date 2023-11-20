@@ -18,7 +18,7 @@ module ieee-yt12 {
     "IEEE 802.3 Working Group";
 
   contact
-    "Marek Hajduczenia, marek.hajduczenia@mybrighthouse.com";
+    "Marek Hajduczenia, mail@domain.xyz";
 
   description 
     "This module contains a collection of YANG definitions

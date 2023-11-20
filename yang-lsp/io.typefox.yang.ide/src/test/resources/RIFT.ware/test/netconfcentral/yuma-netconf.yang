@@ -22,7 +22,7 @@ module yuma-netconf {
 
    contact
      "Translated by Andy Bierman.
-      Send comments to <andy@netconfcentral.org>.";
+      Send comments to <mail@domain.xyz>.";
 
    revision 2012-10-05 {
        description  

@@ -26,12 +26,12 @@ module ENTITY-MIB {
      "IETF ENTMIB Working Group";
 
    contact          
-     "        WG E-mail: entmib@ietf.org
+     "        WG E-mail: mail@domain.xyz
       Mailing list subscription info:
         http://www.ietf.org/mailman/listinfo/entmib
       
       Andy Bierman
-      ietf@andybierman.com
+      mail@domain.xyz
       
       Keith McCloghrie
       Cisco Systems Inc.
@@ -41,7 +41,7 @@ module ENTITY-MIB {
       
       
       +1 408-526-5260
-      kzm@cisco.com";
+      mail@domain.xyz";
 
    description      
      "The MIB module for representing multiple logical

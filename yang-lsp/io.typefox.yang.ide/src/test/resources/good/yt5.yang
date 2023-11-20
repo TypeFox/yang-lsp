@@ -7,7 +7,7 @@ module yt5 {
         "YANG Language Design Team";
 
     contact
-        "ietf@andybierman.com";
+        "mail@domain.xyz";
 
     description
         "YANG test module 5.";

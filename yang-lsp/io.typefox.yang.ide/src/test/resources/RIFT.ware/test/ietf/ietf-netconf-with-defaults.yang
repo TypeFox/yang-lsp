@@ -12,19 +12,19 @@ module ietf-netconf-with-defaults {
    contact
     "WG Web:   <http://tools.ietf.org/wg/netconf/>
 
-     WG List:  <netconf@ietf.org>
+     WG List:  <mail@domain.xyz>
 
      WG Chair: Bert Wijnen
-               <bertietf@bwijnen.net>
+               <mail@domain.xyz>
 
      WG Chair: Mehmet Ersue
-               <mehmet.ersue@nsn.com>
+               <mail@domain.xyz>
 
      Editor: Andy Bierman
-             <andy.bierman@brocade.com>
+             <mail@domain.xyz>
 
      Editor: Balazs Lengyel
-             <balazs.lengyel@ericsson.com>";
+             <mail@domain.xyz>";
 
    description
     "This module defines an extension to the NETCONF protocol

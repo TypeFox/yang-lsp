@@ -9,7 +9,7 @@ module yuma-interfaces {
 
     organization  "Netconf Central";
 
-    contact "Andy Bierman <andy@netconfcentral.org>.";
+    contact "Andy Bierman <mail@domain.xyz>.";
 
     description 
       "Yuma interfaces table.";

@@ -30,7 +30,7 @@ module IANAifType-MIB {
               Marina del Rey, CA 90292
       
       Tel:    +1 310 823 9358
-      E-Mail: iana@iana.org";
+      E-Mail: mail@domain.xyz";
 
    description      
      "This MIB module defines the IANAifType Textual
@@ -480,7 +480,7 @@ module IANAifType-MIB {
          IANA.)
          
          Requests for new values should be made to IANA via
-         email (iana@iana.org).
+         email (mail@domain.xyz).
          
          The relationship between the assignment of ifType
          values and of OIDs to particular media-specific MIBs

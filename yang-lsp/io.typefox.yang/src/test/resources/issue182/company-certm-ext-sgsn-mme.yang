@@ -1,13 +1,13 @@
-module ericsson-certm-ext-sgsn-mme {
+module company-certm-ext-sgsn-mme {
 	yang-version 1.1;
-	namespace "urn:rdns:com:ericsson:oammodel:ericsson-certm-ext-sgsn-mme";
+	namespace "urn:rdns:com:company:oammodel:company-certm-ext-sgsn-mme";
 	prefix certmxsgsnmme;
 
 	import ietf-yang-types {
 		prefix yang;
 	}
 
-	import ericsson-certm-sgsn-mme {
+	import company-certm-sgsn-mme {
 		prefix ecertm;
 	}
 

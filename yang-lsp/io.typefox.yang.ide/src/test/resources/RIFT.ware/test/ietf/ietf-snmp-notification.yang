@@ -12,19 +12,19 @@ submodule ietf-snmp-notification {
 
   contact
     "WG Web:   <http://tools.ietf.org/wg/netmod/>
-     WG List:  <mailto:netmod@ietf.org>
+     WG List:  <mailto:mail@domain.xyz>
 
      WG Chair: David Kessens
-               <mailto:david.kessens@nsn.com>
+               <mailto:mail@domain.xyz>
 
      WG Chair: Juergen Schoenwaelder
-               <mailto:j.schoenwaelder@jacobs-university.de>
+               <mailto:mail@domain.xyz>
 
      Editor:   Martin Bjorklund
-               <mailto:mbj@tail-f.com>
+               <mailto:mail@domain.xyz>
 
      Editor:   Juergen Schoenwaelder
-               <mailto:j.schoenwaelder@jacobs-university.de>";
+               <mailto:mail@domain.xyz>";
 
   description
     "This submodule contains a collection of YANG definitions

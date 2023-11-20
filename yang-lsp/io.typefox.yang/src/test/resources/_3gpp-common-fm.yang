@@ -84,7 +84,7 @@ module _3gpp-common-fm {
 		}
 
 		description "The possible alarm serverities.
-			Aligned with ERICSSON-ALARM-MIB.";
+			Aligned with company-ALARM-MIB.";
 	}
 
   grouping AlarmRecordGrp {    

@@ -28,7 +28,7 @@ module RMON-MIB {
      "Steve Waldbusser
       Phone: +1-650-948-6500
       Fax:   +1-650-745-0671
-      Email: waldbusser@nextbeacon.com";
+      Email: mail@domain.xyz";
 
    description      
      "Remote network monitoring devices, often called

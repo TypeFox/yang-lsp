@@ -10,7 +10,7 @@ module nc-notifications {
       "IETF NETCONF WG";
 
     contact
-      "netconf@ietf.org";
+      "mail@domain.xyz";
 
     description
       "Conversion of the 'manageEvent' XSD in the NETCONF

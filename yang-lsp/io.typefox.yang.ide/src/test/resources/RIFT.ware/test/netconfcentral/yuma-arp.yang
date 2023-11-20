@@ -10,7 +10,7 @@ module yuma-arp {
 
     organization  "Netconf Central";     
 
-    contact "Andy Bierman <andy@netconfcentral.org>.";
+    contact "Andy Bierman <mail@domain.xyz>.";
 
     description
       "This module contains a collection of YANG definitions for

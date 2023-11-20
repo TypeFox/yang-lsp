@@ -246,7 +246,7 @@ module yangdiff {
                 description 
                   \"
                     - Added import baxtypes
-                    - Changed contact to 'support@acme.com'
+                    - Changed contact to 'mail@domain.xyz'
                     - Modified container myobjects
                        - Added list first-list\";
               } ";

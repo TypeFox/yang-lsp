@@ -19,10 +19,10 @@ module ethernet {
      
      Tel: +1 1800 553-NETS
      
-     E-mail: cs-yang@cisco.com";
+     E-mail: mail@domain.xyz";
 
   contact
-    "Robert Wilton - rwilton@cisco.com";
+    "Robert Wilton - mail@domain.xyz";
   
   description
     "This module contains YANG definitions for configuring 802.3

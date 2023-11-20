@@ -50,10 +50,10 @@ class Bug182Test extends AbstractYangTest {
 	def void testExposeScopeContextProviderNPE() {
 		val resourceMap = #[
 			'ietf-yang-types',
-			'ericsson-certm-sgsn-mme',
-			'ericsson-certm-ext-sgsn-mme'
+			'company-certm-sgsn-mme',
+			'company-certm-ext-sgsn-mme'
 		].toMap([it], [resourceSet.getResource(URI.createFileURI('src/test/resources/issue182/' + it + '.yang'), true)])
-		val resource = resourceMap.get('ericsson-certm-ext-sgsn-mme')
+		val resource = resourceMap.get('company-certm-ext-sgsn-mme')
 		EcoreUtil.resolveAll(resource)
 		resource.assertNoErrors()
 	}

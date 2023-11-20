@@ -31,12 +31,12 @@ module HOST-RESOURCES-TYPES {
               USA
       Phone: 650-318-1251
       Fax:   650-318-1633
-      Email: waldbusser@ins.com
+      Email: mail@domain.xyz
       
       In addition, the Host Resources MIB mailing list is dedicated
       to discussion of this MIB. To join the mailing list, send a
-      request message to hostmib-request@andrew.cmu.edu. The mailing
-      list address is hostmib@andrew.cmu.edu.";
+      request message to mail@domain.xyz. The mailing
+      list address is mail@domain.xyz.";
 
    description      
      "This MIB module registers type definitions for

@@ -13,19 +13,19 @@ module ietf-netconf-acm {
 
   contact
     "WG Web:   <http://tools.ietf.org/wg/netconf/>
-     WG List:  <mailto:netconf@ietf.org>
+     WG List:  <mailto:mail@domain.xyz>
 
      WG Chair: Mehmet Ersue
-               <mailto:mehmet.ersue@nsn.com>
+               <mailto:mail@domain.xyz>
 
      WG Chair: Bert Wijnen
-               <mailto:bertietf@bwijnen.net>
+               <mailto:mail@domain.xyz>
 
      Editor:   Andy Bierman
-               <mailto:andy@yumaworks.com>
+               <mailto:mail@domain.xyz>
 
      Editor:   Martin Bjorklund
-               <mailto:mbj@tail-f.com>";
+               <mailto:mail@domain.xyz>";
 
   description
     "NETCONF Access Control Model.

@@ -205,16 +205,16 @@ class MultilineStringTest extends AbstractYangTest {
             toBeFormatted = '''
                 contact
                   "WG Web:   <http://tools.ietf.org/wg/netmod/>
-                   WG List:  <mailto:netmod@ietf.org>
+                   WG List:  <mailto:mail@domain.xyz>
                    
                    WG Chair: David Kessens
-                             <mailto:david.kessens@nsn.com>
+                             <mailto:mail@domain.xyz>
                    
                    WG Chair: Juergen Schoenwaelder
-                             <mailto:j.schoenwaelder@jacobs-university.de>
+                             <mailto:mail@domain.xyz>
                    
                    Editor:   Juergen Schoenwaelder
-                             <mailto:j.schoenwaelder@jacobs-university.de>
+                             <mailto:mail@domain.xyz>
                   ";
             '''.wrapFormatted
         ]
@@ -226,31 +226,31 @@ class MultilineStringTest extends AbstractYangTest {
             expectation = '''
             contact
               "WG Web:   <http://tools.ietf.org/wg/netmod/>
-               WG List:  <mailto:netmod@ietf.org>
+               WG List:  <mailto:mail@domain.xyz>
                
                WG Chair: David Kessens
-                         <mailto:david.kessens@nsn.com>
+                         <mailto:mail@domain.xyz>
                
                WG Chair: Juergen Schoenwaelder
-                         <mailto:j.schoenwaelder@jacobs-university.de>
+                         <mailto:mail@domain.xyz>
                
                Editor:   Juergen Schoenwaelder
-                         <mailto:j.schoenwaelder@jacobs-university.de>
+                         <mailto:mail@domain.xyz>
               ";
             '''.wrapFormatted
             toBeFormatted = '''
             contact
                   "WG Web:   <http://tools.ietf.org/wg/netmod/>
-                   WG List:  <mailto:netmod@ietf.org>
+                   WG List:  <mailto:mail@domain.xyz>
                 
                    WG Chair: David Kessens
-                             <mailto:david.kessens@nsn.com>
+                             <mailto:mail@domain.xyz>
                 
                    WG Chair: Juergen Schoenwaelder
-                             <mailto:j.schoenwaelder@jacobs-university.de>
+                             <mailto:mail@domain.xyz>
                 
                    Editor:   Juergen Schoenwaelder
-                             <mailto:j.schoenwaelder@jacobs-university.de>
+                             <mailto:mail@domain.xyz>
                   ";
             '''.wrapUnformatted
         ]
@@ -295,7 +295,7 @@ class MultilineStringTest extends AbstractYangTest {
             toBeFormatted = '''
             contact
               "WG Chair: David Kessens
-                         <mailto:david.kessens@nsn.com>";
+                         <mailto:mail@domain.xyz>";
             '''.wrapFormatted
         ]
     }
@@ -308,7 +308,7 @@ class MultilineStringTest extends AbstractYangTest {
             ]
             toBeFormatted = '''
             contact "WG Chair: David Kessens
-                               <mailto:david.kessens@nsn.com>";
+                               <mailto:mail@domain.xyz>";
             '''.wrapFormatted
         ]
     }

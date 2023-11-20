@@ -10,12 +10,12 @@ module ietf-netconf-partial-lock {
 
   contact
    "Netconf Working Group
-    Mailing list: netconf@ietf.org
+    Mailing list: mail@domain.xyz
     Web: http://www.ietf.org/html.charters/netconf-charter.html
 
     Balazs Lengyel
-    Ericsson
-    balazs.lengyel@ericsson.com";
+    company
+    mail@domain.xyz";
 
   description
    "This YANG module defines the <partial-lock> and

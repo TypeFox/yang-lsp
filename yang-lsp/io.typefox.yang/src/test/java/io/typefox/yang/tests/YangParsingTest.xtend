@@ -123,7 +123,7 @@ class YangParsingTest {
 			          USA
 			
 			          Phone: +1 800 555 0100
-			          EMail: joe@example.com";
+			          EMail: mail@domain.xyz";
 			
 			       description
 			         "The module for entities implementing the Example system.";
@@ -177,7 +177,7 @@ class YangParsingTest {
 		          USA
 		
 		          Phone: +1 800 555 0100
-		          EMail: joe@example.com'
+		          EMail: mail@domain.xyz'
 		        }
 		        7 : Description {
 		            attr EString description 'The module for entities implementing the Example system.'

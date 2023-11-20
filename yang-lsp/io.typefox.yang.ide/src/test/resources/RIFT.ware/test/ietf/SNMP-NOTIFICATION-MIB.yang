@@ -27,8 +27,8 @@ module SNMP-NOTIFICATION-MIB {
      "IETF SNMPv3 Working Group";
 
    contact          
-     "WG-email:   snmpv3@lists.tislabs.com
-      Subscribe:  majordomo@lists.tislabs.com
+     "WG-email:   mail@domain.xyz
+      Subscribe:  mail@domain.xyz
                   In message body:  subscribe snmpv3
       
       Co-Chair:   Russ Mundy
@@ -36,7 +36,7 @@ module SNMP-NOTIFICATION-MIB {
       Postal:     15204 Omega Drive, Suite 300
                   Rockville, MD 20850-4601
                   USA
-      EMail:      mundy@tislabs.com
+      EMail:      mail@domain.xyz
       Phone:      +1 301-947-7107
       
       Co-Chair:   David Harrington
@@ -45,21 +45,21 @@ module SNMP-NOTIFICATION-MIB {
                   P. O. Box 5004
                   Rochester, New Hampshire 03866-5005
                   USA
-      EMail:      dbh@enterasys.com
+      EMail:      mail@domain.xyz
       Phone:      +1 603-337-2614
       
       Co-editor:  David B. Levi
                   Nortel Networks
       Postal:     3505 Kesterwood Drive
                   Knoxville, Tennessee 37918
-      EMail:      dlevi@nortelnetworks.com
+      EMail:      mail@domain.xyz
       Phone:      +1 865 686 0432
       
       Co-editor:  Paul Meyer
                   Secure Computing Corporation
       Postal:     2675 Long Lake Road
                   Roseville, Minnesota 55113
-      EMail:      paul_meyer@securecomputing.com
+      EMail:      mail@domain.xyz
       Phone:      +1 651 628 1592
       
       Co-editor:  Bob Stewart

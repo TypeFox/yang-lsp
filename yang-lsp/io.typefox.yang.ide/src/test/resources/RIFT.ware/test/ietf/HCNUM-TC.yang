@@ -24,8 +24,8 @@ module HCNUM-TC {
      "IETF OPS Area";
 
    contact          
-     "        E-mail: mibs@ops.ietf.org
-      Subscribe: majordomo@psg.com
+     "        E-mail: mail@domain.xyz
+      Subscribe: mail@domain.xyz
         with msg body: subscribe mibs
       
       Andy Bierman
@@ -33,14 +33,14 @@ module HCNUM-TC {
       170 West Tasman Drive
       San Jose, CA 95134 USA
       +1 408-527-3711
-      abierman@cisco.com
+      mail@domain.xyz
       
       Keith McCloghrie
       Cisco Systems Inc.
       170 West Tasman Drive
       San Jose, CA 95134 USA
       +1 408-526-5260
-      kzm@cisco.com
+      mail@domain.xyz
       
       Randy Presuhn
       BMC Software, Inc.
@@ -48,7 +48,7 @@ module HCNUM-TC {
       2141 North First Street
       San Jose,  California 95131 USA
       +1 408 546-1006
-      rpresuhn@bmc.com";
+      mail@domain.xyz";
 
    description      
      "A MIB module containing textual conventions

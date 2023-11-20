@@ -6,7 +6,7 @@ module yuma-proc {
 
     organization  "Netconf Central";
 
-    contact "Andy Bierman <andy@netconfcentral.org>.";
+    contact "Andy Bierman <mail@domain.xyz>.";
 
     description 
       "NETCONF /proc file system monitoring.";

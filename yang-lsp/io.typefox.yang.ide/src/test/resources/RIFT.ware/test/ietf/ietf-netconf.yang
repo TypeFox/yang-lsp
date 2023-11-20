@@ -15,22 +15,22 @@ module ietf-netconf {
 
   contact
     "WG Web:   <http://tools.ietf.org/wg/netconf/>
-     WG List:  <netconf@ietf.org>
+     WG List:  <mail@domain.xyz>
 
      WG Chair: Bert Wijnen
-               <bertietf@bwijnen.net>
+               <mail@domain.xyz>
 
      WG Chair: Mehmet Ersue
-               <mehmet.ersue@nsn.com>
+               <mail@domain.xyz>
 
      Editor:   Martin Bjorklund
-               <mbj@tail-f.com>
+               <mail@domain.xyz>
 
      Editor:   Juergen Schoenwaelder
-               <j.schoenwaelder@jacobs-university.de>
+               <mail@domain.xyz>
 
      Editor:   Andy Bierman
-               <andy.bierman@brocade.com>";
+               <mail@domain.xyz>";
 
   description
     "NETCONF Protocol Data Types and Protocol Operations.

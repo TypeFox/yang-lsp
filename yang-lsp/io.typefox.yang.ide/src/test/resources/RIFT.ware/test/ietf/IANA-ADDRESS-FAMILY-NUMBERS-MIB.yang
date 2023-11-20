@@ -31,7 +31,7 @@ module IANA-ADDRESS-FAMILY-NUMBERS-MIB {
       USA
       
       Tel:    +1  310-823-9358
-      E-Mail: iana@iana.org";
+      E-Mail: mail@domain.xyz";
 
    description      
      "The MIB module defines the AddressFamilyNumbers
@@ -136,7 +136,7 @@ module IANA-ADDRESS-FAMILY-NUMBERS-MIB {
          reserved(65535)
          
          Requests for new values should be made to IANA via
-         email (iana@iana.org).";
+         email (mail@domain.xyz).";
    }
 
 } /* end of module IANA-ADDRESS-FAMILY-NUMBERS-MIB */

@@ -33,7 +33,7 @@ module IF-MIB {
       US
       
       408-526-5260
-      kzm@cisco.com";
+      mail@domain.xyz";
 
    description      
      "The MIB module to describe generic objects for network

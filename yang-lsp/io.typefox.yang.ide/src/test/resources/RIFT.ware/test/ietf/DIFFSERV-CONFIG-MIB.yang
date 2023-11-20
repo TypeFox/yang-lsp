@@ -27,7 +27,7 @@ module DIFFSERV-CONFIG-MIB {
    contact          
      "SNMPCONF Working Group
       http://www.ietf.org/html.charters/snmpconf-charter.html
-      WG mailing list: snmpconf@snmp.com
+      WG mailing list: mail@domain.xyz
       
       Editors:
       Harrie Hazewinkel
@@ -35,14 +35,14 @@ module DIFFSERV-CONFIG-MIB {
       via Darwin 85
       20019 - Settimo Milanese (MI)
       Italy
-      EMail: harrie@inet.it
+      EMail: mail@domain.xyz
       
       David Partain
-      Ericsson AB
+      company AB
       P.O. Box 1248
       SE-581 12 Linkoping
       Sweden
-      E-mail: David.Partain@ericsson.com";
+      E-mail: mail@domain.xyz";
 
    description      
      "This MIB module contains differentiated services

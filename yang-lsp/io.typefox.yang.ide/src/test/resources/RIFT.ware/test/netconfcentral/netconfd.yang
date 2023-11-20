@@ -14,7 +14,7 @@ module netconfd {
 
     organization  "Netconf Central";
 
-    contact "Andy Bierman <support@netconfcentral.org>.";
+    contact "Andy Bierman <mail@domain.xyz>.";
 
     description 
        "Configuration Parameters for netconfd;

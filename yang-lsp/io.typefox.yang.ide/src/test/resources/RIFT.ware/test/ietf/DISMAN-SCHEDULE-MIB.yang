@@ -26,8 +26,8 @@ module DISMAN-SCHEDULE-MIB {
      "IETF Distributed Management Working Group";
 
    contact          
-     "WG EMail:  disman@dorothy.bmc.com
-      Subscribe: disman-request@dorothy.bmc.com
+     "WG EMail:  mail@domain.xyz
+      Subscribe: mail@domain.xyz
       
       Chair:     Randy Presuhn
                  BMC Software, Inc.
@@ -35,7 +35,7 @@ module DISMAN-SCHEDULE-MIB {
                  2141 North First Street
                  San Jose,  California 95131
                  USA
-      EMail:     rpresuhn@bmc.com
+      EMail:     mail@domain.xyz
       Phone:     +1 408 546-1006
       
       Editor:    David B. Levi
@@ -43,7 +43,7 @@ module DISMAN-SCHEDULE-MIB {
       Postal:    4401 Great America Parkway
                  Santa Clara, CA 95052-8185
                  USA
-      EMail:     dlevi@nortelnetworks.com
+      EMail:     mail@domain.xyz
       Phone:     +1 865 686 0432
       
       Editor:    Juergen Schoenwaelder
@@ -51,7 +51,7 @@ module DISMAN-SCHEDULE-MIB {
       Postal:    Bueltenweg 74/75
                  38106 Braunschweig
                  Germany
-      EMail:     schoenw@ibr.cs.tu-bs.de
+      EMail:     mail@domain.xyz
       Phone:     +49 531 391-3283";
 
    description      

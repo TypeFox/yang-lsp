@@ -7,7 +7,7 @@ module yuma-xsd {
         "Netconf Central";
 
     contact
-        "Andy Bierman <andy@netconfcentral.org>";
+        "Andy Bierman <mail@domain.xyz>";
 
     description
         "XSD derived types for usage in YANG.";

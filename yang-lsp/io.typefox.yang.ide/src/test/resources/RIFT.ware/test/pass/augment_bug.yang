@@ -12,7 +12,7 @@ module augment_bug {
 
   organization "Augment";
 
-  contact "augment@bug.com";
+  contact "mail@domain.xyz";
 
   description "Example file to find the augment bug.";
 

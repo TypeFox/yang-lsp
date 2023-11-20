@@ -30,7 +30,7 @@ module IANA-LANGUAGE-MIB {
               Marina del Rey, CA 90292
       
       Tel:    +1 310 823 9358 x20
-      E-Mail: iana@iana.org";
+      E-Mail: mail@domain.xyz";
 
    description      
      "The MIB module registers object identifier values for

@@ -31,14 +31,14 @@ module INTEGRATED-SERVICES-MIB {
               519 Lado Drive
               Santa Barbara, California 93111
       Tel:    +1 805 681 0115
-      E-Mail: fred@cisco.com
+      E-Mail: mail@domain.xyz
       
               John Krawczyk
       Postal: ArrowPoint Communications
               235 Littleton Road
               Westford, Massachusetts 01886
       Tel:    +1 508 692 5875
-      E-Mail: jjk@tiac.net";
+      E-Mail: mail@domain.xyz";
 
    description      
      "The MIB module to describe the Integrated Services

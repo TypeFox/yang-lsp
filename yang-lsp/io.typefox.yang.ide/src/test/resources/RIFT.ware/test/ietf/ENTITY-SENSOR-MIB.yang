@@ -29,28 +29,28 @@ module ENTITY-SENSOR-MIB {
      "        Andy Bierman
       Cisco Systems, Inc.
       Tel: +1 408-527-3711
-      E-mail: abierman@cisco.com
+      E-mail: mail@domain.xyz
       Postal: 170 West Tasman Drive
       San Jose, CA USA 95134
       
       Dan Romascanu
       Avaya Inc.
       Tel: +972-3-645-8414
-      Email: dromasca@avaya.com
+      Email: mail@domain.xyz
       Postal: Atidim technology Park, Bldg. #3
       Tel Aviv, Israel, 61131
       
       K.C. Norseth
       L-3 Communications
       Tel: +1 801-594-2809
-      Email: kenyon.c.norseth@L-3com.com
+      Email: mail@domain.xyz
       Postal: 640 N. 2200 West.
       
       
       
       Salt Lake City, Utah 84116-0850
       
-      Send comments to <entmib@ietf.org>
+      Send comments to <mail@domain.xyz>
       Mailing list subscription info:
       http://www.ietf.org/mailman/listinfo/entmib ";
 

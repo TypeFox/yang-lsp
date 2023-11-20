@@ -10,16 +10,16 @@ module ietf-ipfix-psamp {
 
   contact
     "WG Web:   <http://tools.ietf.org/wg/ipfix/>
-    WG List:  <mailto:ipfix@ietf.org>
+    WG List:  <mailto:mail@domain.xyz>
 
     WG Chair: Nevil Brownlee
-              <n.brownlee@auckland.ac.nz>
+              <mail@domain.xyz>
 
     WG Chair: Juergen Quittek
-              <quittek@neclab.eu>
+              <mail@domain.xyz>
 
     Editor:   Gerhard Muenz
-              <mailto:muenz@net.in.tum.de>";
+              <mailto:mail@domain.xyz>";
 
   description
     "IPFIX/PSAMP Configuration Data Model

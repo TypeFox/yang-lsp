@@ -26,7 +26,7 @@ module ENTITY-STATE-MIB {
      "IETF Entity MIB Working Group";
 
    contact          
-     " General Discussion: entmib@ietf.org
+     " General Discussion: mail@domain.xyz
       To Subscribe:
       http://www.ietf.org/mailman/listinfo/entmib
       
@@ -37,14 +37,14 @@ module ENTITY-STATE-MIB {
       PO Box 3511 Station C
       Ottawa, Ont.  K1Y 4H7
       Canada
-      schishol@nortel.com
+      mail@domain.xyz
       
       David T. Perkins
       548 Qualbrook Ct
       San Jose, CA 95110
       USA
       Phone: 408 394-8702
-      dperkins@snmpinfo.com";
+      mail@domain.xyz";
 
    description      
      "This MIB defines a state extension to the Entity MIB.

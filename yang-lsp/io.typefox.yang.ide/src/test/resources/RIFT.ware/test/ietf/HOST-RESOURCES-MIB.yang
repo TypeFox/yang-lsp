@@ -33,13 +33,13 @@ module HOST-RESOURCES-MIB {
               USA
       Phone:  650-318-1251
       Fax:    650-318-1633
-      Email:  waldbusser@lucent.com
+      Email:  mail@domain.xyz
       
       In addition, the Host Resources MIB mailing list is
       dedicated to discussion of this MIB. To join the
       mailing list, send a request message to
-      hostmib-request@andrew.cmu.edu. The mailing list
-      address is hostmib@andrew.cmu.edu.";
+      mail@domain.xyz. The mailing list
+      address is mail@domain.xyz.";
 
    description      
      "This MIB is for use in managing host systems. The term

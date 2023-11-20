@@ -9,7 +9,7 @@ module yang-smi {
         "YANG Language Design Team";
 
     contact
-        "Martin Bjorklund (Editor) <mbj@tail-f.com>";
+        "Martin Bjorklund (Editor) <mail@domain.xyz>";
 
     description
         "This module contains extensions for dealing with 

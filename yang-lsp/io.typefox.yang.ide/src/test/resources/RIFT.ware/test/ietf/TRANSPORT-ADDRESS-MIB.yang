@@ -29,9 +29,9 @@ module TRANSPORT-ADDRESS-MIB {
       Bueltenweg 74/75
       38106 Braunschweig, Germany
       Phone: +49 531 391-3289
-      EMail: schoenw@ibr.cs.tu-bs.de
+      EMail: mail@domain.xyz
       
-      Send comments to <mibs@ops.ietf.org>.";
+      Send comments to <mail@domain.xyz>.";
 
    description      
      "This MIB module provides commonly used transport

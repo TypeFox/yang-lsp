@@ -37,7 +37,7 @@ module IP-MIB {
       108 Whispering Pines Dr. Suite 235
       Scotts Valley, CA 95066
       USA
-      EMail: <sar@iwl.com>";
+      EMail: <mail@domain.xyz>";
 
    description      
      "The MIB module for managing IP and ICMP implementations, but

@@ -29,9 +29,9 @@ module INET-ADDRESS-MIB {
       28725 Bremen, Germany
       
       Phone: +49 421 200-3587
-      EMail: j.schoenwaelder@iu-bremen.de
+      EMail: mail@domain.xyz
       
-      Send comments to <ietfmibs@ops.ietf.org>.";
+      Send comments to <mail@domain.xyz>.";
 
    description      
      "This MIB module defines textual conventions for

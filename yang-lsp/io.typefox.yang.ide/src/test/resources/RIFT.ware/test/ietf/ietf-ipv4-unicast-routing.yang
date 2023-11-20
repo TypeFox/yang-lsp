@@ -17,16 +17,16 @@ module ietf-ipv4-unicast-routing {
 
   contact
     "WG Web: <http://tools.ietf.org/wg/netmod/>
-     WG List: <mailto:netmod@ietf.org>
+     WG List: <mailto:mail@domain.xyz>
 
      WG Chair: David Kessens
-     <mailto:david.kessens@nsn.com>
+     <mailto:mail@domain.xyz>
 
      WG Chair: Juergen Schoenwaelder
-     <mailto:j.schoenwaelder@jacobs-university.de>
+     <mailto:mail@domain.xyz>
 
      Editor: Ladislav Lhotka
-     <mailto:lhotka@nic.cz>
+     <mailto:mail@domain.xyz>
     ";
 
   description

@@ -1,6 +1,6 @@
-module ericsson-mf-vdu-deviations {
+module company-mf-vdu-deviations {
   yang-version 1.1;
-  namespace urn:rdns:com:ericsson:oammodel:ericsson-mf-vdu-deviations;
+  namespace urn:rdns:com:company:oammodel:company-mf-vdu-deviations;
   prefix mf3gppdeviations;
 
   import _3gpp-common-managed-element { prefix me3gpp; }

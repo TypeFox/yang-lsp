@@ -1,7 +1,7 @@
 module nrcelldu-vdu-dev {
     yang-version 1.1;
     
-    namespace urn:rdns:com:ericsson:oammodel:nrcelldu-vdu-dev;
+    namespace urn:rdns:com:company:oammodel:nrcelldu-vdu-dev;
     prefix nrcelldu3gppdev;
 
     import _3gpp-common-managed-element207 { prefix me3gpp; }

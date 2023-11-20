@@ -23,15 +23,15 @@ module SNMPv2-TM {
      "IETF SNMPv3 Working Group";
 
    contact          
-     "WG-EMail:   snmpv3@lists.tislabs.com
-      Subscribe:  snmpv3-request@lists.tislabs.com
+     "WG-EMail:   mail@domain.xyz
+      Subscribe:  mail@domain.xyz
       
       Co-Chair:   Russ Mundy
                   Network Associates Laboratories
       postal:     15204 Omega Drive, Suite 300
                   Rockville, MD 20850-4601
                   USA
-      EMail:      mundy@tislabs.com
+      EMail:      mail@domain.xyz
       phone:      +1 301 947-7107
       
       Co-Chair:   David Harrington
@@ -40,7 +40,7 @@ module SNMPv2-TM {
                   P. O. Box 5005
                   Rochester, NH 03866-5005
                   USA
-      EMail:      dbh@enterasys.com
+      EMail:      mail@domain.xyz
       phone:      +1 603 337-2614
       
       Editor:     Randy Presuhn
@@ -48,7 +48,7 @@ module SNMPv2-TM {
       postal:     2141 North First Street
                   San Jose, CA 95131
                   USA
-      EMail:      randy_presuhn@bmc.com
+      EMail:      mail@domain.xyz
       phone:      +1 408 546-1006";
 
    description      

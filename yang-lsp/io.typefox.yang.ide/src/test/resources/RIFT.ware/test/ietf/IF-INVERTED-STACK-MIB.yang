@@ -32,7 +32,7 @@ module IF-INVERTED-STACK-MIB {
       US
       
       408-526-5260
-      kzm@cisco.com";
+      mail@domain.xyz";
 
    description      
      "The MIB module which provides the Inverted Stack Table for

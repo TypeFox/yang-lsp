@@ -26,7 +26,7 @@ module yuma-system {
 
     organization  "Netconf Central";
 
-    contact "Andy Bierman <andy@netconfcentral.org>.";
+    contact "Andy Bierman <mail@domain.xyz>.";
 
     description 
       "NETCONF Basic System Group.";

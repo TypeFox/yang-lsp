@@ -33,7 +33,7 @@ module DISMAN-EVENT-MIB {
       170 West Tasman Drive,
       San Jose CA 95134-1706.
       Phone: +1 408 526 4527
-      Email: ramk@cisco.com";
+      Email: mail@domain.xyz";
 
    description      
      "The MIB module for defining event triggers and actions
