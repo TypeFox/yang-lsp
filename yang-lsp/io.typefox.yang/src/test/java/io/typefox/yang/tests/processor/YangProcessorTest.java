@@ -37,7 +37,7 @@ public class YangProcessorTest extends AbstractYangTest {
 
 		/// CLI tree test
 		try (InputStream in = this.getClass().getClassLoader()
-				.getResourceAsStream("io/typefox/yang/tests/processor/expectation-nodev.txt");
+				.getResourceAsStream("processor/expectation/expectation-nodev.txt");
 				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
 			var writer = new StringWriter();
 			br.transferTo(writer);
@@ -56,7 +56,7 @@ public class YangProcessorTest extends AbstractYangTest {
 
 		/// CLI tree test
 		try (InputStream in = this.getClass().getClassLoader()
-				.getResourceAsStream("io/typefox/yang/tests/processor/expectation.txt");
+				.getResourceAsStream("processor/expectation/expectation.txt");
 				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
 			var writer = new StringWriter();
 			br.transferTo(writer);
@@ -76,7 +76,7 @@ public class YangProcessorTest extends AbstractYangTest {
 		// CLI tree test expect output like:
 		// pyang -f tree ietf-system.yang --deviation-module example-system-ext.yang -F example-system-ext:
 		try (InputStream in = this.getClass().getClassLoader()
-				.getResourceAsStream("io/typefox/yang/tests/processor/expectation-feature-only-example.txt");
+				.getResourceAsStream("processor/expectation/expectation-feature-only-example.txt");
 				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
 			var writer = new StringWriter();
 			br.transferTo(writer);
@@ -96,7 +96,7 @@ public class YangProcessorTest extends AbstractYangTest {
 		// CLI tree test expect output like:
 		// pyang -f tree ietf-system.yang --deviation-module example-system-ext.yang -X example-system-ext:ldap-posix-filter 
 		try (InputStream in = this.getClass().getClassLoader()
-				.getResourceAsStream("io/typefox/yang/tests/processor/expectation-feature-exclude-f.txt");
+				.getResourceAsStream("processor/expectation/expectation-feature-exclude-f.txt");
 				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
 			var writer = new StringWriter();
 			br.transferTo(writer);
@@ -115,7 +115,7 @@ public class YangProcessorTest extends AbstractYangTest {
 
 		// Json output test
 		try (InputStream in = this.getClass().getClassLoader()
-				.getResourceAsStream("io/typefox/yang/tests/processor/expectation-nodev.json");
+				.getResourceAsStream("processor/expectation/expectation-nodev.json");
 				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
 			var writer = new StringWriter();
 			br.transferTo(writer);
@@ -134,7 +134,7 @@ public class YangProcessorTest extends AbstractYangTest {
 
 		// Json output test
 		try (InputStream in = this.getClass().getClassLoader()
-				.getResourceAsStream("io/typefox/yang/tests/processor/expectation.json");
+				.getResourceAsStream("processor/expectation/expectation.json");
 				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
 			var writer = new StringWriter();
 			br.transferTo(writer);
