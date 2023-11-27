@@ -4,7 +4,6 @@ import io.typefox.yang.tests.AbstractYangTest
 import io.typefox.yang.yang.Contact
 import io.typefox.yang.yang.Container
 import io.typefox.yang.yang.Description
-import io.typefox.yang.yang.Grouping
 import io.typefox.yang.yang.KeyReference
 import io.typefox.yang.yang.Leaf
 import io.typefox.yang.yang.List
@@ -414,7 +413,7 @@ class SerializationTest extends AbstractYangTest {
 		resource.assertNoErrors()
 		val module = resource.contents.head as Module
 		val uses = module.substatements.get(4).substatements.get(2).substatements.get(1) as Uses
-		assertTrue(uses.grouping.node instanceof Grouping)
+		assertNotNull(uses.grouping.node)
 		assertFalse((uses.grouping.node as InternalEObject).eIsProxy)
 		
 		val serialized = resource.serializer.serialize(resource.contents.head)

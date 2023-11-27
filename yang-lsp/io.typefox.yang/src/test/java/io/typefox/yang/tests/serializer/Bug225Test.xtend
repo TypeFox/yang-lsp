@@ -8,7 +8,7 @@ import org.eclipse.xtext.resource.SaveOptions
 import org.eclipse.xtext.resource.XtextResource
 import org.eclipse.xtext.util.EmfFormatter
 import org.junit.Test
-
+import static extension org.eclipse.xtext.util.Strings.toPlatformLineSeparator
 import static org.junit.Assert.assertEquals
 
 class Bug225Test extends AbstractYangTest {
@@ -129,7 +129,7 @@ class Bug225Test extends AbstractYangTest {
 		    }
 		}'''
 		assertEquals(expectedResolvedPath,
-			EmfFormatter.objToStr((augmentsLeafType.substatements.head as Path).reference))
+			EmfFormatter.objToStr((augmentsLeafType.substatements.head as Path).reference).toPlatformLineSeparator)
 
 		val result = serializer.serialize(submodule2, SaveOptions.newBuilder().format().getOptions())
 		assertEquals('''

@@ -166,9 +166,9 @@ public class YangProcessor {
 				child = new ElementData((SchemaNode) ele, ElementKind.Grouping);
 			} else if (ele instanceof Uses) {
 				/*
-				 * The effect of a “uses” reference to a grouping is that the nodes defined by
+				 * The effect of a "uses" reference to a grouping is that the nodes defined by
 				 * the grouping are copied into the current schema tree and are then updated
-				 * according to the “refine” and “augment” statements.
+				 * according to the "refine" and "augment" statements.
 				 */
 				GroupingRef groupingRef = ((Uses) ele).getGrouping();
 				Grouping grouping = groupingRef.getNode();
