@@ -297,9 +297,11 @@ class YangContentProposalProvider extends IdeContentProposalProvider {
 					val modulePrefix = suffix.getSegment(i)
 					if (modulePrefix != scopeCtx.moduleName) {
 						val moduleName = suffix.getSegment(i)
-						val importPrefix = scopeCtx.importedModules.entrySet.findFirst[value.moduleName == moduleName].
-							key
-						name.append(importPrefix).append(":")
+						val importedByName = scopeCtx.importedModules.entrySet.findFirst[value.moduleName == moduleName]
+						if(importedByName !== null) {
+							val importPrefix = importedByName.key
+							name.append(importPrefix).append(":")
+						}
 					}
 				} else {
 					name.append(suffix.getSegment(i))

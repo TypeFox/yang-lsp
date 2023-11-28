@@ -1,0 +1,362 @@
+module: ietf-system
+  +--rw system
+  |  +--rw contact?               string
+  |  +--rw hostname?              inet:domain-name
+  |  +--rw location?              string
+  |  +--rw clock
+  |  |  +--rw (timezone)?
+  |  |     +--:(timezone-name) {timezone-name}?
+  |  |     |  +--rw timezone-name?         timezone-name
+  |  |     +--:(timezone-utc-offset)
+  |  |        +--rw timezone-utc-offset?   int16
+  |  +--rw ntp! {ntp}?
+  |  |  +--rw enabled?   boolean
+  |  |  +--rw server* [name]
+  |  |     +--rw name                            string
+  |  |     +--rw (transport)
+  |  |     |  +--:(udp)
+  |  |     |     +--rw udp
+  |  |     |        +--rw address    inet:host
+  |  |     |        +--rw port?      inet:port-number {ntp-udp-port}?
+  |  |     +--rw association-type?               enumeration
+  |  |     +--rw iburst?                         boolean
+  |  |     +--rw prefer?                         boolean
+  |  |     +--rw sysxext:administrative-state?   basic-adm-state {ntp-security}?
+  |  |     +--rw sysxext:mac-algorithm*          mac-algorithm-supported-t {ntp-security}?
+  |  |     +--rw sysxext:pre-shared-key?         string {ntp-security}?
+  |  |     +--rw sysxext:key-id?                 uint64 {ntp-security}?
+  |  |     +--rw sysxext:user-label?             string {ntp-security}?
+  |  +--rw dns-resolver
+  |  |  +--rw search*    inet:domain-name
+  |  |  +--rw server* [name]
+  |  |  |  +--rw name                 string
+  |  |  |  +--rw (transport)
+  |  |  |     +--:(udp-and-tcp)
+  |  |  |        +--rw udp-and-tcp
+  |  |  |           +--rw address    inet:ip-address
+  |  |  |           +--rw port?      inet:port-number {dns-udp-tcp-port}?
+  |  |  +--rw options
+  |  |     +--rw timeout?    uint8
+  |  |     +--rw attempts?   uint8
+  |  +--rw radius {radius}?
+  |  |  +--rw server* [name]
+  |  |  |  +--rw name                   string
+  |  |  |  +--rw (transport)
+  |  |  |  |  +--:(udp)
+  |  |  |  |     +--rw udp
+  |  |  |  |        +--rw address                inet:host
+  |  |  |  |        +--rw authentication-port?   inet:port-number
+  |  |  |  |        +--rw shared-secret          string
+  |  |  |  +--rw authentication-type?   identityref
+  |  |  +--rw options
+  |  |     +--rw timeout?    uint8
+  |  |     +--rw attempts?   uint8
+  |  +--rw authentication {authentication}?
+  |  |  +--rw user-authentication-order*              identityref
+  |  |  +--rw user* [name] {local-users}?
+  |  |  |  +--rw name                               string
+  |  |  |  +--rw password?                          ianach:crypt-hash
+  |  |  |  +--rw authorized-key* [name]
+  |  |  |  |  +--rw name         string
+  |  |  |  |  +--rw algorithm    string
+  |  |  |  |  +--rw key-data     binary
+  |  |  |  +--rw sysxext:password-policy?           -> /sys:system/authentication/password-policy/name {sys:authentication and sys:local-users}?
+  |  |  |  +--rw sysxext:account-policy?            -> /sys:system/authentication/account-policy/name {sys:authentication and sys:local-users}?
+  |  |  |  +--rw sysxext:administrative-state?      basic-adm-state {sys:authentication and sys:local-users}?
+  |  |  |  +--rw sysxext:groups*                    string {sys:authentication and sys:local-users}?
+  |  |  |  +---x sysxext:unlock-operational-lock {sys:authentication and sys:local-users}?
+  |  |  |  +--rw sysxext:full-name?                 string {sys:authentication and sys:local-users}?
+  |  |  |  +--rw sysxext:user-label?                string {sys:authentication and sys:local-users}?
+  |  |  +--rw sysxext:authentication-failure-delay?   uint8 {sys:authentication}?
+  |  |  +--rw sysxext:target-types*                   string {local-target-classes,sys:authentication}?
+  |  |  +--rw sysxext:legal-notice?                   string {sys:authentication}?
+  |  |  +--rw sysxext:privacy-notice?                 string {sys:authentication}?
+  |  |  +--rw sysxext:post-login-notice?              string {sys:authentication}?
+  |  |  +--rw sysxext:default-password-quality {sys:local-users}?
+  |  |  |  +--rw sysxext:max-consecutive-characters-per-class?   uint16
+  |  |  |  +--rw sysxext:min-digit?                              uint16
+  |  |  |  +--rw sysxext:min-lower?                              uint16
+  |  |  |  +--rw sysxext:min-upper?                              uint16
+  |  |  |  +--rw sysxext:min-other?                              uint16
+  |  |  |  +--rw sysxext:min-points?                             uint16
+  |  |  +--rw sysxext:password-quality* [name] {sys:local-users}?
+  |  |  |  +--rw sysxext:name                                    string
+  |  |  |  +--rw sysxext:max-consecutive-characters-per-class?   uint16
+  |  |  |  +--rw sysxext:min-digit?                              uint16
+  |  |  |  +--rw sysxext:min-lower?                              uint16
+  |  |  |  +--rw sysxext:min-upper?                              uint16
+  |  |  |  +--rw sysxext:min-other?                              uint16
+  |  |  |  +--rw sysxext:min-points?                             uint16
+  |  |  |  +--rw sysxext:user-label?                             string
+  |  |  +--rw sysxext:default-password-policy {sys:local-users}?
+  |  |  |  +--rw sysxext:expiry-warning?           uint16
+  |  |  |  +--rw sysxext:failure-count-interval?   uint32
+  |  |  |  +--rw sysxext:history-length?           uint32
+  |  |  |  +--rw sysxext:lockout-duration?         uint32
+  |  |  |  +--rw sysxext:max-age?                  uint16
+  |  |  |  +--rw sysxext:max-failure?              uint32
+  |  |  |  +--rw sysxext:min-age?                  uint16
+  |  |  |  +--rw sysxext:min-length?               uint16
+  |  |  |  +--rw sysxext:must-change?              boolean
+  |  |  |  +--rw sysxext:password-quality?         -> /sys:system/authentication/password-quality/name
+  |  |  +--rw sysxext:password-policy* [name] {sys:local-users}?
+  |  |  |  +--rw sysxext:name                      string
+  |  |  |  +--rw sysxext:expiry-warning?           uint16
+  |  |  |  +--rw sysxext:failure-count-interval?   uint32
+  |  |  |  +--rw sysxext:history-length?           uint32
+  |  |  |  +--rw sysxext:lockout-duration?         uint32
+  |  |  |  +--rw sysxext:max-age?                  uint16
+  |  |  |  +--rw sysxext:max-failure?              uint32
+  |  |  |  +--rw sysxext:min-age?                  uint16
+  |  |  |  +--rw sysxext:min-length?               uint16
+  |  |  |  +--rw sysxext:must-change?              boolean
+  |  |  |  +--rw sysxext:password-quality?         -> /sys:system/authentication/password-quality/name
+  |  |  |  +--rw sysxext:user-label?               string
+  |  |  +--rw sysxext:default-account-policy {sys:local-users}?
+  |  |  |  +--rw sysxext:dormant-timer?          uint16
+  |  |  |  +--rw sysxext:dormant-action?         uint16
+  |  |  |  +--rw sysxext:dormant-action-timer?   uint16
+  |  |  +--rw sysxext:account-policy* [name] {sys:local-users}?
+  |  |  |  +--rw sysxext:name                    string
+  |  |  |  +--rw sysxext:dormant-timer?          uint16
+  |  |  |  +--rw sysxext:dormant-action?         uint16
+  |  |  |  +--rw sysxext:dormant-action-timer?   uint16
+  |  |  |  +--rw sysxext:user-label?             string
+  |  |  +--rw sysxext:admin-user {sys:local-users}?
+  |  |  |  +--rw sysxext:password?                ianach:crypt-hash
+  |  |  |  +--rw sysxext:authorized-key* [name]
+  |  |  |  |  +--rw sysxext:name         string
+  |  |  |  |  +--rw sysxext:algorithm    string
+  |  |  |  |  +--rw sysxext:key-data     binary
+  |  |  |  +--rw sysxext:admin-password-policy
+  |  |  |     +--rw sysxext:failure-count-interval?               uint32 {authentication-failure-alarm}?
+  |  |  |     +--rw sysxext:max-failure?                          uint32 {authentication-failure-alarm}?
+  |  |  |     +---x sysxext:clear-authentication-failure-alarm {authentication-failure-alarm}?
+  |  |  |     +--rw sysxext:password-quality?                     -> /sys:system/authentication/password-quality/name
+  |  |  +--rw sysxext:oauth2-client* [client-id] {oauth2-client-authentication}?
+  |  |     +--rw sysxext:client-id                string
+  |  |     +--rw (sysxext:client-authentication)
+  |  |     |  +--:(sysxext:client-secret)
+  |  |     |  |  +--rw sysxext:client-secret?     string
+  |  |     |  +--:(sysxext:private-key-jwt)
+  |  |     |     +--rw sysxext:private-key-jwt!
+  |  |     |        +--rw (sysxext:local-or-truststore)
+  |  |     |           +--:(sysxext:local) {local-definitions-supported}?
+  |  |     |           |  +--rw sysxext:local-definition
+  |  |     |           |     +--rw sysxext:raw-public-key* [name]
+  |  |     |           |        +--rw sysxext:name                 string
+  |  |     |           |        +--rw sysxext:algorithm            iasa:asymmetric-algorithm-type
+  |  |     |           |        +--rw sysxext:public-key-format?   identityref
+  |  |     |           |        +--rw sysxext:public-key           binary
+  |  |     |           +--:(sysxext:truststore) {truststore-supported,raw-public-keys}?
+  |  |     |              +--rw sysxext:truststore-reference?   ts:raw-public-keys-ref
+  |  |     +--rw sysxext:groups*                  string
+  |  +--rw sysxext:user-label?    string
+  |  +--rw sysxext:ldap! {ldap-authentication}?
+  |  |  +--rw sysxext:server* [name]
+  |  |  |  +--rw sysxext:name         string
+  |  |  |  +--rw (sysxext:transport)
+  |  |  |     +--:(sysxext:tcp)
+  |  |  |        +--rw sysxext:tcp
+  |  |  |           +--rw sysxext:address        inet:host
+  |  |  |           +--rw (sysxext:protocol)?
+  |  |  |              +--:(sysxext:ldap)
+  |  |  |              |  +--rw sysxext:ldap
+  |  |  |              |     +--rw sysxext:port?   inet:port-number
+  |  |  |              +--:(sysxext:ldaps)
+  |  |  |                 +--rw sysxext:ldaps!
+  |  |  |                    +--rw sysxext:port?   inet:port-number
+  |  |  +--rw sysxext:security
+  |  |  |  +--rw (sysxext:transport-security)
+  |  |  |  |  +--:(sysxext:clear) {ldap-clear}?
+  |  |  |  |  |  +--rw sysxext:clear?                    empty
+  |  |  |  |  +--:(sysxext:tls)
+  |  |  |  |     +--rw sysxext:tls!
+  |  |  |  |        +--rw sysxext:client-identity
+  |  |  |  |        |  +--rw (sysxext:auth-type)
+  |  |  |  |        |     +--:(sysxext:certificate)
+  |  |  |  |        |     |  +--rw sysxext:certificate {x509-certificate-auth}?
+  |  |  |  |        |     |     +--rw (sysxext:local-or-keystore)
+  |  |  |  |        |     |        +--:(sysxext:local) {local-definitions-supported}?
+  |  |  |  |        |     |        |  +--rw sysxext:local-definition
+  |  |  |  |        |     |        |     +--rw sysxext:algorithm                               iasa:asymmetric-algorithm-type
+  |  |  |  |        |     |        |     +--rw sysxext:public-key-format?                      identityref
+  |  |  |  |        |     |        |     +--rw sysxext:public-key                              binary
+  |  |  |  |        |     |        |     +--rw sysxext:private-key-format?                     identityref
+  |  |  |  |        |     |        |     +--rw (sysxext:private-key-type)
+  |  |  |  |        |     |        |     |  +--:(sysxext:private-key)
+  |  |  |  |        |     |        |     |  |  +--rw sysxext:private-key?                      binary
+  |  |  |  |        |     |        |     |  +--:(sysxext:hidden-private-key)
+  |  |  |  |        |     |        |     |  |  +--rw sysxext:hidden-private-key?               empty
+  |  |  |  |        |     |        |     |  +--:(sysxext:encrypted-private-key)
+  |  |  |  |        |     |        |     |     +--rw sysxext:encrypted-private-key
+  |  |  |  |        |     |        |     |        +--rw (sysxext:key-type)
+  |  |  |  |        |     |        |     |        |  +--:(sysxext:symmetric-key-ref)
+  |  |  |  |        |     |        |     |        |  |  +--rw sysxext:symmetric-key-ref?    -> /ks:keystore/symmetric-keys/symmetric-key/name {keystore-supported}?
+  |  |  |  |        |     |        |     |        |  +--:(sysxext:asymmetric-key-ref)
+  |  |  |  |        |     |        |     |        |     +--rw sysxext:asymmetric-key-ref?   -> /ks:keystore/asymmetric-keys/asymmetric-key/name {keystore-supported}?
+  |  |  |  |        |     |        |     |        +--rw sysxext:value?                      binary
+  |  |  |  |        |     |        |     +--rw sysxext:cert?                                   end-entity-cert-cms
+  |  |  |  |        |     |        |     +---n sysxext:certificate-expiration
+  |  |  |  |        |     |        |     |  +-- sysxext:expiration-date    yang:date-and-time
+  |  |  |  |        |     |        |     +---x sysxext:generate-certificate-signing-request
+  |  |  |  |        |     |        |        +---w sysxext:input
+  |  |  |  |        |     |        |        |  +---w sysxext:subject       binary
+  |  |  |  |        |     |        |        |  +---w sysxext:attributes?   binary
+  |  |  |  |        |     |        |        +--ro sysxext:output
+  |  |  |  |        |     |        |           +--ro sysxext:certificate-signing-request    binary
+  |  |  |  |        |     |        +--:(sysxext:keystore) {keystore-supported}?
+  |  |  |  |        |     |           +--rw sysxext:keystore-reference
+  |  |  |  |        |     |              +--rw sysxext:asymmetric-key?   ks:asymmetric-key-ref
+  |  |  |  |        |     |              +--rw sysxext:certificate?      -> /ks:keystore/asymmetric-keys/asymmetric-key[ks:name=current()/../asymmetric-key]/certificates/certificate/name
+  |  |  |  |        |     +--:(sysxext:raw-public-key)
+  |  |  |  |        |     |  +--rw sysxext:raw-public-key {raw-public-key-auth}?
+  |  |  |  |        |     |     +--rw (sysxext:local-or-keystore)
+  |  |  |  |        |     |        +--:(sysxext:local) {local-definitions-supported}?
+  |  |  |  |        |     |        |  +--rw sysxext:local-definition
+  |  |  |  |        |     |        |     +--rw sysxext:algorithm                      iasa:asymmetric-algorithm-type
+  |  |  |  |        |     |        |     +--rw sysxext:public-key-format?             identityref
+  |  |  |  |        |     |        |     +--rw sysxext:public-key                     binary
+  |  |  |  |        |     |        |     +--rw sysxext:private-key-format?            identityref
+  |  |  |  |        |     |        |     +--rw (sysxext:private-key-type)
+  |  |  |  |        |     |        |        +--:(sysxext:private-key)
+  |  |  |  |        |     |        |        |  +--rw sysxext:private-key?             binary
+  |  |  |  |        |     |        |        +--:(sysxext:hidden-private-key)
+  |  |  |  |        |     |        |        |  +--rw sysxext:hidden-private-key?      empty
+  |  |  |  |        |     |        |        +--:(sysxext:encrypted-private-key)
+  |  |  |  |        |     |        |           +--rw sysxext:encrypted-private-key
+  |  |  |  |        |     |        |              +--rw (sysxext:key-type)
+  |  |  |  |        |     |        |              |  +--:(sysxext:symmetric-key-ref)
+  |  |  |  |        |     |        |              |  |  +--rw sysxext:symmetric-key-ref?    -> /ks:keystore/symmetric-keys/symmetric-key/name {keystore-supported}?
+  |  |  |  |        |     |        |              |  +--:(sysxext:asymmetric-key-ref)
+  |  |  |  |        |     |        |              |     +--rw sysxext:asymmetric-key-ref?   -> /ks:keystore/asymmetric-keys/asymmetric-key/name {keystore-supported}?
+  |  |  |  |        |     |        |              +--rw sysxext:value?                      binary
+  |  |  |  |        |     |        +--:(sysxext:keystore) {keystore-supported}?
+  |  |  |  |        |     |           +--rw sysxext:keystore-reference?   ks:asymmetric-key-ref
+  |  |  |  |        |     +--:(sysxext:psk)
+  |  |  |  |        |        +--rw sysxext:psk {psk-auth}?
+  |  |  |  |        |           +--rw (sysxext:local-or-keystore)
+  |  |  |  |        |              +--:(sysxext:local) {local-definitions-supported}?
+  |  |  |  |        |              |  +--rw sysxext:local-definition
+  |  |  |  |        |              |     +--rw sysxext:algorithm              isa:symmetric-algorithm-type
+  |  |  |  |        |              |     +--rw sysxext:key-format?            identityref
+  |  |  |  |        |              |     +--rw (sysxext:key-type)
+  |  |  |  |        |              |        +--:(sysxext:key)
+  |  |  |  |        |              |        |  +--rw sysxext:key?             binary
+  |  |  |  |        |              |        +--:(sysxext:hidden-key)
+  |  |  |  |        |              |        |  +--rw sysxext:hidden-key?      empty
+  |  |  |  |        |              |        +--:(sysxext:encrypted-key)
+  |  |  |  |        |              |           +--rw sysxext:encrypted-key
+  |  |  |  |        |              |              +--rw (sysxext:key-type)
+  |  |  |  |        |              |              |  +--:(sysxext:symmetric-key-ref)
+  |  |  |  |        |              |              |  |  +--rw sysxext:symmetric-key-ref?    -> /ks:keystore/symmetric-keys/symmetric-key/name {keystore-supported}?
+  |  |  |  |        |              |              |  +--:(sysxext:asymmetric-key-ref)
+  |  |  |  |        |              |              |     +--rw sysxext:asymmetric-key-ref?   -> /ks:keystore/asymmetric-keys/asymmetric-key/name {keystore-supported}?
+  |  |  |  |        |              |              +--rw sysxext:value?                      binary
+  |  |  |  |        |              +--:(sysxext:keystore) {keystore-supported}?
+  |  |  |  |        |                 +--rw sysxext:keystore-reference?   ks:symmetric-key-ref
+  |  |  |  |        +--rw sysxext:server-authentication
+  |  |  |  |        |  +--rw sysxext:ca-certs! {x509-certificate-auth}?
+  |  |  |  |        |  |  +--rw (sysxext:local-or-truststore)
+  |  |  |  |        |  |     +--:(sysxext:local) {local-definitions-supported}?
+  |  |  |  |        |  |     |  +--rw sysxext:local-definition
+  |  |  |  |        |  |     |     +--rw sysxext:cert*                     trust-anchor-cert-cms
+  |  |  |  |        |  |     |     +---n sysxext:certificate-expiration
+  |  |  |  |        |  |     |        +-- sysxext:expiration-date    yang:date-and-time
+  |  |  |  |        |  |     +--:(sysxext:truststore) {truststore-supported,x509-certificates}?
+  |  |  |  |        |  |        +--rw sysxext:truststore-reference?   ts:certificates-ref
+  |  |  |  |        |  +--rw sysxext:server-certs! {x509-certificate-auth}?
+  |  |  |  |        |  |  +--rw (sysxext:local-or-truststore)
+  |  |  |  |        |  |     +--:(sysxext:local) {local-definitions-supported}?
+  |  |  |  |        |  |     |  +--rw sysxext:local-definition
+  |  |  |  |        |  |     |     +--rw sysxext:cert*                     trust-anchor-cert-cms
+  |  |  |  |        |  |     |     +---n sysxext:certificate-expiration
+  |  |  |  |        |  |     |        +-- sysxext:expiration-date    yang:date-and-time
+  |  |  |  |        |  |     +--:(sysxext:truststore) {truststore-supported,x509-certificates}?
+  |  |  |  |        |  |        +--rw sysxext:truststore-reference?   ts:certificates-ref
+  |  |  |  |        |  +--rw sysxext:raw-public-keys! {raw-public-key-auth}?
+  |  |  |  |        |  |  +--rw (sysxext:local-or-truststore)
+  |  |  |  |        |  |     +--:(sysxext:local) {local-definitions-supported}?
+  |  |  |  |        |  |     |  +--rw sysxext:local-definition
+  |  |  |  |        |  |     |     +--rw sysxext:raw-public-key* [name]
+  |  |  |  |        |  |     |        +--rw sysxext:name                 string
+  |  |  |  |        |  |     |        +--rw sysxext:algorithm            iasa:asymmetric-algorithm-type
+  |  |  |  |        |  |     |        +--rw sysxext:public-key-format?   identityref
+  |  |  |  |        |  |     |        +--rw sysxext:public-key           binary
+  |  |  |  |        |  |     +--:(sysxext:truststore) {truststore-supported,raw-public-keys}?
+  |  |  |  |        |  |        +--rw sysxext:truststore-reference?   ts:raw-public-keys-ref
+  |  |  |  |        |  +--rw sysxext:psks! {psk-auth}?
+  |  |  |  |        +--rw sysxext:hello-params {tls-client-hello-params-config}?
+  |  |  |  |        |  +--rw sysxext:tls-versions
+  |  |  |  |        |  |  +--rw sysxext:tls-version*   identityref
+  |  |  |  |        |  +--rw sysxext:cipher-suites
+  |  |  |  |        |     +--rw sysxext:cipher-suite*   identityref
+  |  |  |  |        +--rw sysxext:keepalives! {tls-client-keepalives}?
+  |  |  |  |           +--rw sysxext:max-wait?       uint16
+  |  |  |  |           +--rw sysxext:max-attempts?   uint8
+  |  |  |  +--rw (sysxext:authentication-type)
+  |  |  |  |  +--:(sysxext:simple-anonymous)
+  |  |  |  |  |  +--rw sysxext:simple-anonymous?         empty
+  |  |  |  |  +--:(sysxext:simple-unauthenticated)
+  |  |  |  |  |  +--rw sysxext:simple-unauthenticated
+  |  |  |  |  |     +--rw sysxext:bind-dn    distinguished-name
+  |  |  |  |  +--:(sysxext:simple-authenticated)
+  |  |  |  |  |  +--rw sysxext:simple-authenticated
+  |  |  |  |  |     +--rw sysxext:bind-dn          distinguished-name
+  |  |  |  |  |     +--rw sysxext:bind-password    string
+  |  |  |  |  +--:(sysxext:sasl-external) {ldap-sasl-external}?
+  |  |  |  |     +--rw sysxext:sasl-external?            empty
+  |  |  |  +--rw sysxext:user-base-dn                    distinguished-name
+  |  |  +--rw sysxext:options
+  |  |     +--rw sysxext:timeout?            uint8
+  |  |     +--rw sysxext:enable-referrals?   boolean
+  |  |     +--rw sysxext:group-filter
+  |  |        +--rw (sysxext:group-filter)?
+  |  |           +--:(sysxext:custom) {ldap-custom-filter}?
+  |  |           |  +--rw sysxext:custom
+  |  |           |     +--rw sysxext:filter    string
+  |  |           |     +--rw sysxext:attr      string
+  |  |           +--:(sysxext:posix) {ldap-posix-filter}?
+  |  |           |  +--rw sysxext:posix?            empty
+  |  |           +--:(sysxext:example-filter)
+  |  |              +--rw sysxext:example-filter
+  |  |                 +--rw sysxext:enable-target-based-access-control?   boolean
+  |  |                 +--rw sysxext:role-aliases-base-dn?                 distinguished-name
+  |  +--rw sysxext:ldap-checks {ldap-authentication}?
+  +--ro system-state
+     +--ro platform
+     |  +--ro os-name?      string
+     |  +--ro os-release?   string
+     |  +--ro os-version?   string
+     |  +--ro machine?      string
+     +--ro clock
+     |  +--ro current-datetime?            yang:date-and-time
+     |  +--ro boot-datetime?               yang:date-and-time
+     |  +--ro sysxext:timezone-revision?   string
+     +--ro sysxext:managed-element-type?   string
+     +--ro sysxext:release?                string
+     +--ro sysxext:authentication {sys:authentication}?
+        +--ro sysxext:user* [name] {sys:local-users}?
+        |  +--ro sysxext:name                      -> /sys:system/authentication/user/name
+        |  +--ro sysxext:state?                    enumeration
+        |  +--ro sysxext:usage-state?              enumeration
+        |  +--ro sysxext:password-state?           enumeration
+        |  +--ro sysxext:last-login-time?          yang:date-and-time
+        |  +--ro sysxext:password-changed-time?    yang:date-and-time
+        |  +--ro sysxext:password-failure-times*   yang:date-and-time
+        |  +--ro sysxext:locked-time?              yang:date-and-time
+        |  +--ro sysxext:password-locked-time?     yang:date-and-time
+        +--ro sysxext:admin-user {sys:local-users}?
+           +--ro sysxext:name?                     string
+           +--ro sysxext:admin-password-policy
+           |  +--ro sysxext:history-length?   uint32
+           |  +--ro sysxext:min-length?       uint32
+           +--ro sysxext:last-login-time?          yang:date-and-time
+           +--ro sysxext:password-changed-time?    yang:date-and-time
+           +--ro sysxext:password-failure-times*   yang:date-and-time
+
+  rpcs:
+    +---x set-current-datetime
+    |  +---w input
+    |     +---w current-datetime    yang:date-and-time
+    +---x system-restart

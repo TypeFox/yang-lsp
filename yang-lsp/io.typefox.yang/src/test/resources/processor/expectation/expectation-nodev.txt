@@ -1,0 +1,73 @@
+module: ietf-system
+  +--rw system
+  |  +--rw contact?   string
+  |  +--rw hostname?   inet:domain-name
+  |  +--rw location?   string
+  |  +--rw clock
+  |  |  +--rw (timezone)?
+  |  |     +--:(timezone-name) {timezone-name}?
+  |  |     |  +--rw timezone-name?   timezone-name
+  |  |     +--:(timezone-utc-offset)
+  |  |        +--rw timezone-utc-offset?   int16
+  |  +--rw ntp! {ntp}?
+  |  |  +--rw enabled?   boolean
+  |  |  +--rw server* [name]
+  |  |     +--rw name   string
+  |  |     +--rw (transport)
+  |  |     |  +--:(udp)
+  |  |     |     +--rw udp
+  |  |     |        +--rw address   inet:host
+  |  |     |        +--rw port?   inet:port-number {ntp-udp-port}?
+  |  |     +--rw association-type?   enumeration
+  |  |     +--rw iburst?   boolean
+  |  |     +--rw prefer?   boolean
+  |  +--rw dns-resolver
+  |  |  +--rw search*   inet:domain-name
+  |  |  +--rw server* [name]
+  |  |  |  +--rw name   string
+  |  |  |  +--rw (transport)
+  |  |  |     +--:(udp-and-tcp)
+  |  |  |        +--rw udp-and-tcp
+  |  |  |           +--rw address   inet:ip-address
+  |  |  |           +--rw port?   inet:port-number {dns-udp-tcp-port}?
+  |  |  +--rw options
+  |  |     +--rw timeout?   uint8
+  |  |     +--rw attempts?   uint8
+  |  +--rw radius {radius}?
+  |  |  +--rw server* [name]
+  |  |  |  +--rw name   string
+  |  |  |  +--rw (transport)
+  |  |  |  |  +--:(udp)
+  |  |  |  |     +--rw udp
+  |  |  |  |        +--rw address   inet:host
+  |  |  |  |        +--rw authentication-port?   inet:port-number
+  |  |  |  |        +--rw shared-secret   string
+  |  |  |  +--rw authentication-type?   identityref
+  |  |  +--rw options
+  |  |     +--rw timeout?   uint8
+  |  |     +--rw attempts?   uint8
+  |  +--rw authentication {authentication}?
+  |     +--rw user-authentication-order*   identityref
+  |     +--rw user* [name] {local-users}?
+  |        +--rw name   string
+  |        +--rw password?   ianach:crypt-hash
+  |        +--rw authorized-key* [name]
+  |           +--rw name   string
+  |           +--rw algorithm   string
+  |           +--rw key-data   binary
+  +--ro system-state
+     +--ro platform
+     |  +--ro os-name?   string
+     |  +--ro os-release?   string
+     |  +--ro os-version?   string
+     |  +--ro machine?   string
+     +--ro clock
+        +--ro current-datetime?   yang:date-and-time
+        +--ro boot-datetime?   yang:date-and-time
+
+  rpcs:
+    +---x set-current-datetime
+    |  +---w input
+    |     +---w current-datetime   yang:date-and-time
+    +---x system-restart
+    +---x system-shutdown

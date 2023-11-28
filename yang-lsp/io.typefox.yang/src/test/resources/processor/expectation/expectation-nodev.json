@@ -1,0 +1,792 @@
+{
+  "rpcs": [
+    {
+      "elementKind": "Rpc",
+      "accessKind": "x",
+      "cardinality": "mandatory",
+      "children": [
+        {
+          "elementKind": "Input",
+          "accessKind": "w",
+          "cardinality": "mandatory",
+          "children": [
+            {
+              "elementKind": "Leaf",
+              "type": {
+                "prefix": "yang",
+                "name": "date-and-time"
+              },
+              "accessKind": "w",
+              "cardinality": "mandatory",
+              "id": {
+                "name": "current-datetime"
+              }
+            }
+          ],
+          "id": {
+            "name": "input"
+          }
+        }
+      ],
+      "id": {
+        "name": "set-current-datetime"
+      }
+    },
+    {
+      "elementKind": "Rpc",
+      "accessKind": "x",
+      "cardinality": "mandatory",
+      "id": {
+        "name": "system-restart"
+      }
+    },
+    {
+      "elementKind": "Rpc",
+      "accessKind": "x",
+      "cardinality": "mandatory",
+      "id": {
+        "name": "system-shutdown"
+      }
+    }
+  ],
+  "children": [
+    {
+      "elementKind": "Container",
+      "accessKind": "rw",
+      "cardinality": "not_set",
+      "children": [
+        {
+          "elementKind": "Leaf",
+          "type": {
+            "name": "string"
+          },
+          "accessKind": "rw",
+          "cardinality": "optional",
+          "id": {
+            "name": "contact"
+          }
+        },
+        {
+          "elementKind": "Leaf",
+          "type": {
+            "prefix": "inet",
+            "name": "domain-name"
+          },
+          "accessKind": "rw",
+          "cardinality": "optional",
+          "id": {
+            "name": "hostname"
+          }
+        },
+        {
+          "elementKind": "Leaf",
+          "type": {
+            "name": "string"
+          },
+          "accessKind": "rw",
+          "cardinality": "optional",
+          "id": {
+            "name": "location"
+          }
+        },
+        {
+          "elementKind": "Container",
+          "accessKind": "rw",
+          "cardinality": "not_set",
+          "children": [
+            {
+              "elementKind": "Choice",
+              "accessKind": "rw",
+              "cardinality": "optional",
+              "children": [
+                {
+                  "elementKind": "Case",
+                  "featureConditions": [
+                    "timezone-name"
+                  ],
+                  "accessKind": "rw",
+                  "cardinality": "mandatory",
+                  "children": [
+                    {
+                      "elementKind": "Leaf",
+                      "type": {
+                        "name": "timezone-name"
+                      },
+                      "accessKind": "rw",
+                      "cardinality": "optional",
+                      "id": {
+                        "name": "timezone-name"
+                      }
+                    }
+                  ],
+                  "id": {
+                    "name": "timezone-name"
+                  }
+                },
+                {
+                  "elementKind": "Case",
+                  "accessKind": "rw",
+                  "cardinality": "mandatory",
+                  "children": [
+                    {
+                      "elementKind": "Leaf",
+                      "type": {
+                        "name": "int16"
+                      },
+                      "accessKind": "rw",
+                      "cardinality": "optional",
+                      "id": {
+                        "name": "timezone-utc-offset"
+                      }
+                    }
+                  ],
+                  "id": {
+                    "name": "timezone-utc-offset"
+                  }
+                }
+              ],
+              "id": {
+                "name": "timezone"
+              }
+            }
+          ],
+          "id": {
+            "name": "clock"
+          }
+        },
+        {
+          "elementKind": "Container",
+          "featureConditions": [
+            "ntp"
+          ],
+          "accessKind": "rw",
+          "cardinality": "presence",
+          "children": [
+            {
+              "elementKind": "Leaf",
+              "type": {
+                "name": "boolean"
+              },
+              "accessKind": "rw",
+              "cardinality": "optional",
+              "id": {
+                "name": "enabled"
+              }
+            },
+            {
+              "keys": [
+                "name"
+              ],
+              "elementKind": "List",
+              "accessKind": "rw",
+              "cardinality": "many",
+              "children": [
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "string"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "mandatory",
+                  "id": {
+                    "name": "name"
+                  }
+                },
+                {
+                  "elementKind": "Choice",
+                  "accessKind": "rw",
+                  "cardinality": "mandatory",
+                  "children": [
+                    {
+                      "elementKind": "Case",
+                      "accessKind": "rw",
+                      "cardinality": "mandatory",
+                      "children": [
+                        {
+                          "elementKind": "Container",
+                          "accessKind": "rw",
+                          "cardinality": "not_set",
+                          "children": [
+                            {
+                              "elementKind": "Leaf",
+                              "type": {
+                                "prefix": "inet",
+                                "name": "host"
+                              },
+                              "accessKind": "rw",
+                              "cardinality": "mandatory",
+                              "id": {
+                                "name": "address"
+                              }
+                            },
+                            {
+                              "elementKind": "Leaf",
+                              "type": {
+                                "prefix": "inet",
+                                "name": "port-number"
+                              },
+                              "featureConditions": [
+                                "ntp-udp-port"
+                              ],
+                              "accessKind": "rw",
+                              "cardinality": "optional",
+                              "id": {
+                                "name": "port"
+                              }
+                            }
+                          ],
+                          "id": {
+                            "name": "udp"
+                          }
+                        }
+                      ],
+                      "id": {
+                        "name": "udp"
+                      }
+                    }
+                  ],
+                  "id": {
+                    "name": "transport"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "enumeration"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "association-type"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "boolean"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "iburst"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "boolean"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "prefer"
+                  }
+                }
+              ],
+              "id": {
+                "name": "server"
+              }
+            }
+          ],
+          "id": {
+            "name": "ntp"
+          }
+        },
+        {
+          "elementKind": "Container",
+          "accessKind": "rw",
+          "cardinality": "not_set",
+          "children": [
+            {
+              "elementKind": "LeafList",
+              "type": {
+                "prefix": "inet",
+                "name": "domain-name"
+              },
+              "accessKind": "rw",
+              "cardinality": "many",
+              "id": {
+                "name": "search"
+              }
+            },
+            {
+              "keys": [
+                "name"
+              ],
+              "elementKind": "List",
+              "accessKind": "rw",
+              "cardinality": "many",
+              "children": [
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "string"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "mandatory",
+                  "id": {
+                    "name": "name"
+                  }
+                },
+                {
+                  "elementKind": "Choice",
+                  "accessKind": "rw",
+                  "cardinality": "mandatory",
+                  "children": [
+                    {
+                      "elementKind": "Case",
+                      "accessKind": "rw",
+                      "cardinality": "mandatory",
+                      "children": [
+                        {
+                          "elementKind": "Container",
+                          "accessKind": "rw",
+                          "cardinality": "not_set",
+                          "children": [
+                            {
+                              "elementKind": "Leaf",
+                              "type": {
+                                "prefix": "inet",
+                                "name": "ip-address"
+                              },
+                              "accessKind": "rw",
+                              "cardinality": "mandatory",
+                              "id": {
+                                "name": "address"
+                              }
+                            },
+                            {
+                              "elementKind": "Leaf",
+                              "type": {
+                                "prefix": "inet",
+                                "name": "port-number"
+                              },
+                              "featureConditions": [
+                                "dns-udp-tcp-port"
+                              ],
+                              "accessKind": "rw",
+                              "cardinality": "optional",
+                              "id": {
+                                "name": "port"
+                              }
+                            }
+                          ],
+                          "id": {
+                            "name": "udp-and-tcp"
+                          }
+                        }
+                      ],
+                      "id": {
+                        "name": "udp-and-tcp"
+                      }
+                    }
+                  ],
+                  "id": {
+                    "name": "transport"
+                  }
+                }
+              ],
+              "id": {
+                "name": "server"
+              }
+            },
+            {
+              "elementKind": "Container",
+              "accessKind": "rw",
+              "cardinality": "not_set",
+              "children": [
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint8"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "timeout"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint8"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "attempts"
+                  }
+                }
+              ],
+              "id": {
+                "name": "options"
+              }
+            }
+          ],
+          "id": {
+            "name": "dns-resolver"
+          }
+        },
+        {
+          "elementKind": "Container",
+          "featureConditions": [
+            "radius"
+          ],
+          "accessKind": "rw",
+          "cardinality": "not_set",
+          "children": [
+            {
+              "keys": [
+                "name"
+              ],
+              "elementKind": "List",
+              "accessKind": "rw",
+              "cardinality": "many",
+              "children": [
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "string"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "mandatory",
+                  "id": {
+                    "name": "name"
+                  }
+                },
+                {
+                  "elementKind": "Choice",
+                  "accessKind": "rw",
+                  "cardinality": "mandatory",
+                  "children": [
+                    {
+                      "elementKind": "Case",
+                      "accessKind": "rw",
+                      "cardinality": "mandatory",
+                      "children": [
+                        {
+                          "elementKind": "Container",
+                          "accessKind": "rw",
+                          "cardinality": "not_set",
+                          "children": [
+                            {
+                              "elementKind": "Leaf",
+                              "type": {
+                                "prefix": "inet",
+                                "name": "host"
+                              },
+                              "accessKind": "rw",
+                              "cardinality": "mandatory",
+                              "id": {
+                                "name": "address"
+                              }
+                            },
+                            {
+                              "elementKind": "Leaf",
+                              "type": {
+                                "prefix": "inet",
+                                "name": "port-number"
+                              },
+                              "accessKind": "rw",
+                              "cardinality": "optional",
+                              "id": {
+                                "name": "authentication-port"
+                              }
+                            },
+                            {
+                              "elementKind": "Leaf",
+                              "type": {
+                                "name": "string"
+                              },
+                              "accessKind": "rw",
+                              "cardinality": "mandatory",
+                              "id": {
+                                "name": "shared-secret"
+                              }
+                            }
+                          ],
+                          "id": {
+                            "name": "udp"
+                          }
+                        }
+                      ],
+                      "id": {
+                        "name": "udp"
+                      }
+                    }
+                  ],
+                  "id": {
+                    "name": "transport"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "identityref"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "authentication-type"
+                  }
+                }
+              ],
+              "id": {
+                "name": "server"
+              }
+            },
+            {
+              "elementKind": "Container",
+              "accessKind": "rw",
+              "cardinality": "not_set",
+              "children": [
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint8"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "timeout"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "uint8"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "attempts"
+                  }
+                }
+              ],
+              "id": {
+                "name": "options"
+              }
+            }
+          ],
+          "id": {
+            "name": "radius"
+          }
+        },
+        {
+          "elementKind": "Container",
+          "featureConditions": [
+            "authentication"
+          ],
+          "accessKind": "rw",
+          "cardinality": "not_set",
+          "children": [
+            {
+              "elementKind": "LeafList",
+              "type": {
+                "name": "identityref"
+              },
+              "accessKind": "rw",
+              "cardinality": "many",
+              "id": {
+                "name": "user-authentication-order"
+              }
+            },
+            {
+              "keys": [
+                "name"
+              ],
+              "elementKind": "List",
+              "featureConditions": [
+                "local-users"
+              ],
+              "accessKind": "rw",
+              "cardinality": "many",
+              "children": [
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "name": "string"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "mandatory",
+                  "id": {
+                    "name": "name"
+                  }
+                },
+                {
+                  "elementKind": "Leaf",
+                  "type": {
+                    "prefix": "ianach",
+                    "name": "crypt-hash"
+                  },
+                  "accessKind": "rw",
+                  "cardinality": "optional",
+                  "id": {
+                    "name": "password"
+                  }
+                },
+                {
+                  "keys": [
+                    "name"
+                  ],
+                  "elementKind": "List",
+                  "accessKind": "rw",
+                  "cardinality": "many",
+                  "children": [
+                    {
+                      "elementKind": "Leaf",
+                      "type": {
+                        "name": "string"
+                      },
+                      "accessKind": "rw",
+                      "cardinality": "mandatory",
+                      "id": {
+                        "name": "name"
+                      }
+                    },
+                    {
+                      "elementKind": "Leaf",
+                      "type": {
+                        "name": "string"
+                      },
+                      "accessKind": "rw",
+                      "cardinality": "mandatory",
+                      "id": {
+                        "name": "algorithm"
+                      }
+                    },
+                    {
+                      "elementKind": "Leaf",
+                      "type": {
+                        "name": "binary"
+                      },
+                      "accessKind": "rw",
+                      "cardinality": "mandatory",
+                      "id": {
+                        "name": "key-data"
+                      }
+                    }
+                  ],
+                  "id": {
+                    "name": "authorized-key"
+                  }
+                }
+              ],
+              "id": {
+                "name": "user"
+              }
+            }
+          ],
+          "id": {
+            "name": "authentication"
+          }
+        }
+      ],
+      "id": {
+        "name": "system"
+      }
+    },
+    {
+      "elementKind": "Container",
+      "accessKind": "ro",
+      "cardinality": "not_set",
+      "children": [
+        {
+          "elementKind": "Container",
+          "accessKind": "ro",
+          "cardinality": "not_set",
+          "children": [
+            {
+              "elementKind": "Leaf",
+              "type": {
+                "name": "string"
+              },
+              "accessKind": "ro",
+              "cardinality": "optional",
+              "id": {
+                "name": "os-name"
+              }
+            },
+            {
+              "elementKind": "Leaf",
+              "type": {
+                "name": "string"
+              },
+              "accessKind": "ro",
+              "cardinality": "optional",
+              "id": {
+                "name": "os-release"
+              }
+            },
+            {
+              "elementKind": "Leaf",
+              "type": {
+                "name": "string"
+              },
+              "accessKind": "ro",
+              "cardinality": "optional",
+              "id": {
+                "name": "os-version"
+              }
+            },
+            {
+              "elementKind": "Leaf",
+              "type": {
+                "name": "string"
+              },
+              "accessKind": "ro",
+              "cardinality": "optional",
+              "id": {
+                "name": "machine"
+              }
+            }
+          ],
+          "id": {
+            "name": "platform"
+          }
+        },
+        {
+          "elementKind": "Container",
+          "accessKind": "ro",
+          "cardinality": "not_set",
+          "children": [
+            {
+              "elementKind": "Leaf",
+              "type": {
+                "prefix": "yang",
+                "name": "date-and-time"
+              },
+              "accessKind": "ro",
+              "cardinality": "optional",
+              "id": {
+                "name": "current-datetime"
+              }
+            },
+            {
+              "elementKind": "Leaf",
+              "type": {
+                "prefix": "yang",
+                "name": "date-and-time"
+              },
+              "accessKind": "ro",
+              "cardinality": "optional",
+              "id": {
+                "name": "boot-datetime"
+              }
+            }
+          ],
+          "id": {
+            "name": "clock"
+          }
+        }
+      ],
+      "id": {
+        "name": "system-state"
+      }
+    }
+  ],
+  "id": {
+    "name": "ietf-system",
+    "prefix": "sys"
+  }
+}
