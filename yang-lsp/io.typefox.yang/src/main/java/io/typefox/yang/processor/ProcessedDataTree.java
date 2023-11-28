@@ -20,6 +20,7 @@ import io.typefox.yang.yang.Path;
 import io.typefox.yang.yang.Presence;
 import io.typefox.yang.yang.SchemaNode;
 import io.typefox.yang.yang.Type;
+import io.typefox.yang.yang.TypeReference;
 import io.typefox.yang.yang.Typedef;
 import io.typefox.yang.yang.XpathExpression;
 
@@ -45,8 +46,7 @@ public class ProcessedDataTree {
 
 		private List<HasStatements> children;
 		private transient HasStatements parent;
-		 
-		
+
 		public void addToChildren(HasStatements child) {
 			if (children == null)
 				children = newArrayList();
@@ -147,16 +147,22 @@ public class ProcessedDataTree {
 
 	static public class ValueType {
 		final String prefix, name;
+		final transient boolean forceSimpleName;
 
 		public ValueType(String prefix, String name) {
+			this(prefix, name, false);
+		}
+		
+		public ValueType(String prefix, String name, boolean forceSimpleName) {
 			super();
 			this.prefix = prefix;
 			this.name = name;
+			this.forceSimpleName = forceSimpleName;
 		}
 
 		@Override
 		public String toString() {
-			return prefix != null ? (prefix + ":" + name) : name;
+			return (prefix != null && !forceSimpleName) ? (prefix + ":" + name) : name;
 		}
 	}
 
@@ -277,22 +283,29 @@ public class ProcessedDataTree {
 				return new ValueType(null, typeRef.getBuiltin());
 			}
 
-			Typedef typedef = typeRef.getType();
+			Typedef typeDef = typeRef.getType();
 			// FIXME use import statement prefix
-			var typeModule = ProcessorUtility.moduleIdentifier(typedef);
-			String prefix = Objects.equal(typeModule.name, ProcessorUtility.moduleIdentifier(typeRef).name) ? null
-							: typeModule.prefix;
-			return new ValueType(prefix, typedef.getName());
-		}
-/*
-		private boolean sameParentModule(EObject o1, EObject o2) {
-			var o1module = EcoreUtil2.getContainerOfType(o1, AbstractModule.class);
-			if (o1module != null) {
-				return o1module.equals(EcoreUtil2.getContainerOfType(o2, AbstractModule.class));
+			var typeModule = ProcessorUtility.moduleIdentifier(typeDef);
+			var typeRefModule = ProcessorUtility.moduleIdentifier(typeRef);
+			var sameModule = Objects.equal(typeModule.name, typeRefModule.name);
+			String prefix = sameModule ? null : typeModule.prefix;
+			
+			var refText = referenceText(typeRef);
+			if (prefix != null && refText != null && !refText.equals(prefix + ":" + typeDef.getName())) {
+				// use reference text if type
+				return new ValueType(prefix, typeDef.getName(), true);
 			}
-			return false;
+			return new ValueType(prefix, typeDef.getName());
 		}
-*/
+
+		private String referenceText(TypeReference typeRef) {
+			var node = NodeModelUtils.getNode(typeRef);
+			if(node == null) {
+				return null;
+			}
+			return NodeModelUtils.getTokenText(node);
+		}
+		
 		private String serializedXpath(XpathExpression reference) {
 			// TODO use serializer or implement a an own simple one
 			ICompositeNode nodeFor = NodeModelUtils.findActualNodeFor(reference);
