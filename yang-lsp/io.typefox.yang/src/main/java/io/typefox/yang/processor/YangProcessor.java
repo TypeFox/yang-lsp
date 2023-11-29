@@ -44,6 +44,10 @@ import io.typefox.yang.yang.Uses;
 
 public class YangProcessor {
 
+	public static enum Format {
+		tree, json
+	}
+
 	/**
 	 * 
 	 * @param modules          loaded modules
@@ -66,13 +70,17 @@ public class YangProcessor {
 	 * @param format        tree or json. tree is default
 	 * @param output        target
 	 */
-	public void serialize(ProcessedDataTree processedData, String format, StringBuilder output) {
-
-		if ("json".equals(format)) {
+	public void serialize(ProcessedDataTree processedData, Format format, StringBuilder output) {
+		switch (format) {
+		case json: {
 			new GsonBuilder().setPrettyPrinting().create().toJson(processedData, output);
-		} else {
-			// pick module by file name
+			break;
+		}
+		case tree: {
+			// TODO pick module by file name
 			output.append(new DataTreeSerializer().serialize(processedData.getModules().get(0)));
+			break;
+		}
 		}
 	}
 

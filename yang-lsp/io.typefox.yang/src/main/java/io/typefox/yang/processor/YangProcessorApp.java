@@ -5,11 +5,14 @@ import static com.google.common.collect.Lists.newArrayList;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 
 import org.eclipse.emf.common.util.URI;
 import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.xtext.resource.FileExtensionProvider;
 import org.eclipse.xtext.resource.XtextResourceSet;
 
 import com.beust.jcommander.JCommander;
@@ -17,6 +20,7 @@ import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
 
 import io.typefox.yang.YangStandaloneSetup;
+import io.typefox.yang.processor.YangProcessor.Format;
 import io.typefox.yang.yang.AbstractModule;
 
 public class YangProcessorApp {
@@ -33,17 +37,17 @@ public class YangProcessorApp {
 				"--deviation-module" }, description = "DISABLED! Use to apply the deviations defined in this file.")
 		public String deviationModule;
 
-		@Parameter(names = { "-f", "--format" }, description = "Output format: tree, json")
-		public String format;
+		@Parameter(names = { "-f", "--format" }, description = "Output format.")
+		public Format format = Format.tree;
 
 		@Parameter(names = { "-p",
 				"--path" }, description = "A colon (:) separated list of directories to search for imported modules. Default is the current directory.")
 		public String path;
 
-		@Parameter(names = { "-F", "--features" }, description = "Included features")
+		@Parameter(names = { "-F", "--features" }, description = "Included features.")
 		public List<String> includedFeatures = newArrayList();
 
-		@Parameter(names = { "-X", "--exclude-features" }, description = "Excluded features")
+		@Parameter(names = { "-X", "--exclude-features" }, description = "Excluded features.")
 		public List<String> excludedFeatures = newArrayList();
 
 	}
@@ -99,15 +103,20 @@ public class YangProcessorApp {
 			throw new IOException(
 					"File " + moduleFilePath + " doesn't exists in directory " + moduleFile.getAbsolutePath());
 		}
-		
-		
+
 		var rs = injector.getInstance(XtextResourceSet.class);
 		// add main module as first resource
 		var moduleResource = rs.createResource(URI.createFileURI(moduleFile.getAbsolutePath()));
-		
+
 		// add files from the current directory
-		var implicitLookup = moduleFile.getParentFile();
-		loadAdditionalFiles(implicitLookup, rs);
+		var implicitLookup = moduleFile.getAbsoluteFile().getParentFile();
+		var extensionProvider = injector.getInstance(FileExtensionProvider.class);
+		var fileExts = Collections.singleton("yang");
+		if (extensionProvider != null && extensionProvider.getFileExtensions() != null) {
+			if (!extensionProvider.getFileExtensions().isEmpty())
+				fileExts = extensionProvider.getFileExtensions();
+		}
+		loadAdditionalFiles(implicitLookup, rs, fileExts);
 
 		// handle --path argument
 		if (paths != null) {
@@ -116,7 +125,7 @@ public class YangProcessorApp {
 				if (!folder.isDirectory()) {
 					System.err.println(folder.getAbsolutePath() + " is not a directory. Skipped.");
 				} else {
-					loadAdditionalFiles(folder, rs);
+					loadAdditionalFiles(folder.getAbsoluteFile(), rs, fileExts);
 				}
 			}
 		}
@@ -136,10 +145,10 @@ public class YangProcessorApp {
 		return modules;
 	}
 
-	private static void loadAdditionalFiles(File path, XtextResourceSet rs) {
-		for (File file : path.listFiles()) {
+	private static void loadAdditionalFiles(File parent, XtextResourceSet rs, Set<String> fileExtensions) {
+		for (File file : parent.listFiles()) {
 			URI fileURI = URI.createFileURI(file.getAbsolutePath());
-			if(file.isFile() && "yang".equals(fileURI.fileExtension())) {
+			if (file.isFile() && fileExtensions.contains(fileURI.fileExtension())) {
 				rs.getResource(fileURI, true);
 			}
 		}
