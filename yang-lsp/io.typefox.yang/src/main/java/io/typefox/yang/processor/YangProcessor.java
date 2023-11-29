@@ -9,6 +9,8 @@ import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
 import com.google.common.collect.Lists;
 import com.google.gson.GsonBuilder;
 
@@ -44,9 +46,42 @@ import io.typefox.yang.yang.Uses;
 
 public class YangProcessor {
 
+	public static class Args {
+		@Parameter(description = "Module file")
+		public String module;
+
+		@Parameter(names = { "--deviation-module", "-d" }, description = "Deviation module file")
+		public String deviationModule;
+
+		@Parameter(names = { "--format", "-f" }, description = "Output format: tree, json")
+		public String format;
+
+		@Parameter(names = { "-X" }, description = "Excluded features")
+		public List<String> excludedFeatures = newArrayList();
+
+		@Parameter(names = { "-F" }, description = "Included features")
+		public List<String> includedFeatures = newArrayList();
+
+	}
+
 	public static void main(String[] args) {
-		var processedData = new YangProcessor().process(newArrayList(), newArrayList(), newArrayList());
-		new GsonBuilder().create().toJson(processedData, System.out);
+
+		var cliArgs = parseArgs(args);
+		var processedData = new YangProcessor().process(newArrayList(), cliArgs.includedFeatures,
+				cliArgs.excludedFeatures);
+
+		if ("json".equals(cliArgs.format)) {
+			new GsonBuilder().create().toJson(processedData, System.out);
+		} else {
+			// pick module by file name
+			System.out.println(new DataTreeSerializer().serialize(processedData.getModules().get(0)));
+		}
+	}
+
+	public static Args parseArgs(String... args) {
+		var cliArgs = new Args();
+		JCommander.newBuilder().addObject(cliArgs).build().parse(args);
+		return cliArgs;
 	}
 
 	/**
@@ -142,10 +177,6 @@ public class YangProcessor {
 	}
 
 	private void processChildren(Statement statement, HasStatements parent, FeatureEvaluationContext evalCtx) {
-		/*if (!ProcessorUtility.isEnabled(statement, evalCtx)) {
-			// filtered by a feature
-			return;
-		}*/
 		statement.getSubstatements().stream().filter( ele -> ProcessorUtility.isEnabled(ele, evalCtx)).forEach((ele) -> {
 			ElementData child = null;
 			if (ele instanceof Container) {

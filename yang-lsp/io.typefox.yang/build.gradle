@@ -10,6 +10,7 @@ configurations {
 dependencies {
 	implementation "org.eclipse.xtext:org.eclipse.xtext:${versions.xtext}"
 	implementation "com.google.code.gson:gson:${versions.gson}"
+	implementation "org.jcommander:jcommander:1.83"
 	implementation("xerces:xercesImpl:${versions.xerces}") {
 		exclude module: "xml-apis"
 	}
