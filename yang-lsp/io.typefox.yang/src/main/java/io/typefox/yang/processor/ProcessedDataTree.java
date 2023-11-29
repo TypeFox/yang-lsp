@@ -66,6 +66,8 @@ public class ProcessedDataTree {
 	public static class ElementIdentifier {
 		final public String name, prefix;
 
+		final static public ElementIdentifier UNRESOLVED = new ElementIdentifier("<unresoved>", null);
+
 		public ElementIdentifier(String name, String prefix) {
 			super();
 			this.name = name;
@@ -152,11 +154,11 @@ public class ProcessedDataTree {
 		public ValueType(String prefix, String name) {
 			this(prefix, name, false);
 		}
-		
+
 		public ValueType(String prefix, String name, boolean forceSimpleName) {
 			super();
 			this.prefix = prefix;
-			this.name = name;
+			this.name = name == null ? "unknown" : name;
 			this.forceSimpleName = forceSimpleName;
 		}
 
@@ -289,7 +291,7 @@ public class ProcessedDataTree {
 			var typeRefModule = ProcessorUtility.moduleIdentifier(typeRef);
 			var sameModule = Objects.equal(typeModule.name, typeRefModule.name);
 			String prefix = sameModule ? null : typeModule.prefix;
-			
+
 			var refText = referenceText(typeRef);
 			if (prefix != null && refText != null && !refText.equals(prefix + ":" + typeDef.getName())) {
 				// use reference text if type
@@ -300,12 +302,12 @@ public class ProcessedDataTree {
 
 		private String referenceText(TypeReference typeRef) {
 			var node = NodeModelUtils.getNode(typeRef);
-			if(node == null) {
+			if (node == null) {
 				return null;
 			}
 			return NodeModelUtils.getTokenText(node);
 		}
-		
+
 		private String serializedXpath(XpathExpression reference) {
 			// TODO use serializer or implement a an own simple one
 			ICompositeNode nodeFor = NodeModelUtils.findActualNodeFor(reference);

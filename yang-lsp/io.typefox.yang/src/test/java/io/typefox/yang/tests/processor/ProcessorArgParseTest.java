@@ -29,7 +29,7 @@ public class ProcessorArgParseTest extends AbstractYangTest {
 		assertEquals("Usage: yang-tool [options] <filename>\n"
 				+ "  Options:\n"
 				+ "    -d, --deviation-module\n"
-				+ "      Deviation module file\n"
+				+ "      DISABLED! Use to apply the deviations defined in this file.\n"
 				+ "    -X, --exclude-features\n"
 				+ "      Excluded features\n"
 				+ "      Default: []\n"
@@ -39,7 +39,11 @@ public class ProcessorArgParseTest extends AbstractYangTest {
 				+ "    -f, --format\n"
 				+ "      Output format: tree, json\n"
 				+ "    --help\n"
-				+ "\n", out.toString());
+				+ "\n"
+				+ "    -p, --path\n"
+				+ "      A colon (:) separated list of directories to search for imported \n"
+				+ "      modules. Default is the current directory.\n"
+				, out.toString());
 	}
 
 	@Test

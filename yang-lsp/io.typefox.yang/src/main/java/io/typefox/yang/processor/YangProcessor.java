@@ -82,12 +82,9 @@ public class YangProcessor {
 		ProcessedDataTree processedDataTree = new ProcessedDataTree();
 		modules.forEach((module) -> module.eAllContents().forEachRemaining((ele) -> {
 			if (ele instanceof Deviate) {
-				/*
-				 * var deviation = ((Deviation) ele); deviation.getSubstatements().forEach((sub)
-				 * -> { });
-				 */
 				Deviate deviate = (Deviate) ele;
 				switch (deviate.getArgument()) {
+				// TODO implements other cases
 				case "add":
 				case "replace":
 					break;

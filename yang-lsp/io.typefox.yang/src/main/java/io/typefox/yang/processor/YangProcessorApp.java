@@ -8,6 +8,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.resource.Resource;
 import org.eclipse.emf.ecore.util.EcoreUtil;
 import org.eclipse.xtext.resource.XtextResourceSet;
 
@@ -28,11 +29,16 @@ public class YangProcessorApp {
 		@Parameter(description = "<filename>", required = true)
 		public String module;
 
-		@Parameter(names = { "-d", "--deviation-module" }, description = "Deviation module file")
+		@Parameter(names = { "-d",
+				"--deviation-module" }, description = "DISABLED! Use to apply the deviations defined in this file.")
 		public String deviationModule;
 
 		@Parameter(names = { "-f", "--format" }, description = "Output format: tree, json")
 		public String format;
+
+		@Parameter(names = { "-p",
+				"--path" }, description = "A colon (:) separated list of directories to search for imported modules. Default is the current directory.")
+		public String path;
 
 		@Parameter(names = { "-F", "--features" }, description = "Included features")
 		public List<String> includedFeatures = newArrayList();
@@ -62,7 +68,8 @@ public class YangProcessorApp {
 
 		List<AbstractModule> modules = null;
 		try {
-			modules = loadModuleFileAndDependencies(cliArgs.module);
+			var pathes = cliArgs.path != null ? cliArgs.path.split(":") : null;
+			modules = loadModuleFileAndDependencies(cliArgs.module, pathes);
 		} catch (IOException e) {
 			String msg = e.getMessage();
 			if (msg == null) {
@@ -84,22 +91,58 @@ public class YangProcessorApp {
 		System.out.println(output.toString());
 	}
 
-	private static List<AbstractModule> loadModuleFileAndDependencies(String moduleFile) throws IOException {
+	private static List<AbstractModule> loadModuleFileAndDependencies(String moduleFilePath, String... paths)
+			throws IOException {
 		var injector = new YangStandaloneSetup().createInjectorAndDoEMFRegistration();
-		var rs = injector.getInstance(XtextResourceSet.class);
-		var file = new File(moduleFile);
-		if (!file.exists()) {
-			throw new IOException("File " + moduleFile + " doesn't exists.");
+		var moduleFile = new File(moduleFilePath);
+		if (!moduleFile.exists()) {
+			throw new IOException(
+					"File " + moduleFilePath + " doesn't exists in directory " + moduleFile.getAbsolutePath());
 		}
-		var mainResource = rs.createResource(URI.createFileURI(file.getAbsolutePath()));
-		mainResource.load(rs.getLoadOptions());
-		EcoreUtil.resolveAll(mainResource);
+		
+		
+		var rs = injector.getInstance(XtextResourceSet.class);
+		// add main module as first resource
+		var moduleResource = rs.createResource(URI.createFileURI(moduleFile.getAbsolutePath()));
+		
+		// add files from the current directory
+		var implicitLookup = moduleFile.getParentFile();
+		loadAdditionalFiles(implicitLookup, rs);
+
+		// handle --path argument
+		if (paths != null) {
+			for (String path : paths) {
+				var folder = new File(path);
+				if (!folder.isDirectory()) {
+					System.err.println(folder.getAbsolutePath() + " is not a directory. Skipped.");
+				} else {
+					loadAdditionalFiles(folder, rs);
+				}
+			}
+		}
+
+		// load models
+		moduleResource.load(rs.getLoadOptions());
+		EcoreUtil.resolveAll(moduleResource);
+
+		// Collect all contained modules
 		var modules = new ArrayList<AbstractModule>();
-		var rootObj = mainResource.getContents().get(0);
-		if (rootObj instanceof AbstractModule) {
-			modules.add((AbstractModule) rootObj);
+		for (Resource res : rs.getResources()) {
+			var rootObj = res.getContents().get(0);
+			if (rootObj instanceof AbstractModule) {
+				modules.add((AbstractModule) rootObj);
+			}
 		}
 		return modules;
+	}
+
+	private static void loadAdditionalFiles(File path, XtextResourceSet rs) {
+		for (File file : path.listFiles()) {
+			URI fileURI = URI.createFileURI(file.getAbsolutePath());
+			if(file.isFile() && "yang".equals(fileURI.fileExtension())) {
+				rs.getResource(fileURI, true);
+			}
+		}
 	}
 
 	public static Args parseArgs(StringBuilder out, String... args) {
