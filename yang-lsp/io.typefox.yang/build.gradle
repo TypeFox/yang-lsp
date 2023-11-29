@@ -1,3 +1,5 @@
+apply from: "${rootDir}/gradle/distribution.gradle"
+
 ext.title = 'Yang Language'
 description = 'Language infrastructure for Yang based on Xtext'
 
@@ -10,6 +12,7 @@ configurations {
 dependencies {
 	implementation "org.eclipse.xtext:org.eclipse.xtext:${versions.xtext}"
 	implementation "com.google.code.gson:gson:${versions.gson}"
+	implementation "org.jcommander:jcommander:1.83"
 	implementation("xerces:xercesImpl:${versions.xerces}") {
 		exclude module: "xml-apis"
 	}
@@ -36,6 +39,12 @@ task generateXtextLanguage(type: JavaExec) {
 	args += "rootPath=/${projectDir}/.."
 }
 
+mainClassName = 'io.typefox.yang.processor.YangProcessorApp'
+applicationName = 'yang-tool'
+ext.applicationQualifier = 'cli'
+
 generateXtext.dependsOn(generateXtextLanguage)
 clean.dependsOn(cleanGenerateXtextLanguage)
 eclipse.classpath.plusConfigurations += [configurations.mwe2]
+
+

@@ -44,6 +44,9 @@ public class ProcessorUtility {
 			return foreignAdapter.moduleId;
 		}
 		var module = new YangExtensions().getMainModule(eObj);
+		if (module == null) {
+			return ElementIdentifier.UNRESOLVED;
+		}
 		Prefix prefix = (Prefix) module.getSubstatements().stream().filter(s -> (s instanceof Prefix)).findFirst()
 				.get();
 		return new ElementIdentifier(module.getName(), prefix != null ? prefix.getPrefix() : null);

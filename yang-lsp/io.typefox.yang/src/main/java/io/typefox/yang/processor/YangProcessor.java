@@ -44,16 +44,15 @@ import io.typefox.yang.yang.Uses;
 
 public class YangProcessor {
 
-	public static void main(String[] args) {
-		var processedData = new YangProcessor().process(newArrayList(), newArrayList(), newArrayList());
-		new GsonBuilder().create().toJson(processedData, System.out);
+	public static enum Format {
+		tree, json
 	}
 
 	/**
 	 * 
-	 * @param modules
-	 * @param includedFeatures
-	 * @param excludedFeatures
+	 * @param modules          loaded modules
+	 * @param includedFeatures features to include
+	 * @param excludedFeatures features to exclude
 	 * @return ProcessedDataTree or <code>null</code> if modules is
 	 *         <code>null</code> or empty.
 	 */
@@ -66,18 +65,34 @@ public class YangProcessor {
 				excludedFeatures == null ? newArrayList() : excludedFeatures);
 	}
 
+	/**
+	 * @param processedData data to serialize
+	 * @param format        tree or json. tree is default
+	 * @param output        target
+	 */
+	public void serialize(ProcessedDataTree processedData, Format format, StringBuilder output) {
+		switch (format) {
+		case json: {
+			new GsonBuilder().setPrettyPrinting().create().toJson(processedData, output);
+			break;
+		}
+		case tree: {
+			// TODO pick module by file name
+			output.append(new DataTreeSerializer().serialize(processedData.getModules().get(0)));
+			break;
+		}
+		}
+	}
+
 	protected ProcessedDataTree processInternal(List<AbstractModule> modules, List<String> includedFeatures,
 			List<String> excludedFeatures) {
 		var evalCtx = new FeatureEvaluationContext(includedFeatures, excludedFeatures);
 		ProcessedDataTree processedDataTree = new ProcessedDataTree();
 		modules.forEach((module) -> module.eAllContents().forEachRemaining((ele) -> {
 			if (ele instanceof Deviate) {
-				/*
-				 * var deviation = ((Deviation) ele); deviation.getSubstatements().forEach((sub)
-				 * -> { });
-				 */
 				Deviate deviate = (Deviate) ele;
 				switch (deviate.getArgument()) {
+				// TODO implements other cases
 				case "add":
 				case "replace":
 					break;
@@ -141,12 +156,8 @@ public class YangProcessor {
 		return processedDataTree;
 	}
 
-	private void processChildren(Statement statement, HasStatements parent, FeatureEvaluationContext evalCtx) {
-		/*if (!ProcessorUtility.isEnabled(statement, evalCtx)) {
-			// filtered by a feature
-			return;
-		}*/
-		statement.getSubstatements().stream().filter( ele -> ProcessorUtility.isEnabled(ele, evalCtx)).forEach((ele) -> {
+	protected void processChildren(Statement statement, HasStatements parent, FeatureEvaluationContext evalCtx) {
+		statement.getSubstatements().stream().filter(ele -> ProcessorUtility.isEnabled(ele, evalCtx)).forEach((ele) -> {
 			ElementData child = null;
 			if (ele instanceof Container) {
 				child = new ElementData((Container) ele, ElementKind.Container);

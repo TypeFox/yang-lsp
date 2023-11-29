@@ -54,3 +54,9 @@ jobs:
         name: yang-language-server_diagram-extension_${{ env.PROJECT_VERSION }}
         path: |
           yang-lsp/build/yang-language-server_diagram-extension*.zip
+    - name: Archive yang-tool_cli
+      uses: actions/upload-artifact@v3
+      with:
+        name: yang-tool_cli_${{ env.PROJECT_VERSION }}
+        path: |
+          yang-lsp/build/yang-tool_cli_*.zip
