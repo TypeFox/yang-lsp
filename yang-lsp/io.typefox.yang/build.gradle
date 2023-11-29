@@ -41,7 +41,7 @@ task generateXtextLanguage(type: JavaExec) {
 
 mainClassName = 'io.typefox.yang.processor.YangProcessorApp'
 applicationName = 'yang-tool'
-ext.applicationQualifier = 'yang-tool'
+ext.applicationQualifier = 'cli'
 
 generateXtext.dependsOn(generateXtextLanguage)
 clean.dependsOn(cleanGenerateXtextLanguage)
