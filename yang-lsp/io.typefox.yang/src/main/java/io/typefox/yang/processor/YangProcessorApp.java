@@ -2,11 +2,21 @@ package io.typefox.yang.processor;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
+
+import org.eclipse.emf.common.util.URI;
+import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.xtext.resource.XtextResourceSet;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.Parameter;
 import com.beust.jcommander.ParameterException;
+
+import io.typefox.yang.YangStandaloneSetup;
+import io.typefox.yang.yang.AbstractModule;
 
 public class YangProcessorApp {
 
@@ -49,17 +59,47 @@ public class YangProcessorApp {
 		}
 
 		var yangProcessor = new YangProcessor();
-		var processedData = yangProcessor.process(null, cliArgs.includedFeatures, cliArgs.excludedFeatures);
+
+		List<AbstractModule> modules = null;
+		try {
+			modules = loadModuleFileAndDependencies(cliArgs.module);
+		} catch (IOException e) {
+			String msg = e.getMessage();
+			if (msg == null) {
+				msg = "An exception occured when loading file: " + cliArgs.module;
+			}
+			System.err.println(msg);
+			System.exit(11);
+		}
+		var processedData = yangProcessor.process(modules, cliArgs.includedFeatures, cliArgs.excludedFeatures);
 
 		if (processedData == null || processedData.getModules() == null) {
 			String msg = "No module found in file: " + (cliArgs.module == null ? "<empty>" : cliArgs.module);
 			System.err.println(msg);
-			System.exit(11);
+			System.exit(23);
 		}
 
 		var output = new StringBuilder();
 		yangProcessor.serialize(processedData, cliArgs.format, output);
 		System.out.println(output.toString());
+	}
+
+	private static List<AbstractModule> loadModuleFileAndDependencies(String moduleFile) throws IOException {
+		var injector = new YangStandaloneSetup().createInjectorAndDoEMFRegistration();
+		var rs = injector.getInstance(XtextResourceSet.class);
+		var file = new File(moduleFile);
+		if (!file.exists()) {
+			throw new IOException("File " + moduleFile + " doesn't exists.");
+		}
+		var mainResource = rs.createResource(URI.createFileURI(file.getAbsolutePath()));
+		mainResource.load(rs.getLoadOptions());
+		EcoreUtil.resolveAll(mainResource);
+		var modules = new ArrayList<AbstractModule>();
+		var rootObj = mainResource.getContents().get(0);
+		if (rootObj instanceof AbstractModule) {
+			modules.add((AbstractModule) rootObj);
+		}
+		return modules;
 	}
 
 	public static Args parseArgs(StringBuilder out, String... args) {

@@ -69,7 +69,7 @@ public class YangProcessor {
 	public void serialize(ProcessedDataTree processedData, String format, StringBuilder output) {
 
 		if ("json".equals(format)) {
-			new GsonBuilder().create().toJson(processedData, output);
+			new GsonBuilder().setPrettyPrinting().create().toJson(processedData, output);
 		} else {
 			// pick module by file name
 			output.append(new DataTreeSerializer().serialize(processedData.getModules().get(0)));
