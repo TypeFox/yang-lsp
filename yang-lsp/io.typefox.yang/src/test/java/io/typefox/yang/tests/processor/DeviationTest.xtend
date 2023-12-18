@@ -81,6 +81,10 @@ class DeviationTest extends AbstractYangTest {
 			            // remove this "must" constraint
 			            must "daytime or time";
 			        }
+			        deviate add {
+			            // add this "must" constraint
+			            must "time";
+			        }
 			    }
 			}
 		'''.load().root
@@ -98,7 +102,8 @@ class DeviationTest extends AbstractYangTest {
 		      "accessKind": "rw",
 		      "cardinality": "not_set",
 		      "mustConstraint": [
-		        "user"
+		        "user",
+		        "time"
 		      ],
 		      "children": [
 		        {
