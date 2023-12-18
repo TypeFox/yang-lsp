@@ -161,6 +161,7 @@
               },
               "accessKind": "rw",
               "cardinality": "optional",
+              "defaultValue": "true",
               "id": {
                 "name": "enabled"
               }
@@ -222,6 +223,7 @@
                               ],
                               "accessKind": "rw",
                               "cardinality": "optional",
+                              "defaultValue": "123",
                               "id": {
                                 "name": "port"
                               }
@@ -248,6 +250,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "server",
                   "id": {
                     "name": "association-type"
                   }
@@ -259,6 +262,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "false",
                   "id": {
                     "name": "iburst"
                   }
@@ -270,6 +274,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "false",
                   "id": {
                     "name": "prefer"
                   }
@@ -284,6 +289,7 @@
                   ],
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "unlocked",
                   "id": {
                     "name": "administrative-state",
                     "prefix": "sysxext"
@@ -433,6 +439,7 @@
                               ],
                               "accessKind": "rw",
                               "cardinality": "optional",
+                              "defaultValue": "53",
                               "id": {
                                 "name": "port"
                               }
@@ -469,6 +476,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "5",
                   "id": {
                     "name": "timeout"
                   }
@@ -480,6 +488,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "2",
                   "id": {
                     "name": "attempts"
                   }
@@ -556,6 +565,7 @@
                               },
                               "accessKind": "rw",
                               "cardinality": "optional",
+                              "defaultValue": "1812",
                               "id": {
                                 "name": "authentication-port"
                               }
@@ -593,6 +603,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "radius-pap",
                   "id": {
                     "name": "authentication-type"
                   }
@@ -614,6 +625,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "5",
                   "id": {
                     "name": "timeout"
                   }
@@ -625,6 +637,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "2",
                   "id": {
                     "name": "attempts"
                   }
@@ -654,6 +667,9 @@
               },
               "accessKind": "rw",
               "cardinality": "many",
+              "mustConstraint": [
+                "(.!\u003dsys:radiusor../../radius/server)"
+              ],
               "id": {
                 "name": "user-authentication-order"
               }
@@ -778,6 +794,7 @@
                   ],
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "unlocked",
                   "id": {
                     "name": "administrative-state",
                     "prefix": "sysxext"
@@ -793,6 +810,9 @@
                   ],
                   "accessKind": "rw",
                   "cardinality": "many",
+                  "mustConstraint": [
+                    "count(/nacm:nacm/groups/group/user-name)\u003d0"
+                  ],
                   "id": {
                     "name": "groups",
                     "prefix": "sysxext"
@@ -855,6 +875,7 @@
               ],
               "accessKind": "rw",
               "cardinality": "optional",
+              "defaultValue": "3",
               "id": {
                 "name": "authentication-failure-delay",
                 "prefix": "sysxext"
@@ -886,6 +907,7 @@
               ],
               "accessKind": "rw",
               "cardinality": "optional",
+              "defaultValue": "IF YOU ARE NOT AN AUTHORIZED USER,\n                     PLEASE EXIT IMMEDIATELY",
               "id": {
                 "name": "legal-notice",
                 "prefix": "sysxext"
@@ -901,6 +923,7 @@
               ],
               "accessKind": "rw",
               "cardinality": "optional",
+              "defaultValue": "This system processes sensitive personal data.\n                     The misuse of such data may generate considerable\n                     harm to the data subjects. Be reminded of the\n                     confidentiality obligations you have when accessing\n                     this kind of data and the disciplinary consequences\n                     of improper handling.\n                     Version: 1.0, Last Updated: May 21, 2019",
               "id": {
                 "name": "privacy-notice",
                 "prefix": "sysxext"
@@ -916,6 +939,7 @@
               ],
               "accessKind": "rw",
               "cardinality": "optional",
+              "defaultValue": "",
               "id": {
                 "name": "post-login-notice",
                 "prefix": "sysxext"
@@ -1135,6 +1159,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "7",
                   "id": {
                     "name": "expiry-warning",
                     "prefix": "sysxext"
@@ -1147,6 +1172,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "1800",
                   "id": {
                     "name": "failure-count-interval",
                     "prefix": "sysxext"
@@ -1159,6 +1185,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "12",
                   "id": {
                     "name": "history-length",
                     "prefix": "sysxext"
@@ -1171,6 +1198,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "0",
                   "id": {
                     "name": "lockout-duration",
                     "prefix": "sysxext"
@@ -1183,6 +1211,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "90",
                   "id": {
                     "name": "max-age",
                     "prefix": "sysxext"
@@ -1195,6 +1224,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "5",
                   "id": {
                     "name": "max-failure",
                     "prefix": "sysxext"
@@ -1207,6 +1237,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "15",
                   "id": {
                     "name": "min-age",
                     "prefix": "sysxext"
@@ -1219,6 +1250,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "12",
                   "id": {
                     "name": "min-length",
                     "prefix": "sysxext"
@@ -1231,6 +1263,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "true",
                   "id": {
                     "name": "must-change",
                     "prefix": "sysxext"
@@ -1284,6 +1317,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "7",
                   "id": {
                     "name": "expiry-warning",
                     "prefix": "sysxext"
@@ -1296,6 +1330,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "1800",
                   "id": {
                     "name": "failure-count-interval",
                     "prefix": "sysxext"
@@ -1308,6 +1343,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "12",
                   "id": {
                     "name": "history-length",
                     "prefix": "sysxext"
@@ -1320,6 +1356,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "0",
                   "id": {
                     "name": "lockout-duration",
                     "prefix": "sysxext"
@@ -1332,6 +1369,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "90",
                   "id": {
                     "name": "max-age",
                     "prefix": "sysxext"
@@ -1344,6 +1382,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "5",
                   "id": {
                     "name": "max-failure",
                     "prefix": "sysxext"
@@ -1356,6 +1395,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "15",
                   "id": {
                     "name": "min-age",
                     "prefix": "sysxext"
@@ -1368,6 +1408,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "12",
                   "id": {
                     "name": "min-length",
                     "prefix": "sysxext"
@@ -1380,6 +1421,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "true",
                   "id": {
                     "name": "must-change",
                     "prefix": "sysxext"
@@ -1430,6 +1472,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "180",
                   "id": {
                     "name": "dormant-timer",
                     "prefix": "sysxext"
@@ -1442,6 +1485,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "0",
                   "id": {
                     "name": "dormant-action",
                     "prefix": "sysxext"
@@ -1454,6 +1498,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "90",
                   "id": {
                     "name": "dormant-action-timer",
                     "prefix": "sysxext"
@@ -1495,6 +1540,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "180",
                   "id": {
                     "name": "dormant-timer",
                     "prefix": "sysxext"
@@ -1507,6 +1553,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "0",
                   "id": {
                     "name": "dormant-action",
                     "prefix": "sysxext"
@@ -1519,6 +1566,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "90",
                   "id": {
                     "name": "dormant-action-timer",
                     "prefix": "sysxext"
@@ -1628,6 +1676,7 @@
                       ],
                       "accessKind": "rw",
                       "cardinality": "optional",
+                      "defaultValue": "86400",
                       "id": {
                         "name": "failure-count-interval",
                         "prefix": "sysxext"
@@ -1643,6 +1692,7 @@
                       ],
                       "accessKind": "rw",
                       "cardinality": "optional",
+                      "defaultValue": "3",
                       "id": {
                         "name": "max-failure",
                         "prefix": "sysxext"
@@ -1815,6 +1865,9 @@
                                               },
                                               "accessKind": "rw",
                                               "cardinality": "mandatory",
+                                              "mustConstraint": [
+                                                "../public-key-format"
+                                              ],
                                               "id": {
                                                 "name": "public-key",
                                                 "prefix": "sysxext"
@@ -1940,6 +1993,7 @@
               "elementKind": "List",
               "accessKind": "rw",
               "cardinality": "many",
+              "minElements": "1",
               "children": [
                 {
                   "elementKind": "Leaf",
@@ -1985,6 +2039,7 @@
                               "elementKind": "Choice",
                               "accessKind": "rw",
                               "cardinality": "optional",
+                              "defaultValue": "ldap",
                               "children": [
                                 {
                                   "elementKind": "Case",
@@ -2004,6 +2059,7 @@
                                           },
                                           "accessKind": "rw",
                                           "cardinality": "optional",
+                                          "defaultValue": "389",
                                           "id": {
                                             "name": "port",
                                             "prefix": "sysxext"
@@ -2030,6 +2086,9 @@
                                       "elementKind": "Container",
                                       "accessKind": "rw",
                                       "cardinality": "presence",
+                                      "mustConstraint": [
+                                        "(/sys:system/ldap/security/tls)"
+                                      ],
                                       "children": [
                                         {
                                           "elementKind": "Leaf",
@@ -2039,6 +2098,7 @@
                                           },
                                           "accessKind": "rw",
                                           "cardinality": "optional",
+                                          "defaultValue": "636",
                                           "id": {
                                             "name": "port",
                                             "prefix": "sysxext"
@@ -2208,6 +2268,9 @@
                                                       },
                                                       "accessKind": "rw",
                                                       "cardinality": "mandatory",
+                                                      "mustConstraint": [
+                                                        "../public-key-format"
+                                                      ],
                                                       "id": {
                                                         "name": "public-key",
                                                         "prefix": "sysxext"
@@ -2241,6 +2304,9 @@
                                                               },
                                                               "accessKind": "rw",
                                                               "cardinality": "optional",
+                                                              "mustConstraint": [
+                                                                "../private-key-format"
+                                                              ],
                                                               "id": {
                                                                 "name": "private-key",
                                                                 "prefix": "sysxext"
@@ -2282,6 +2348,9 @@
                                                               "elementKind": "Container",
                                                               "accessKind": "rw",
                                                               "cardinality": "not_set",
+                                                              "mustConstraint": [
+                                                                "../private-key-format"
+                                                              ],
                                                               "id": {
                                                                 "name": "encrypted-private-key",
                                                                 "prefix": "sysxext"
@@ -2511,6 +2580,9 @@
                                                       },
                                                       "accessKind": "rw",
                                                       "cardinality": "optional",
+                                                      "mustConstraint": [
+                                                        "../certificate"
+                                                      ],
                                                       "id": {
                                                         "name": "asymmetric-key",
                                                         "prefix": "sysxext"
@@ -2523,6 +2595,9 @@
                                                       },
                                                       "accessKind": "rw",
                                                       "cardinality": "optional",
+                                                      "mustConstraint": [
+                                                        "../asymmetric-key"
+                                                      ],
                                                       "id": {
                                                         "name": "certificate",
                                                         "prefix": "sysxext"
@@ -2618,6 +2693,9 @@
                                                       },
                                                       "accessKind": "rw",
                                                       "cardinality": "mandatory",
+                                                      "mustConstraint": [
+                                                        "../public-key-format"
+                                                      ],
                                                       "id": {
                                                         "name": "public-key",
                                                         "prefix": "sysxext"
@@ -2651,6 +2729,9 @@
                                                               },
                                                               "accessKind": "rw",
                                                               "cardinality": "optional",
+                                                              "mustConstraint": [
+                                                                "../private-key-format"
+                                                              ],
                                                               "id": {
                                                                 "name": "private-key",
                                                                 "prefix": "sysxext"
@@ -2692,6 +2773,9 @@
                                                               "elementKind": "Container",
                                                               "accessKind": "rw",
                                                               "cardinality": "not_set",
+                                                              "mustConstraint": [
+                                                                "../private-key-format"
+                                                              ],
                                                               "id": {
                                                                 "name": "encrypted-private-key",
                                                                 "prefix": "sysxext"
@@ -2908,6 +2992,9 @@
                                                               },
                                                               "accessKind": "rw",
                                                               "cardinality": "optional",
+                                                              "mustConstraint": [
+                                                                "../key-format"
+                                                              ],
                                                               "id": {
                                                                 "name": "key",
                                                                 "prefix": "sysxext"
@@ -2949,6 +3036,9 @@
                                                               "elementKind": "Container",
                                                               "accessKind": "rw",
                                                               "cardinality": "not_set",
+                                                              "mustConstraint": [
+                                                                "../key-format"
+                                                              ],
                                                               "id": {
                                                                 "name": "encrypted-key",
                                                                 "prefix": "sysxext"
@@ -3106,6 +3196,9 @@
                               "elementKind": "Container",
                               "accessKind": "rw",
                               "cardinality": "not_set",
+                              "mustConstraint": [
+                                "ca-certsorserver-certs"
+                              ],
                               "children": [
                                 {
                                   "elementKind": "Container",
@@ -3415,6 +3508,9 @@
                                                       },
                                                       "accessKind": "rw",
                                                       "cardinality": "mandatory",
+                                                      "mustConstraint": [
+                                                        "../public-key-format"
+                                                      ],
                                                       "id": {
                                                         "name": "public-key",
                                                         "prefix": "sysxext"
@@ -3571,6 +3667,7 @@
                                   },
                                   "accessKind": "rw",
                                   "cardinality": "optional",
+                                  "defaultValue": "30",
                                   "id": {
                                     "name": "max-wait",
                                     "prefix": "sysxext"
@@ -3583,6 +3680,7 @@
                                   },
                                   "accessKind": "rw",
                                   "cardinality": "optional",
+                                  "defaultValue": "3",
                                   "id": {
                                     "name": "max-attempts",
                                     "prefix": "sysxext"
@@ -3735,6 +3833,9 @@
                           },
                           "accessKind": "rw",
                           "cardinality": "optional",
+                          "mustConstraint": [
+                            "(/sys:system/ldap/security/tls)"
+                          ],
                           "id": {
                             "name": "sasl-external",
                             "prefix": "sysxext"
@@ -3782,6 +3883,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "5",
                   "id": {
                     "name": "timeout",
                     "prefix": "sysxext"
@@ -3794,6 +3896,7 @@
                   },
                   "accessKind": "rw",
                   "cardinality": "optional",
+                  "defaultValue": "false",
                   "id": {
                     "name": "enable-referrals",
                     "prefix": "sysxext"
@@ -3808,6 +3911,7 @@
                       "elementKind": "Choice",
                       "accessKind": "rw",
                       "cardinality": "optional",
+                      "defaultValue": "example-filter",
                       "children": [
                         {
                           "elementKind": "Case",
@@ -3901,6 +4005,10 @@
                                   },
                                   "accessKind": "rw",
                                   "cardinality": "optional",
+                                  "defaultValue": "false",
+                                  "mustConstraint": [
+                                    "(.\u003dfalseor/sys:system/authentication/target-types)"
+                                  ],
                                   "id": {
                                     "name": "enable-target-based-access-control",
                                     "prefix": "sysxext"
@@ -3961,6 +4069,9 @@
           ],
           "accessKind": "rw",
           "cardinality": "not_set",
+          "mustConstraint": [
+            "not(/sys:system/authentication[sys:user-authentication-order\u003dsysxext:ldap])or/system/ldap/server"
+          ],
           "id": {
             "name": "ldap-checks",
             "prefix": "sysxext"

@@ -20,8 +20,8 @@ import com.google.common.collect.Maps;
 import com.google.gson.GsonBuilder;
 
 import io.typefox.yang.processor.DataTreeSerializer;
-import io.typefox.yang.processor.ProcessedDataTree;
-import io.typefox.yang.processor.ProcessedDataTree.ModuleData;
+import io.typefox.yang.processor.ProcessedDataModel;
+import io.typefox.yang.processor.ProcessedDataModel.ModuleData;
 import io.typefox.yang.processor.YangProcessor;
 import io.typefox.yang.tests.AbstractYangTest;
 import io.typefox.yang.yang.AbstractModule;
@@ -175,7 +175,7 @@ public class YangProcessorTest extends AbstractYangTest {
 			}
 		});
 
-		ProcessedDataTree dataTree = new YangProcessor().process(modules, includedFeatures, excludedFeatures);
+		ProcessedDataModel dataTree = new YangProcessor().process(modules, includedFeatures, excludedFeatures);
 		var sysModule = dataTree.getModules().stream().filter(mod -> "ietf-system".equals(mod.getSimpleName())).findFirst();
 		return sysModule;
 

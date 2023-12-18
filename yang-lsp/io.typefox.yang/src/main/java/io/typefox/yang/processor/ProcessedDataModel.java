@@ -2,10 +2,10 @@ package io.typefox.yang.processor;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
-import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
 import com.google.common.base.Objects;
@@ -13,18 +13,21 @@ import com.google.common.collect.Sets;
 
 import io.typefox.yang.processor.FeatureExpressions.FeatureCondition;
 import io.typefox.yang.yang.Config;
+import io.typefox.yang.yang.Default;
 import io.typefox.yang.yang.IfFeature;
 import io.typefox.yang.yang.Key;
 import io.typefox.yang.yang.Mandatory;
+import io.typefox.yang.yang.MaxElements;
+import io.typefox.yang.yang.MinElements;
+import io.typefox.yang.yang.Must;
 import io.typefox.yang.yang.Path;
 import io.typefox.yang.yang.Presence;
 import io.typefox.yang.yang.SchemaNode;
 import io.typefox.yang.yang.Type;
 import io.typefox.yang.yang.TypeReference;
 import io.typefox.yang.yang.Typedef;
-import io.typefox.yang.yang.XpathExpression;
 
-public class ProcessedDataTree {
+public class ProcessedDataModel {
 
 	private List<ModuleData> modules;
 
@@ -169,8 +172,12 @@ public class ProcessedDataTree {
 	}
 
 	static public enum ElementKind {
-		Container, Leaf, LeafList, List, Rpc, Choice, Case, Action, Grouping, Refine, Uses, Input, Output, Notification,
-		AnyXml;
+		// SchemaNodes
+		Action, Case, Choice,
+		// DataSchemaNodes
+		AnyXml, Container, Leaf, LeafList, List,
+		// SchemaNodes
+		Grouping, Input, Notification, Output, Rpc;
 
 		public static Set<ElementKind> mayOmitCase = Sets.newHashSet(AnyXml, Container, Leaf, List, LeafList);
 	}
@@ -203,6 +210,16 @@ public class ProcessedDataTree {
 		Cardinality cardinality;
 
 		transient private SchemaNode origin;
+
+		/**
+		 * 0..1 Node properties that can be changed by a Deviate
+		 */
+		public String defaultValue, maxElements, minElements = null;
+
+		/**
+		 * 0..n Node properties that can be changed by a Deviate
+		 */
+		public List<String> mustConstraint = null;
 
 		private ElementData(ElementIdentifier elementId, ElementKind elementKind) {
 			super(elementId);
@@ -268,6 +285,18 @@ public class ProcessedDataTree {
 					this.cardinality = Cardinality.mandatory;
 				} else if (sub instanceof Presence) {
 					this.cardinality = Cardinality.presence;
+				} else if (sub instanceof Default) {
+					this.defaultValue = ((Default) sub).getDefaultStringValue();
+				} else if (sub instanceof MaxElements) {
+					this.maxElements = ((MaxElements) sub).getMaxElements();
+				} else if (sub instanceof MinElements) {
+					this.minElements = ((MinElements) sub).getMinElements();
+				} else if (sub instanceof Must) {
+					if (this.mustConstraint == null) {
+						this.mustConstraint = new ArrayList<>();
+					}
+					var exprAsString = ProcessorUtility.serializedXpath(((Must) sub).getConstraint());
+					this.mustConstraint.add(exprAsString);
 				}
 			});
 		}
@@ -279,7 +308,7 @@ public class ProcessedDataTree {
 					Path pathRef = (Path) typeStatement.getSubstatements().stream().filter(s -> s instanceof Path)
 							.findFirst().get();
 					if (pathRef != null && pathRef.getReference() != null) {
-						return new ValueType(null, "-> " + serializedXpath(pathRef.getReference()));
+						return new ValueType(null, "-> " + ProcessorUtility.serializedXpath(pathRef.getReference()));
 					}
 				}
 				return new ValueType(null, typeRef.getBuiltin());
@@ -306,22 +335,6 @@ public class ProcessedDataTree {
 				return null;
 			}
 			return NodeModelUtils.getTokenText(node);
-		}
-
-		private String serializedXpath(XpathExpression reference) {
-			// TODO use serializer or implement a an own simple one
-			ICompositeNode nodeFor = NodeModelUtils.findActualNodeFor(reference);
-			if (nodeFor != null) {
-				var nodeText = nodeFor.getText();
-				nodeText = nodeText.replaceAll("\"|'|\\s|\n|\r", "").replaceAll("\\+", "");
-				int firstColon = nodeText.indexOf(":");
-				if (firstColon > 0) {
-					nodeText = nodeText.substring(0, firstColon)
-							+ nodeText.substring(firstColon).replaceAll("\\/[a-zA-Z]+:", "/");
-				}
-				return nodeText;
-			}
-			return "leafref";
 		}
 
 		private void addFeatureCondition(String condition) {

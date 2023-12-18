@@ -8,16 +8,19 @@ import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.common.util.EList;
 import org.eclipse.emf.ecore.EObject;
+import org.eclipse.emf.ecore.EReference;
+import org.eclipse.emf.ecore.EStructuralFeature;
+import org.eclipse.emf.ecore.util.EcoreUtil;
 
+import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
-import com.google.gson.GsonBuilder;
 
-import io.typefox.yang.processor.ProcessedDataTree.ElementData;
-import io.typefox.yang.processor.ProcessedDataTree.ElementIdentifier;
-import io.typefox.yang.processor.ProcessedDataTree.ElementKind;
-import io.typefox.yang.processor.ProcessedDataTree.HasStatements;
-import io.typefox.yang.processor.ProcessedDataTree.ListData;
-import io.typefox.yang.processor.ProcessedDataTree.ModuleData;
+import io.typefox.yang.processor.ProcessedDataModel.ElementData;
+import io.typefox.yang.processor.ProcessedDataModel.ElementIdentifier;
+import io.typefox.yang.processor.ProcessedDataModel.ElementKind;
+import io.typefox.yang.processor.ProcessedDataModel.HasStatements;
+import io.typefox.yang.processor.ProcessedDataModel.ListData;
+import io.typefox.yang.processor.ProcessedDataModel.ModuleData;
 import io.typefox.yang.yang.AbstractModule;
 import io.typefox.yang.yang.Action;
 import io.typefox.yang.yang.Augment;
@@ -36,7 +39,6 @@ import io.typefox.yang.yang.LeafList;
 import io.typefox.yang.yang.Notification;
 import io.typefox.yang.yang.Output;
 import io.typefox.yang.yang.Prefix;
-import io.typefox.yang.yang.Refine;
 import io.typefox.yang.yang.Rpc;
 import io.typefox.yang.yang.SchemaNode;
 import io.typefox.yang.yang.Statement;
@@ -56,7 +58,7 @@ public class YangProcessor {
 	 * @return ProcessedDataTree or <code>null</code> if modules is
 	 *         <code>null</code> or empty.
 	 */
-	public ProcessedDataTree process(List<AbstractModule> modules, List<String> includedFeatures,
+	public ProcessedDataModel process(List<AbstractModule> modules, List<String> includedFeatures,
 			List<String> excludedFeatures) {
 		if (modules == null || modules.isEmpty()) {
 			return null;
@@ -70,77 +72,30 @@ public class YangProcessor {
 	 * @param format        tree or json. tree is default
 	 * @param output        target
 	 */
-	public void serialize(ProcessedDataTree processedData, Format format, StringBuilder output) {
+	public void serialize(ProcessedDataModel processedData, Format format, StringBuilder output) {
+		// TODO pick module by file name
+		ModuleData moduleData = processedData.getModules().get(0);
 		switch (format) {
 		case json: {
-			new GsonBuilder().setPrettyPrinting().create().toJson(processedData, output);
+			new JsonSerializer().serialize(moduleData, output);
 			break;
 		}
 		case tree: {
-			// TODO pick module by file name
-			output.append(new DataTreeSerializer().serialize(processedData.getModules().get(0)));
+			output.append(new DataTreeSerializer().serialize(moduleData));
 			break;
 		}
 		}
 	}
 
-	protected ProcessedDataTree processInternal(List<AbstractModule> modules, List<String> includedFeatures,
+	protected ProcessedDataModel processInternal(List<AbstractModule> modules, List<String> includedFeatures,
 			List<String> excludedFeatures) {
 		var evalCtx = new FeatureEvaluationContext(includedFeatures, excludedFeatures);
-		ProcessedDataTree processedDataTree = new ProcessedDataTree();
+		ProcessedDataModel processedDataTree = new ProcessedDataModel();
 		modules.forEach((module) -> module.eAllContents().forEachRemaining((ele) -> {
 			if (ele instanceof Deviate) {
-				Deviate deviate = (Deviate) ele;
-				switch (deviate.getArgument()) {
-				// TODO implements other cases
-				case "add":
-				case "replace":
-					break;
-				case "delete":
-				case "not-supported":
-					var deviation = ((Deviation) ele.eContainer());
-					SchemaNode schemaNode = deviation.getReference().getSchemaNode();
-					Object eGet = schemaNode.eContainer().eGet(schemaNode.eContainingFeature(), true);
-					if (eGet instanceof EList) {
-						((EList<?>) eGet).remove(schemaNode);
-					}
-					break;
-				}
+				processDeviate((Deviate) ele);
 			} else if (ele instanceof Augment) {
-				var augment = (Augment) ele;
-				List<IfFeature> ifFeatures = ProcessorUtility.findIfFeatures(augment);
-				boolean featuresMatch = ProcessorUtility.checkIfFeatures(ifFeatures, evalCtx);
-				// disabled by feature
-				if (!featuresMatch) {
-					return;
-				}
-				var globalModuleId = ProcessorUtility.moduleIdentifier(module);
-
-				augment.getSubstatements().stream().filter(sub -> !(sub instanceof IfFeature))
-						.forEach((subStatement) -> {
-							// TODO check what can be added
-							if (subStatement instanceof SchemaNode) {
-								SchemaNode copy = ProcessorUtility.copyEObject((SchemaNode) subStatement);
-								// add augment's feature conditions to copied augment children
-								copy.getSubstatements().addAll(ProcessorUtility.copyAllEObjects(ifFeatures));
-
-								// memorize source module information as adapter
-								copy.eAdapters().add(new ForeignModuleAdapter(globalModuleId));
-
-								// Remove same named existing node
-								var existing = augment.getPath().getSchemaNode().getSubstatements().stream()
-										.filter((statement) -> {
-											if (statement instanceof SchemaNode) {
-												return copy.getName().equals(((SchemaNode) statement).getName());
-											}
-											return false;
-										}).findFirst();
-								if (existing.isPresent()) {
-									augment.getPath().getSchemaNode().getSubstatements().remove(existing.get());
-								}
-								augment.getPath().getSchemaNode().getSubstatements().add(copy);
-							}
-						});
+				processAugment((Augment) ele, module, evalCtx);
 			}
 		}));
 
@@ -154,6 +109,114 @@ public class YangProcessor {
 			processChildren(module, moduleData, evalCtx);
 		});
 		return processedDataTree;
+	}
+
+	/*
+	 * The deviates's Substatements: config, default, mandatory, max-elements,
+	 * min-elements, must, type,unique,units
+	 */
+	protected void processDeviate(Deviate deviate) {
+		var deviation = (Deviation) deviate.eContainer();
+		SchemaNode targetNode = deviation.getReference().getSchemaNode();
+		switch (deviate.getArgument()) {
+		case "add": {
+			for (Statement statement : deviate.getSubstatements()) {
+				var copy = ProcessorUtility.copyEObject(statement);
+				targetNode.getSubstatements().add(copy);
+			}
+			break;
+		}
+		case "delete":
+			for (Statement statement : deviate.getSubstatements()) {
+				var existingProperty = targetNode.getSubstatements().stream()
+						.filter(child -> matchingArguments(child, statement)).findFirst();
+				if (existingProperty.isPresent()) {
+					targetNode.getSubstatements().remove(existingProperty.get());
+				}
+			}
+			break;
+		case "replace":
+			for (Statement statement : deviate.getSubstatements()) {
+				var existingProperty = targetNode.getSubstatements().stream()
+						.filter(child -> child.eClass() == statement.eClass()).findFirst();
+				if (existingProperty.isPresent()) {
+					targetNode.getSubstatements().remove(existingProperty.get());
+					var copy = ProcessorUtility.copyEObject(statement);
+					targetNode.getSubstatements().add(copy);
+				}
+			}
+			break;
+		case "not-supported":
+			Object eGet = targetNode.eContainer().eGet(targetNode.eContainingFeature(), true);
+			if (eGet instanceof EList) {
+				((EList<?>) eGet).remove(targetNode);
+			}
+			break;
+		}
+	}
+
+	/**
+	 * The properties to delete are identified by substatements to the "delete"
+	 * statement. The substatement's keyword MUST match a corresponding keyword in
+	 * the target node, and the argument's string MUST be equal to the corresponding
+	 * keyword's argument string in the target node.
+	 * 
+	 * @param candidate
+	 * @param objToMatch
+	 * @return true if candidate matches the objToMatch
+	 */
+	protected boolean matchingArguments(Statement candidate, Statement objToMatch) {
+		if (candidate.eClass() != objToMatch.eClass()) {
+			return false;
+		}
+		for (EStructuralFeature feat : objToMatch.eClass().getEStructuralFeatures()) {
+			var toMatch = objToMatch.eGet(feat, true);
+			var candidateState = candidate.eGet(feat, true);
+			if (feat instanceof EReference && toMatch instanceof EObject && candidateState instanceof EObject) {
+				if (!EcoreUtil.equals((EObject) toMatch, (EObject) candidateState)) {
+					return false;
+				}
+			} else {
+				if (!Objects.equal(toMatch, candidateState)) {
+					return false;
+				}
+			}
+		}
+		return true;
+	}
+
+	protected void processAugment(Augment augment, AbstractModule module, FeatureEvaluationContext evalCtx) {
+		List<IfFeature> ifFeatures = ProcessorUtility.findIfFeatures(augment);
+		boolean featuresMatch = ProcessorUtility.checkIfFeatures(ifFeatures, evalCtx);
+		// disabled by feature
+		if (!featuresMatch) {
+			return;
+		}
+		var globalModuleId = ProcessorUtility.moduleIdentifier(module);
+
+		augment.getSubstatements().stream().filter(sub -> !(sub instanceof IfFeature)).forEach((subStatement) -> {
+			// TODO check what can be added
+			if (subStatement instanceof SchemaNode) {
+				SchemaNode copy = ProcessorUtility.copyEObject((SchemaNode) subStatement);
+				// add augment's feature conditions to copied augment children
+				copy.getSubstatements().addAll(ProcessorUtility.copyAllEObjects(ifFeatures));
+
+				// memorize source module information as adapter
+				copy.eAdapters().add(new ForeignModuleAdapter(globalModuleId));
+
+				// Remove same named existing node
+				var existing = augment.getPath().getSchemaNode().getSubstatements().stream().filter((statement) -> {
+					if (statement instanceof SchemaNode) {
+						return copy.getName().equals(((SchemaNode) statement).getName());
+					}
+					return false;
+				}).findFirst();
+				if (existing.isPresent()) {
+					augment.getPath().getSchemaNode().getSubstatements().remove(existing.get());
+				}
+				augment.getPath().getSchemaNode().getSubstatements().add(copy);
+			}
+		});
 	}
 
 	protected void processChildren(Statement statement, HasStatements parent, FeatureEvaluationContext evalCtx) {
@@ -191,8 +254,6 @@ public class YangProcessor {
 				}
 				processChildren(grouping, parent, evalCtx);
 
-			} else if (ele instanceof Refine) {
-				child = new ElementData((SchemaNode) ele, ElementKind.Refine);
 			} else if (ele instanceof Input) {
 				child = new ElementData((SchemaNode) ele, ElementKind.Input, "input");
 			} else if (ele instanceof Output) {
@@ -218,15 +279,6 @@ public class YangProcessor {
 			}
 		});
 	}
-
-//	private ModuleData parentModule(HasStatements element) {
-//		if (element instanceof ModuleData) {
-//			return (ModuleData) element;
-//		} else if (element.getParent() != null) {
-//			return parentModule(element.getParent());
-//		}
-//		return null;
-//	}
 
 	public static class ForeignModuleAdapter extends AdapterImpl {
 		final ElementIdentifier moduleId;

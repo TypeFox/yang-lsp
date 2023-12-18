@@ -1,25 +1,25 @@
 package io.typefox.yang.processor
 
-import io.typefox.yang.processor.ProcessedDataTree.AccessKind
-import io.typefox.yang.processor.ProcessedDataTree.ElementData
-import io.typefox.yang.processor.ProcessedDataTree.HasStatements
-import io.typefox.yang.processor.ProcessedDataTree.ListData
-import io.typefox.yang.processor.ProcessedDataTree.ModuleData
 import java.util.List
-import io.typefox.yang.processor.ProcessedDataTree.ElementKind
+import io.typefox.yang.processor.ProcessedDataModel.ElementKind
+import io.typefox.yang.processor.ProcessedDataModel.AccessKind
+import io.typefox.yang.processor.ProcessedDataModel.ModuleData
+import io.typefox.yang.processor.ProcessedDataModel.ListData
+import io.typefox.yang.processor.ProcessedDataModel.ElementData
+import io.typefox.yang.processor.ProcessedDataModel.HasStatements
 
 class DataTreeSerializer {
 
 	def CharSequence serialize(ModuleData moduleData) {
 		'''
 			module: «moduleData.simpleName»
-			  «FOR child : moduleData.children?:#[]»
-			  	«doSerialize(child, '', needsConnect(child, moduleData.children))»
+			  «FOR child : moduleData.getChildren?:#[]»
+			  	«doSerialize(child, '', needsConnect(child, moduleData.getChildren))»
 			  «ENDFOR»
 			
 			  rpcs:
-			    «FOR rpc : moduleData.rpcs?:#[]»
-			    	«doSerialize(rpc, '', needsConnect(rpc, moduleData.rpcs))»
+			    «FOR rpc : moduleData.getRpcs?:#[]»
+			    	«doSerialize(rpc, '', needsConnect(rpc, moduleData.getRpcs))»
 			    «ENDFOR»
 		'''
 	}
@@ -48,24 +48,24 @@ class DataTreeSerializer {
 			}
 		}
 		val keys = if (ele instanceof ListData) {
-				ele.keys.empty ? null : ''' [«ele.keys.join(', ')»]'''
+				ele.getKeys.empty ? null : ''' [«ele.getKeys.join(', ')»]'''
 			}
 
 		val type = ele.getType
 		// no idea why this indentation is needed in pyang
 		val additionalIdent = if(ele.elementKind === ElementKind.Choice && prevSibling(ele)?.elementKind === ElementKind.Container) ' ' else ''
 		'''
-			«indent»«additionalIdent»+«prefix»«label»«ele.cardinality?.toString()»«keys»«IF type !== null»   «type»«ENDIF»«IF ele.featureConditions !== null» {«ele.featureConditions.join(',')»}?«ENDIF»
-			«IF ele.children !== null»
-				«FOR child : ele.children»
-					«doSerialize(child, indent + (needsConnect?'|  ':'   '), needsConnect(child, ele.children))»
+			«indent»«additionalIdent»+«prefix»«label»«ele.cardinality?.toString()»«keys»«IF type !== null»   «type»«ENDIF»«IF ele.getFeatureConditions !== null» {«ele.getFeatureConditions.join(',')»}?«ENDIF»
+			«IF ele.getChildren !== null»
+				«FOR child : ele.getChildren»
+					«doSerialize(child, indent + (needsConnect?'|  ':'   '), needsConnect(child, ele.getChildren))»
 				«ENDFOR»
 			«ENDIF»
 		'''
 	}
 	
 	private def ElementData prevSibling(ElementData ele) {
-		val siblings = ele.parent?.children
+		val siblings = ele.getParent?.getChildren
 		if(siblings === null) {
 			return null
 		}

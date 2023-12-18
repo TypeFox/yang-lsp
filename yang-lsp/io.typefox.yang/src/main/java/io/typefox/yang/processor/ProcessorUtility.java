@@ -8,11 +8,12 @@ import java.util.stream.Collectors;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 import org.eclipse.xtext.EcoreUtil2;
+import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.impl.CompositeNodeWithSemanticElement;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
 import io.typefox.yang.processor.FeatureExpressions.FeatureCondition;
-import io.typefox.yang.processor.ProcessedDataTree.ElementIdentifier;
+import io.typefox.yang.processor.ProcessedDataModel.ElementIdentifier;
 import io.typefox.yang.processor.YangProcessor.ForeignModuleAdapter;
 import io.typefox.yang.utils.YangExtensions;
 import io.typefox.yang.yang.AbstractModule;
@@ -22,6 +23,7 @@ import io.typefox.yang.yang.Prefix;
 import io.typefox.yang.yang.SchemaNode;
 import io.typefox.yang.yang.Statement;
 import io.typefox.yang.yang.Submodule;
+import io.typefox.yang.yang.XpathExpression;
 
 public class ProcessorUtility {
 
@@ -108,4 +110,24 @@ public class ProcessorUtility {
 		copier.copyReferences();
 		return result;
 	}
+
+	public static String serializedXpath(XpathExpression reference) {
+		if(reference == null) {
+			return null;
+		}
+		// TODO use serializer or implement a an own simple one
+		ICompositeNode nodeFor = NodeModelUtils.findActualNodeFor(reference);
+		if (nodeFor != null) {
+			var nodeText = nodeFor.getText();
+			nodeText = nodeText.replaceAll("\"|'|\\s|\n|\r", "").replaceAll("\\+", "");
+			int firstColon = nodeText.indexOf(":");
+			if (firstColon > 0) {
+				nodeText = nodeText.substring(0, firstColon)
+						+ nodeText.substring(firstColon).replaceAll("\\/[a-zA-Z]+:", "/");
+			}
+			return nodeText;
+		}
+		return "leafref";
+	}
+
 }

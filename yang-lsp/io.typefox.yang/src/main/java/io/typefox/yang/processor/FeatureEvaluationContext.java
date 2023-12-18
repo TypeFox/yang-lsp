@@ -7,7 +7,7 @@ import java.util.Set;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 
-import io.typefox.yang.processor.ProcessedDataTree.ElementIdentifier;
+import io.typefox.yang.processor.ProcessedDataModel.ElementIdentifier;
 import io.typefox.yang.yang.Feature;
 
 public class FeatureEvaluationContext {

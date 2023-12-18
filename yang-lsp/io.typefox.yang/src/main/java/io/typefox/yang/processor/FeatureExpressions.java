@@ -2,7 +2,7 @@ package io.typefox.yang.processor;
 
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
-import io.typefox.yang.processor.ProcessedDataTree.ElementIdentifier;
+import io.typefox.yang.processor.ProcessedDataModel.ElementIdentifier;
 import io.typefox.yang.yang.BinaryOperation;
 import io.typefox.yang.yang.Expression;
 import io.typefox.yang.yang.Feature;
