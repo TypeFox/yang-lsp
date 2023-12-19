@@ -93,6 +93,8 @@ public class YangProcessor {
 			List<String> excludedFeatures) {
 		var evalCtx = new FeatureEvaluationContext(includedFeatures, excludedFeatures);
 		ProcessedDataModel processedModel = new ProcessedDataModel();
+		collectSyntaxErrors(modules.get(0), processedModel);
+
 		modules.forEach((module) -> module.eAllContents().forEachRemaining((ele) -> {
 			if (ele instanceof Deviate) {
 				processDeviate((Deviate) ele, module, processedModel);
@@ -113,6 +115,13 @@ public class YangProcessor {
 		return processedModel;
 	}
 
+	private void collectSyntaxErrors(AbstractModule entryModule, ProcessedDataModel processedModel) {
+		var moduleFile = moduleFileName(entryModule);
+		entryModule.eResource().getErrors().forEach(diagnostic -> {
+			processedModel.addError(moduleFile, diagnostic.getLine(), diagnostic.getColumn(), diagnostic.getMessage());
+		});
+	}
+
 	/*
 	 * The deviates's Substatements: config, default, mandatory, max-elements,
 	 * min-elements, must, type, unique, units. Properties 'must' and 'unique' are
@@ -121,7 +130,7 @@ public class YangProcessor {
 	protected void processDeviate(Deviate deviate, AbstractModule module, ProcessedDataModel processedModel) {
 		var deviation = (Deviation) deviate.eContainer();
 		SchemaNode targetNode = deviation.getReference().getSchemaNode();
-		if(targetNode == null || targetNode.eIsProxy()) {
+		if (targetNode == null || targetNode.eIsProxy()) {
 			processedModel.addError(moduleFileName(module), deviation.getReference(),
 					"Deviation target node not found");
 			return;

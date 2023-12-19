@@ -56,17 +56,23 @@ public class ProcessedDataModel {
 		return null;
 	}
 
-	public void addError(String moduleFile, EObject source, String message) {
+	public void addError(String moduleFile, int line, int col, String message) {
 		var msgEntry = new MessageEntry();
 		msgEntry.moduleFile = moduleFile == null ? "<unknown>" : moduleFile;
-		msgEntry.line = -1;
+		msgEntry.line = line;
+		msgEntry.col = col;
 		msgEntry.severity = Severity.Error;
 		msgEntry.message = message;
+		messages.add(msgEntry);
+	}
+
+	public void addError(String moduleFile, EObject source, String message) {
+		var line = -1;
 		ICompositeNode node = NodeModelUtils.getNode(source);
 		if (node != null) {
-			msgEntry.line = node.getStartLine();
+			line = node.getStartLine();
 		}
-		messages.add(msgEntry);
+		addError(moduleFile, line, -1, message);
 	}
 
 	public List<MessageEntry> getMessages() {
@@ -443,13 +449,13 @@ public class ProcessedDataModel {
 
 	public static class MessageEntry {
 		String moduleFile;
-		int line;
+		int line, col = -1;
 		Severity severity;
 		String message;
 
 		@Override
 		public String toString() {
-			return moduleFile + ":" + line + ": " + severity + ": " + message;
+			return moduleFile + ":" + line + ":" + (col < 0 ? "" : col) + " " + severity + ": " + message;
 		}
 	}
 

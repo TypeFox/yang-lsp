@@ -199,7 +199,7 @@ class DeviationTest extends AbstractYangTest {
 			        }
 			    }
 			}
-		'''.load().root
+		'''.load.root
 
 		val deviateModule = '''
 			module example-deviations {
@@ -251,14 +251,63 @@ class DeviationTest extends AbstractYangTest {
 		val processor = new YangProcessor()
 		val processedData = processor.process(#[mainModule, deviateModule], null, null)
 		assertEquals(4, processedData.messages.size)
-		assertEquals('__synthetic1.yang:18: Error: the "default" property already exists in node "base-test-module:system:user:type"',
+		assertEquals(
+			'__synthetic1.yang:18: Error: the "default" property already exists in node "base-test-module:system:user:type"',
 			processedData.messages.head.toString)
-		assertEquals('__synthetic1.yang:25: Error: the "max-elements" property does not exist in node "base-test-module:system:name-server"',
+		assertEquals(
+			'__synthetic1.yang:25: Error: the "max-elements" property does not exist in node "base-test-module:system:name-server"',
 			processedData.messages.get(1).toString)
-		assertEquals('__synthetic1.yang:32: Error: the "must" property does not exist in node "base-test-module:system"',
+		assertEquals(
+			'__synthetic1.yang:32: Error: the "must" property does not exist in node "base-test-module:system"',
 			processedData.messages.get(2).toString)
 		assertEquals('__synthetic1.yang:41: Error: Deviation target node not found',
 			processedData.messages.get(3).toString)
 	}
 
+	@Test
+	def void testSyntaxErrorsProcessing() {
+
+		val mainModule = '''
+			module base-test-module {
+			    yang-version 1.1;
+			    namespace urn:ietf:params:xml:ns:yang:base-test-module;
+			    prefix base-test-module;
+			
+			    container system {
+			        must "user";
+			
+			        container daytime {
+			            leaf date {
+			                type string;
+			            }
+			        }
+			
+			        le af time {
+			            type string;
+			        }
+			
+			        container user {
+			            leaf type {
+			                default "normal"; // error on "add" cause already exists
+			                type string {
+			                    length "1..10";
+			                }
+			            }
+			        }
+			        leaf-list name-server {
+			            type string;
+			        }
+			    }
+			}
+		'''.loadWithSyntaxErrors().root
+		val processor = new YangProcessor()
+		val processedData = processor.process(#[mainModule], null, null)
+		assertEquals(2, processedData.messages.size)
+		assertEquals(
+			"__synthetic0.yang:15:9 Error: mismatched input 'le' expecting '}'",
+			processedData.messages.head.toString)
+		assertEquals(
+			"__synthetic0.yang:19:9 Error: missing EOF at 'container'",
+			processedData.messages.get(1).toString)
+	}
 }
