@@ -6,6 +6,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
 
+import javax.annotation.Nullable;
+
+import org.eclipse.emf.ecore.EObject;
+import org.eclipse.xtext.nodemodel.ICompositeNode;
 import org.eclipse.xtext.nodemodel.util.NodeModelUtils;
 
 import com.google.common.base.Objects;
@@ -30,6 +34,7 @@ import io.typefox.yang.yang.Typedef;
 public class ProcessedDataModel {
 
 	private List<ModuleData> modules;
+	private List<MessageEntry> messages = new ArrayList<>();
 
 	public void addModule(ModuleData moduleData) {
 		if (modules == null)
@@ -37,8 +42,35 @@ public class ProcessedDataModel {
 		modules.add(moduleData);
 	}
 
+	@Nullable
 	public List<ModuleData> getModules() {
 		return modules;
+	}
+
+	@Nullable
+	public ModuleData getEntryModule() {
+		// TODO pick module by file name
+		if (modules != null && modules.size() > 0) {
+			return modules.get(0);
+		}
+		return null;
+	}
+
+	public void addError(String moduleFile, EObject source, String message) {
+		var msgEntry = new MessageEntry();
+		msgEntry.moduleFile = moduleFile == null ? "<unknown>" : moduleFile;
+		msgEntry.line = -1;
+		msgEntry.severity = Severity.Error;
+		msgEntry.message = message;
+		ICompositeNode node = NodeModelUtils.getNode(source);
+		if (node != null) {
+			msgEntry.line = node.getStartLine();
+		}
+		messages.add(msgEntry);
+	}
+
+	public List<MessageEntry> getMessages() {
+		return messages;
 	}
 
 	public static class HasStatements extends Named {
@@ -409,4 +441,19 @@ public class ProcessedDataModel {
 		}
 	}
 
+	public static class MessageEntry {
+		String moduleFile;
+		int line;
+		Severity severity;
+		String message;
+
+		@Override
+		public String toString() {
+			return moduleFile + ":" + line + ": " + severity + ": " + message;
+		}
+	}
+
+	public static enum Severity {
+		Error, Warning
+	}
 }

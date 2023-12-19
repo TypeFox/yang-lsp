@@ -1,6 +1,7 @@
 package io.typefox.yang.tests.processor;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
 import org.junit.Test;
@@ -27,20 +28,32 @@ public class ProcessorArgParseTest extends AbstractYangTest {
 	public void processHelpArg() {
 		var out = new StringBuilder();
 		YangProcessorApp.parseArgs(out, "--help");
-		assertEquals("Usage: yang-tool [options] <filename>\n" + "  Options:\n" + "    -d, --deviation-module\n"
-				+ "      DISABLED! Use to apply the deviations defined in this file.\n" + "    -X, --exclude-features\n"
-				+ "      Excluded features.\n" + "      Default: []\n" + "    -F, --features\n"
-				+ "      Included features.\n" + "      Default: []\n" + "    -f, --format\n" + "      Output format.\n"
-				+ "      Default: tree\n" + "      Possible Values: [tree, json]\n" + "    --help\n" + "\n"
-				+ "    -p, --path\n" + "      A colon (:) separated list of directories to search for imported \n"
-				+ "      modules. Default is the current directory.\n", out.toString());
+		assertEquals("Usage: yang-tool [options] <filename>\n"
+				+ "  Options:\n"
+				+ "    -d, --deviation-module\n"
+				+ "      DISABLED! Use to apply the deviations defined in this file.\n"
+				+ "    -X, --exclude-features\n"
+				+ "      Excluded features.\n"
+				+ "      Default: []\n"
+				+ "    -F, --features\n"
+				+ "      Included features.\n"
+				+ "      Default: []\n"
+				+ "    -f, --format\n"
+				+ "      Output format.\n"
+				+ "      Possible Values: [tree, json]\n"
+				+ "    --help\n"
+				+ "\n"
+				+ "    -p, --path\n"
+				+ "      A colon (:) separated list of directories to search for imported \n"
+				+ "      modules. Default is the current directory.\n"
+				+ "", out.toString());
 	}
 
 	@Test
 	public void processOnlyRequieredArgs() {
 		var parsed = parseArgs("ietf-system.yang");
 		assertEquals("ietf-system.yang", parsed.module);
-		assertEquals(Format.tree, parsed.format);
+		assertNull(parsed.format);
 	}
 
 	@Test

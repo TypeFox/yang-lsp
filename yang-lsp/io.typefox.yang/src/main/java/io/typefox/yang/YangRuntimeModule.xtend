@@ -13,7 +13,6 @@ import io.typefox.yang.resource.YangCrossReferenceSerializer
 import io.typefox.yang.resource.YangResource
 import io.typefox.yang.resource.YangSerializer
 import io.typefox.yang.resource.YangTokenUtil
-import io.typefox.yang.scoping.QualifiedNameConverter
 import io.typefox.yang.scoping.ResourceDescriptionStrategy
 import io.typefox.yang.scoping.YangResourceDescriptionManager
 import io.typefox.yang.scoping.YangSerializerScopeProvider
@@ -43,6 +42,7 @@ import org.eclipse.xtext.workspace.IProjectConfigProvider
 import org.eclipse.xtext.workspace.ProjectConfigProvider
 import org.eclipse.xtext.serializer.tokens.IValueSerializer
 import io.typefox.yang.resource.YangValueSerializer
+import io.typefox.yang.scoping.YangQualifiedNameConverter
 
 /**
  * Use this class to register components to be used at runtime / without the Equinox extension registry.
@@ -69,7 +69,7 @@ class YangRuntimeModule extends AbstractYangRuntimeModule {
 	}
 
 	def Class<? extends IQualifiedNameConverter> bindIQualifiedNameConverter() {
-		QualifiedNameConverter
+		YangQualifiedNameConverter
 	}
 
 	override bindIValueConverterService() {

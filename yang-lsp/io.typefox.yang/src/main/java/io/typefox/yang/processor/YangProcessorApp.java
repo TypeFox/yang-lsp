@@ -38,7 +38,7 @@ public class YangProcessorApp {
 		public String deviationModule;
 
 		@Parameter(names = { "-f", "--format" }, description = "Output format.")
-		public Format format = Format.tree;
+		public Format format;
 
 		@Parameter(names = { "-p",
 				"--path" }, description = "A colon (:) separated list of directories to search for imported modules. Default is the current directory.")
@@ -91,7 +91,11 @@ public class YangProcessorApp {
 		}
 
 		var output = new StringBuilder();
-		yangProcessor.serialize(processedData, cliArgs.format, output);
+		if(cliArgs.format != null) {
+			yangProcessor.serialize(processedData, cliArgs.format, output);
+		} else {
+			processedData.getMessages().forEach(msg -> output.append(msg.toString()).append(System.lineSeparator()));
+		}
 		System.out.println(output.toString());
 	}
 

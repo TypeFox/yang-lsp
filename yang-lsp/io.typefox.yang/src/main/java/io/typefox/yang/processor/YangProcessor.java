@@ -11,6 +11,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.xtext.naming.DefaultDeclarativeQualifiedNameProvider;
 
 import com.google.common.base.Objects;
 import com.google.common.collect.Lists;
@@ -21,6 +22,7 @@ import io.typefox.yang.processor.ProcessedDataModel.ElementKind;
 import io.typefox.yang.processor.ProcessedDataModel.HasStatements;
 import io.typefox.yang.processor.ProcessedDataModel.ListData;
 import io.typefox.yang.processor.ProcessedDataModel.ModuleData;
+import io.typefox.yang.utils.YangNameUtils;
 import io.typefox.yang.yang.AbstractModule;
 import io.typefox.yang.yang.Action;
 import io.typefox.yang.yang.Augment;
@@ -43,6 +45,7 @@ import io.typefox.yang.yang.Rpc;
 import io.typefox.yang.yang.SchemaNode;
 import io.typefox.yang.yang.Statement;
 import io.typefox.yang.yang.Uses;
+import io.typefox.yang.yang.YangPackage;
 
 public class YangProcessor {
 
@@ -73,8 +76,7 @@ public class YangProcessor {
 	 * @param output        target
 	 */
 	public void serialize(ProcessedDataModel processedData, Format format, StringBuilder output) {
-		// TODO pick module by file name
-		ModuleData moduleData = processedData.getModules().get(0);
+		ModuleData moduleData = processedData.getEntryModule();
 		switch (format) {
 		case json: {
 			new JsonSerializer().serialize(moduleData, output);
@@ -90,10 +92,10 @@ public class YangProcessor {
 	protected ProcessedDataModel processInternal(List<AbstractModule> modules, List<String> includedFeatures,
 			List<String> excludedFeatures) {
 		var evalCtx = new FeatureEvaluationContext(includedFeatures, excludedFeatures);
-		ProcessedDataModel processedDataTree = new ProcessedDataModel();
+		ProcessedDataModel processedModel = new ProcessedDataModel();
 		modules.forEach((module) -> module.eAllContents().forEachRemaining((ele) -> {
 			if (ele instanceof Deviate) {
-				processDeviate((Deviate) ele);
+				processDeviate((Deviate) ele, module, processedModel);
 			} else if (ele instanceof Augment) {
 				processAugment((Augment) ele, module, evalCtx);
 			}
@@ -105,24 +107,40 @@ public class YangProcessor {
 			if (!prefixStatements.isEmpty())
 				prefix = prefixStatements.get(0).getPrefix();
 			var moduleData = new ModuleData(new ElementIdentifier(module.getName(), prefix));
-			processedDataTree.addModule(moduleData);
+			processedModel.addModule(moduleData);
 			processChildren(module, moduleData, evalCtx);
 		});
-		return processedDataTree;
+		return processedModel;
 	}
 
 	/*
 	 * The deviates's Substatements: config, default, mandatory, max-elements,
-	 * min-elements, must, type,unique,units
+	 * min-elements, must, type, unique, units. Properties 'must' and 'unique' are
+	 * 0..n
 	 */
-	protected void processDeviate(Deviate deviate) {
+	protected void processDeviate(Deviate deviate, AbstractModule module, ProcessedDataModel processedModel) {
 		var deviation = (Deviation) deviate.eContainer();
 		SchemaNode targetNode = deviation.getReference().getSchemaNode();
+
 		switch (deviate.getArgument()) {
 		case "add": {
 			for (Statement statement : deviate.getSubstatements()) {
-				var copy = ProcessorUtility.copyEObject(statement);
-				targetNode.getSubstatements().add(copy);
+				boolean error = false;
+				if (statement.eClass() != YangPackage.Literals.MUST && statement.eClass() != YangPackage.Literals.UNIQUE
+						&& statement.eClass() != YangPackage.Literals.UNKNOWN) {
+					var existingProperty = targetNode.getSubstatements().stream()
+							.filter(child -> child.eClass() == statement.eClass()).findFirst();
+					if (existingProperty.isPresent()) {
+						error = true;
+						processedModel.addError(moduleFileName(module), statement,
+								"the \"" + YangNameUtils.getYangName(statement)
+										+ "\" property already exists in node \"" + nodeQName(targetNode) + "\"");
+					}
+				}
+				if (!error) {
+					var copy = ProcessorUtility.copyEObject(statement);
+					targetNode.getSubstatements().add(copy);
+				}
 			}
 			break;
 		}
@@ -132,6 +150,10 @@ public class YangProcessor {
 						.filter(child -> matchingArguments(child, statement)).findFirst();
 				if (existingProperty.isPresent()) {
 					targetNode.getSubstatements().remove(existingProperty.get());
+				} else {
+					processedModel.addError(moduleFileName(module), statement,
+							"the \"" + YangNameUtils.getYangName(statement) + "\" property does not exist in node \""
+									+ nodeQName(targetNode) + "\"");
 				}
 			}
 			break;
@@ -143,6 +165,10 @@ public class YangProcessor {
 					targetNode.getSubstatements().remove(existingProperty.get());
 					var copy = ProcessorUtility.copyEObject(statement);
 					targetNode.getSubstatements().add(copy);
+				} else {
+					processedModel.addError(moduleFileName(module), statement,
+							"the \"" + YangNameUtils.getYangName(statement) + "\" property does not exist in node \""
+									+ nodeQName(targetNode) + "\"");
 				}
 			}
 			break;
@@ -153,6 +179,16 @@ public class YangProcessor {
 			}
 			break;
 		}
+	}
+
+	protected String moduleFileName(AbstractModule module) {
+		return module.eResource().getURI().lastSegment();
+	}
+
+	protected String nodeQName(SchemaNode node) {
+		// TODO use injected version
+		var qName = new DefaultDeclarativeQualifiedNameProvider().getFullyQualifiedName(node);
+		return String.join(":", qName.getSegments());
 	}
 
 	/**
