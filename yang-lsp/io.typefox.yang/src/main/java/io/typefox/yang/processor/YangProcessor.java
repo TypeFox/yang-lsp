@@ -121,7 +121,11 @@ public class YangProcessor {
 	protected void processDeviate(Deviate deviate, AbstractModule module, ProcessedDataModel processedModel) {
 		var deviation = (Deviation) deviate.eContainer();
 		SchemaNode targetNode = deviation.getReference().getSchemaNode();
-
+		if(targetNode == null || targetNode.eIsProxy()) {
+			processedModel.addError(moduleFileName(module), deviation.getReference(),
+					"Deviation target node not found");
+			return;
+		}
 		switch (deviate.getArgument()) {
 		case "add": {
 			for (Statement statement : deviate.getSubstatements()) {

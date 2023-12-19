@@ -240,19 +240,25 @@ class DeviationTest extends AbstractYangTest {
 			            must "time";
 			        }
 			    }
+			
+			    // missing target node
+			    deviation /base:system/base:missing {
+			        deviate not-supported;
+			    }
 			}
 		'''.load().root
-		mainModule.assertNoErrors;
-		deviateModule.assertNoErrors;
+
 		val processor = new YangProcessor()
 		val processedData = processor.process(#[mainModule, deviateModule], null, null)
-		assertEquals(3, processedData.messages.size)
+		assertEquals(4, processedData.messages.size)
 		assertEquals('__synthetic1.yang:18: Error: the "default" property already exists in node "base-test-module:system:user:type"',
 			processedData.messages.head.toString)
 		assertEquals('__synthetic1.yang:25: Error: the "max-elements" property does not exist in node "base-test-module:system:name-server"',
 			processedData.messages.get(1).toString)
 		assertEquals('__synthetic1.yang:32: Error: the "must" property does not exist in node "base-test-module:system"',
 			processedData.messages.get(2).toString)
+		assertEquals('__synthetic1.yang:41: Error: Deviation target node not found',
+			processedData.messages.get(3).toString)
 	}
 
 }
