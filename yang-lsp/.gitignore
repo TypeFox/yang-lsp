@@ -4,3 +4,4 @@ bin/
 xtend-gen/
 xtext-gen/
 YangFlexer.java*
+/eyang_repository/

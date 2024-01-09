@@ -16,11 +16,13 @@ class DataTreeSerializer {
 			  «FOR child : moduleData.getChildren?:#[]»
 			  	«doSerialize(child, '', needsConnect(child, moduleData.getChildren))»
 			  «ENDFOR»
+			«IF moduleData.getRpcs !== null»
 			
 			  rpcs:
-			    «FOR rpc : moduleData.getRpcs?:#[]»
+			    «FOR rpc : moduleData.getRpcs»
 			    	«doSerialize(rpc, '', needsConnect(rpc, moduleData.getRpcs))»
 			    «ENDFOR»
+			«ENDIF»
 		'''
 	}
 

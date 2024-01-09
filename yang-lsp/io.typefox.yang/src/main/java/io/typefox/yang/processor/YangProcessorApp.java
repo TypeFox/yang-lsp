@@ -91,7 +91,7 @@ public class YangProcessorApp {
 		}
 
 		var output = new StringBuilder();
-		if(cliArgs.format != null) {
+		if (cliArgs.format != null) {
 			yangProcessor.serialize(processedData, cliArgs.format, output);
 		} else {
 			processedData.getMessages().forEach(msg -> output.append(msg.toString()).append(System.lineSeparator()));
@@ -113,34 +113,36 @@ public class YangProcessorApp {
 		var moduleResource = rs.createResource(URI.createFileURI(moduleFile.getAbsolutePath()));
 
 		// add files from the current directory
-		var implicitLookup = moduleFile.getAbsoluteFile().getParentFile();
+		var implicitLookup = new File("").getAbsoluteFile();
 		var extensionProvider = injector.getInstance(FileExtensionProvider.class);
 		var fileExts = Collections.singleton("yang");
 		if (extensionProvider != null && extensionProvider.getFileExtensions() != null) {
 			if (!extensionProvider.getFileExtensions().isEmpty())
 				fileExts = extensionProvider.getFileExtensions();
 		}
-		loadAdditionalFiles(implicitLookup, rs, fileExts);
+		loadAdditionalFiles(implicitLookup, rs, fileExts, false);
 
 		// handle --path argument
 		if (paths != null) {
 			for (String path : paths) {
 				var folder = new File(path);
-				if (!folder.isDirectory()) {
-					System.err.println(folder.getAbsolutePath() + " is not a directory. Skipped.");
-				} else {
-					loadAdditionalFiles(folder.getAbsoluteFile(), rs, fileExts);
-				}
+				if (!folder.exists()) {
+					System.err.println("Path " + folder.getAbsolutePath() + " doesn't exist. Skipped.");
+				} else if (!folder.isDirectory()) {
+					System.err.println("Path " + folder.getAbsolutePath() + " is not a directory. Skipped.");
+				} 
+				loadAdditionalFiles(folder.getAbsoluteFile(), rs, fileExts, true);
 			}
 		}
 
 		// load models
 		moduleResource.load(rs.getLoadOptions());
-		EcoreUtil.resolveAll(moduleResource);
 
 		// Collect all contained modules
 		var modules = new ArrayList<AbstractModule>();
 		for (Resource res : rs.getResources()) {
+			// Resolve all proxies. Otherwise resolving might fail when copying EObjects
+			EcoreUtil.resolveAll(res);
 			var rootObj = res.getContents().get(0);
 			if (rootObj instanceof AbstractModule) {
 				modules.add((AbstractModule) rootObj);
@@ -149,11 +151,17 @@ public class YangProcessorApp {
 		return modules;
 	}
 
-	private static void loadAdditionalFiles(File parent, XtextResourceSet rs, Set<String> fileExtensions) {
+	private static void loadAdditionalFiles(File parent, XtextResourceSet rs, Set<String> fileExtensions,
+			final boolean recursive) {
 		for (File file : parent.listFiles()) {
 			URI fileURI = URI.createFileURI(file.getAbsolutePath());
 			if (file.isFile() && fileExtensions.contains(fileURI.fileExtension())) {
-				rs.getResource(fileURI, true);
+				if(rs.getResource(fileURI, false) == null) {
+					rs.getResource(fileURI, true);
+				}
+			}
+			if (recursive && file.isDirectory()) { // TODO allow to disable with --no-path-recurse argument
+				loadAdditionalFiles(file, rs, fileExtensions, recursive);
 			}
 		}
 	}
