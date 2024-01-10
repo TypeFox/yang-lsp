@@ -48,15 +48,6 @@ public class ProcessedDataModel {
 		return modules;
 	}
 
-	@Nullable
-	public ModuleData getEntryModule() {
-		// TODO pick module by file name
-		if (modules != null && modules.size() > 0) {
-			return modules.get(0);
-		}
-		return null;
-	}
-
 	public void addError(String moduleFile, int line, int col, String message, boolean processorError) {
 		var msgEntry = new MessageEntry();
 		msgEntry.moduleFile = moduleFile == null ? "<unknown>" : moduleFile;
@@ -181,11 +172,13 @@ public class ProcessedDataModel {
 	}
 
 	public static class ModuleData extends HasStatements {
+		private transient String uri;
+		
+		private List<HasStatements> rpcs;
+
 		public ModuleData(ElementIdentifier name) {
 			super(name);
 		}
-
-		private List<HasStatements> rpcs;
 
 		public void addToRpcs(ElementData rpc) {
 			if (rpcs == null)
@@ -195,6 +188,14 @@ public class ProcessedDataModel {
 
 		public List<HasStatements> getRpcs() {
 			return rpcs;
+		}
+
+		public void setURI(String uri) {
+			this.uri = uri;
+		}
+		
+		public String getUri() {
+			return uri;
 		}
 	}
 

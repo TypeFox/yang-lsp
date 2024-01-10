@@ -30,8 +30,8 @@ public class YangProcessorApp {
 		@Parameter(names = "--help", help = true, description = "Print a short help text.")
 		private boolean help;
 
-		@Parameter(description = "<filename>", required = true)
-		public String module;
+		@Parameter(description = "<file...>", required = true)
+		public List<String> modules = newArrayList();
 
 		@Parameter(names = { "-d",
 				"--deviation-module" }, description = "DISABLED! Use to apply the deviations defined in this file.")
@@ -77,11 +77,11 @@ public class YangProcessorApp {
 		List<AbstractModule> modules = null;
 		try {
 			var pathes = cliArgs.path != null ? cliArgs.path.split(":") : null;
-			modules = loadModuleFileAndDependencies(cliArgs.module, cliArgs.noPathRecurse, pathes);
+			modules = loadModuleFileAndDependencies(cliArgs.modules, cliArgs.noPathRecurse, pathes);
 		} catch (IOException e) {
 			String msg = e.getMessage();
 			if (msg == null) {
-				msg = "An exception occured when loading file: " + cliArgs.module;
+				msg = "An exception occured when loading module files: " + String.join(", ", cliArgs.modules);
 			}
 			System.err.println(msg);
 			System.exit(11);
@@ -89,33 +89,47 @@ public class YangProcessorApp {
 		var processedData = yangProcessor.process(modules, cliArgs.includedFeatures, cliArgs.excludedFeatures);
 
 		if (processedData == null || processedData.getModules() == null) {
-			String msg = "No module found in file: " + (cliArgs.module == null ? "<empty>" : cliArgs.module);
+			String msg = "No modules found in files: " + String.join(", ", cliArgs.modules);
 			System.err.println(msg);
 			System.exit(23);
 		}
 
 		var output = new StringBuilder();
-		processedData.getLoadingErrors().forEachRemaining(msg -> output.append(msg.toString()).append(System.lineSeparator()));
+		processedData.getLoadingErrors()
+				.forEachRemaining(msg -> output.append(msg.toString()).append(System.lineSeparator()));
 		if (cliArgs.format != null) {
-			yangProcessor.serialize(processedData, cliArgs.format, output);
+			for (var module : processedData.getModules()) {
+				if (cliArgs.modules.stream().anyMatch(file -> module.getUri().endsWith(file.trim()))) {
+					yangProcessor.serialize(module, cliArgs.format, output);
+				}
+			}
 		} else {
-			processedData.getProcessingErrors().forEachRemaining(msg -> output.append(msg.toString()).append(System.lineSeparator()));
+			processedData.getProcessingErrors()
+					.forEachRemaining(msg -> output.append(msg.toString()).append(System.lineSeparator()));
 		}
 		System.out.println(output.toString());
 	}
 
-	private static List<AbstractModule> loadModuleFileAndDependencies(String moduleFilePath, Boolean noPathRecurse,
-			String... paths) throws IOException {
+	private static List<AbstractModule> loadModuleFileAndDependencies(List<String> moduleFilePath,
+			Boolean noPathRecurse, String... paths) throws IOException {
 		var injector = new YangStandaloneSetup().createInjectorAndDoEMFRegistration();
-		var moduleFile = new File(moduleFilePath);
-		if (!moduleFile.exists()) {
-			throw new IOException(
-					"File " + moduleFilePath + " doesn't exists in directory " + moduleFile.getAbsolutePath());
-		}
 
+		var moduleResources = new ArrayList<Resource>(moduleFilePath.size());
 		var rs = injector.getInstance(XtextResourceSet.class);
-		// add main module as first resource
-		var moduleResource = rs.createResource(URI.createFileURI(moduleFile.getAbsolutePath()));
+
+		for (String path : moduleFilePath) {
+			var moduleFile = new File(path);
+			if (!moduleFile.exists()) {
+				throw new IOException(
+						"File " + path + " doesn't exists.");
+			} else if (!moduleFile.isFile()) {
+				throw new IOException("File " + path + " is not a file.");
+
+			} else {
+				// add main modules as first resources
+				moduleResources.add(rs.createResource(URI.createFileURI(moduleFile.getAbsolutePath())));
+			}
+		}
 
 		// add files from the current directory
 		var implicitLookup = new File("").getAbsoluteFile();
@@ -141,7 +155,9 @@ public class YangProcessorApp {
 		}
 
 		// load models
-		moduleResource.load(rs.getLoadOptions());
+		for (Resource res : moduleResources) {
+			res.load(rs.getLoadOptions());
+		}
 
 		// Collect all contained modules
 		var modules = new ArrayList<AbstractModule>();

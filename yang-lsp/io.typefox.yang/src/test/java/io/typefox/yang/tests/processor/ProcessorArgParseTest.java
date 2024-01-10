@@ -28,7 +28,7 @@ public class ProcessorArgParseTest extends AbstractYangTest {
 	public void processHelpArg() {
 		var out = new StringBuilder();
 		YangProcessorApp.parseArgs(out, "--help");
-		assertEquals("Usage: yang-tool [options] <filename>\n"
+		assertEquals("Usage: yang-tool [options] <file...>\n"
 				+ "  Options:\n"
 				+ "    -d, --deviation-module\n"
 				+ "      DISABLED! Use to apply the deviations defined in this file.\n"
@@ -56,7 +56,7 @@ public class ProcessorArgParseTest extends AbstractYangTest {
 	@Test
 	public void processOnlyRequieredArgs() {
 		var parsed = parseArgs("ietf-system.yang");
-		assertEquals("ietf-system.yang", parsed.module);
+		assertEquals("ietf-system.yang", parsed.modules.get(0));
 		assertNull(parsed.format);
 	}
 
@@ -64,8 +64,16 @@ public class ProcessorArgParseTest extends AbstractYangTest {
 	public void processMainArgs() {
 		var parsed = parseArgs("-f", "tree", "ietf-system.yang", "--deviation-module", "example-system-ext.yang");
 		assertEquals(Format.tree, parsed.format);
-		assertEquals("ietf-system.yang", parsed.module);
+		assertEquals("ietf-system.yang", parsed.modules.get(0));
 		assertEquals("example-system-ext.yang", parsed.deviationModule);
+	}
+	
+	@Test
+	public void processMultipleInputFiles() {
+		var parsed = parseArgs("-f", "tree", "ietf-system.yang", "ietf-system2.yang");
+		assertEquals(Format.tree, parsed.format);
+		assertEquals("ietf-system.yang", parsed.modules.get(0));
+		assertEquals("ietf-system2.yang", parsed.modules.get(1));
 	}
 
 	@Test

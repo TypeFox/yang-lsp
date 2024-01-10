@@ -71,12 +71,11 @@ public class YangProcessor {
 	}
 
 	/**
-	 * @param processedData data to serialize
+	 * @param moduleData data to serialize
 	 * @param format        tree or json. tree is default
 	 * @param output        target
 	 */
-	public void serialize(ProcessedDataModel processedData, Format format, StringBuilder output) {
-		ModuleData moduleData = processedData.getEntryModule();
+	public void serialize(ModuleData moduleData, Format format, StringBuilder output) {
 		switch (format) {
 		case json: {
 			new JsonSerializer().serialize(moduleData, output);
@@ -109,6 +108,7 @@ public class YangProcessor {
 			if (!prefixStatements.isEmpty())
 				prefix = prefixStatements.get(0).getPrefix();
 			var moduleData = new ModuleData(new ElementIdentifier(module.getName(), prefix));
+			moduleData.setURI(module.eResource().getURI().toString());
 			processedModel.addModule(moduleData);
 			processChildren(module, moduleData, evalCtx);
 		});
