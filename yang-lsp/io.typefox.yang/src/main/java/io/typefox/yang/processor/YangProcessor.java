@@ -72,8 +72,8 @@ public class YangProcessor {
 
 	/**
 	 * @param moduleData data to serialize
-	 * @param format        tree or json. tree is default
-	 * @param output        target
+	 * @param format     tree or json. tree is default
+	 * @param output     target
 	 */
 	public void serialize(ModuleData moduleData, Format format, StringBuilder output) {
 		switch (format) {
@@ -118,7 +118,8 @@ public class YangProcessor {
 	private void collectResourceErrors(AbstractModule entryModule, ProcessedDataModel processedModel) {
 		var moduleFile = moduleFileName(entryModule);
 		entryModule.eResource().getErrors().forEach(diagnostic -> {
-			processedModel.addError(moduleFile, diagnostic.getLine(), diagnostic.getColumn(), diagnostic.getMessage(), false);
+			processedModel.addError(moduleFile, diagnostic.getLine(), diagnostic.getColumn(), diagnostic.getMessage(),
+					false);
 		});
 	}
 
@@ -179,9 +180,14 @@ public class YangProcessor {
 					var copy = ProcessorUtility.copyEObject(statement);
 					targetNode.getSubstatements().add(copy);
 				} else {
-					processedModel.addProcessorError(moduleFileName(module), statement,
-							"the \"" + YangNameUtils.getYangName(statement) + "\" property does not exist in node \""
-									+ nodeQName(targetNode) + "\"");
+					if (statement.eClass() == YangPackage.Literals.CONFIG) {
+						// config could be inherited from parent or be default = true
+						targetNode.getSubstatements().add(ProcessorUtility.copyEObject(statement));
+					} else {
+						processedModel.addProcessorError(moduleFileName(module), statement,
+								"the \"" + YangNameUtils.getYangName(statement)
+										+ "\" property does not exist in node \"" + nodeQName(targetNode) + "\"");
+					}
 				}
 			}
 			break;

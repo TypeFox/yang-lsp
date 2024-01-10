@@ -32,10 +32,10 @@ public class YangProcessorApp {
 
 		@Parameter(description = "<file...>", required = true)
 		public List<String> modules = newArrayList();
-
-		@Parameter(names = { "-d",
-				"--deviation-module" }, description = "DISABLED! Use to apply the deviations defined in this file.")
-		public String deviationModule;
+//
+//		@Parameter(names = { "-d",
+//				"--deviation-module" }, description = "DISABLED! Use to apply the deviations defined in this file.")
+//		public String deviationModule;
 
 		@Parameter(names = { "-f", "--format" }, description = "Output format.")
 		public Format format;

@@ -30,8 +30,6 @@ public class ProcessorArgParseTest extends AbstractYangTest {
 		YangProcessorApp.parseArgs(out, "--help");
 		assertEquals("Usage: yang-tool [options] <file...>\n"
 				+ "  Options:\n"
-				+ "    -d, --deviation-module\n"
-				+ "      DISABLED! Use to apply the deviations defined in this file.\n"
 				+ "    -X, --exclude-features\n"
 				+ "      Excluded features.\n"
 				+ "      Default: []\n"
@@ -62,10 +60,9 @@ public class ProcessorArgParseTest extends AbstractYangTest {
 
 	@Test
 	public void processMainArgs() {
-		var parsed = parseArgs("-f", "tree", "ietf-system.yang", "--deviation-module", "example-system-ext.yang");
+		var parsed = parseArgs("-f", "tree", "ietf-system.yang");
 		assertEquals(Format.tree, parsed.format);
 		assertEquals("ietf-system.yang", parsed.modules.get(0));
-		assertEquals("example-system-ext.yang", parsed.deviationModule);
 	}
 	
 	@Test
