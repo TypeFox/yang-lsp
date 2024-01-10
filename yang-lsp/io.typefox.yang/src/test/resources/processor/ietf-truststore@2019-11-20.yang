@@ -20,9 +20,9 @@ module ietf-truststore {
 
   contact
     "WG Web  : <http://datatracker.ietf.org/wg/netconf/>
-     WG List : <mailto:netconf@ietf.org>
-     Author  : Kent Watsen <kent+ietf@watsen.net>
-     Author  : Henk Birkholz <henk.birkholz@sit.fraunhofer.de>";
+     WG List : <mailto:mail@domain.xyz>
+     Author  : Kent Watsen <kent+mail@domain.xyz>
+     Author  : Henk Birkholz <mail@domain.xyz>";
 
   description
     "This module defines a truststore to centralize management

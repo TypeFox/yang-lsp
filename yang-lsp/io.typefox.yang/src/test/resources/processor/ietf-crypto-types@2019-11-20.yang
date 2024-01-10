@@ -37,9 +37,9 @@ module ietf-crypto-types {
 
   contact
     "WG Web:   <http://datatracker.ietf.org/wg/netconf/>
-     WG List:  <mailto:netconf@ietf.org>
-     Author:   Kent Watsen <mailto:kent+ietf@watsen.net>
-     Author:   Wang Haiguang <wang.haiguang.shieldlab@huawei.com>";
+     WG List:  <mailto:mail@domain.xyz>
+     Author:   Kent Watsen <mailto:kent+mail@domain.xyz>
+     Author:   Wang Haiguang <mail@domain.xyz>";
 
   description
     "This module defines common YANG types for cryptographic

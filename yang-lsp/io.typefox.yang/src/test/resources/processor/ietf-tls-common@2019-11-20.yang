@@ -8,9 +8,9 @@ module ietf-tls-common {
 
   contact
     "WG Web:   <http://datatracker.ietf.org/wg/netconf/>
-     WG List:  <mailto:netconf@ietf.org>
-     Author:   Kent Watsen <mailto:kent+ietf@watsen.net>
-     Author:   Gary Wu <mailto:garywu@cisco.com>";
+     WG List:  <mailto:mail@domain.xyz>
+     Author:   Kent Watsen <mailto:kent+mail@domain.xyz>
+     Author:   Gary Wu <mailto:mail@domain.xyz>";
 
    description
     "This module defines a common features, identities, and

@@ -13,13 +13,13 @@ module ietf-netconf-acm {
 
   contact
     "WG Web:   <https://datatracker.ietf.org/wg/netconf/>
-     WG List:  <mailto:netconf@ietf.org>
+     WG List:  <mailto:mail@domain.xyz>
 
      Author:   Andy Bierman
-               <mailto:andy@yumaworks.com>
+               <mailto:mail@domain.xyz>
 
      Author:   Martin Bjorklund
-               <mailto:mbj@tail-f.com>";
+               <mailto:mail@domain.xyz>";
 
   description
     "Network Configuration Access Control Model.

@@ -12,7 +12,7 @@ module iana-crypt-hash {
              United States
 
      Tel:    +1 310 301 5800
-     E-Mail: iana@iana.org>";
+     E-Mail: mail@domain.xyz>";
   description
     "This YANG module defines a type for storing passwords
      using a hash function and features to indicate which hash
@@ -22,7 +22,7 @@ module iana-crypt-hash {
      the IANA web site.
 
      Requests for new values should be made to IANA via
-     email (iana@iana.org).
+     email (mail@domain.xyz).
 
      Copyright (c) 2014 IETF Trust and the persons identified as
      authors of the code.  All rights reserved.

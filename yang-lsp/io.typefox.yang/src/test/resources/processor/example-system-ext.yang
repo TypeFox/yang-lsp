@@ -213,7 +213,7 @@ module example-system-ext {
            The Attribute value can contain control characters if its an escaped
              double digit hex number.
              Examples could be
-               UID=nobody@example.com,DC=example,DC=com
+               UID=mail@domain.xyz,DC=example,DC=com
                  CN=John Smith,OU=Sales,O=ACME Limited,L=Moab,ST=Utah,C=US";
         reference
           "RFC 4512 Lightweight Directory Access Protocol (LDAP):
