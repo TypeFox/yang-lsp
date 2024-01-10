@@ -27,7 +27,7 @@ public class YangProcessorApp {
 
 	public static class Args {
 
-		@Parameter(names = "--help", help = true)
+		@Parameter(names = "--help", help = true, description = "Print a short help text.")
 		private boolean help;
 
 		@Parameter(description = "<filename>", required = true)
@@ -43,6 +43,10 @@ public class YangProcessorApp {
 		@Parameter(names = { "-p",
 				"--path" }, description = "A colon (:) separated list of directories to search for imported modules. Default is the current directory.")
 		public String path;
+
+		@Parameter(names = {
+				"--no-path-recurse" }, description = "If this parameter is given, directories in the search path are not recursively scanned for modules.")
+		public boolean noPathRecurse = false;
 
 		@Parameter(names = { "-F", "--features" }, description = "Included features.")
 		public List<String> includedFeatures = newArrayList();
@@ -73,7 +77,7 @@ public class YangProcessorApp {
 		List<AbstractModule> modules = null;
 		try {
 			var pathes = cliArgs.path != null ? cliArgs.path.split(":") : null;
-			modules = loadModuleFileAndDependencies(cliArgs.module, pathes);
+			modules = loadModuleFileAndDependencies(cliArgs.module, cliArgs.noPathRecurse, pathes);
 		} catch (IOException e) {
 			String msg = e.getMessage();
 			if (msg == null) {
@@ -99,8 +103,8 @@ public class YangProcessorApp {
 		System.out.println(output.toString());
 	}
 
-	private static List<AbstractModule> loadModuleFileAndDependencies(String moduleFilePath, String... paths)
-			throws IOException {
+	private static List<AbstractModule> loadModuleFileAndDependencies(String moduleFilePath, Boolean noPathRecurse,
+			String... paths) throws IOException {
 		var injector = new YangStandaloneSetup().createInjectorAndDoEMFRegistration();
 		var moduleFile = new File(moduleFilePath);
 		if (!moduleFile.exists()) {
@@ -130,8 +134,8 @@ public class YangProcessorApp {
 					System.err.println("Path " + folder.getAbsolutePath() + " doesn't exist. Skipped.");
 				} else if (!folder.isDirectory()) {
 					System.err.println("Path " + folder.getAbsolutePath() + " is not a directory. Skipped.");
-				} 
-				loadAdditionalFiles(folder.getAbsoluteFile(), rs, fileExts, true);
+				}
+				loadAdditionalFiles(folder.getAbsoluteFile(), rs, fileExts, !noPathRecurse);
 			}
 		}
 
@@ -156,11 +160,11 @@ public class YangProcessorApp {
 		for (File file : parent.listFiles()) {
 			URI fileURI = URI.createFileURI(file.getAbsolutePath());
 			if (file.isFile() && fileExtensions.contains(fileURI.fileExtension())) {
-				if(rs.getResource(fileURI, false) == null) {
+				if (rs.getResource(fileURI, false) == null) {
 					rs.getResource(fileURI, true);
 				}
 			}
-			if (recursive && file.isDirectory()) { // TODO allow to disable with --no-path-recurse argument
+			if (recursive && file.isDirectory()) {
 				loadAdditionalFiles(file, rs, fileExtensions, recursive);
 			}
 		}
