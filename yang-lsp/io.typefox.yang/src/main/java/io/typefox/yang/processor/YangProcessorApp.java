@@ -95,10 +95,11 @@ public class YangProcessorApp {
 		}
 
 		var output = new StringBuilder();
+		processedData.getLoadingErrors().forEachRemaining(msg -> output.append(msg.toString()).append(System.lineSeparator()));
 		if (cliArgs.format != null) {
 			yangProcessor.serialize(processedData, cliArgs.format, output);
 		} else {
-			processedData.getMessages().forEach(msg -> output.append(msg.toString()).append(System.lineSeparator()));
+			processedData.getProcessingErrors().forEachRemaining(msg -> output.append(msg.toString()).append(System.lineSeparator()));
 		}
 		System.out.println(output.toString());
 	}

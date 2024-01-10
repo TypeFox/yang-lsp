@@ -93,7 +93,7 @@ public class YangProcessor {
 			List<String> excludedFeatures) {
 		var evalCtx = new FeatureEvaluationContext(includedFeatures, excludedFeatures);
 		ProcessedDataModel processedModel = new ProcessedDataModel();
-		collectSyntaxErrors(modules.get(0), processedModel);
+		collectResourceErrors(modules.get(0), processedModel);
 
 		modules.forEach((module) -> module.eAllContents().forEachRemaining((ele) -> {
 			if (ele instanceof Deviate) {
@@ -115,10 +115,10 @@ public class YangProcessor {
 		return processedModel;
 	}
 
-	private void collectSyntaxErrors(AbstractModule entryModule, ProcessedDataModel processedModel) {
+	private void collectResourceErrors(AbstractModule entryModule, ProcessedDataModel processedModel) {
 		var moduleFile = moduleFileName(entryModule);
 		entryModule.eResource().getErrors().forEach(diagnostic -> {
-			processedModel.addError(moduleFile, diagnostic.getLine(), diagnostic.getColumn(), diagnostic.getMessage());
+			processedModel.addError(moduleFile, diagnostic.getLine(), diagnostic.getColumn(), diagnostic.getMessage(), false);
 		});
 	}
 
@@ -131,7 +131,7 @@ public class YangProcessor {
 		var deviation = (Deviation) deviate.eContainer();
 		SchemaNode targetNode = deviation.getReference().getSchemaNode();
 		if (targetNode == null || targetNode.eIsProxy()) {
-			processedModel.addError(moduleFileName(module), deviation.getReference(),
+			processedModel.addProcessorError(moduleFileName(module), deviation.getReference(),
 					"Deviation target node not found");
 			return;
 		}
@@ -145,7 +145,7 @@ public class YangProcessor {
 							.filter(child -> child.eClass() == statement.eClass()).findFirst();
 					if (existingProperty.isPresent()) {
 						error = true;
-						processedModel.addError(moduleFileName(module), statement,
+						processedModel.addProcessorError(moduleFileName(module), statement,
 								"the \"" + YangNameUtils.getYangName(statement)
 										+ "\" property already exists in node \"" + nodeQName(targetNode) + "\"");
 					}
@@ -164,7 +164,7 @@ public class YangProcessor {
 				if (existingProperty.isPresent()) {
 					targetNode.getSubstatements().remove(existingProperty.get());
 				} else {
-					processedModel.addError(moduleFileName(module), statement,
+					processedModel.addProcessorError(moduleFileName(module), statement,
 							"the \"" + YangNameUtils.getYangName(statement) + "\" property does not exist in node \""
 									+ nodeQName(targetNode) + "\"");
 				}
@@ -179,7 +179,7 @@ public class YangProcessor {
 					var copy = ProcessorUtility.copyEObject(statement);
 					targetNode.getSubstatements().add(copy);
 				} else {
-					processedModel.addError(moduleFileName(module), statement,
+					processedModel.addProcessorError(moduleFileName(module), statement,
 							"the \"" + YangNameUtils.getYangName(statement) + "\" property does not exist in node \""
 									+ nodeQName(targetNode) + "\"");
 				}

@@ -3,6 +3,7 @@ package io.typefox.yang.processor;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
 
@@ -56,29 +57,38 @@ public class ProcessedDataModel {
 		return null;
 	}
 
-	public void addError(String moduleFile, int line, int col, String message) {
+	public void addError(String moduleFile, int line, int col, String message, boolean processorError) {
 		var msgEntry = new MessageEntry();
 		msgEntry.moduleFile = moduleFile == null ? "<unknown>" : moduleFile;
 		msgEntry.line = line;
 		msgEntry.col = col;
 		msgEntry.severity = Severity.Error;
 		msgEntry.message = message;
+		msgEntry.loadingError = !processorError;
 		messages.add(msgEntry);
 	}
 
-	public void addError(String moduleFile, EObject source, String message) {
+	public void addProcessorError(String moduleFile, EObject source, String message) {
 		var line = -1;
 		ICompositeNode node = NodeModelUtils.getNode(source);
 		if (node != null) {
 			line = node.getStartLine();
 		}
-		addError(moduleFile, line, -1, message);
+		addError(moduleFile, line, -1, message, true);
 	}
 
+	public Iterator<MessageEntry> getLoadingErrors() {
+		return messages.stream().filter(msg -> msg.loadingError).iterator();
+	}
+
+	public Iterator<MessageEntry> getProcessingErrors() {
+		return messages.stream().filter(msg -> !msg.loadingError).iterator();
+	}
+	
 	public List<MessageEntry> getMessages() {
 		return messages;
 	}
-
+	
 	public static class HasStatements extends Named {
 
 		public HasStatements(ElementIdentifier id) {
@@ -448,6 +458,7 @@ public class ProcessedDataModel {
 	}
 
 	public static class MessageEntry {
+		boolean loadingError;
 		String moduleFile;
 		int line, col = -1;
 		Severity severity;
@@ -462,4 +473,5 @@ public class ProcessedDataModel {
 	public static enum Severity {
 		Error, Warning
 	}
+
 }
