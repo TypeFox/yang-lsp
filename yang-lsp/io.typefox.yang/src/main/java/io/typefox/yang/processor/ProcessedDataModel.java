@@ -75,11 +75,11 @@ public class ProcessedDataModel {
 	public Iterator<MessageEntry> getProcessingErrors() {
 		return messages.stream().filter(msg -> !msg.loadingError).iterator();
 	}
-	
+
 	public List<MessageEntry> getMessages() {
 		return messages;
 	}
-	
+
 	public static class HasStatements extends Named {
 
 		public HasStatements(ElementIdentifier id) {
@@ -173,7 +173,7 @@ public class ProcessedDataModel {
 
 	public static class ModuleData extends HasStatements {
 		private transient String uri;
-		
+
 		private List<HasStatements> rpcs;
 
 		public ModuleData(ElementIdentifier name) {
@@ -193,7 +193,7 @@ public class ProcessedDataModel {
 		public void setURI(String uri) {
 			this.uri = uri;
 		}
-		
+
 		public String getUri() {
 			return uri;
 		}
@@ -250,6 +250,29 @@ public class ProcessedDataModel {
 		}
 	}
 
+	static public enum Status {
+		current("+"), obsolete("o"), deprecated("x");
+
+		private String label;
+
+		Status(String label) {
+			this.label = label;
+		}
+
+		@Override
+		public String toString() {
+			return label;
+		}
+
+		static Status toStatus(String name) {
+			try {
+				return valueOf(name);
+			} catch (IllegalArgumentException e) {
+			}
+			return current;
+		}
+	}
+
 	public static class ElementData extends HasStatements {
 
 		final ElementKind elementKind;
@@ -257,6 +280,7 @@ public class ProcessedDataModel {
 		private List<String> featureConditions;
 		private AccessKind accessKind = AccessKind.not_set;
 		Cardinality cardinality;
+		Status status;
 
 		transient private SchemaNode origin;
 
@@ -346,6 +370,8 @@ public class ProcessedDataModel {
 					}
 					var exprAsString = ProcessorUtility.serializedXpath(((Must) sub).getConstraint());
 					this.mustConstraint.add(exprAsString);
+				} else if (sub instanceof io.typefox.yang.yang.Status) {
+					this.status = Status.toStatus(((io.typefox.yang.yang.Status) sub).getArgument());
 				}
 			});
 		}
