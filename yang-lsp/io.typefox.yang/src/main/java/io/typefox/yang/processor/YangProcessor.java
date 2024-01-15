@@ -192,6 +192,11 @@ public class YangProcessor {
 			}
 			break;
 		case "not-supported":
+			if (targetNode.eContainer() == null) {
+				processedModel.addProcessorError(moduleFileName(module), deviation.getReference(),
+						"Deviation target node has no apparent.");
+				break;
+			}
 			Object eGet = targetNode.eContainer().eGet(targetNode.eContainingFeature(), true);
 			if (eGet instanceof EList) {
 				((EList<?>) eGet).remove(targetNode);

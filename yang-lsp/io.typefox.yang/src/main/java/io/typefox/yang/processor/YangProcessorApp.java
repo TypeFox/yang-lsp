@@ -139,7 +139,9 @@ public class YangProcessorApp {
 			if (!extensionProvider.getFileExtensions().isEmpty())
 				fileExts = extensionProvider.getFileExtensions();
 		}
-		loadAdditionalFiles(implicitLookup, rs, fileExts, false);
+		if(implicitLookup.canRead() && implicitLookup.isDirectory()) {
+			loadAdditionalFiles(implicitLookup, rs, fileExts, false);
+		}
 
 		// handle --path argument
 		if (paths != null) {
@@ -149,8 +151,9 @@ public class YangProcessorApp {
 					System.err.println("Path " + folder.getAbsolutePath() + " doesn't exist. Skipped.");
 				} else if (!folder.isDirectory()) {
 					System.err.println("Path " + folder.getAbsolutePath() + " is not a directory. Skipped.");
+				} else {
+					loadAdditionalFiles(folder.getAbsoluteFile(), rs, fileExts, !noPathRecurse);
 				}
-				loadAdditionalFiles(folder.getAbsoluteFile(), rs, fileExts, !noPathRecurse);
 			}
 		}
 
@@ -174,14 +177,18 @@ public class YangProcessorApp {
 
 	private static void loadAdditionalFiles(File parent, XtextResourceSet rs, Set<String> fileExtensions,
 			final boolean recursive) {
-		for (File file : parent.listFiles()) {
+		File[] files = parent.listFiles();
+		if(files == null) {
+			return;
+		}
+		for (File file : files) {
 			URI fileURI = URI.createFileURI(file.getAbsolutePath());
 			if (file.isFile() && fileExtensions.contains(fileURI.fileExtension())) {
 				if (rs.getResource(fileURI, false) == null) {
 					rs.getResource(fileURI, true);
 				}
 			}
-			if (recursive && file.isDirectory()) {
+			if (recursive && file.canRead() && file.isDirectory()) {
 				loadAdditionalFiles(file, rs, fileExtensions, recursive);
 			}
 		}
