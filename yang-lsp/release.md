@@ -10,3 +10,4 @@
 - Go to [OSS Staging Repository](https://oss.sonatype.org/#stagingRepositories) and __Close__ -> __Release__ the staging yang repositories
 - Check the released version inside the [maven repo](https://repo1.maven.org/maven2/io/typefox/yang/)
 - Check if dependent projects (yang-vscode) need to be updated
+- Switch to master. Change gradle version to next snapshot e.g. 0.5.1-SNAPSHOT and commit.
