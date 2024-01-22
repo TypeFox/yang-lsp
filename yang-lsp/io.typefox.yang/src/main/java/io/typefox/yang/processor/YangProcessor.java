@@ -136,7 +136,8 @@ public class YangProcessor {
 					"Deviation target node not found");
 			return;
 		}
-		switch (deviate.getArgument()) {
+		final String argument = deviate.getArgument();
+		switch (argument) {
 		case "add": {
 			for (Statement statement : deviate.getSubstatements()) {
 				boolean error = false;
@@ -193,12 +194,15 @@ public class YangProcessor {
 			break;
 		case "not-supported":
 			if (targetNode.eContainer() == null) {
-				processedModel.addProcessorError(moduleFileName(module), deviation.getReference(),
-						"Deviation target node has no apparent.");
+				if (!Objects.equal("not-supported", DeviationAdapter.find(targetNode))) {
+					processedModel.addProcessorError(moduleFileName(module), deviation.getReference(),
+							"Deviation target node has no parent.");
+				}
 				break;
 			}
 			Object eGet = targetNode.eContainer().eGet(targetNode.eContainingFeature(), true);
 			if (eGet instanceof EList) {
+				DeviationAdapter.add(targetNode, argument);
 				((EList<?>) eGet).remove(targetNode);
 			}
 			break;
@@ -367,6 +371,31 @@ public class YangProcessor {
 
 		public String toString() {
 			return moduleId.toString();
+		}
+	}
+
+	public static class DeviationAdapter extends AdapterImpl {
+		final String argument;
+
+		public DeviationAdapter(String argument) {
+			this.argument = argument;
+		}
+
+		public static String find(EObject eObject) {
+			for (Adapter adapter : eObject.eAdapters()) {
+				if (adapter instanceof DeviationAdapter) {
+					return ((DeviationAdapter) adapter).argument;
+				}
+			}
+			return null;
+		}
+
+		public static void add(EObject eObject, String argument) {
+			eObject.eAdapters().add(new DeviationAdapter(argument));
+		}
+
+		public String toString() {
+			return "Deviated with: " + argument;
 		}
 	}
 }
