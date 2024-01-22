@@ -2,6 +2,7 @@ package io.typefox.yang.processor;
 
 import static com.google.common.collect.Lists.newArrayList;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.eclipse.emf.common.notify.Adapter;
@@ -93,14 +94,18 @@ public class YangProcessor {
 		var evalCtx = new FeatureEvaluationContext(includedFeatures, excludedFeatures);
 		ProcessedDataModel processedModel = new ProcessedDataModel();
 		collectResourceErrors(modules.get(0), processedModel);
-
+		List<Deviate> deviations = new ArrayList<>();
+		List<Augment> augments = new ArrayList<>();
 		modules.forEach((module) -> module.eAllContents().forEachRemaining((ele) -> {
 			if (ele instanceof Deviate) {
-				processDeviate((Deviate) ele, module, processedModel);
+				deviations.add((Deviate) ele);
 			} else if (ele instanceof Augment) {
-				processAugment((Augment) ele, module, evalCtx);
+				augments.add((Augment) ele);
 			}
 		}));
+		
+		deviations.forEach(dev -> processDeviate(dev, processedModel));
+		augments.forEach(augm -> processAugment(augm, evalCtx));
 
 		modules.forEach((module) -> {
 			String prefix = null;
@@ -128,11 +133,13 @@ public class YangProcessor {
 	 * min-elements, must, type, unique, units. Properties 'must' and 'unique' are
 	 * 0..n
 	 */
-	protected void processDeviate(Deviate deviate, AbstractModule module, ProcessedDataModel processedModel) {
+	protected void processDeviate(Deviate deviate, ProcessedDataModel processedModel) {
+		var moduleFileName = moduleFileName(deviate);
 		var deviation = (Deviation) deviate.eContainer();
 		SchemaNode targetNode = deviation.getReference().getSchemaNode();
+
 		if (targetNode == null || targetNode.eIsProxy()) {
-			processedModel.addProcessorError(moduleFileName(module), deviation.getReference(),
+			processedModel.addProcessorError(moduleFileName, deviation.getReference(),
 					"Deviation target node not found");
 			return;
 		}
@@ -147,7 +154,7 @@ public class YangProcessor {
 							.filter(child -> child.eClass() == statement.eClass()).findFirst();
 					if (existingProperty.isPresent()) {
 						error = true;
-						processedModel.addProcessorError(moduleFileName(module), statement,
+						processedModel.addProcessorError(moduleFileName, statement,
 								"the \"" + YangNameUtils.getYangName(statement)
 										+ "\" property already exists in node \"" + nodeQName(targetNode) + "\"");
 					}
@@ -166,7 +173,7 @@ public class YangProcessor {
 				if (existingProperty.isPresent()) {
 					targetNode.getSubstatements().remove(existingProperty.get());
 				} else {
-					processedModel.addProcessorError(moduleFileName(module), statement,
+					processedModel.addProcessorError(moduleFileName, statement,
 							"the \"" + YangNameUtils.getYangName(statement) + "\" property does not exist in node \""
 									+ nodeQName(targetNode) + "\"");
 				}
@@ -185,7 +192,7 @@ public class YangProcessor {
 						// config could be inherited from parent or be default = true
 						targetNode.getSubstatements().add(ProcessorUtility.copyEObject(statement));
 					} else {
-						processedModel.addProcessorError(moduleFileName(module), statement,
+						processedModel.addProcessorError(moduleFileName, statement,
 								"the \"" + YangNameUtils.getYangName(statement)
 										+ "\" property does not exist in node \"" + nodeQName(targetNode) + "\"");
 					}
@@ -195,7 +202,7 @@ public class YangProcessor {
 		case "not-supported":
 			if (targetNode.eContainer() == null) {
 				if (!Objects.equal("not-supported", DeviationAdapter.find(targetNode))) {
-					processedModel.addProcessorError(moduleFileName(module), deviation.getReference(),
+					processedModel.addProcessorError(moduleFileName, deviation.getReference(),
 							"Deviation target node has no parent.");
 				}
 				break;
@@ -209,8 +216,8 @@ public class YangProcessor {
 		}
 	}
 
-	protected String moduleFileName(AbstractModule module) {
-		return module.eResource().getURI().lastSegment();
+	protected String moduleFileName(EObject eObj) {
+		return eObj.eResource().getURI().lastSegment();
 	}
 
 	protected String nodeQName(SchemaNode node) {
@@ -249,14 +256,14 @@ public class YangProcessor {
 		return true;
 	}
 
-	protected void processAugment(Augment augment, AbstractModule module, FeatureEvaluationContext evalCtx) {
+	protected void processAugment(Augment augment, FeatureEvaluationContext evalCtx) {
 		List<IfFeature> ifFeatures = ProcessorUtility.findIfFeatures(augment);
 		boolean featuresMatch = ProcessorUtility.checkIfFeatures(ifFeatures, evalCtx);
 		// disabled by feature
 		if (!featuresMatch) {
 			return;
 		}
-		var globalModuleId = ProcessorUtility.moduleIdentifier(module);
+		var globalModuleId = ProcessorUtility.moduleIdentifier(augment);
 
 		augment.getSubstatements().stream().filter(sub -> !(sub instanceof IfFeature)).forEach((subStatement) -> {
 			// TODO check what can be added

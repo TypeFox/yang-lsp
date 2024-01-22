@@ -6,6 +6,7 @@ import io.typefox.yang.tests.AbstractYangTest
 import org.junit.Test
 
 import static org.junit.Assert.assertEquals
+import io.typefox.yang.processor.DataTreeSerializer
 
 class DeviationTest extends AbstractYangTest {
 
@@ -303,11 +304,45 @@ class DeviationTest extends AbstractYangTest {
 		val processor = new YangProcessor()
 		val processedData = processor.process(#[mainModule], null, null)
 		assertEquals(2, processedData.messages.size)
-		assertEquals(
-			"__synthetic0.yang:15:9 Error: mismatched input 'le' expecting '}'",
+		assertEquals("__synthetic0.yang:15:9 Error: mismatched input 'le' expecting '}'",
 			processedData.messages.head.toString)
-		assertEquals(
-			"__synthetic0.yang:19:9 Error: missing EOF at 'container'",
-			processedData.messages.get(1).toString)
+		assertEquals("__synthetic0.yang:19:9 Error: missing EOF at 'container'", processedData.messages.get(1).toString)
+	}
+
+	@Test
+	def void testDeviateAugmentedNode() {
+
+		val mainModule = '''
+			module base-test-module {
+			    yang-version 1.1;
+			    namespace yang:base-test-module;
+			    prefix btm;
+			
+			    container system {
+			        leaf simple-leaf {
+			            type string;
+			        }
+			    }
+			
+			    augment "/btm:system" {
+			        container encrypted-private-key {
+			            leaf encrypted-key {
+			                type string;
+			            }
+			        }
+			    }
+			
+			    deviation "/system/encrypted-private-key" {
+			        deviate not-supported;
+			    }
+			}
+		'''.loadWithSyntaxErrors().root
+		val processor = new YangProcessor()
+		val processedData = processor.process(#[mainModule], null, null)
+		assertEquals('''
+		module: base-test-module
+		  +--rw system
+		     +--rw simple-leaf?   string
+		'''.toString, new DataTreeSerializer().serialize(processedData.modules.get(0)).toString)
 	}
 }
