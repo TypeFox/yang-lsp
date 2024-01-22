@@ -301,7 +301,8 @@ public class YangProcessor {
 			} else if (ele instanceof Action) {
 				child = new ElementData((SchemaNode) ele, ElementKind.Action);
 			} else if (ele instanceof Grouping) {
-				child = new ElementData((SchemaNode) ele, ElementKind.Grouping);
+				// Don't add grouping definitions to the output
+				// child = new ElementData((SchemaNode) ele, ElementKind.Grouping);
 			} else if (ele instanceof Uses) {
 				/*
 				 * The effect of a "uses" reference to a grouping is that the nodes defined by

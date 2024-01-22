@@ -1,11 +1,12 @@
 package io.typefox.yang.tests.processor
 
+import io.typefox.yang.processor.DataTreeSerializer
+import io.typefox.yang.processor.JsonSerializer
 import io.typefox.yang.processor.YangProcessor
 import io.typefox.yang.tests.AbstractYangTest
 import org.junit.Test
 
 import static org.junit.Assert.assertEquals
-import io.typefox.yang.processor.DataTreeSerializer
 
 class TreeSerializerTest extends AbstractYangTest {
 
@@ -137,6 +138,69 @@ class TreeSerializerTest extends AbstractYangTest {
 		     +---n certificate-expiration
 		        +-- expiration-date   string
 		'''.toString, tree)
+	}
+	@Test
+	def void testGrouping() {
+
+		val mainModule = '''
+			module base-test-module {
+			    yang-version 1.1;
+			    namespace urn:ietf:params:xml:ns:yang:base-test-module;
+			    prefix base-test-module;
+			
+			    container system {
+			        leaf simple-leaf {
+			            type string;
+			        }
+			    }
+			    grouping grouping-name {
+			        leaf leaf-name {
+			            type string;
+			        }
+			    }
+			}
+		'''.load.root
+
+		val processor = new YangProcessor()
+		val processedData = processor.process(#[mainModule], null, null)
+		val module = processedData.modules.get(0)
+		val tree = new DataTreeSerializer().serialize(module).toString
+		assertEquals('''
+		module: base-test-module
+		  +--rw system
+		     +--rw simple-leaf?   string
+		'''.toString, tree)
+		
+		assertEquals('''
+		{
+		  "children": [
+		    {
+		      "elementKind": "Container",
+		      "accessKind": "rw",
+		      "cardinality": "not_set",
+		      "children": [
+		        {
+		          "elementKind": "Leaf",
+		          "type": {
+		            "name": "string"
+		          },
+		          "accessKind": "rw",
+		          "cardinality": "optional",
+		          "id": {
+		            "name": "simple-leaf"
+		          }
+		        }
+		      ],
+		      "id": {
+		        "name": "system"
+		      }
+		    }
+		  ],
+		  "id": {
+		    "name": "base-test-module",
+		    "prefix": "base-test-module"
+		  }
+		}'''.toString, new JsonSerializer().serialize(module).toString)
 	}
 
 }
