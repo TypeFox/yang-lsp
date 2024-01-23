@@ -310,7 +310,7 @@ class DeviationTest extends AbstractYangTest {
 	}
 
 	@Test
-	def void testDeviateAugmentedNode() {
+	def void testDeviateAugmentedNode_01() {
 
 		val mainModule = '''
 			module base-test-module {
@@ -345,4 +345,5 @@ class DeviationTest extends AbstractYangTest {
 		     +--rw simple-leaf?   string
 		'''.toString, new DataTreeSerializer().serialize(processedData.modules.get(0)).toString)
 	}
+
 }

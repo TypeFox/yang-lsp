@@ -4,7 +4,9 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
+import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
 import org.eclipse.xtext.EcoreUtil2;
@@ -103,6 +105,7 @@ public class ProcessorUtility {
 					// store text information. e.g. to serialize XPath
 					createCopy.eAdapters().add((CompositeNodeWithSemanticElement) node);
 				}
+				eObject.eAdapters().add(new CopiedObjectAdapter(createCopy));
 				return createCopy;
 			}
 		};
@@ -112,7 +115,7 @@ public class ProcessorUtility {
 	}
 
 	public static String serializedXpath(XpathExpression reference) {
-		if(reference == null) {
+		if (reference == null) {
 			return null;
 		}
 		// TODO use serializer or implement a an own simple one
@@ -130,4 +133,21 @@ public class ProcessorUtility {
 		return "leafref";
 	}
 
+	public static class CopiedObjectAdapter extends AdapterImpl {
+		final EObject copy;
+
+		public CopiedObjectAdapter(EObject copy) {
+			this.copy = copy;
+		}
+
+		public EObject getCopy() {
+			return copy;
+		}
+
+		public static Stream<CopiedObjectAdapter> findAll(EObject eObject) {
+			return eObject.eAdapters().stream().filter(a -> a instanceof CopiedObjectAdapter)
+					.map(a -> ((CopiedObjectAdapter) a));
+		}
+
+	}
 }

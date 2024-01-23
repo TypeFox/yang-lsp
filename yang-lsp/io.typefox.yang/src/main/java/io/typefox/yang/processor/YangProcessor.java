@@ -23,6 +23,7 @@ import io.typefox.yang.processor.ProcessedDataModel.ElementKind;
 import io.typefox.yang.processor.ProcessedDataModel.HasStatements;
 import io.typefox.yang.processor.ProcessedDataModel.ListData;
 import io.typefox.yang.processor.ProcessedDataModel.ModuleData;
+import io.typefox.yang.processor.ProcessorUtility.CopiedObjectAdapter;
 import io.typefox.yang.utils.YangNameUtils;
 import io.typefox.yang.yang.AbstractModule;
 import io.typefox.yang.yang.Action;
@@ -103,9 +104,9 @@ public class YangProcessor {
 				augments.add((Augment) ele);
 			}
 		}));
-		
-		deviations.forEach(dev -> processDeviate(dev, processedModel));
+
 		augments.forEach(augm -> processAugment(augm, evalCtx));
+		deviations.forEach(dev -> processDeviate(dev, processedModel));
 
 		modules.forEach((module) -> {
 			String prefix = null;
@@ -207,12 +208,19 @@ public class YangProcessor {
 				}
 				break;
 			}
-			Object eGet = targetNode.eContainer().eGet(targetNode.eContainingFeature(), true);
-			if (eGet instanceof EList) {
-				DeviationAdapter.add(targetNode, argument);
-				((EList<?>) eGet).remove(targetNode);
-			}
+			removeFromContainer(targetNode);
+			DeviationAdapter.add(targetNode, argument);
 			break;
+		}
+	}
+
+	private void removeFromContainer(EObject objToRemove) {
+		if (objToRemove.eContainer() != null) {
+			Object eGet = objToRemove.eContainer().eGet(objToRemove.eContainingFeature(), true);
+			if (eGet instanceof EList) {
+				((EList<?>) eGet).remove(objToRemove);
+			}
+			CopiedObjectAdapter.findAll(objToRemove).forEach(adapter -> removeFromContainer(adapter.getCopy()));
 		}
 	}
 
