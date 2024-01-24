@@ -30,6 +30,7 @@ import io.typefox.yang.processor.ProcessedDataModel.HasStatements;
 import io.typefox.yang.processor.ProcessedDataModel.ListData;
 import io.typefox.yang.processor.ProcessedDataModel.ModuleData;
 import io.typefox.yang.processor.ProcessorUtility.CopiedObjectAdapter;
+import io.typefox.yang.processor.ProcessorUtility.InsideUsesMutationAdapter;
 import io.typefox.yang.utils.YangNameUtils;
 import io.typefox.yang.yang.AbstractModule;
 import io.typefox.yang.yang.Action;
@@ -111,7 +112,6 @@ public class YangProcessor {
 				deviations.add((Deviate) ele);
 			} else if (ele instanceof Augment) {
 				// don't process augments that are parts of grouping or uses statement.
-				// Also ignore augments inside action outputs, as it not clear how to deal with that
 				if (EcoreUtil2.getContainerOfType(ele, Uses.class) == null
 						&& EcoreUtil2.getContainerOfType(ele, Grouping.class) == null) {
 					augments.add((Augment) ele);
@@ -170,8 +170,15 @@ public class YangProcessor {
 		nodesToAdd.addAll(ProcessorUtility.copyAllEObjects(grouping.getSubstatements().stream()
 				.filter(ele -> ProcessorUtility.isEnabled(ele, evalCtx)).collect(Collectors.toList())));
 		// uses nodes
-		nodesToAdd.addAll(ProcessorUtility.copyAllEObjects(uses.getSubstatements().stream()
-				.filter(ele -> ProcessorUtility.isEnabled(ele, evalCtx)).collect(Collectors.toList())));
+		nodesToAdd.addAll(ProcessorUtility.copyAllEObjects(
+				uses.getSubstatements().stream().filter(ele -> ProcessorUtility.isEnabled(ele, evalCtx)).map(ele -> {
+					if (ele.eClass() == YangPackage.Literals.AUGMENT) {
+						// mark as `uses` children. As mutations should only be applied to copied
+						// children
+						ele.eAdapters().add(InsideUsesMutationAdapter.create());
+					}
+					return ele;
+				}).collect(Collectors.toList())));
 		if (uses.eContainer() instanceof Statement) {
 			Statement parent = (Statement) uses.eContainer();
 			parent.getSubstatements().addAll(parent.getSubstatements().indexOf(uses), nodesToAdd);
@@ -278,7 +285,7 @@ public class YangProcessor {
 			if (eGet instanceof EList && EcoreUtil2.getContainerOfType(objToRemove, Uses.class) == null) {
 				((EList<?>) eGet).remove(objToRemove);
 			}
-			
+
 		}
 		Iterator<CopiedObjectAdapter> iterator = CopiedObjectAdapter.findAll(objToRemove).iterator();
 		if (iterator.hasNext()) {
@@ -335,18 +342,7 @@ public class YangProcessor {
 		}
 
 		SchemaNode schemaNode = augment.getPath().getSchemaNode();
-		for (Statement st : augment.getSubstatements()) {
-			if(st.eClass() == YangPackage.Literals.CONTAINER) {
-				if(((Container)st).getName().equals("encrypted-private-key1")) {
-					
-					System.out.println("YangProcessor.processAugment()" + schemaNode.getName());
-					if(EcoreUtil2.getContainerOfType(augment, Augment.class) == null) {
-						return;
-					}
-				}
-			}
-		}
-		Set<SchemaNode> targetNodeAndCopies = collectCopies(schemaNode, new LinkedHashSet<>());
+		Set<SchemaNode> targetNodeAndCopies = collectCopies(schemaNode, augment, new LinkedHashSet<>());
 
 		if (targetNodeAndCopies.size() > 0) {
 			processAugments(targetNodeAndCopies, augment);
@@ -355,10 +351,14 @@ public class YangProcessor {
 		}
 	}
 
-	protected Set<SchemaNode> collectCopies(SchemaNode schemaNode, Set<SchemaNode> collector) {
+	protected Set<SchemaNode> collectCopies(SchemaNode schemaNode, Augment augmen, Set<SchemaNode> collector) {
 		CopiedObjectAdapter.findAll(schemaNode).map(a -> ((SchemaNode) a.getCopy())).forEach(copy -> {
-			collector.add(copy);
-			collectCopies(copy, collector);
+			if (!InsideUsesMutationAdapter.find(augmen) || Objects.equal(augmen.eContainer().eClass(), copy.eContainer().eClass())) {
+				// augment and the target node need to be in the same hierarchy, defined by a
+				// potential `uses` expansion.
+				collector.add(copy);
+			}
+			collectCopies(copy, augmen, collector);
 		});
 
 		return collector;
@@ -497,4 +497,5 @@ public class YangProcessor {
 			return "Deviated with: " + argument;
 		}
 	}
+
 }

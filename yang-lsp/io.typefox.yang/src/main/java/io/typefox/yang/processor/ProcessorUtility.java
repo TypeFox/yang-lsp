@@ -6,6 +6,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
 import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.util.EcoreUtil.Copier;
@@ -19,6 +20,7 @@ import io.typefox.yang.processor.ProcessedDataModel.ElementIdentifier;
 import io.typefox.yang.processor.YangProcessor.ForeignModuleAdapter;
 import io.typefox.yang.utils.YangExtensions;
 import io.typefox.yang.yang.AbstractModule;
+import io.typefox.yang.yang.Augment;
 import io.typefox.yang.yang.IfFeature;
 import io.typefox.yang.yang.OtherStatement;
 import io.typefox.yang.yang.Prefix;
@@ -105,7 +107,21 @@ public class ProcessorUtility {
 					// store text information. e.g. to serialize XPath
 					createCopy.eAdapters().add((CompositeNodeWithSemanticElement) node);
 				}
+				
+				EObject origin = OriginElementAdapter.find(eObject);
+				if (origin == null) {
+					origin = eObject;
+				}
+				// trace origin reference
+				createCopy.eAdapters().add(OriginElementAdapter.create(origin));
+				
+				// trace created copy in the source
 				eObject.eAdapters().add(new CopiedObjectAdapter(createCopy));
+				
+				if (eObject instanceof Augment && InsideUsesMutationAdapter.find(eObject)) {
+					// propagate marker to copies
+					createCopy.eAdapters().add(InsideUsesMutationAdapter.create());
+				}
 				return createCopy;
 			}
 		};
@@ -133,6 +149,41 @@ public class ProcessorUtility {
 		return "leafref";
 	}
 
+	/**
+	 * 
+	 * <p>
+	 * Adapter holds a reference to the origin object.
+	 * </p>
+	 * This adapter is added to copied objects only and currently only used for better debugging.
+	 */
+	public static class OriginElementAdapter extends AdapterImpl {
+		private final EObject origin;
+
+		public OriginElementAdapter(EObject origin) {
+			this.origin = origin;
+		}
+
+		public static OriginElementAdapter create(EObject origin) {
+			return new OriginElementAdapter(origin);
+		}
+
+		public static EObject find(EObject eObj) {
+			for (Adapter adapter : eObj.eAdapters()) {
+				if (adapter instanceof OriginElementAdapter) {
+					return ((OriginElementAdapter) adapter).origin;
+				}
+			}
+			return null;
+		}
+	}
+
+	/**
+	 * <p>
+	 * Adapter that marks an object being copied. The copy of this object being made
+	 * is the adapter's <code>copy</code> field.
+	 * </p>
+	 * according to the "refine" and "augment" statements.
+	 */
 	public static class CopiedObjectAdapter extends AdapterImpl {
 		final EObject copy;
 
@@ -150,4 +201,30 @@ public class ProcessorUtility {
 		}
 
 	}
+
+	/**
+	 * <p>
+	 * Marks an augment that was inside a uses xyz {} block.
+	 * </p>
+	 * 
+	 * 
+	 * The effect of a "uses" reference to a grouping is that the nodes defined by
+	 * the grouping are copied into the current schema tree and are then updated
+	 * 
+	 */
+	public static class InsideUsesMutationAdapter extends AdapterImpl {
+		public static InsideUsesMutationAdapter create() {
+			return new InsideUsesMutationAdapter();
+		}
+
+		public static boolean find(EObject eObj) {
+			for (Adapter adapter : eObj.eAdapters()) {
+				if (adapter instanceof InsideUsesMutationAdapter) {
+					return true;
+				}
+			}
+			return false;
+		}
+	}
+
 }

@@ -45,11 +45,11 @@ class TreeSerializerTest extends AbstractYangTest {
 		val processedData = processor.process(#[mainModule], null, null)
 		val tree = new DataTreeSerializer().serialize(processedData.modules.get(0)).toString
 		assertEquals('''
-		module: base-test-module
-		  +--rw system
-		     +--rw simple-leaf?   string
-		     x--ro deprecated-leaf?   string
-		     o--ro obsolete-leaf?   string
+			module: base-test-module
+			  +--rw system
+			     +--rw simple-leaf?   string
+			     x--ro deprecated-leaf?   string
+			     o--ro obsolete-leaf?   string
 		'''.toString, tree)
 	}
 
@@ -97,16 +97,17 @@ class TreeSerializerTest extends AbstractYangTest {
 		val processedData = processor.process(#[mainModule], null, null)
 		val tree = new DataTreeSerializer().serialize(processedData.modules.get(0)).toString
 		assertEquals('''
-		module: base-test-module
-		  +--rw system
-		     +--rw sw-version* [product-number product-revision]
-		     |  +--rw product-number   string
-		     |  +--rw product-revision   string
-		     +--rw additional-info* []
-		        +--rw name   string
-		        +--rw value   string
+			module: base-test-module
+			  +--rw system
+			     +--rw sw-version* [product-number product-revision]
+			     |  +--rw product-number   string
+			     |  +--rw product-revision   string
+			     +--rw additional-info* []
+			        +--rw name   string
+			        +--rw value   string
 		'''.toString, tree)
 	}
+
 	@Test
 	def void testNotification() {
 
@@ -133,12 +134,13 @@ class TreeSerializerTest extends AbstractYangTest {
 		val processedData = processor.process(#[mainModule], null, null)
 		val tree = new DataTreeSerializer().serialize(processedData.modules.get(0)).toString
 		assertEquals('''
-		module: base-test-module
-		  +--rw system
-		     +---n certificate-expiration
-		        +-- expiration-date   string
+			module: base-test-module
+			  +--rw system
+			     +---n certificate-expiration
+			        +-- expiration-date   string
 		'''.toString, tree)
 	}
+
 	@Test
 	def void testGrouping() {
 
@@ -166,11 +168,11 @@ class TreeSerializerTest extends AbstractYangTest {
 		val module = processedData.modules.get(0)
 		val tree = new DataTreeSerializer().serialize(module).toString
 		assertEquals('''
-		module: base-test-module
-		  +--rw system
-		     +--rw simple-leaf?   string
+			module: base-test-module
+			  +--rw system
+			     +--rw simple-leaf?   string
 		'''.toString, tree)
-		
+
 		assertEquals('''
 		{
 		  "children": [
@@ -203,4 +205,46 @@ class TreeSerializerTest extends AbstractYangTest {
 		}'''.toString, new JsonSerializer().serialize(module).toString)
 	}
 
+	@Test
+	def void testActionOutput() {
+
+		val mainModule = '''
+			module test-module {
+			    yang-version 1.1;
+			    namespace urn:ietf:params:xml:ns:yang:test-module;
+			    prefix test-module;
+			
+			    container container-name {
+			        action simple-action {
+			            input {
+			                leaf name {
+			                    type string;
+			                    mandatory true;
+			                }
+			            }
+			            output {
+			                leaf result {
+			                    type string;
+			                }
+			            }
+			        }
+			    }
+			}
+		'''.load.root
+
+		val processor = new YangProcessor()
+		val processedData = processor.process(#[mainModule], null, null)
+		val module = processedData.modules.get(0)
+		val tree = new DataTreeSerializer().serialize(module).toString
+		assertEquals('''
+			module: test-module
+			  +--rw container-name
+			     +---x simple-action
+			        +---w input
+			        |  +---w name   string
+			        +--ro output
+			           +--ro result?   string
+		'''.toString, tree)
+
+	}
 }
