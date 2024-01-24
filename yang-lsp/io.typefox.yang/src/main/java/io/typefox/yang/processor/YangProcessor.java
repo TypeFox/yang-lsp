@@ -3,7 +3,12 @@ package io.typefox.yang.processor;
 import static com.google.common.collect.Lists.newArrayList;
 
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.eclipse.emf.common.notify.Adapter;
 import org.eclipse.emf.common.notify.impl.AdapterImpl;
@@ -12,6 +17,7 @@ import org.eclipse.emf.ecore.EObject;
 import org.eclipse.emf.ecore.EReference;
 import org.eclipse.emf.ecore.EStructuralFeature;
 import org.eclipse.emf.ecore.util.EcoreUtil;
+import org.eclipse.xtext.EcoreUtil2;
 import org.eclipse.xtext.naming.DefaultDeclarativeQualifiedNameProvider;
 
 import com.google.common.base.Objects;
@@ -95,13 +101,21 @@ public class YangProcessor {
 		var evalCtx = new FeatureEvaluationContext(includedFeatures, excludedFeatures);
 		ProcessedDataModel processedModel = new ProcessedDataModel();
 		collectResourceErrors(modules.get(0), processedModel);
+
+		modules.forEach((module) -> expandUses(module, evalCtx));
+
 		List<Deviate> deviations = new ArrayList<>();
 		List<Augment> augments = new ArrayList<>();
 		modules.forEach((module) -> module.eAllContents().forEachRemaining((ele) -> {
 			if (ele instanceof Deviate) {
 				deviations.add((Deviate) ele);
 			} else if (ele instanceof Augment) {
-				augments.add((Augment) ele);
+				// don't process augments that are parts of grouping or uses statement.
+				// Also ignore augments inside action outputs, as it not clear how to deal with that
+				if (EcoreUtil2.getContainerOfType(ele, Uses.class) == null
+						&& EcoreUtil2.getContainerOfType(ele, Grouping.class) == null) {
+					augments.add((Augment) ele);
+				}
 			}
 		}));
 
@@ -119,6 +133,50 @@ public class YangProcessor {
 			processChildren(module, moduleData, evalCtx);
 		});
 		return processedModel;
+	}
+
+	private void expandUses(AbstractModule module, FeatureEvaluationContext evalCtx) {
+		module.eContents().forEach((ele) -> {
+			expandUses(ele, evalCtx);
+		});
+	}
+
+	private void expandUses(EObject eObj, FeatureEvaluationContext evalCtx) {
+		if (eObj.eClass() == YangPackage.Literals.USES) {
+			if (EcoreUtil2.getContainerOfType(eObj, Grouping.class) != null) {
+				// ignore uses inside a grouping as it will be processed, when the group is used
+			} else {
+				expandUses((Uses) eObj, evalCtx);
+			}
+		} else {
+			eObj.eContents().forEach(e -> expandUses(e, evalCtx));
+		}
+	}
+
+	private void expandUses(Uses uses, FeatureEvaluationContext evalCtx) {
+		if (!ProcessorUtility.isEnabled(uses, evalCtx)) {
+			return;
+		}
+		GroupingRef groupingRef = uses.getGrouping();
+		Grouping grouping = groupingRef.getNode();
+		ForeignModuleAdapter adapted = ForeignModuleAdapter.find(uses);
+		if (adapted != null) {
+			ForeignModuleAdapter moduleAdapter = new ForeignModuleAdapter(adapted.moduleId);
+			// used groupings are bound to the namespace of the current module
+			grouping.eAdapters().add(moduleAdapter);
+		}
+		List<Statement> nodesToAdd = newArrayList();
+		// grouping nodes
+		nodesToAdd.addAll(ProcessorUtility.copyAllEObjects(grouping.getSubstatements().stream()
+				.filter(ele -> ProcessorUtility.isEnabled(ele, evalCtx)).collect(Collectors.toList())));
+		// uses nodes
+		nodesToAdd.addAll(ProcessorUtility.copyAllEObjects(uses.getSubstatements().stream()
+				.filter(ele -> ProcessorUtility.isEnabled(ele, evalCtx)).collect(Collectors.toList())));
+		if (uses.eContainer() instanceof Statement) {
+			Statement parent = (Statement) uses.eContainer();
+			parent.getSubstatements().addAll(parent.getSubstatements().indexOf(uses), nodesToAdd);
+			nodesToAdd.forEach(eObj -> expandUses(eObj, evalCtx));
+		}
 	}
 
 	private void collectResourceErrors(AbstractModule entryModule, ProcessedDataModel processedModel) {
@@ -217,10 +275,14 @@ public class YangProcessor {
 	private void removeFromContainer(EObject objToRemove) {
 		if (objToRemove.eContainer() != null) {
 			Object eGet = objToRemove.eContainer().eGet(objToRemove.eContainingFeature(), true);
-			if (eGet instanceof EList) {
+			if (eGet instanceof EList && EcoreUtil2.getContainerOfType(objToRemove, Uses.class) == null) {
 				((EList<?>) eGet).remove(objToRemove);
 			}
-			CopiedObjectAdapter.findAll(objToRemove).forEach(adapter -> removeFromContainer(adapter.getCopy()));
+			
+		}
+		Iterator<CopiedObjectAdapter> iterator = CopiedObjectAdapter.findAll(objToRemove).iterator();
+		if (iterator.hasNext()) {
+			iterator.forEachRemaining(adapter -> removeFromContainer(adapter.getCopy()));
 		}
 	}
 
@@ -271,30 +333,64 @@ public class YangProcessor {
 		if (!featuresMatch) {
 			return;
 		}
-		var globalModuleId = ProcessorUtility.moduleIdentifier(augment);
 
-		augment.getSubstatements().stream().filter(sub -> !(sub instanceof IfFeature)).forEach((subStatement) -> {
-			// TODO check what can be added
-			if (subStatement instanceof SchemaNode) {
-				SchemaNode copy = ProcessorUtility.copyEObject((SchemaNode) subStatement);
-				// add augment's feature conditions to copied augment children
-				copy.getSubstatements().addAll(ProcessorUtility.copyAllEObjects(ifFeatures));
-
-				// memorize source module information as adapter
-				copy.eAdapters().add(new ForeignModuleAdapter(globalModuleId));
-
-				// Remove same named existing node
-				var existing = augment.getPath().getSchemaNode().getSubstatements().stream().filter((statement) -> {
-					if (statement instanceof SchemaNode) {
-						return copy.getName().equals(((SchemaNode) statement).getName());
+		SchemaNode schemaNode = augment.getPath().getSchemaNode();
+		for (Statement st : augment.getSubstatements()) {
+			if(st.eClass() == YangPackage.Literals.CONTAINER) {
+				if(((Container)st).getName().equals("encrypted-private-key1")) {
+					
+					System.out.println("YangProcessor.processAugment()" + schemaNode.getName());
+					if(EcoreUtil2.getContainerOfType(augment, Augment.class) == null) {
+						return;
 					}
-					return false;
-				}).findFirst();
-				if (existing.isPresent()) {
-					augment.getPath().getSchemaNode().getSubstatements().remove(existing.get());
 				}
-				augment.getPath().getSchemaNode().getSubstatements().add(copy);
 			}
+		}
+		Set<SchemaNode> targetNodeAndCopies = collectCopies(schemaNode, new LinkedHashSet<>());
+
+		if (targetNodeAndCopies.size() > 0) {
+			processAugments(targetNodeAndCopies, augment);
+		} else {
+			processAugments(newArrayList(schemaNode), augment);
+		}
+	}
+
+	protected Set<SchemaNode> collectCopies(SchemaNode schemaNode, Set<SchemaNode> collector) {
+		CopiedObjectAdapter.findAll(schemaNode).map(a -> ((SchemaNode) a.getCopy())).forEach(copy -> {
+			collector.add(copy);
+			collectCopies(copy, collector);
+		});
+
+		return collector;
+	}
+
+	protected void processAugments(Collection<SchemaNode> targets, Augment source) {
+		var globalModuleId = ProcessorUtility.moduleIdentifier(source);
+		List<IfFeature> ifFeatures = ProcessorUtility.findIfFeatures(source);
+		targets.forEach((schemaNode) -> {
+			source.getSubstatements().stream().filter(sub -> !(sub instanceof IfFeature)).forEach((subStatement) -> {
+				// TODO check what can be added
+				if (subStatement instanceof SchemaNode) {
+					SchemaNode copy = ProcessorUtility.copyEObject((SchemaNode) subStatement);
+					// add augment's feature conditions to copied augment children
+					copy.getSubstatements().addAll(ProcessorUtility.copyAllEObjects(ifFeatures));
+
+					// memorize source module information as adapter
+					copy.eAdapters().add(new ForeignModuleAdapter(globalModuleId));
+
+					// Remove same named existing node
+					var existing = schemaNode.getSubstatements().stream().filter((statement) -> {
+						if (statement instanceof SchemaNode) {
+							return copy.getName().equals(((SchemaNode) statement).getName());
+						}
+						return false;
+					}).findFirst();
+					if (existing.isPresent()) {
+						schemaNode.getSubstatements().remove(existing.get());
+					}
+					schemaNode.getSubstatements().add(copy);
+				}
+			});
 		});
 	}
 
@@ -319,20 +415,7 @@ public class YangProcessor {
 				// Don't add grouping definitions to the output
 				// child = new ElementData((SchemaNode) ele, ElementKind.Grouping);
 			} else if (ele instanceof Uses) {
-				/*
-				 * The effect of a "uses" reference to a grouping is that the nodes defined by
-				 * the grouping are copied into the current schema tree and are then updated
-				 * according to the "refine" and "augment" statements.
-				 */
-				GroupingRef groupingRef = ((Uses) ele).getGrouping();
-				Grouping grouping = groupingRef.getNode();
-				ForeignModuleAdapter adapted = ForeignModuleAdapter.find(ele);
-				if (adapted != null) {
-					ForeignModuleAdapter moduleAdapter = new ForeignModuleAdapter(adapted.moduleId);
-					// used groupings are bound to the namespace of the current module
-					grouping.eAdapters().add(moduleAdapter);
-				}
-				processChildren(grouping, parent, evalCtx);
+				// handled earlier in expandUses
 
 			} else if (ele instanceof Input) {
 				child = new ElementData((SchemaNode) ele, ElementKind.Input, "input");
