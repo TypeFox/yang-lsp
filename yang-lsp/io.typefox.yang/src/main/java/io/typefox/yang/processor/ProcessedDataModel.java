@@ -17,10 +17,14 @@ import com.google.common.base.Objects;
 import com.google.common.collect.Sets;
 
 import io.typefox.yang.processor.FeatureExpressions.FeatureCondition;
+import io.typefox.yang.yang.Anyxml;
 import io.typefox.yang.yang.Config;
+import io.typefox.yang.yang.Container;
 import io.typefox.yang.yang.Default;
 import io.typefox.yang.yang.IfFeature;
 import io.typefox.yang.yang.Key;
+import io.typefox.yang.yang.Leaf;
+import io.typefox.yang.yang.LeafList;
 import io.typefox.yang.yang.Mandatory;
 import io.typefox.yang.yang.MaxElements;
 import io.typefox.yang.yang.MinElements;
@@ -229,6 +233,25 @@ public class ProcessedDataModel {
 		Grouping, Input, Notification, Output, Rpc;
 
 		public static Set<ElementKind> mayOmitCase = Sets.newHashSet(AnyXml, Container, Leaf, List, LeafList);
+
+		/**
+		 * If choices case can be omitted for this child statement. It's elementkind is
+		 * returned. null otherwise.
+		 */
+		public static ElementKind mayOmitCaseKind(EObject obj) {
+			if(obj instanceof Anyxml) {
+				return AnyXml;
+			} else if(obj instanceof Container) {
+				return Container;
+			} else if(obj instanceof Leaf) {
+				return Leaf;
+			} else if(obj instanceof List) {
+				return List;
+			} else if(obj instanceof LeafList) {
+				return LeafList;
+			}
+			return null;
+		}
 	}
 
 	static public enum AccessKind {

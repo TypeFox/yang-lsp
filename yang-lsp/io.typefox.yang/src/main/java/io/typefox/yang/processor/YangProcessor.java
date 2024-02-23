@@ -47,7 +47,6 @@ import io.typefox.yang.yang.IfFeature;
 import io.typefox.yang.yang.Input;
 import io.typefox.yang.yang.Leaf;
 import io.typefox.yang.yang.LeafList;
-import io.typefox.yang.yang.Mandatory;
 import io.typefox.yang.yang.Notification;
 import io.typefox.yang.yang.Output;
 import io.typefox.yang.yang.Prefix;
@@ -399,13 +398,15 @@ public class YangProcessor {
 	protected void processChildren(Statement statement, HasStatements parent, FeatureEvaluationContext evalCtx) {
 		statement.getSubstatements().stream().forEach((ele) -> {
 			if (!ProcessorUtility.isEnabled(ele, evalCtx)) {
-				if (ele instanceof Leaf && ele.eContainer() instanceof Choice
-						&& isMandatory((Choice) ele.eContainer())) {
-					// Wrapped choice's direct non-case children into case Element
-					// See https://www.rfc-editor.org/rfc/rfc6020#section-7.9.2
-					// exclude the leafe, but keep the synthetic case statement
-					parent.addToChildren(ElementData.createNamedWrapper(ProcessorUtility.qualifiedName((Leaf) ele),
-							ElementKind.Case));
+				if (parent instanceof ElementData && ((ElementData) parent).elementKind == ElementKind.Choice) {
+					var omitKind = ElementKind.mayOmitCaseKind(ele);
+					if (omitKind != null) {
+						// Wrapped choice's direct non-case children into case Element
+						// See https://www.rfc-editor.org/rfc/rfc6020#section-7.9.2
+						// exclude the leaf, but keep the synthetic case statement
+						parent.addToChildren(ElementData.createNamedWrapper(
+								ProcessorUtility.qualifiedName((SchemaNode) ele), ElementKind.Case));
+					}
 				}
 				return;
 			}
@@ -458,11 +459,11 @@ public class YangProcessor {
 
 	/**
 	 * Checks if the node has "mandatory true" substatement
+	 * 
+	 * private boolean isMandatory(SchemaNode node) { return
+	 * node.getSubstatements().stream() .anyMatch(sub -> (sub instanceof Mandatory)
+	 * && "true".equals(((Mandatory) sub).getIsMandatory())); }
 	 */
-	private boolean isMandatory(SchemaNode node) {
-		return node.getSubstatements().stream()
-				.anyMatch(sub -> (sub instanceof Mandatory) && "true".equals(((Mandatory) sub).getIsMandatory()));
-	}
 
 	public static class ForeignModuleAdapter extends AdapterImpl {
 		final ElementIdentifier moduleId;
