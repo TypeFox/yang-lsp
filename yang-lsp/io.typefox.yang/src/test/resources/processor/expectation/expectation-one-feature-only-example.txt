@@ -1,0 +1,92 @@
+module: ietf-keystore
+  +--rw keystore
+   +--rw asymmetric-keys
+   |  +--rw asymmetric-key* [name]
+   |  |  +--rw name   string
+   |  |  +--rw algorithm   iasa:asymmetric-algorithm-type
+   |  |  +--rw public-key-format?   identityref
+   |  |  +--rw public-key   binary
+   |  |  +--rw private-key-format?   identityref
+   |  |  +--rw (private-key-type)
+   |  |  |  +--:(private-key)
+   |  |  |  |  +--rw private-key?   binary
+   |  |  |  +--:(hidden-private-key)
+   |  |  |  |  +--rw hidden-private-key?   empty
+   |  |  |  +--:(ks:encrypted-private-key)
+   |  |  |   +--rw ks:encrypted-private-key
+   |  |  |   +--rw (ks:key-type)
+   |  |  |   |  +--:(ks:symmetric-key-ref)
+   |  |  |   |  +--:(ks:asymmetric-key-ref)
+   |  |  |   +--rw ks:value?   binary
+   |  |  +--rw certificates
+   |  |  |  +--rw certificate* [name]
+   |  |  |   +--rw name   string
+   |  |  |   +--rw cert?   end-entity-cert-cms
+   |  |  |   +---n certificate-expiration
+   |  |  |   +-- expiration-date   yang:date-and-time
+   |  |  +---x generate-certificate-signing-request
+   |  |   +---w input
+   |  |   |  +---w subject   binary
+   |  |   |  +---w attributes?   binary
+   |  |   +--ro output
+   |  |   +--ro certificate-signing-request   binary
+   |  +---x generate-asymmetric-key
+   |   +---w input
+   |   |  +---w algorithm   iasa:asymmetric-algorithm-type
+   |   |  +---w encrypt-with!
+   |   |   +---w (key-type)
+   |   |   +--:(symmetric-key-ref)
+   |   |   +--:(asymmetric-key-ref)
+   |   +--ro output
+   |   +--ro algorithm   iasa:asymmetric-algorithm-type
+   |   +--ro public-key-format?   identityref
+   |   +--ro public-key   binary
+   |   +--ro private-key-format?   identityref
+   |   +--ro (private-key-type)
+   |   +--:(private-key)
+   |   |  +--rw private-key?   binary
+   |   +--:(hidden-private-key)
+   |   |  +--rw hidden-private-key?   empty
+   |   +--:(ks:encrypted-private-key)
+   |   +--rw ks:encrypted-private-key
+   |   +--rw (ks:key-type)
+   |   |  +--:(ks:symmetric-key-ref)
+   |   |  +--:(ks:asymmetric-key-ref)
+   |   +--rw ks:value?   binary
+   +--rw symmetric-keys
+   +--rw symmetric-key* [name]
+   |  +--rw name   string
+   |  +--rw algorithm   isa:symmetric-algorithm-type
+   |  +--rw key-format?   identityref
+   |  +--rw (key-type)
+   |   +--:(key)
+   |   |  +--rw key?   binary
+   |   +--:(hidden-key)
+   |   |  +--rw hidden-key?   empty
+   |   +--:(ks:encrypted-key)
+   |   +--rw ks:encrypted-key
+   |   +--rw (ks:key-type)
+   |   |  +--:(ks:symmetric-key-ref)
+   |   |  +--:(ks:asymmetric-key-ref)
+   |   +--rw ks:value?   binary
+   +---x generate-symmetric-key
+   +---w input
+   |  +---w algorithm   isa:symmetric-algorithm-type
+   |  +---w encrypt-with!
+   |   +---w (key-type)
+   |   +--:(symmetric-key-ref)
+   |   +--:(asymmetric-key-ref)
+   +--ro output
+   +--ro algorithm   isa:symmetric-algorithm-type
+   +--ro key-format?   identityref
+   +--ro (key-type)
+   +--:(key)
+   |  +--rw key?   binary
+   +--:(hidden-key)
+   |  +--rw hidden-key?   empty
+   +--:(ks:encrypted-key)
+   +--rw ks:encrypted-key
+   +--rw (ks:key-type)
+   |  +--:(ks:symmetric-key-ref)
+   |  +--:(ks:asymmetric-key-ref)
+   +--rw ks:value?   binary

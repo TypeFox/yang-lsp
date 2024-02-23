@@ -47,6 +47,7 @@ import io.typefox.yang.yang.IfFeature;
 import io.typefox.yang.yang.Input;
 import io.typefox.yang.yang.Leaf;
 import io.typefox.yang.yang.LeafList;
+import io.typefox.yang.yang.Mandatory;
 import io.typefox.yang.yang.Notification;
 import io.typefox.yang.yang.Output;
 import io.typefox.yang.yang.Prefix;
@@ -99,9 +100,9 @@ public class YangProcessor {
 
 	protected ProcessedDataModel processInternal(List<AbstractModule> modules, List<String> includedFeatures,
 			List<String> excludedFeatures) {
-		var evalCtx = new FeatureEvaluationContext(includedFeatures, excludedFeatures);
 		ProcessedDataModel processedModel = new ProcessedDataModel();
 		collectResourceErrors(modules.get(0), processedModel);
+		var evalCtx = new FeatureEvaluationContext(includedFeatures, excludedFeatures);
 
 		modules.forEach((module) -> expandUses(module, evalCtx));
 
@@ -353,7 +354,8 @@ public class YangProcessor {
 
 	protected Set<SchemaNode> collectCopies(SchemaNode schemaNode, Augment augmen, Set<SchemaNode> collector) {
 		CopiedObjectAdapter.findAll(schemaNode).map(a -> ((SchemaNode) a.getCopy())).forEach(copy -> {
-			if (!InsideUsesMutationAdapter.find(augmen) || Objects.equal(augmen.eContainer().eClass(), copy.eContainer().eClass())) {
+			if (!InsideUsesMutationAdapter.find(augmen)
+					|| Objects.equal(augmen.eContainer().eClass(), copy.eContainer().eClass())) {
 				// augment and the target node need to be in the same hierarchy, defined by a
 				// potential `uses` expansion.
 				collector.add(copy);
@@ -395,7 +397,18 @@ public class YangProcessor {
 	}
 
 	protected void processChildren(Statement statement, HasStatements parent, FeatureEvaluationContext evalCtx) {
-		statement.getSubstatements().stream().filter(ele -> ProcessorUtility.isEnabled(ele, evalCtx)).forEach((ele) -> {
+		statement.getSubstatements().stream().forEach((ele) -> {
+			if (!ProcessorUtility.isEnabled(ele, evalCtx)) {
+				if (ele instanceof Leaf && ele.eContainer() instanceof Choice
+						&& isMandatory((Choice) ele.eContainer())) {
+					// Wrapped choice's direct non-case children into case Element
+					// See https://www.rfc-editor.org/rfc/rfc6020#section-7.9.2
+					// exclude the leafe, but keep the synthetic case statement
+					parent.addToChildren(ElementData.createNamedWrapper(ProcessorUtility.qualifiedName((Leaf) ele),
+							ElementKind.Case));
+				}
+				return;
+			}
 			ElementData child = null;
 			if (ele instanceof Container) {
 				child = new ElementData((Container) ele, ElementKind.Container);
@@ -441,6 +454,14 @@ public class YangProcessor {
 				processChildren(ele, child, evalCtx);
 			}
 		});
+	}
+
+	/**
+	 * Checks if the node has "mandatory true" substatement
+	 */
+	private boolean isMandatory(SchemaNode node) {
+		return node.getSubstatements().stream()
+				.anyMatch(sub -> (sub instanceof Mandatory) && "true".equals(((Mandatory) sub).getIsMandatory()));
 	}
 
 	public static class ForeignModuleAdapter extends AdapterImpl {

@@ -3,6 +3,10 @@ package io.typefox.yang.processor;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.eclipse.xtext.util.Pair;
+import org.eclipse.xtext.util.Tuples;
 
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
@@ -14,11 +18,31 @@ public class FeatureEvaluationContext {
 
 	private Map<String, Boolean> cache = Maps.newHashMap();
 
-	private Set<String> include = Sets.newHashSet(), exclude = Sets.newHashSet();
+	private Map<String, Set<String>> include = Maps.newHashMap();
+	private Set<String> exclude = Sets.newHashSet();
 
 	public FeatureEvaluationContext(List<String> includedFeatures, List<String> excludedFeatures) {
-		include.addAll(includedFeatures);
+		for (var featureToInclude : includedFeatures) {
+			Pair<String, String[]> parsedFeature = parseFeature(featureToInclude);
+			if (parsedFeature != null) {
+				include.put(parsedFeature.getFirst(), Sets.newHashSet(parsedFeature.getSecond()).stream()
+						.map(it -> it.trim()).collect(Collectors.toSet()));
+			}
+		}
 		exclude.addAll(excludedFeatures);
+	}
+
+	private Pair<String, String[]> parseFeature(String featureToInclude) {
+		var colonIdx = featureToInclude.indexOf(':');
+		if (colonIdx > 0) {
+			var module = featureToInclude.substring(0, colonIdx + 1);
+			var features = featureToInclude.substring(colonIdx + 1).split(",");
+			return Tuples.pair(module, features);
+		} else {
+			System.out.println("Feature include '" + featureToInclude
+					+ "' ignored. Must match the pattern: modulename:[feature(,feature)*]");
+		}
+		return null;
 	}
 
 	public boolean isActive(Feature feature) {
@@ -27,7 +51,8 @@ public class FeatureEvaluationContext {
 		if (cache.containsKey(featureQName)) {
 			return cache.get(featureQName);
 		}
-		var active = isActive(featureModule.name + ":", featureQName) && featureIfConditionsActive(feature);
+		var active = isActive(featureModule.name + ":", featureQName, feature.getName())
+				&& featureIfConditionsActive(feature);
 		cache.put(featureQName, active);
 		return active;
 	}
@@ -36,15 +61,17 @@ public class FeatureEvaluationContext {
 		return ProcessorUtility.checkIfFeatures(ProcessorUtility.findIfFeatures(feature), this);
 	}
 
-	private boolean isActive(String modulePrefix, String featureQName) {
+	public boolean isActive(String modulePrefix, String featureQName, String featureName) {
 		// include <module>: means include none of <module> features.
-		if(include.contains(modulePrefix) && !include.contains(featureQName)) {
-			// include e.g. 'example-system-ext:' means any of example-system-ext module features should be included
-			return false;
+		var moduleEntry = include.get(modulePrefix);
+		// if <module>: not listed in include, all features are enabled by default.
+		boolean included = true;
+		if (moduleEntry != null) {
+			// include e.g. 'example-system-ext:' means any of example-system-ext module
+			// features should be included
+			included = moduleEntry.contains(featureName);
 		}
-		return (include.isEmpty() || include.contains(featureQName) 
-				|| !include.contains(modulePrefix)) // if <module>: not listed in include, all features are enabled
-				&& (exclude.isEmpty() || !(exclude.contains(featureQName) || exclude.contains(modulePrefix)));
+		return (included) && (exclude.isEmpty() || !(exclude.contains(featureQName) || exclude.contains(modulePrefix)));
 	}
 
 	private String featureGlobalQName(ElementIdentifier module, String featureName) {
