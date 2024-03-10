@@ -5,7 +5,7 @@ A setting file has the name `yang.settings` and can be located
  - at the root of a project
  - in the user's directory under `~/.yang/yang.settings`.
 
-The file syntax is a JSON.
+The file syntax is a JSONC and its schema can be found [here](../schema/yang-lsp-settings-schema.json).
 
 ## Disable Code Lens
 

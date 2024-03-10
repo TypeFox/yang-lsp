@@ -1,0 +1,236 @@
+{
+  "$id": "https://github.com/TypeFox/yang-lsp/schema/yang-lsp-settings-schema.json",
+  "$schema": "http://json-schema.org/draft-07/schema#",
+  "title": "YANG LSP Settings JSON Schema",
+  "description": "JSON Schema for YANG LSP settings file 'yang.settings'.\nSee https://github.com/TypeFox/yang-lsp/blob/master/docs/Settings.md",
+  "type": "object",
+  "properties": {
+    "code-lens-enabled": {
+      "description": "If you don't want to see the code lenses you can turn it off.",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "default": "on"
+    },
+    "excludePath": {
+      "description": "The path elements are project relative directory names.\nYou can specify multiple elements separated with a colon ':'.\nThe file separator is always '/' independent from the OS",
+      "type": "string"
+    },
+    "yangPath": {
+      "description": "You can specify individual files, directories (contents will be added recursively) or ZIP files.\nThe file name format is OS specific, and so is the path separator (';' on Windows, ':' elsewhere).",
+      "type": "string"
+    },
+    "extension": {
+      "description": "YANG LSP extension settings",
+      "type": "object",
+      "properties": {
+        "classpath": {
+          "description": "Location of extension jar relative to the project's root directory",
+          "type": "string",
+          "pattern": "\\.jar$"
+        },
+        "validators": {
+          "description": "IValidatorExtension implementor class e.g., 'my.pack.MyExampleValidator'",
+          "type": "string"
+        },
+        "commands": {
+          "description": "ICommandExtension implementor class e.g., 'my.pack.MyCommand'",
+          "type": "string"
+        }
+      },
+      "required": [
+        "classpath"
+      ],
+      "additionalProperties": false
+    },
+    "diagnostic": {
+      "description": "YANG LSP diagnostics settings. The severities for the contained diagnostics can be adjusted",
+      "type": "object",
+      "$defs": {
+        "severity": {
+          "enum": [
+            "error",
+            "warning",
+            "ignore"
+          ]
+        }
+      },
+      "properties": {
+        "substatement-cardinality": {
+          "description": "Issue code that are entangled with cardinality problems of container statement's sub-statements.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "unexpected-statement": {
+          "description": "Issue code indicating an invalid sub-statement inside its parent statement container.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "substatement-ordering": {
+          "description": "Issue code for cases when a sub-statement incorrectly precedes another sub-statement.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "incorrect-version": {
+          "description": "Issues code that is used when a module has anything but '1.1' version.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "type-error": {
+          "description": "Errors for types. Such as invalid type restriction, range error, fraction-digits issue.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "duplicate-name": {
+          "description": "A duplicate local name.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "missing-prefix": {
+          "description": "",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "missing-revision": {
+          "description": "Diagnostic that indicates a module is available in multiple revisions when no revision is provided on an import.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "warning"
+        },
+        "import-not-a-module": {
+          "description": "Diagnostic indicating that an include statement is not pointing to a submodule.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "included-submodule-belongs-to-different-module": {
+          "description": "Indicating that an included module belongs to a different module.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "invalid-revision-format": {
+          "description": "Issue code when the revision date does not conform the 'YYYY-MM-DD' format.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "warning"
+        },
+        "revision-order": {
+          "description": "Issue code that applies on a revision if that is not in a reverse chronological order.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "warning"
+        },
+        "bad-type-name": {
+          "description": "Issue code when the name of a type does not conform with the existing constraints. For instance; the name contains any invalid characters, or equals to any YANG built-in type name.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "bad-include-yang-version": {
+          "description": "Issues code when there is an inconsistency between a module's yang-version and the yang-version of the included modules.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "bad-import-yang-version": {
+          "description": "Issues code when there is an inconsistency between a module's yang-version and the yang-version of the imported modules.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "duplicate-enumerable-name": {
+          "description": "Issue code indicating that all assigned names in an enumerable must be unique.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "duplicate-enumerable-value": {
+          "description": "Issue code indicating that all assigned values in an enumerable must be unique.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "enumerable-restriction-name": {
+          "description": "Issue code indicating that an enumerable introduces a new name that is not declared among the parent restriction.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "enumerable-restriction-value": {
+          "description": "Issue code indicating that an enumerable introduces a new value that is not declared among the parent restriction.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "key-duplicate-leaf-name": {
+          "description": "Issues code for indicating a duplicate leaf node name in a key.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "ordinal-value": {
+          "description": "Issue code when an ordinal value exceeds its limits.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "indentation": {
+          "description": "Controls the indentation string when formatting or serializing yang files.",
+          "type": "string",
+          "pattern": "^[ ]+$",
+          "default": "    "
+        },
+        "invalid-config": {
+          "description": "Issue code when a config=true is a child of a config=false (see https://tools.ietf.org/html/rfc7950#section-7.21.1)",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "invalid-augmentation": {
+          "description": "Issue code when an augmented node declares invalid sub-statements. For instance when an augmented leaf node has leaf nodes.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "invalid-default": {
+          "description": "Issue code for cases when the a choice has default value and the mandatory sub-statement is 'true'.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "mandatory-after-default-case": {
+          "description": "Issue code when any mandatory nodes are declared after the default case in a 'choice'.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "invalid-action-ancestor": {
+          "description": "Issue code when an action (or notification) has a 'list' ancestor node without a 'key' statement. Also applies, when an action (or notification) is declared within another action, rpc or notification.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "identity-cycle": {
+          "description": "Issue code when an identity references itself, either directly or indirectly through a chain of other identities.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "leaf-key-with-if-feature": {
+          "description": "This issue code is used when a leaf node is declared as a list key and have any 'if-feature' statements.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "xpath-invalid-type": {
+          "description": "Invalid type in Xpath expression",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "xpath-unknown-variable": {
+          "description": "Xpath expressions in YANG don't have variables in context",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "xpath-unknown-function": {
+          "description": "An unknown function is called",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "warning"
+        },
+        "xpath-function-arity": {
+          "description": "Wrong argument arity for an Xpath function call.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "error"
+        },
+        "xpath-linking-error": {
+          "description": "Diagnostic for unresolvable Xpath expressions.",
+          "$ref": "#/properties/diagnostic/$defs/severity",
+          "default": "ignore"
+        }
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}
