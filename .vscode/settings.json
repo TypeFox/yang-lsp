@@ -1,0 +1,13 @@
+{
+  "files.associations": {
+    "yang.settings": "jsonc"
+  },
+  "json.schemas": [
+    {
+      "fileMatch": [
+        "/yang-lsp/io.typefox.yang/yang.settings"
+      ],
+      "url": "./schema/yang-lsp-settings-schema.json"
+    }
+  ]
+}
