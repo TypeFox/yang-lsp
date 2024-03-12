@@ -1,5 +1,5 @@
 {
-  "$id": "https://github.com/TypeFox/yang-lsp/schema/yang-lsp-settings-schema.json",
+  "$id": "https://github.com/TypeFox/yang-lsp/blob/master/schema/yang-lsp-settings-schema.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "YANG LSP Settings JSON Schema",
   "description": "JSON Schema for YANG LSP settings file 'yang.settings'.\nSee https://github.com/TypeFox/yang-lsp/blob/master/docs/Settings.md",
@@ -53,6 +53,11 @@
             "error",
             "warning",
             "ignore"
+          ]
+        },
+        "fixed-severity": {
+          "enum": [
+            "error"
           ]
         }
       },
@@ -124,12 +129,12 @@
         },
         "bad-include-yang-version": {
           "description": "Issues code when there is an inconsistency between a module's yang-version and the yang-version of the included modules.",
-          "$ref": "#/properties/diagnostic/$defs/severity",
+          "$ref": "#/properties/diagnostic/$defs/fixed-severity",
           "default": "error"
         },
         "bad-import-yang-version": {
           "description": "Issues code when there is an inconsistency between a module's yang-version and the yang-version of the imported modules.",
-          "$ref": "#/properties/diagnostic/$defs/severity",
+          "$ref": "#/properties/diagnostic/$defs/fixed-severity",
           "default": "error"
         },
         "duplicate-enumerable-name": {
