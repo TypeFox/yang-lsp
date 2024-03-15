@@ -66,18 +66,66 @@ public class YangProcessorTest extends AbstractYangTest {
 
 	}
 
+	/*
+	 Should return the same result as processModules_TreeTest()
+	 */
 	@Test
-	public void processModules_TreeTest_FeatureInclude() throws IOException {
+	public void processModules_TreeTest_FeatureIncludeAllListed() throws IOException {
+		
+		var sysModule = processData(true, newArrayList(
+				"example-system-ext:ldap",
+				"example-system-ext:ldap-authentication",
+				"example-system-ext:ldap-clear",
+				"example-system-ext:ldap-posix-filter",
+				"example-system-ext:ldap-custom-filter",
+				"example-system-ext:ldap-sasl-external",
+				"example-system-ext:local-target-classes",
+				"example-system-ext:authentication-failure-alarm",
+				"example-system-ext:ntp-security",
+				"example-system-ext:oauth2-client-authentication"
+				), null);
+		
+		String expectation = null;
+		
+		// CLI tree test expect output like:
+		/*
+		  pyang -f tree ietf-system.yang --deviation-module example-system-ext.yang \
+			-F example-system-ext:example-system-ext:ldap\
+			-F example-system-ext:ldap-authentication \
+			-F example-system-ext:ldap-clear \
+			-F example-system-ext:ldap-posix-filter \
+			-F example-system-ext:ldap-custom-filter \
+			-F example-system-ext:ldap-sasl-external \
+			-F example-system-ext:local-target-classes \
+			-F example-system-ext:authentication-failure-alarm \
+			-F example-system-ext:ntp-security \
+			-F example-system-ext:oauth2-client-authentication \
+			-F example-system-ext:oauth2-client-authentication > pyang-enable-all-as-features.txt
+			
+			
+			pyang -f tree ietf-system.yang --deviation-module example-system-ext.yang -F example-system-ext:example-system-ext:ldap,ldap-authentication,ldap-clear,ldap-posix-filter,ldap-custom-filter,ldap-sasl-external,local-target-classes,authentication-failure-alarm,ntp-security,oauth2-client-authentication > pyang-include-all-comma.txt
+		 */
+		try (InputStream in = this.getClass().getClassLoader()
+				.getResourceAsStream("processor/expectation/expectation.txt");
+				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
+			var writer = new StringWriter();
+			br.transferTo(writer);
+			expectation = writer.getBuffer().toString();
+		}
+		assertEqualsReduceSpace(expectation, new DataTreeSerializer().serialize(sysModule.get()).toString());
+	}
+
+	@Test
+	public void processModules_TreeTest_FeatureIncludeEmptyModule() throws IOException {
 
 		var sysModule = processData(true, newArrayList("example-system-ext:"), null);
 
 		String expectation = null;
 
 		// CLI tree test expect output like:
-		// pyang -f tree ietf-system.yang --deviation-module example-system-ext.yang -F
-		// example-system-ext:
+		// pyang -f tree ietf-system.yang --deviation-module example-system-ext.yang -F example-system-ext:
 		try (InputStream in = this.getClass().getClassLoader()
-				.getResourceAsStream("processor/expectation/expectation-feature-only-example.txt");
+				.getResourceAsStream("processor/expectation/expectation-disable-all-features-for-module.txt");
 				BufferedReader br = new BufferedReader(new InputStreamReader(in))) {
 			var writer = new StringWriter();
 			br.transferTo(writer);
@@ -86,6 +134,8 @@ public class YangProcessorTest extends AbstractYangTest {
 		assertEqualsReduceSpace(expectation, new DataTreeSerializer().serialize(sysModule.get()).toString());
 
 	}
+	
+	
 
 	/*
 	 * enables ietf-keystore:local-definitions-supported feature.

@@ -19,17 +19,27 @@ public class FeatureEvaluationContext {
 	private Map<String, Boolean> cache = Maps.newHashMap();
 
 	private Map<String, Set<String>> include = Maps.newHashMap();
-	private Set<String> exclude = Sets.newHashSet();
+	private Map<String, Set<String>> exclude = Maps.newHashMap();
 
 	public FeatureEvaluationContext(List<String> includedFeatures, List<String> excludedFeatures) {
-		for (var featureToInclude : includedFeatures) {
-			Pair<String, String[]> parsedFeature = parseFeature(featureToInclude);
+		processConfiguration(includedFeatures, include);
+		processConfiguration(excludedFeatures, exclude);
+	}
+
+	private void processConfiguration(List<String> features, Map<String, Set<String>> featureMap) {
+		for (var featureEntry : features) {
+			Pair<String, String[]> parsedFeature = parseFeature(featureEntry);
 			if (parsedFeature != null) {
-				include.put(parsedFeature.getFirst(), Sets.newHashSet(parsedFeature.getSecond()).stream()
-						.map(it -> it.trim()).collect(Collectors.toSet()));
+				Set<String> existingInclude = featureMap.get(parsedFeature.getFirst());
+				Set<String> toAdd = Sets.newHashSet(parsedFeature.getSecond()).stream().map(it -> it.trim())
+						.filter(it -> !it.isEmpty()).collect(Collectors.toSet());
+				if (existingInclude != null) {
+					existingInclude.addAll(toAdd);
+				} else {
+					featureMap.put(parsedFeature.getFirst(), toAdd);
+				}
 			}
 		}
-		exclude.addAll(excludedFeatures);
 	}
 
 	private Pair<String, String[]> parseFeature(String featureToInclude) {
@@ -51,8 +61,7 @@ public class FeatureEvaluationContext {
 		if (cache.containsKey(featureQName)) {
 			return cache.get(featureQName);
 		}
-		var active = isActive(featureModule.name + ":", featureQName, feature.getName())
-				&& featureIfConditionsActive(feature);
+		var active = isActive(featureModule.name + ":", feature.getName()) && featureIfConditionsActive(feature);
 		cache.put(featureQName, active);
 		return active;
 	}
@@ -61,17 +70,42 @@ public class FeatureEvaluationContext {
 		return ProcessorUtility.checkIfFeatures(ProcessorUtility.findIfFeatures(feature), this);
 	}
 
-	public boolean isActive(String modulePrefix, String featureQName, String featureName) {
-		// include <module>: means include none of <module> features.
-		var moduleEntry = include.get(modulePrefix);
-		// if <module>: not listed in include, all features are enabled by default.
+	/**
+	 * For testing only. Use cached
+	 * {@link FeatureEvaluationContext#isActive(Feature)} instead.
+	 * 
+	 * @param modulePrefix
+	 * @param featureName
+	 * @return
+	 */
+	public boolean isActive(String modulePrefix, String featureName) {
+		// All modules and features are enabled by default.
 		boolean included = true;
-		if (moduleEntry != null) {
+		var includeEntry = include.get(modulePrefix);
+		if (includeEntry != null) {
 			// include e.g. 'example-system-ext:' means any of example-system-ext module
 			// features should be included
-			included = moduleEntry.contains(featureName);
+			included = includeEntry.contains(featureName);
 		}
-		return (included) && (exclude.isEmpty() || !(exclude.contains(featureQName) || exclude.contains(modulePrefix)));
+
+		if (!included) {
+			return false;
+		}
+
+		boolean excluded = false;
+		var excludeEntry = exclude.get(modulePrefix);
+		if (excludeEntry != null) {
+			if (excludeEntry.isEmpty()) {
+				// exclude all e.g. 'example-system-ext:' means exclude all of example-system-ex
+				// features
+				excluded = true;
+			} else {
+				// otherwise check feature entry
+				excluded = excludeEntry.contains(featureName);
+			}
+		}
+
+		return included && !excluded;
 	}
 
 	private String featureGlobalQName(ElementIdentifier module, String featureName) {
