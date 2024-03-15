@@ -150,13 +150,13 @@ For instance; the name contains any invalid characters, or equals to any YANG bu
 
 Issues code when there is an inconsistency between a module's version and the version of the included modules.
 
- (default severity: error)
+ (fixed severity: error)
 
 #### `bad-import-yang-version`
 
 Issues code when there is an inconsistency between a module's version and the version of the included modules.
 
- (default severity: error)
+ (fixed severity: error)
 
 #### `duplicate-enumerable-name`
 
