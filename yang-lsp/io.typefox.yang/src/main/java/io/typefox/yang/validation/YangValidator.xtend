@@ -138,14 +138,14 @@ class YangValidator extends AbstractYangValidator {
 				}
 			];
 
-		// A YANG version 1 module or submodule must not import a YANG version 1.1 module by revision.	
+		// A YANG version 1 module or submodule must not import a YANG version 1.1 module by revision.
 		if (baseModuleVersion == YANG_1) {
 			baseModule.substatementsOfType(Import)
 				.filter[module?.eResource !== null && !module.eIsProxy]
 				.forEach [ importStatement |
 					val importedModuleVersion = importStatement.module.yangVersion
 					val revisionDate = importStatement.substatementsOfType(RevisionDate)
-					if (!revisionDate.nullOrEmpty && baseModuleVersion != importedModuleVersion) {
+					if (baseModuleVersion != importedModuleVersion && !revisionDate.empty) {
 						val message = '''Cannot import a version «importedModuleVersion» module by revision in a version «baseModuleVersion» module.''';
 						error(message, importStatement, ABSTRACT_IMPORT__MODULE, BAD_IMPORT_YANG_VERSION);
 					}
