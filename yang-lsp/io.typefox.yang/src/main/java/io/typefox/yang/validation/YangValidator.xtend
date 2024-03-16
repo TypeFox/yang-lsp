@@ -40,6 +40,7 @@ import io.typefox.yang.yang.Pattern
 import io.typefox.yang.yang.Presence
 import io.typefox.yang.yang.Refinable
 import io.typefox.yang.yang.Revision
+import io.typefox.yang.yang.RevisionDate
 import io.typefox.yang.yang.Rpc
 import io.typefox.yang.yang.SchemaNode
 import io.typefox.yang.yang.SchemaNodeIdentifier
@@ -143,8 +144,9 @@ class YangValidator extends AbstractYangValidator {
 				.filter[module?.eResource !== null && !module.eIsProxy]
 				.forEach [ importStatement |
 					val importedModuleVersion = importStatement.module.yangVersion
-					if(baseModuleVersion != importedModuleVersion) {
-						val message = '''Cannot import a version «importedModuleVersion» module in a version «baseModuleVersion» module.''';
+					val revisionDate = importStatement.substatementsOfType(RevisionDate)
+					if (!revisionDate.nullOrEmpty && baseModuleVersion != importedModuleVersion) {
+						val message = '''Cannot import a version «importedModuleVersion» module by revision in a version «baseModuleVersion» module.''';
 						error(message, importStatement, ABSTRACT_IMPORT__MODULE, BAD_IMPORT_YANG_VERSION);
 					}
 				];
