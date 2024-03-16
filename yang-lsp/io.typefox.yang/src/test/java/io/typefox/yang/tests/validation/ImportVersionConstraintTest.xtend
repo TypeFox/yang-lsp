@@ -68,20 +68,50 @@ class ImportVersionConstraintTest extends AbstractYangTest {
 			    yang-version 1;
 			    namespace urn:ietf:params:xml:ns:yang:foo;
 			    prefix foo;
-			
+
 			    import bar {
-			    		prefix bar;
-			    	}
+			        prefix bar;
+			        revision-date 1970-01-01;
+			    }
 			}
 		''')
 		load('''
 			module bar {
 			    yang-version 1.1;
-				namespace urn:ietf:params:xml:ns:yang:bar;
-				prefix bar;
+			    namespace urn:ietf:params:xml:ns:yang:bar;
+			    prefix bar;
+			    revision 1970-01-01 {
+			        reference "";
+			    }
 			}
 		''')
 		validator.validate(foo.root.eResource)
 		assertError(foo.root.substatements.filter(Import).head, BAD_IMPORT_YANG_VERSION)
+	}
+
+	@Test def void testImportVersion_1() {
+		val foo = load('''
+			module foo {
+			    yang-version 1;
+			    namespace urn:ietf:params:xml:ns:yang:foo;
+			    prefix foo;
+
+			    import bar {
+			        prefix bar;
+			    }
+			}
+		''')
+		load('''
+			module bar {
+			    yang-version 1.1;
+			    namespace urn:ietf:params:xml:ns:yang:bar;
+			    prefix bar;
+			    revision 1970-01-01 {
+			        reference "";
+			    }
+			}
+		''')
+		validator.validate(foo.root.eResource)
+		assertNoError(foo.root.substatements.filter(Import).head, BAD_IMPORT_YANG_VERSION)
 	}
 }
