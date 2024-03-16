@@ -1,11 +1,13 @@
 # Settings
 
-The yang-lsp allos the user to configure various settings, though setting files.
-A setting file has the name `yang.settings` and can be located
- - at the root of a project
- - in the user's directory under `~/.yang/yang.settings`.
+The yang-lsp allows users to configure various settings, through settings files.
+The settings file has the name `yang.settings` and can be located
 
-The file syntax is a JSONC and its schema can be found [here](../schema/yang-lsp-settings-schema.json).
+- at the root of a project
+- in the user's directory under `~/.yang/yang.settings`.
+
+The file syntax is a [JSON with Comments][1], and its [JSON Schema][2] can be
+found [here](../schema/yang-lsp-settings-schema.json).
 
 ## Disable Code Lens
 
@@ -48,12 +50,14 @@ The settings is used to register an extension. Please find the details [here](Ex
 ## Diagnostics
 
 The user can change the severity of diagnostics, by setting the value of a diagnostic preference key to either
- - `"error"`
- - `"warning"`
- - `"ignore"`
+
+- `"error"`
+- `"warning"`
+- `"ignore"`
 
 The settings contains a `diagnostics` section in which the serverioties for the below diagnostics can be adjusted.
 An example :
+
 ```json
 {
   "diagnostic" : {
@@ -61,6 +65,8 @@ An example :
   }
 }
 ```
+
+### Diagnostic Codes
 
 #### `substatement-cardinality`
 
@@ -82,7 +88,7 @@ Issue code for cases when a sub-statement incorrectly precedes another sub-state
 
 #### `incorrect-version`
 
-Issues code that is used when a module has anything but {@code '1.1'} version.
+Issue code that is used when a module has anything but {@code '1.1'} version.
 
  (default severity: error)
 
@@ -99,7 +105,6 @@ A duplicate local name.
  (default severity: error)
 
 #### `missing-prefix`
-
 
  (default severity: error)
 
@@ -148,13 +153,13 @@ For instance; the name contains any invalid characters, or equals to any YANG bu
 
 #### `bad-include-yang-version`
 
-Issues code when there is an inconsistency between a module's version and the version of the included modules.
+Issue code when there is an inconsistency between a module's version and the version of the included modules.
 
  (fixed severity: error)
 
 #### `bad-import-yang-version`
 
-Issues code when there is an inconsistency between a module's version and the version of the included modules.
+Issue code when there is an inconsistency between a module's version and the version of the included modules.
 
  (fixed severity: error)
 
@@ -184,7 +189,7 @@ Issue code indicating that an enumerable introduces a new value that is not decl
 
 #### `key-duplicate-leaf-name`
 
-Issues code for indicating a duplicate leaf node name in a key.
+Issue code for indicating a duplicate leaf node name in a key.
 
  (default severity: error)
 
@@ -202,7 +207,7 @@ Controls the indentation string when formatting or serializing yang files.
 
 #### `invalid-config`
 
-Issue code when a `config=true` is a child of a `config=false` (see https://tools.ietf.org/html/rfc7950#section-7.21.1)
+Issue code when a `config=true` is a child of a `config=false` (see <https://tools.ietf.org/html/rfc7950#section-7.21.1>)
 
  (default severity: error)
 
@@ -273,3 +278,5 @@ Diagnostic for unresolvable Xpath expressions.
 
  (default severity: ignore)
 
+[1]: https://code.visualstudio.com/docs/languages/json#_json-with-comments
+[2]: https://json-schema.org/

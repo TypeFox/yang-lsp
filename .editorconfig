@@ -6,7 +6,7 @@ trim_trailing_whitespace = true
 end_of_line = lf
 insert_final_newline = true
 
-[*.json]
+[{*.json,yang.settings}]
 indent_style = space
 indent_size = 2
 
@@ -24,3 +24,7 @@ indent_size = 4
 
 [gradlew.bat]
 end_of_line = crlf
+
+[*.yml]
+indent_style = space
+indent_size = 2

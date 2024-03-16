@@ -1,4 +1,4 @@
-### Steps to follow
+# Steps to follow
 
 - Create local branch e.g. `release-0.5.0`
 - Update the version to `version = '0.5.0'` in `yang-lsp/gradle/versions.gradle` and commit
