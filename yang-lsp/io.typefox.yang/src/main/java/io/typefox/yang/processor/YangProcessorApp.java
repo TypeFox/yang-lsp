@@ -4,6 +4,7 @@ import static com.google.common.collect.Lists.newArrayList;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.FileSystems;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -118,7 +119,7 @@ public class YangProcessorApp {
 		var rs = injector.getInstance(XtextResourceSet.class);
 
 		for (String path : moduleFilePath) {
-			var moduleFile = new File(path);
+			var moduleFile = toFile(path);
 			if (!moduleFile.exists()) {
 				throw new IOException(
 						"File " + path + " doesn't exists.");
@@ -146,7 +147,7 @@ public class YangProcessorApp {
 		// handle --path argument
 		if (paths != null) {
 			for (String path : paths) {
-				var folder = new File(path);
+				var folder = toFile(path);
 				if (!folder.exists()) {
 					System.err.println("Path " + folder.getAbsolutePath() + " doesn't exist. Skipped.");
 				} else if (!folder.isDirectory()) {
@@ -173,6 +174,10 @@ public class YangProcessorApp {
 			}
 		}
 		return modules;
+	}
+
+	public static File toFile(String path) {
+		return FileSystems.getDefault().getPath(path).normalize().toFile();
 	}
 
 	private static void loadAdditionalFiles(File parent, XtextResourceSet rs, Set<String> fileExtensions,

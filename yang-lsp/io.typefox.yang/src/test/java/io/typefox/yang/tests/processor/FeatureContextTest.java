@@ -18,7 +18,7 @@ public class FeatureContextTest {
 				Collections.emptyList());
 		assertTrue(ctx.isActive("module:", "feature1"));
 		assertFalse(ctx.isActive("module:", "feature2"));
-		// all other modules that are not listed are completely disabled
+		// all other modules that are not listed are completely enabled
 		assertTrue(ctx.isActive("module2:", "feature1"));
 		assertTrue(ctx.isActive("module2:", "feature2"));
 	}
@@ -34,13 +34,22 @@ public class FeatureContextTest {
 	}
 
 	@Test
-	public void testIncludeTwoFeatures() {
+	public void testIncludeAllFeaturesOneModule() {
 		FeatureEvaluationContext ctx = new FeatureEvaluationContext(
 				Lists.newArrayList("module:feature1", "module:feature2"), Collections.emptyList());
 		assertTrue(ctx.isActive("module:", "feature1"));
 		assertTrue(ctx.isActive("module:", "feature2"));
 		assertTrue(ctx.isActive("module2:", "feature1"));
 		assertTrue(ctx.isActive("module2:", "feature2"));
+	}
+	@Test
+	public void testIncludeTwoFeatures() {
+		FeatureEvaluationContext ctx = new FeatureEvaluationContext(
+				Lists.newArrayList("module:feature1", "module2:feature1"), Collections.emptyList());
+		assertTrue(ctx.isActive("module:", "feature1"));
+		assertFalse(ctx.isActive("module:", "feature2"));
+		assertTrue(ctx.isActive("module2:", "feature1"));
+		assertFalse(ctx.isActive("module2:", "feature2"));
 	}
 
 	@Test

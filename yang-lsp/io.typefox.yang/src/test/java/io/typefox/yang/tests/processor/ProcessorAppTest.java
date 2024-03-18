@@ -1,6 +1,7 @@
 package io.typefox.yang.tests.processor;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThrows;
 
@@ -13,7 +14,7 @@ import io.typefox.yang.processor.YangProcessorApp;
 import io.typefox.yang.processor.YangProcessorApp.Args;
 import io.typefox.yang.tests.AbstractYangTest;
 
-public class ProcessorArgParseTest extends AbstractYangTest {
+public class ProcessorAppTest extends AbstractYangTest {
 
 	private Args parseArgs(String... args) {
 		return YangProcessorApp.parseArgs(new StringBuilder(), args);
@@ -64,7 +65,7 @@ public class ProcessorArgParseTest extends AbstractYangTest {
 		assertEquals(Format.tree, parsed.format);
 		assertEquals("ietf-system.yang", parsed.modules.get(0));
 	}
-	
+
 	@Test
 	public void processMultipleInputFiles() {
 		var parsed = parseArgs("-f", "tree", "ietf-system.yang", "ietf-system2.yang");
@@ -93,6 +94,11 @@ public class ProcessorArgParseTest extends AbstractYangTest {
 				"example-system-ext:ldap-posix-filter");
 		assertEquals(1, parsed.includedFeatures.size());
 		assertEquals("example-system-ext:ldap-posix-filter", parsed.includedFeatures.get(0));
+	}
+
+	@Test
+	public void stringToFileTest() {
+		assertFalse("Normalized path", YangProcessorApp.toFile("./test").getAbsolutePath().contains("/./"));
 	}
 
 }

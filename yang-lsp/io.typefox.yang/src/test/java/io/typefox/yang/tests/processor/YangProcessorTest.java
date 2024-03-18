@@ -90,20 +90,8 @@ public class YangProcessorTest extends AbstractYangTest {
 		// CLI tree test expect output like:
 		/*
 		  pyang -f tree ietf-system.yang --deviation-module example-system-ext.yang \
-			-F example-system-ext:example-system-ext:ldap\
-			-F example-system-ext:ldap-authentication \
-			-F example-system-ext:ldap-clear \
-			-F example-system-ext:ldap-posix-filter \
-			-F example-system-ext:ldap-custom-filter \
-			-F example-system-ext:ldap-sasl-external \
-			-F example-system-ext:local-target-classes \
-			-F example-system-ext:authentication-failure-alarm \
-			-F example-system-ext:ntp-security \
-			-F example-system-ext:oauth2-client-authentication \
-			-F example-system-ext:oauth2-client-authentication > pyang-enable-all-as-features.txt
-			
-			
-			pyang -f tree ietf-system.yang --deviation-module example-system-ext.yang -F example-system-ext:example-system-ext:ldap,ldap-authentication,ldap-clear,ldap-posix-filter,ldap-custom-filter,ldap-sasl-external,local-target-classes,authentication-failure-alarm,ntp-security,oauth2-client-authentication > pyang-include-all-comma.txt
+			-F example-system-ext:ldap,ldap-authentication,ldap-clear,ldap-posix-filter,ldap-custom-filter,ldap-sasl-external,local-target-classes,authentication-failure-alarm,ntp-security,oauth2-client-authentication\
+			 > pyang-enable-all-as-features.txt
 		 */
 		try (InputStream in = this.getClass().getClassLoader()
 				.getResourceAsStream("processor/expectation/expectation.txt");
@@ -276,4 +264,13 @@ public class YangProcessorTest extends AbstractYangTest {
 		assertEquals(expectation, actual);
 	}
 
+	/*
+	public static void main(String[] args) {
+		var features = "ericsson-keystore-ext:cmp,manual-renewal,pkcs10,pkcs12,pkcs8,scep ietf-keystore:key-generation,keystore-supported,local-definitions-supported ietf-truststore:local-definitions-supported ietf-truststore:raw-public-keys ietf-truststore:ssh-host-keys ietf-truststore:truststore-supported ietf-truststore:x509-certificates";
+		var cmd = new StringBuilder("pyang -f tree -p . ietf-keystore.yang --deviation-module ericsson-keystore-ext.yang ");
+		for (String string : features.split(" ")) {
+			cmd.append(" --features=" + string);
+		}
+		System.out.println(cmd.toString());
+	}*/
 }

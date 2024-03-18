@@ -90,6 +90,8 @@ public class FeatureEvaluationContext {
 
 		if (!included) {
 			return false;
+		} else if(exclude.isEmpty()) {
+			return true;
 		}
 
 		boolean excluded = false;
