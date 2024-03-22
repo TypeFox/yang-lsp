@@ -2,7 +2,8 @@
   "$id": "https://github.com/TypeFox/yang-lsp/blob/master/schema/yang-lsp-settings-schema.json",
   "$schema": "http://json-schema.org/draft-07/schema#",
   "title": "YANG LSP Settings JSON Schema",
-  "description": "JSON Schema for YANG LSP settings file 'yang.settings'.\nSee https://github.com/TypeFox/yang-lsp/blob/master/docs/Settings.md",
+  "description": "JSON Schema for YANG LSP settings file 'yang.settings'",
+  "markdownDescription": "See [documentation](https://github.com/TypeFox/yang-lsp/blob/master/docs/Settings.md)",
   "type": "object",
   "properties": {
     "code-lens-enabled": {
@@ -32,13 +33,26 @@
         },
         "validators": {
           "description": "IValidatorExtension implementor class e.g., 'my.pack.MyExampleValidator'",
+          "markdownDescription": "`IValidatorExtension` implementor class e.g., `my.pack.MyExampleValidator`",
           "type": "string"
         },
         "commands": {
-          "description": "ICommandExtension implementor class e.g., 'my.pack.MyCommand'",
+          "description": "ICommandExtension implementor class e.g., 'my.pack.MyExampleCommand'",
+          "markdownDescription": "`ICommandExtension` implementor class e.g., `my.pack.MyExampleCommand`",
           "type": "string"
         }
       },
+      "defaultSnippets": [
+        {
+          "label": "New YANG LSP extension",
+          "description": "Hooks YANG LSP extension to the language server instance",
+          "body": {
+            "classpath": "${1:project/relative/path/to/extension.jar}",
+            "validators": "${2:my.pack.MyExampleValidator}",
+            "commands": "${3:my.pack.MyExampleCommand}"
+          }
+        }
+      ],
       "required": [
         "classpath"
       ],
@@ -78,7 +92,7 @@
           "default": "error"
         },
         "incorrect-version": {
-          "description": "Issues code that is used when a module has anything but '1.1' version.",
+          "description": "Issue code that is used when a module has anything but '1.1' version.",
           "$ref": "#/properties/diagnostic/$defs/severity",
           "default": "error"
         },
@@ -128,12 +142,12 @@
           "default": "error"
         },
         "bad-include-yang-version": {
-          "description": "Issues code when there is an inconsistency between a module's yang-version and the yang-version of the included modules.",
+          "description": "Issue code when there is an inconsistency between a module's yang-version and the yang-version of the included modules.",
           "$ref": "#/properties/diagnostic/$defs/fixed-severity",
           "default": "error"
         },
         "bad-import-yang-version": {
-          "description": "Issues code when there is an inconsistency between a module's yang-version and the yang-version of the imported modules.",
+          "description": "Issue code when there is an inconsistency between a module's yang-version and the yang-version of the imported modules.",
           "$ref": "#/properties/diagnostic/$defs/fixed-severity",
           "default": "error"
         },
@@ -158,7 +172,7 @@
           "default": "error"
         },
         "key-duplicate-leaf-name": {
-          "description": "Issues code for indicating a duplicate leaf node name in a key.",
+          "description": "Issue code for indicating a duplicate leaf node name in a key.",
           "$ref": "#/properties/diagnostic/$defs/severity",
           "default": "error"
         },
@@ -174,7 +188,8 @@
           "default": "    "
         },
         "invalid-config": {
-          "description": "Issue code when a config=true is a child of a config=false (see https://tools.ietf.org/html/rfc7950#section-7.21.1)",
+          "description": "Issue code when a config=true is a child of a config=false",
+          "markdownDescription": "Issue code when a `config true` node is a child of a `config false` node.\n\nSee [IETF RFC 7950 Section 7.21.1](https://tools.ietf.org/html/rfc7950#section-7.21.1)",
           "$ref": "#/properties/diagnostic/$defs/severity",
           "default": "error"
         },

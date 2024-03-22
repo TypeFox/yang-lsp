@@ -19,4 +19,5 @@ build.dependsOn(installDist)
 applicationDistribution.from("${rootDir}/..") {
 	include "LICENSE"
 	include "README.md"
+	include "schema/yang-lsp-settings-schema.json"
 }

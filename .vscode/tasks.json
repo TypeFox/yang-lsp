@@ -12,6 +12,16 @@
         "kind": "build",
         "isDefault": true
       }
+    },
+    {
+      "label": "Gradle Build Distribution",
+      "type": "shell",
+      "command": "cd yang-lsp && ./gradlew --no-daemon build copyDist",
+      "problemMatcher": [],
+      "group": {
+        "kind": "build",
+        "isDefault": false
+      }
     }
   ]
 }
