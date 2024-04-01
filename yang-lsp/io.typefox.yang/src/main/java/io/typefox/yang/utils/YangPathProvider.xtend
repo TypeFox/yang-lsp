@@ -21,6 +21,7 @@ import org.eclipse.xtext.util.internal.Log
 class YangPathProvider {
 
 	public static val YANG_PATH = new PreferenceKey("yangPath", "")
+	public static val YANG_PATH_IGNORE = new PreferenceKey("yangPathIgnore", "")
 
 	@Inject PreferenceValuesProvider preferenceProvider
 	@Inject Provider<XtextResourceSet> resourceSetProvider
@@ -38,12 +39,20 @@ class YangPathProvider {
 		]
 		val prefs = preferenceProvider.getPreferenceValues(resource)
 		val yangpath = prefs.getPreference(YANG_PATH)
+		val yangignorepath = prefs.getPreference(YANG_PATH_IGNORE)
+		val List<File> yangignoredpaths = newArrayList
+		if (!yangignorepath.isNullOrEmpty) {
+			Splitter.on(File.pathSeparator).split(yangpath).forEach [
+				val file = new File(it)
+				yangignoredpaths += file
+			]
+		}
 		val resourceDescriptions = newArrayList
 		if (!yangpath.isNullOrEmpty) {
 			val resourceSet = resourceSetProvider.get();
 			Splitter.on(File.pathSeparator).split(yangpath).forEach [
 				val file = new File(it)
-				file.process(resourceSet)
+				file.process(resourceSet, yangignoredpaths)
 			]
 			resourceSet.resources.forEach [
 				try {
@@ -57,15 +66,11 @@ class YangPathProvider {
 		return resourceDescriptions
 	}
 
-	private def void process(File file, ResourceSet resourceSet) {
+	private def void process(File file, ResourceSet resourceSet, List<File> ignoredFiles) {
 		try {
-			if (!file.canRead)
+			if (!file.canRead) {
 				return
-			else if (file.isDirectory)
-				file.listFiles.forEach[process(resourceSet)]
-			else if (file.name.endsWith('.yang'))
-				resourceSet.getResource(URI.createFileURI(file.absolutePath), true)
-			else if (file.name.endsWith('.zip')) {
+			} else if (!file.isDirectory && file.name.endsWith('.zip')) {
 				val zipFile = new ZipFile(file)
 				val entries = zipFile.entries
 				val zipFileUri = URI.createFileURI(file.absolutePath).toString
@@ -77,9 +82,20 @@ class YangPathProvider {
 						resource.load(zipFile.getInputStream(entry), null)
 					}
 				}
+			} else {
+				for (ignoredfile : ignoredFiles) {
+					if (file.absolutePath == ignoredfile.absolutePath) {
+						return
+					}
+				}
+				if (file.isDirectory) {
+					file.listFiles.forEach[process(resourceSet, ignoredFiles)]
+				} else if (file.name.endsWith('.yang')) {
+					resourceSet.getResource(URI.createFileURI(file.absolutePath), true)
+				}
 			}
-			} catch (Throwable e) {
-				LOG.error('Error loading yangPath resource ' + URI.toString, e)
-			}
+		} catch (Throwable e) {
+			LOG.error('Error loading yangPath resource ' + URI.toString, e)
+		}
 	}
 }

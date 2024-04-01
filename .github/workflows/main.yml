@@ -9,6 +9,16 @@ on:
       - master
 
 jobs:
+  mdlint:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v4
+    - uses: DavidAnson/markdownlint-cli2-action@v15
+      with:
+        globs: |
+          **/*.md
+          !build/**/*.md
+          !bin/**/*.md
   build:
     runs-on: ubuntu-latest
     steps:
