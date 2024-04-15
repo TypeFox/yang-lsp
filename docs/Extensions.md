@@ -1,7 +1,8 @@
 # Extensions
 
-The yang-lsp allows to have additional third party extensions, configured through `yang.settings`.
-For details on file format and schema see [Settings.md](./Settings.md).
+The yang-lsp allows to have additional third party extensions, configured
+through `yang.settings`. For details on file format and schema see
+[Settings.md](./Settings.md).
 
 So far two different kinds of extensions are supported :
 
@@ -10,7 +11,9 @@ So far two different kinds of extensions are supported :
 
 ## Create a Validator
 
-A validator extension is a Java class that implements the interface `io.typefox.yang.validation.IValidatorExtension`.
+A validator extension is a Java class that implements the interface
+`io.typefox.yang.validation.IValidatorExtension`.
+
 Here is a small example:
 
 ```java
@@ -50,7 +53,7 @@ class MyCommand implements ICommandExtension {
      * return a list of commands. A command string is used as ID internally and as a label in the UI.
      */
     override getCommands() {
-      #[COMMAND]
+        #[COMMAND]
     }
 
     /**

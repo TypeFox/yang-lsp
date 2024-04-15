@@ -9,5 +9,6 @@
       ],
       "url": "./schema/yang-lsp-settings-schema.json"
     }
-  ]
+  ],
+  "markdownlint.ignore": ".gitignore"
 }

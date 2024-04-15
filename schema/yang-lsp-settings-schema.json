@@ -16,11 +16,18 @@
     },
     "excludePath": {
       "description": "The path elements are project relative directory names.\nYou can specify multiple elements separated with a colon ':'.\nThe file separator is always '/' independent from the OS",
-      "type": "string"
+      "type": "string",
+      "default": ""
     },
     "yangPath": {
       "description": "You can specify individual files, directories (contents will be added recursively) or ZIP files.\nThe file name format is OS specific, and so is the path separator (';' on Windows, ':' elsewhere).",
-      "type": "string"
+      "type": "string",
+      "default": ""
+    },
+    "yangPathIgnore": {
+      "description": "You can specify individual files or directories to be ignored from `yangPath`.\nThe file name format is OS specific, and so is the path separator (';' on Windows, ':' elsewhere).",
+      "type": "string",
+      "default": ""
     },
     "extension": {
       "description": "YANG LSP extension settings",

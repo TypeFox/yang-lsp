@@ -1,8 +1,13 @@
 # Processing YANG files
 
-As yang-lsp contains all the tools to parse, link and validate YANG models. If you want to further process the YANG files you authored with yang-lsp it makes sense to make reuse of the existing functionality.
+As yang-lsp contains all the tools to parse, link and validate YANG models. If
+you want to further process the YANG files you authored with yang-lsp it makes
+sense to make reuse of the existing functionality.
 
-Here is some example code in Xtend for an application that reads in all YANG files from a given directory. The files are parsed into our YANG EMF model, all cross-references are resolved and all files are validated. If there are no errors, the method `generate()` is called for all resources:
+Here is some example code in Xtend for an application that reads in all YANG
+files from a given directory. The files are parsed into our YANG EMF model, all
+cross-references are resolved and all files are validated. If there are no
+errors, the method `generate()` is called for all resources:
 
 ```xtend
 package io.typefox.yang.example
@@ -66,7 +71,7 @@ class StandaloneExample {
 }
 ```
 
-A number of useful helper methods can be found in the [utils package](https://github.com/TypeFox/yang-lsp/tree/master/yang-lsp/io.typefox.yang/src/main/java/io/typefox/yang/utils)
+A number of useful helper methods can be found in the [utils package][1]
 
 Here is sample `build.gradle` to build the above class:
 
@@ -98,3 +103,5 @@ dependencies {
     compile 'com.google.inject:guice:3.0'
 }
 ```
+
+[1]: https://github.com/TypeFox/yang-lsp/tree/master/yang-lsp/io.typefox.yang/src/main/java/io/typefox/yang/utils

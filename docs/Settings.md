@@ -1,17 +1,18 @@
 # Settings
 
-The yang-lsp allows users to configure various settings, through settings files.
+The yang-lsp allows users to configure various settings, through setting files.
 The settings file has the name `yang.settings` and can be located
 
 - at the root of a project
 - in the user's directory under `~/.yang/yang.settings`.
 
 The file syntax is a [JSON with Comments][1], and its [JSON Schema][2] can be
-found [here](../schema/yang-lsp-settings-schema.json).
+found [here][3].
 
 ## Disable Code Lens
 
-If you don't want to see the code lenses you can turn it of with the following property:
+If you don't want to see the code lenses you can turn it of with the following
+property:
 
 ```json
 {
@@ -21,7 +22,10 @@ If you don't want to see the code lenses you can turn it of with the following p
 
 ## Excluded Paths
 
-Many IDEs and tools copy YANG files into another folder within the same project. As the YANG LSP treats all files within a project the same, this usually infers issues about duplicate elements. To avoid that, you can exclude several directories in the project setting `excludePath`, e.g.
+Many IDEs and tools copy YANG files into another folder within the same
+project. As the YANG LSP treats all files within a project the same, this
+usually informs issues about duplicate elements. To avoid that, you can exclude
+several directories in the project setting `excludePath`, e.g.
 
 ```json
 {
@@ -29,11 +33,16 @@ Many IDEs and tools copy YANG files into another folder within the same project.
 }
 ```
 
-exludes the default output folder of Maven/Gradle and Eclipse JDT. The path elements are project relative directory names. You can specify multiple elements separated with a colon. The file separator is always `/` independent from the OS.
+exludes the default output folder of Maven/Gradle and Eclipse JDT. The path
+elements are project relative directory names. You can specify multiple elements
+separated with a colon. The file separator is always `/` independent from the
+OS.
 
 ## YANG Libraries
 
-Often you don't specify a self contained set of YANG models but rely on existing standard libs instead, e.g. from the IETF. Thes don't necessarily reside in your workspace. To specify such libraries, use `yangPath`
+Often you don't specify a self contained set of YANG models but rely on existing
+standard libs instead, e.g. from the IETF. These don't necessarily reside in
+your workspace. To specify such libraries, use `yangPath`
 
 ```json
 {
@@ -41,21 +50,36 @@ Often you don't specify a self contained set of YANG models but rely on existing
 }
 ```
 
-You can specify individual files, directories (contents will be added recursively) or ZIP files. The file name format is OS specific, and so is the path separator (`;` on Windows, `:` elsewhere).
+If `yangPath` is provided to refer to an SDK location which includes a version
+of the project's YANG models that need to be ignored, following approach can be
+used.
+
+```json
+{
+  "yangPath": "/path/to/sdk/yang/dir",
+  "yangPathIgnore": "/path/to/sdk/yang/dir/project"
+}
+```
+
+You can specify individual files, directories (contents will be added
+recursively) or ZIP files. The file name format is OS specific, and so is the
+path separator (`;` on Windows, `:` elsewhere).
 
 ## Extensions
 
-The settings is used to register an extension. Please find the details [here](Extensions.md).
+The settings is used to register an extension. Please find the details [here][4].
 
 ## Diagnostics
 
-The user can change the severity of diagnostics, by setting the value of a diagnostic preference key to either
+The user can change the severity of diagnostics, by setting the value of a
+diagnostic preference key to either
 
 - `"error"`
 - `"warning"`
 - `"ignore"`
 
-The settings contains a `diagnostics` section in which the serverioties for the below diagnostics can be adjusted.
+The settings contains a `diagnostics` section in which the serverioties for the
+below diagnostics can be adjusted.
 An example :
 
 ```json
@@ -66,23 +90,26 @@ An example :
 }
 ```
 
-### Diagnostic Codes
+### Diagnostic Issue Codes
 
 #### `substatement-cardinality`
 
-Issue code that are entangled with cardinality problems of container statement's sub-statements.
+Issue code that are entangled with cardinality problems of container statement's
+sub-statements.
 
  (default severity: error)
 
 #### `unexpected-statement`
 
-Issue code indicating an invalid sub-statement inside its parent statement container.
+Issue code indicating an invalid sub-statement inside its parent statement
+container.
 
  (default severity: error)
 
 #### `substatement-ordering`
 
-Issue code for cases when a sub-statement incorrectly precedes another sub-statement.
+Issue code for cases when a sub-statement incorrectly precedes another
+sub-statement.
 
  (default severity: error)
 
@@ -94,7 +121,8 @@ Issue code that is used when a module has anything but {@code '1.1'} version.
 
 #### `type-error`
 
-Errors for types. Such as invalid type restriction, range error, fraction-digits issue.
+Errors for types. Such as invalid type restriction, range error, fraction-digits
+issue.
 
  (default severity: error)
 
@@ -110,7 +138,8 @@ A duplicate local name.
 
 #### `missing-revision`
 
-Diagnostic that indicates a module is available in multiple revisions when no revision is provided on an import.
+Diagnostic that indicates a module is available in multiple revisions when no
+revision is provided on an import.
 
  (default severity: warning)
 
@@ -140,26 +169,30 @@ Issue code when the revision date does not conform the "YYYY-MM-DD" format.
 
 #### `revision-order`
 
-Issue code that applies on a revision if that is not in a reverse chronological order.
+Issue code that applies on a revision if that is not in a reverse chronological
+order.
 
  (default severity: warning)
 
 #### `bad-type-name`
 
-Issue code when the name of a type does not conform with the existing constraints.
-For instance; the name contains any invalid characters, or equals to any YANG built-in type name.
+Issue code when the name of a type does not conform with the existing
+constraints. For instance, the name contains any invalid characters, or equals
+to any YANG built-in type name.
 
  (default severity: error)
 
 #### `bad-include-yang-version`
 
-Issue code when there is an inconsistency between a module's version and the version of the included modules.
+Issues code when there is an inconsistency between a module's version and the
+version of the included modules.
 
  (fixed severity: error)
 
 #### `bad-import-yang-version`
 
-Issue code when there is an inconsistency between a module's version and the version of the included modules.
+Issues code when there is an inconsistency between a module's version and the
+version of the included modules.
 
  (fixed severity: error)
 
@@ -177,13 +210,15 @@ Issue code indicating that all assigned values in an enumerable must be unique.
 
 #### `enumerable-restriction-name`
 
-Issue code indicating that an enumerable introduces a new name that is not declared among the parent restriction.
+Issue code indicating that an enumerable introduces a new name that is not
+declared among the parent restriction.
 
  (default severity: error)
 
 #### `enumerable-restriction-value`
 
-Issue code indicating that an enumerable introduces a new value that is not declared among the parent restriction.
+Issue code indicating that an enumerable introduces a new value that is not
+declared among the parent restriction.
 
  (default severity: error)
 
@@ -207,44 +242,51 @@ Controls the indentation string when formatting or serializing yang files.
 
 #### `invalid-config`
 
-Issue code when a `config=true` is a child of a `config=false` (see <https://tools.ietf.org/html/rfc7950#section-7.21.1>)
+Issue code when a `config=true` is a child of a `config=false`
+(see <https://tools.ietf.org/html/rfc7950#section-7.21.1>)
 
  (default severity: error)
 
 #### `invalid-augmentation`
 
-Issue code when an augmented node declares invalid sub-statements. For instance when an augmented leaf node has leaf nodes.
+Issue code when an augmented node declares invalid sub-statements. For instance,
+when an augmented leaf node has leaf nodes.
 
  (default severity: error)
 
 #### `invalid-default`
 
-Issue code for cases when the a choice has default value and the mandatory sub-statement is "true".
+Issue code for cases when the a choice has default value and the mandatory
+sub-statement is "true".
 
  (default severity: error)
 
 #### `mandatory-after-default-case`
 
-Issue code when any mandatory nodes are declared after the default case in a "choice".
+Issue code when any mandatory nodes are declared after the default case in a
+"choice".
 
  (default severity: error)
 
 #### `invalid-action-ancestor`
 
-Issue code when an action (or notification) has a "list" ancestor node without a "key" statement.
-Also applies, when an action (or notification) is declared within another action, rpc or notification.
+Issue code when an action (or notification) has a "list" ancestor node without a
+"key" statement. Also applies, when an action (or notification) is declared
+within another action, rpc or notification.
 
  (default severity: error)
 
 #### `identity-cycle`
 
-Issue code when an identity references itself, either directly or indirectly through a chain of other identities.
+Issue code when an identity references itself, either directly or indirectly
+through a chain of other identities.
 
  (default severity: error)
 
 #### `leaf-key-with-if-feature`
 
-This issue code is used when a leaf node is declared as a list key and have any "if-feature" statements.
+This issue code is used when a leaf node is declared as a list key and have any
+"if-feature" statements.
 
  (default severity: error)
 
@@ -280,3 +322,5 @@ Diagnostic for unresolvable Xpath expressions.
 
 [1]: https://code.visualstudio.com/docs/languages/json#_json-with-comments
 [2]: https://json-schema.org/
+[3]: ../schema/yang-lsp-settings-schema.json
+[4]: ./Extensions.md
