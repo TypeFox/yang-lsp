@@ -91,8 +91,8 @@ configuration:
 ```json
   "extension" : {
     "classpath" : "extension.jar",
-    "validators" : "my.pack.MyExampleValidator",
-    "commands" : "my.pack.MyCommand"
+    "validators" : "my.pack.MyExampleValidator:my.pack.MyYetAnotherExampleValidator",
+    "commands" : "my.pack.MyCommand:my.pack.MyOtherCommand"
   }
 ```
 

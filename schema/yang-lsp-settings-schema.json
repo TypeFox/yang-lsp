@@ -39,13 +39,13 @@
           "pattern": "\\.jar$"
         },
         "validators": {
-          "description": "IValidatorExtension implementor class e.g., 'my.pack.MyExampleValidator'",
-          "markdownDescription": "`IValidatorExtension` implementor class e.g., `my.pack.MyExampleValidator`",
+          "description": "IValidatorExtension implementor classes e.g., 'my.pack.MyExampleValidator'.\nYou can specify multiple elements separated with a colon ':'",
+          "markdownDescription": "`IValidatorExtension` implementor classes e.g., `my.pack.MyExampleValidator`.\nYou can specify multiple elements separated with a colon ':'",
           "type": "string"
         },
         "commands": {
-          "description": "ICommandExtension implementor class e.g., 'my.pack.MyExampleCommand'",
-          "markdownDescription": "`ICommandExtension` implementor class e.g., `my.pack.MyExampleCommand`",
+          "description": "ICommandExtension implementor classes e.g., 'my.pack.MyExampleCommand'.\nYou can specify multiple elements separated with a colon ':'",
+          "markdownDescription": "`ICommandExtension` implementor class e.g., `my.pack.MyExampleCommand`.\nYou can specify multiple elements separated with a colon ':'",
           "type": "string"
         }
       },
@@ -255,8 +255,7 @@
           "$ref": "#/properties/diagnostic/$defs/severity",
           "default": "ignore"
         }
-      },
-      "additionalProperties": false
+      }
     }
   },
   "additionalProperties": false
