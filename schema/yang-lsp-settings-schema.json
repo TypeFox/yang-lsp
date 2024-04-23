@@ -34,9 +34,8 @@
       "type": "object",
       "properties": {
         "classpath": {
-          "description": "Location of extension jar relative to the project's root directory",
-          "type": "string",
-          "pattern": "\\.jar$"
+          "description": "Location of extension jar relative to the project's root directory.\nIt may also be a path to a directory.\nYou can specify multiple elements separated with a colon ':'",
+          "type": "string"
         },
         "validators": {
           "description": "IValidatorExtension implementor classes e.g., 'my.pack.MyExampleValidator'.\nYou can specify multiple elements separated with a colon ':'",

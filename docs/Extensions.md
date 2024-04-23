@@ -86,11 +86,12 @@ project's root directory.
 ## Add the plugin
 
 Create (or open) the `yang.settings` file and add the plugin using the following
-configuration:
+configuration. Other classpaths, validator and commands classes can be provided
+as well.
 
 ```json
   "extension" : {
-    "classpath" : "extension.jar",
+    "classpath" : "extension.jar:./second-extension.jar:./local-classdir/.",
     "validators" : "my.pack.MyExampleValidator:my.pack.MyYetAnotherExampleValidator",
     "commands" : "my.pack.MyCommand:my.pack.MyOtherCommand"
   }
