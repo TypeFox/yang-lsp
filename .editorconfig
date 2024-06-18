@@ -32,3 +32,7 @@ indent_size = 2
 [{*.xtext,*.xtend,*.java}]
 indent_style = tab
 indent_size = 4
+
+[JenkinsFile]
+indent_style = space
+indent_size = 4
