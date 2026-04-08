@@ -40,13 +40,44 @@ class YangValueConverterService extends AbstractDeclarativeValueConverterService
 				if (!n.hidden) {
 					val seg = n.text
 					if (isQuoted(seg)) {
-						result.append(seg.substring(1, seg.length-1))
+						val inner = seg.substring(1, seg.length-1)
+						if (seg.startsWith("\"")) {
+							result.append(unescapeYangDoubleQuoted(inner))
+						} else {
+							result.append(inner)
+						}
 					} else {
 						result.append(seg)
 					}
 				}
 			}
 			return result.toString
+		}
+		
+		/**
+		 * Process YANG double-quoted string escape sequences per RFC 7950 Section 6.1.3.
+		 */
+		def static String unescapeYangDoubleQuoted(String s) {
+			val bsIndex = s.indexOf('\\')
+			if (bsIndex < 0) return s
+			val sb = new StringBuilder(s.length)
+			sb.append(s, 0, bsIndex)
+			var i = bsIndex
+			while (i < s.length) {
+				val c = s.charAt(i)
+				if (c === 0x5C && i + 1 < s.length) {
+					val next = s.charAt(i + 1)
+					if (next === 0x6E) { sb.append('\n'); i += 2 }
+					else if (next === 0x74) { sb.append('\t'); i += 2 }
+					else if (next === 0x22) { sb.append('"'); i += 2 }
+					else if (next === 0x5C) { sb.append('\\'); i += 2 }
+					else { sb.append(c); i++ }
+				} else {
+					sb.append(c)
+					i++
+				}
+			}
+			return sb.toString
 		}
 		
 		def static boolean isQuoted(String text) {

@@ -46,6 +46,26 @@ class RegexpTest extends AbstractYangTest {
 		assertNoErrors(foo.allContents.filter(Pattern).head, TYPE_ERROR)
 	}
 	
+	@Test def void testIssue239() {
+		val foo = load('''
+			module foo {
+			    yang-version 1.1;
+			    namespace urn:ietf:params:xml:ns:yang:foo;
+			    prefix foo;
+			
+			    	typedef foo {
+					type string  {
+						pattern "[a-zA-Z0-9!$%\\^()\\[\\]_\\-~{}.+]*";
+					}
+				}
+			}
+		''')
+		val p = foo.allContents.filter(Pattern).head
+		System.out.println("Issue 239 regexp value: [" + p.regexp + "]")
+		validator.validate(foo)
+		assertNoErrors(p, TYPE_ERROR)
+	}
+	
 	@Test def void testIllegalPattern_0() {
 		val foo = load('''
 			module foo {

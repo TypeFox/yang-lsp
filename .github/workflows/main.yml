@@ -22,9 +22,9 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v4
     - name: Set up JDK
-      uses: actions/setup-java@v3
+      uses: actions/setup-java@v4
       with:
         java-version: 11
         distribution: adopt
@@ -53,19 +53,19 @@ jobs:
       with:
         files: yang-lsp/**/test-results/**/*.xml
     - name: Archive yang-language-server
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: yang-language-server_${{ env.PROJECT_VERSION }}
         path: |
           yang-lsp/build/yang-language-server_[0-9]*.zip
     - name: Archive yang-language-server_diagram-extension
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: yang-language-server_diagram-extension_${{ env.PROJECT_VERSION }}
         path: |
           yang-lsp/build/yang-language-server_diagram-extension*.zip
     - name: Archive yang-tool_cli
-      uses: actions/upload-artifact@v3
+      uses: actions/upload-artifact@v4
       with:
         name: yang-tool_cli_${{ env.PROJECT_VERSION }}
         path: |
