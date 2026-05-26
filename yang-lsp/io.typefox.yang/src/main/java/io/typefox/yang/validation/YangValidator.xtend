@@ -402,7 +402,7 @@ class YangValidator extends AbstractYangValidator {
 			val expectedElements = maxElements.parseIntSafe;
 			if (expectedElements === null || expectedElements.intValue < 1) {
 				val message = '''The value of the "max-elements" must be a positive integer or the string "unbounded".''';
-				error(message, it, MIN_ELEMENTS__MIN_ELEMENTS, TYPE_ERROR);
+				error(message, it, MAX_ELEMENTS__MAX_ELEMENTS, TYPE_ERROR);
 			}
 		}
 	}
