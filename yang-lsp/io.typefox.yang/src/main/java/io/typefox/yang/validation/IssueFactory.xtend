@@ -12,13 +12,20 @@ class IssueFactory {
 	
 	static def Issue createIssue(EObject obj, EStructuralFeature feature, Severity severity, String message, String code) {
 		val nodes = NodeModelUtils.findNodesForFeature(obj, feature)
-		val lineAndOffset = NodeModelUtils.getLineAndColumn(nodes.head, nodes.head.offset)
+		val node = nodes.head
+		val startOffset = node.offset
+		val totalLength = nodes.map[length].reduce[p1, p2| p1 + p2]
+		val lineAndColumn = NodeModelUtils.getLineAndColumn(node, startOffset)
+		val endLineAndColumn = NodeModelUtils.getLineAndColumn(node, startOffset + totalLength)
 		val result = new IssueImpl
 		result.message = message
 		result.code = code
-		result.lineNumber = lineAndOffset.line
-		result.column = lineAndOffset.column
-		result.length = nodes.map[length].reduce[p1, p2| p1 + p2]
+		result.offset = startOffset
+		result.length = totalLength
+		result.lineNumber = lineAndColumn.line
+		result.column = lineAndColumn.column
+		result.lineNumberEnd = endLineAndColumn.line
+		result.columnEnd = endLineAndColumn.column
 		result.severity = severity
 		result.uriToProblem = EcoreUtil.getURI(obj)
 		return result
