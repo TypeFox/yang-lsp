@@ -11,14 +11,51 @@ found [here][3].
 
 ## Disable Code Lens
 
-If you don't want to see the code lenses you can turn it of with the following
+If you don't want to see the code lenses you can turn it off with the following
 property:
 
 ```json
 {
-  "code-lens-enabled" : "off"
+  "code-lenses" : "off"
 }
 ```
+
+## Feature Toggles
+
+Individual language server features can be enabled or disabled. All features
+default to `"on"`.
+
+```json
+{
+  "code-lenses": "off",
+  "semantic-tokens": "off",
+  "validation": "off",
+  "formatting": "off",
+  "code-actions": "off",
+  "completion": "off",
+  "hover": "off",
+  "definition": "off",
+  "references": "off",
+  "document-symbols": "off",
+  "document-highlight": "off",
+  "rename": "off"
+}
+```
+
+| Setting | Description |
+|---|---|
+| `code-lenses` | Code lens references |
+| `semantic-tokens` | Semantic token highlighting |
+| `validation` | Validation diagnostics |
+| `formatting` | Document formatting |
+| `code-actions` | Code actions (quick fixes) |
+| `completion` | Auto-completion |
+| `hover` | Hover information |
+| `definition` | Go to definition |
+| `references` | Find references |
+| `document-symbols` | Document symbols (outline) |
+| `document-highlight` | Highlight occurrences |
+| `rename` | Symbol renaming |
 
 ## Excluded Paths
 

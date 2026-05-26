@@ -6,8 +6,96 @@
   "markdownDescription": "See [documentation](https://github.com/TypeFox/yang-lsp/blob/master/docs/Settings.md)",
   "type": "object",
   "properties": {
-    "code-lens-enabled": {
-      "description": "If you don't want to see the code lenses you can turn it off.",
+    "code-lenses": {
+      "description": "Enable or disable code lens references.",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "default": "on"
+    },
+    "semantic-tokens": {
+      "description": "Enable or disable semantic token highlighting.",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "default": "on"
+    },
+    "validation": {
+      "description": "Enable or disable YANG validation diagnostics.",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "default": "on"
+    },
+    "formatting": {
+      "description": "Enable or disable document formatting.",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "default": "on"
+    },
+    "code-actions": {
+      "description": "Enable or disable code actions (quick fixes).",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "default": "on"
+    },
+    "completion": {
+      "description": "Enable or disable auto-completion.",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "default": "on"
+    },
+    "hover": {
+      "description": "Enable or disable hover information.",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "default": "on"
+    },
+    "references": {
+      "description": "Enable or disable find references.",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "default": "on"
+    },
+    "document-symbols": {
+      "description": "Enable or disable document symbols (outline).",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "default": "on"
+    },
+    "rename": {
+      "description": "Enable or disable symbol renaming.",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "default": "on"
+    },
+    "definition": {
+      "description": "Enable or disable go to definition.",
+      "enum": [
+        "off",
+        "on"
+      ],
+      "default": "on"
+    },
+    "document-highlight": {
+      "description": "Enable or disable document highlight (highlight occurrences).",
       "enum": [
         "off",
         "on"
